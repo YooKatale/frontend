@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:yookatale/views/account.dart';
 import 'package:yookatale/views/cart.dart';
 import 'package:yookatale/views/home.dart';
@@ -12,6 +15,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  ByteData data = await PlatformAssetBundle().load('assets/ca/lets-encrypt-r3.pem');
+  SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
   runApp(const MyApp());
 }
 
@@ -61,20 +67,20 @@ class _YookataleBaseState extends State<YookataleBase> {
       body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false,
-          selectedItemColor: Colors.black,
+          selectedItemColor: Colors.green.shade900,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
           items: const [
             BottomNavigationBarItem(
-                backgroundColor: Colors.black54,
+                backgroundColor: Colors.lightGreen,
                 icon: Icon(Icons.home_outlined),
                 label: "Home"),
             BottomNavigationBarItem(
-                backgroundColor: Colors.black54,
+                backgroundColor: Colors.lightGreen,
                 icon: Icon(Icons.window),
                 label: "Categories"),
             BottomNavigationBarItem(
-                backgroundColor: Colors.black54,
+                backgroundColor: Colors.lightGreen,
                 icon: Stack(
                   children: [
                     Icon(Icons.shopping_cart_outlined),
@@ -89,7 +95,7 @@ class _YookataleBaseState extends State<YookataleBase> {
                 ),
                 label: "Cart"),
             BottomNavigationBarItem(
-                backgroundColor: Colors.black54,
+                backgroundColor: Colors.lightGreen,
                 icon: Icon(Icons.people_alt_outlined),
                 label: "Account"),
           ]),

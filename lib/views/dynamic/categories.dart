@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../static/categoryproduct.dart';
+
 class CategoriesPageDynamic extends StatelessWidget {
   const CategoriesPageDynamic({super.key});
 
@@ -11,8 +13,8 @@ class CategoriesPageDynamic extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: const Text("Categories"),
+        backgroundColor: Colors.lightGreen,
+        title: const Text("Categories",style:TextStyle(color: Colors.white),),
       ),
       body: StreamBuilder(
           stream: categories.snapshots(),
@@ -29,24 +31,36 @@ class CategoriesPageDynamic extends StatelessWidget {
                   itemBuilder: (BuildContext context, int index) {
                     final data =
                         documents[index].data() as Map<String, dynamic>;
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        side: const BorderSide(color: Colors.red),
-                      ),
-                      color: Color.fromRGBO(
-                          data['red'], data['green'], data['blue'], 1),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                              height: 150,
-                              child: Image.network(data['imageUrl'])),
-                          Text(
-                            data['name'],
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                        ],
+                    return InkWell(
+                      onTap: (){
+
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: ((context) => CategoryProduct(
+
+                                  name:data['name'],
+                                ))));
+                      },
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          side: const BorderSide(color: Colors.red),
+                        ),
+                        color: Color.fromRGBO(
+                            data['red'], data['green'], data['blue'], 1),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                                height: 146,
+                                child: Image.network(data['imageUrl'])),
+                            Text(
+                              data['name'],
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   });
