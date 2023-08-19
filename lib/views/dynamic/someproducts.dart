@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../product_categoryjson/productjson.dart';
 import '../static/productdetails.dart';
 
 class SomeProducts extends StatefulWidget {
@@ -75,45 +77,42 @@ class _SomeProductsState extends State<SomeProducts> {
   }
 
 
+  List itemsTemp = [];
+  int itemLength = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      itemsTemp = pro_json ;
+      itemLength = pro_json.length;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return  Padding(
       padding: const EdgeInsets.all(8.0),
-      child:StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collectionGroup('products')
-              .snapshots(),
-          builder: (BuildContext context,
-              AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-
-              return const CircularProgressIndicator();
-
-
-            } else if (snapshot.hasData) {
-              List<QueryDocumentSnapshot> documents =
-                  snapshot.data!.docs;
-              return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const ClampingScrollPhysics(),
-                  itemCount: documents.length,
-                  gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 7,
-                      mainAxisSpacing: 7),
-                  itemBuilder: (BuildContext context, int index) {
-                    final data =
-                    documents[index].data() as Map<String, dynamic>;
+      child:GridView.builder(
+          shrinkWrap: true,
+          physics: const ClampingScrollPhysics(),
+          itemCount:itemLength,
+          gridDelegate:
+          const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 7,
+              mainAxisSpacing: 7),
+          itemBuilder: (BuildContext context, int index) {
 
 
-                    return InkWell(
-                      onTap: (){
+            return InkWell(
+              onTap: (){
 
-                        Navigator.push(context, MaterialPageRoute(builder:(context)=> ProductDetails(
-                            im:data['imageUrl'],nem:data['name'],price:data['price'].toString(),
-                            cross:data['crossedPrice'].toString()!!,unit:data['unit'].toString(),wei:data['weight'].toString()
-                        )));
+
+                Navigator.push(context, MaterialPageRoute(builder:(context)=> ProductDetails(
+                    im:itemsTemp[index]['img'],nem:itemsTemp[index]['name'],price:itemsTemp[index]['price'].toString(),
+                    cross:itemsTemp[index]['crossedPrice'].toString()!!,unit:itemsTemp[index]['unit'].toString(),wei:itemsTemp[index]['Weight'].toString()
+                )));
                       },
                       child:Card(
                         color: const Color.fromRGBO(243, 253, 254, 1),
@@ -122,8 +121,8 @@ class _SomeProductsState extends State<SomeProducts> {
                               left: 2.0, right: 2.0),
                           child: Column(
                             children: [
-                              Image.network(
-                                data["imageUrl"],
+                              CachedNetworkImage(
+                                imageUrl:'${itemsTemp[index]['img']}',
                                 width: double.infinity,
                                 height: 50,
                                 fit: BoxFit.contain,
@@ -136,7 +135,7 @@ class _SomeProductsState extends State<SomeProducts> {
                                     padding:
                                     const EdgeInsets.only(left: 8.0),
                                     child: Text(
-                                      data["name"],
+                                      itemsTemp[index]["name"],
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold),
@@ -145,83 +144,79 @@ class _SomeProductsState extends State<SomeProducts> {
                                   InkWell(
                                       onTap: (){
 
-                                        save();
-                                      },
-                                      child: const Icon(Icons.favorite_outline,color: Colors.red,)
-                                  ),
-                                ],
+                                save();
+                              },
+                              child: const Icon(Icons.favorite_outline,color: Colors.red,)
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                "\$${itemsTemp[index]['price'].toStringAsFixed(2)}",
+                                style: const TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 18),
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "\$${data['price'].toStringAsFixed(2)}",
-                                        style: const TextStyle(
-                                            color: Colors.green,
-                                            fontSize: 18),
-                                      ),
-                                      if (data['crossedPrice'] !=
-                                          null) ...[
-                                        Padding(
-                                          padding:
-                                          const EdgeInsets.only(
-                                              left: 3.0),
-                                          child: Text(
-                                            "\$${data['crossedPrice'].toStringAsFixed(2)}",
-                                            style: const TextStyle(
-                                                decoration:
-                                                TextDecoration
-                                                    .lineThrough),
-                                          ),
-                                        ),
-                                      ],
-                                    ],
+                              if (itemsTemp[index]['crossedPrice'] !=
+                                  null) ...[
+                                Padding(
+                                  padding:
+                                  const EdgeInsets.only(
+                                      left: 3.0),
+                                  child: Text(
+                                    "\$${itemsTemp[index]['crossedPrice'].toStringAsFixed(2)}",
+                                    style: const TextStyle(
+                                        decoration:
+                                        TextDecoration
+                                            .lineThrough),
                                   ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        data["unit"],
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight:
-                                            FontWeight.bold),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 4.0, right: 8.0),
-                                        child: Text(
-                                          "${data['weight']}",
-                                          style: const TextStyle(
-                                              fontSize: 16),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                ),
+                              ],
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                itemsTemp[index]["unit"],
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight:
+                                    FontWeight.bold),
                               ),
-                              TextButton(
-                                onPressed: () {
-
-                                  cart();
-                                },
-                                child: const Text(
-                                  "Add to cart",
-                                  style: TextStyle(
-                                      color: Colors.black, fontSize: 18),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 4.0, right: 8.0),
+                                child: Text(
+                                  "${itemsTemp[index]['Weight']}",
+                                  style: const TextStyle(
+                                      fontSize: 16),
                                 ),
                               ),
                             ],
                           ),
+                        ],
+                      ),
+                      TextButton(
+                        onPressed: () {
+
+                          cart();
+                        },
+                        child: const Text(
+                          "Add to cart",
+                          style: TextStyle(
+                              color: Colors.black, fontSize: 18),
                         ),
                       ),
-                    );
-                  });
-            }
-            // if snapshot.hasError
-            return const Text('Something went wrong');
+                    ],
+                  ),
+                ),
+              ),
+            );
           }),
     );
   }

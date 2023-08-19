@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "1062407257024",
-    "project_id": "yookatale-a171d",
-    "storage_bucket": "yookatale-a171d.appspot.com"
+    "project_number": "1085598173623",
+    "project_id": "yokatale-70625",
+    "storage_bucket": "yokatale-70625.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1062407257024:android:346516cdd216fa599be625",
+        "mobilesdk_app_id": "1:1085598173623:android:b48ca06dda7e89ca774032",
         "android_client_info": {
           "package_name": "com.example.yookatale"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1062407257024-gjgc5ksaloq3enjahmtvsh36knaluokm.apps.googleusercontent.com",
+          "client_id": "1085598173623-8afkh7tp7m0lo25q5rel1m2oiq8mcmls.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCA9OkIjaFEIYYRQ-3mBF4INp3I09EXvS0"
+          "current_key": "AIzaSyCi0tTkiPDleVC-3a50L6bGktzyzbFyKBU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1062407257024-gjgc5ksaloq3enjahmtvsh36knaluokm.apps.googleusercontent.com",
+              "client_id": "1085598173623-8afkh7tp7m0lo25q5rel1m2oiq8mcmls.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -17,24 +17,15 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -52,11 +43,40 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyC8pPNA-l4WFKXelM3TxuGJqp-ByPE3M4s',
+    appId: '1:1085598173623:web:ccbf96b1ba6bca2a774032',
+    messagingSenderId: '1085598173623',
+    projectId: 'yokatale-70625',
+    authDomain: 'yokatale-70625.firebaseapp.com',
+    storageBucket: 'yokatale-70625.appspot.com',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCA9OkIjaFEIYYRQ-3mBF4INp3I09EXvS0',
-    appId: '1:1062407257024:android:346516cdd216fa599be625',
-    messagingSenderId: '1062407257024',
-    projectId: 'yookatale-a171d',
-    storageBucket: 'yookatale-a171d.appspot.com',
+    apiKey: 'AIzaSyCi0tTkiPDleVC-3a50L6bGktzyzbFyKBU',
+    appId: '1:1085598173623:android:b48ca06dda7e89ca774032',
+    messagingSenderId: '1085598173623',
+    projectId: 'yokatale-70625',
+    storageBucket: 'yokatale-70625.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyAy-6b3RBDw8cOsaauQUQlt5YrIlk9Sbn0',
+    appId: '1:1085598173623:ios:19e00ea9003d3909774032',
+    messagingSenderId: '1085598173623',
+    projectId: 'yokatale-70625',
+    storageBucket: 'yokatale-70625.appspot.com',
+    iosClientId: '1085598173623-4gfc1snepuk60thsuqonrlufg1dlfhk9.apps.googleusercontent.com',
+    iosBundleId: 'com.example.yookatale',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyAy-6b3RBDw8cOsaauQUQlt5YrIlk9Sbn0',
+    appId: '1:1085598173623:ios:8ef335d110d5076c774032',
+    messagingSenderId: '1085598173623',
+    projectId: 'yokatale-70625',
+    storageBucket: 'yokatale-70625.appspot.com',
+    iosClientId: '1085598173623-8qnq7colp5ag7k9bpjflss0bj46lv1ec.apps.googleusercontent.com',
+    iosBundleId: 'com.example.yookatale.RunnerTests',
   );
 }

@@ -1,13 +1,18 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:yookatale/views/account.dart';
 import 'package:yookatale/views/cart.dart';
 import 'package:yookatale/views/home.dart';
+import 'package:yookatale/views/login/login.dart';
+import 'package:yookatale/views/login/register.dart';
+import 'package:yookatale/views/splashscreen/splash.dart';
 
 import 'firebase_options.dart';
+import 'gradient/dashboard.dart';
 import 'views/dynamic/categories.dart';
 
 void main() async {
@@ -33,72 +38,31 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: const YookataleBase(),
+      home:StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context,snapshot){
+
+          if(snapshot.hasData){
+
+            return const Dashboard();
+
+          }else{
+
+            return const Login();
+          }
+        },
+      ),
+      //initialRoute: ,// first route
+      routes: {
+        SplashScreen.id:(context)=>const SplashScreen(),
+        Register.id:(context)=>const Register(),
+        Login.id:(context)=>const Login(),
+        Dashboard.id:(context)=>const Dashboard(),
+      },
     );
   }
 }
 
-class YookataleBase extends StatefulWidget {
-  const YookataleBase({super.key});
 
-  @override
-  State<YookataleBase> createState() => _YookataleBaseState();
-}
 
-class _YookataleBaseState extends State<YookataleBase> {
-  int _selectedIndex = 0;
 
-  List pages = const [
-    HomePage(),
-    CategoriesPageDynamic(),
-    CartPage(),
-    AccountPage(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-          showSelectedLabels: false,
-          selectedItemColor: Colors.green.shade900,
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          items: const [
-            BottomNavigationBarItem(
-                backgroundColor: Colors.lightGreen,
-                icon: Icon(Icons.home_outlined),
-                label: "Home"),
-            BottomNavigationBarItem(
-                backgroundColor: Colors.lightGreen,
-                icon: Icon(Icons.window),
-                label: "Categories"),
-            BottomNavigationBarItem(
-                backgroundColor: Colors.lightGreen,
-                icon: Stack(
-                  children: [
-                    Icon(Icons.shopping_cart_outlined),
-                    Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Badge(
-                          backgroundColor: Colors.blue,
-                          label: Text("0"),
-                        )),
-                  ],
-                ),
-                label: "Cart"),
-            BottomNavigationBarItem(
-                backgroundColor: Colors.lightGreen,
-                icon: Icon(Icons.people_alt_outlined),
-                label: "Account"),
-          ]),
-    );
-  }
-}

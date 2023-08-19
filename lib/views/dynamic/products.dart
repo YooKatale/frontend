@@ -1,7 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:yookatale/views/cart.dart';
 import 'package:yookatale/views/static/productdetails.dart';
+
+import '../product_categoryjson/productjson.dart';
 
 
 class AllProductsPageDynamic extends StatefulWidget {
@@ -77,6 +80,20 @@ class _AllProductsPageDynamicState extends State<AllProductsPageDynamic> {
 
   }
 
+
+  List itemsTemp = [];
+  int itemLength = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      itemsTemp = pro_json ;
+      itemLength = pro_json.length;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,148 +140,129 @@ class _AllProductsPageDynamicState extends State<AllProductsPageDynamic> {
                   ),
                 ),
               ),
-              StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collectionGroup('products')
-                      .snapshots(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-
-                      return const CircularProgressIndicator();
-
-                    } else if (snapshot.hasData) {
-                      List<QueryDocumentSnapshot> documents =
-                          snapshot.data!.docs;
-                      return GridView.builder(
-                          shrinkWrap: true,
-                          itemCount: documents.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 7,
-                                  mainAxisSpacing: 7),
-                          itemBuilder: (BuildContext context, int index) {
-                            final data =
-                                documents[index].data() as Map<String, dynamic>;
+            GridView.builder(
+            shrinkWrap: true,
+            itemCount:itemLength,
+            gridDelegate:
+            const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 7,
+                mainAxisSpacing: 7),
+            itemBuilder: (BuildContext context, int index) {
 
 
-                            return InkWell(
-                              onTap: (){
+              return InkWell(
+                onTap: (){
 
-                                Navigator.push(context, MaterialPageRoute(builder:(context)=> ProductDetails(
-                                  im:data['imageUrl'],nem:data['name'],price:data['price'].toString(),
-                                    cross:data['crossedPrice'].toString()!!,unit:data['unit'].toString(),wei:data['weight'].toString()
-                                )));
-                              },
-                              child:Card(
-                                color: const Color.fromRGBO(243, 253, 254, 1),
-                                child: Padding(
+                  Navigator.push(context, MaterialPageRoute(builder:(context)=> ProductDetails(
+                      im:itemsTemp[index]['img'],nem:itemsTemp[index]['name'],price:itemsTemp[index]['price'].toString(),
+                      cross:itemsTemp[index]['crossedPrice'].toString()!!,unit:itemsTemp[index]['unit'].toString(),wei:itemsTemp[index]['Weight'].toString()
+                  )));
+                },
+                child:Card(
+                  color: const Color.fromRGBO(243, 253, 254, 1),
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        left: 8.0, right: 8.0),
+                    child: Column(
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl:'${itemsTemp[index]['img']}',
+                          width: double.infinity,
+                          height: 60,
+                          fit: BoxFit.contain,
+                        ),
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding:
+                              const EdgeInsets.only(left: 8.0),
+                              child: Text(
+                                itemsTemp[index]["name"],
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            InkWell(
+                                onTap: (){
+
+                                  save();
+                                },
+                                child: const Icon(Icons.favorite_outline,color: Colors.red,)
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  "\$${itemsTemp[index]['price'].toStringAsFixed(2)}",
+                                  style: const TextStyle(
+                                      color: Colors.green,
+                                      fontSize: 18),
+                                ),
+                                if (itemsTemp[index]['crossedPrice'] !=
+                                    null) ...[
+                                  Padding(
+                                    padding:
+                                    const EdgeInsets.only(
+                                        left: 3.0),
+                                    child: Text(
+                                      "\$${itemsTemp[index]['crossedPrice'].toStringAsFixed(2)}",
+                                      style: const TextStyle(
+                                          decoration:
+                                          TextDecoration
+                                              .lineThrough),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  itemsTemp[index]["unit"],
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight:
+                                      FontWeight.bold),
+                                ),
+                                Padding(
                                   padding: const EdgeInsets.only(
-                                      left: 8.0, right: 8.0),
-                                  child: Column(
-                                    children: [
-                                      Image.network(
-                                        data["imageUrl"],
-                                        width: double.infinity,
-                                        height: 60,
-                                        fit: BoxFit.contain,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Padding(
-                                            padding:
-                                            const EdgeInsets.only(left: 8.0),
-                                            child: Text(
-                                              data["name"],
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          InkWell(
-                                            onTap: (){
-
-                                              save();
-                                            },
-                                              child: const Icon(Icons.favorite_outline,color: Colors.red,)
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "\$${data['price'].toStringAsFixed(2)}",
-                                                style: const TextStyle(
-                                                    color: Colors.green,
-                                                    fontSize: 18),
-                                              ),
-                                              if (data['crossedPrice'] !=
-                                                  null) ...[
-                                                Padding(
-                                                  padding:
-                                                  const EdgeInsets.only(
-                                                      left: 3.0),
-                                                  child: Text(
-                                                    "\$${data['crossedPrice'].toStringAsFixed(2)}",
-                                                    style: const TextStyle(
-                                                        decoration:
-                                                        TextDecoration
-                                                            .lineThrough),
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                data["unit"],
-                                                style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                    FontWeight.bold),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 4.0, right: 8.0),
-                                                child: Text(
-                                                  "${data['weight']}",
-                                                  style: const TextStyle(
-                                                      fontSize: 16),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-
-                                          cart();
-                                        },
-                                        child: const Text(
-                                          "Add to cart",
-                                          style: TextStyle(
-                                              color: Colors.black, fontSize: 18),
-                                        ),
-                                      ),
-                                    ],
+                                      left: 4.0, right: 8.0),
+                                  child: Text(
+                                    "${itemsTemp[index]['Weight']}",
+                                    style: const TextStyle(
+                                        fontSize: 16),
                                   ),
                                 ),
-                              ),
-                            );
-                          });
-                    }
-                    // if snapshot.hasError
-                    return const Text('Something went wrong');
-                  }),
+                              ],
+                            ),
+                          ],
+                        ),
+                        TextButton(
+                          onPressed: () {
+
+                            cart();
+                          },
+                          child: const Text(
+                            "Add to cart",
+                            style: TextStyle(
+                                color: Colors.black, fontSize: 18),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
             ],
           ),
         ),

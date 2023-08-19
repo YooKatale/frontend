@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:yookatale/views/static/productdetails.dart';
 
+import '../product_categoryjson/categoryjson.dart';
+
 class CategoryProduct extends StatefulWidget {
 
   final String name;
@@ -12,6 +14,26 @@ class CategoryProduct extends StatefulWidget {
 }
 
 class _CategoryProductState extends State<CategoryProduct> {
+
+
+  List itemsTemp = [];
+  int itemLength = 0;
+
+
+
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      itemsTemp = cat_json ;
+      itemLength = cat_json.length;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

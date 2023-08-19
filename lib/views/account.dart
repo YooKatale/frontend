@@ -1,8 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:yookatale/views/pdfs/invoicelist.dart';
+
 
 import 'cart.dart';
 import 'contactus.dart';
+import 'login/login.dart';
+import 'loyalty/loyalty.dart';
+import 'orders/orders.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -100,7 +106,7 @@ class _AccountPageState extends State<AccountPage> {
             child:  const ListTile(
               leading: CircleAvatar(
                 radius: 30,
-                backgroundImage: AssetImage('assets/images/favi.png'),
+                backgroundImage: NetworkImage('https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75'),
               ),
               title: Text('Profile',style: TextStyle(fontSize: 20),),
               subtitle: Text('Profile'),
@@ -187,11 +193,12 @@ class _AccountPageState extends State<AccountPage> {
                       padding:const EdgeInsets.only(top: 20),
                       child:InkWell(
                         child:const Badge(
-                          label:Text('0',style: TextStyle(color: Colors.white,fontSize: 10),),
+                          label:Text('4',style: TextStyle(color: Colors.white,fontSize: 10),),
                           child:Icon(Icons.shopping_cart,color:Colors.green,size: 35,) ,
                         ),
                         onTap: (){
 
+                          Navigator.push(context,MaterialPageRoute(builder: (context)=> const CartPage()));
                         },
                       ),
                     ),
@@ -207,6 +214,7 @@ class _AccountPageState extends State<AccountPage> {
                 ListTile(
                   onTap: (){
 
+                    Navigator.push(context,MaterialPageRoute(builder: (context)=> const Orders()));
 
                   },
                   leading: Container(
@@ -229,7 +237,7 @@ class _AccountPageState extends State<AccountPage> {
 
 
 
-                    //Navigator.push(context, MaterialPageRoute(builder:(context)=>const FavoritePage()))
+                    Navigator.push(context,MaterialPageRoute(builder: (context)=> const InvoiceList()));
 
 
                   },
@@ -238,9 +246,34 @@ class _AccountPageState extends State<AccountPage> {
                       color: Colors.green.shade100,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(CupertinoIcons.heart_fill,color: Colors.red,size: 35,),
+                    child: const Icon(CupertinoIcons.money_pound,color: Colors.red,size: 35,),
                   ),
-                  title: const Text('Favorite Products',style: TextStyle(fontSize: 18),),
+                  title: const Text('Invoices',style: TextStyle(fontSize: 18),),
+                  trailing:const Icon(Icons.arrow_forward_ios_outlined),
+
+                ),
+
+                const SizedBox(height: 10,),
+
+
+                ListTile(
+                  onTap: (){
+
+
+
+
+                    Navigator.push(context,MaterialPageRoute(builder: (context)=> const LoyaltyPoints()));
+
+
+                  },
+                  leading: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(CupertinoIcons.hand_point_right_fill,color: Colors.red,size: 35,),
+                  ),
+                  title: const Text('Loyalty points',style: TextStyle(fontSize: 18),),
                   trailing:const Icon(Icons.arrow_forward_ios_outlined),
 
                 ),
@@ -291,6 +324,8 @@ class _AccountPageState extends State<AccountPage> {
             child: ListTile(
               onTap: (){
 
+                FirebaseAuth.instance.signOut();
+                Navigator.pushReplacementNamed(context,Login.id);
               },
               leading: Container(
                 decoration: BoxDecoration(
