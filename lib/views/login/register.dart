@@ -1,6 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:yookatale/views/home.dart';
 
 import '../../firebase_auth_implementation/auth_fire.dart';
 import '../../gradient/dashboard.dart';
@@ -20,22 +21,37 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
 
 
-  final FirebaseAuthService _auth=FirebaseAuthService();
+  //final FirebaseAuthService _auth=FirebaseAuthService();
+  // jude modifications
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
+  // final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  // //final _formKey=GlobalKey<FormState>();
+  // late String _email, _password, _name;
+  // checkAuthentification() async {
+  //   _auth.authStateChanges().listen((user) async {
+  //     if (_auth.currentUser != null) {
+  //       Navigator.push(
+  //           context, MaterialPageRoute(builder: (context) => HomePage()));
+  //     }
+  //   });
+  // }
+  //
+  //
+  //
+  // //final _formKey=GlobalKey<FormState>();
+  //
+  // //final _name=TextEditingController();
+  // final _num=TextEditingController();
+  // final _ema=TextEditingController();
+  // final _pass=TextEditingController();
+  // final _address=TextEditingController();
+  // final _lon=TextEditingController();
+  // final _lat=TextEditingController();
+  //
 
-  final _formKey=GlobalKey<FormState>();
 
-  final _name=TextEditingController();
-  final _num=TextEditingController();
-  final _ema=TextEditingController();
-  final _pass=TextEditingController();
-  final _address=TextEditingController();
-  final _lon=TextEditingController();
-  final _lat=TextEditingController();
-
-
-
-  bool verifyButton=false;
-
+  // bool verifyButton=false;
+  //
   bool _secureText = true;
   showHide() {
     setState(() {
@@ -44,14 +60,69 @@ class _RegisterState extends State<Register> {
   }
 
   @override
-  void dispose() {
+  // void dispose() {
+  //
+  //   _ema.text;
+  //   _pass.text;
+  //   // TODO: implement dispose
+  //   super.dispose();
+  // }
+  //
 
-    _ema.text;
-    _pass.text;
-    // TODO: implement dispose
-    super.dispose();
+  // new method
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  late String _email, _password, _name;
+  checkAuthentification() async {
+    _auth.authStateChanges().listen((user) async {
+      if (_auth.currentUser != null) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Login()));
+      }
+    });
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    this.checkAuthentification();
+  }
+
+  signup() async {
+    if (_formkey.currentState!.validate()) {
+      _formkey.currentState!.save();
+      try {
+        UserCredential user = await _auth.createUserWithEmailAndPassword(
+            email: _email, password: _password);
+        if (user != null) {
+          await FirebaseAuth.instance.currentUser!
+              .updateProfile(displayName: _name);
+        }
+      } catch (e) {
+        showError(e.toString());
+      }
+    }
+  }
+
+  showError(String errormessage) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('error'),
+            content: Text(errormessage),
+            actions: [
+              MaterialButton(
+                color: Colors.blue,
+                onPressed: () {},
+                child: Text('ok'),
+              )
+            ],
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +132,7 @@ class _RegisterState extends State<Register> {
         backgroundColor:Colors.white,
         body: SafeArea(
             child:Form(
-              key: _formKey,
+              key: _formkey,
               child: ListView(
                 padding:const EdgeInsets.only(left: 10,right: 10),
                 children:  [
@@ -89,7 +160,7 @@ class _RegisterState extends State<Register> {
 
                   //email
                   TextFormField(
-                      controller: _ema,
+                      // controller: _ema,
                       cursorColor: Colors.blue.shade200,
                       decoration: InputDecoration(
                           hintText: 'Email',
@@ -106,25 +177,23 @@ class _RegisterState extends State<Register> {
                           )
                       ),
                       validator: (value){
-                        if(value!.isEmpty){
-
-                          return 'Enter Email';
-                        }
+                        value!.isEmpty ? 'Enter Email' : null;
                         bool _isValid= (EmailValidator.validate(value));
+
                         if(_isValid==false){
                           return 'Enter Valid Email Address';
 
                         }
-                        return null;
+                      },
+                    onSaved: (value) => _email = value!,
 
-                      }
                   ),
 
                   const SizedBox(height: 10,),
 
                   //password
                   TextFormField(
-                      controller: _pass,
+                      // controller: _pass,
                       cursorColor: Colors.blue.shade200,
                       obscureText: _secureText,
                       decoration: InputDecoration(
@@ -159,11 +228,13 @@ class _RegisterState extends State<Register> {
                       validator: (value){
                         if(value!.isEmpty){
                           return 'Enter your Password';
-
                         }
-                        return null;
-                      }
+                      },
+                    onSaved: (value) => _password = value!,
 
+                    // validator: (value) =>
+                    // value!.isEmpty ? 'Password cannot be blank' : null,
+                    // onSaved: (value) => _password = value!,
                   ),
 
                   const SizedBox(height: 10,),
@@ -174,13 +245,13 @@ class _RegisterState extends State<Register> {
                     padding: const EdgeInsets.only(left: 20,right: 20),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                      onPressed: (){
+                      onPressed: signup,
 
-                        _signUp(context);
+                        //signUp(context);
 
                         //FirebaseAuth.instance.createUserWithEmailAndPassword(email:_ema.text.trim(), password:_pass.text.trim());
 
-                      }, child:const Text('Sign Up',style: TextStyle(color: Colors.white),),
+                       child:const Text('Sign Up',style: TextStyle(color: Colors.white),),
                     ),
                   ),
 
@@ -217,33 +288,30 @@ class _RegisterState extends State<Register> {
   }
 
 
-  void _signUp(BuildContext context) async{
 
-    String email=_ema.text;
-    String pass=_pass.text;
-
-
-    User? user = await _auth.signUpWithEmailAndPassword(email, pass);
-
-    if(user != null){
-
-      print("user successfully registered");
-
-      if(context.mounted){
-        Navigator.pushReplacementNamed(context,Dashboard.id);
-      }
-
-      
-    }else{
-
-      print("some error ocurred");
-
-    }
-
-
-
-
-  }
+  // void _signUp(BuildContext context) async{
+  //
+  //   String email=_ema.text;
+  //   String pass=_pass.text;
+  //
+  //
+  //   User? user = await _auth.signUpWithEmailAndPassword(email, pass);
+  //
+  //   if(user != null){
+  //
+  //     print("user successfully registered");
+  //
+  //     if(context.mounted){
+  //       Navigator.pushReplacementNamed(context,Dashboard.id);
+  //     }
+  //
+  //   }else{
+  //
+  //     print("some error ocurred");
+  //
+  //   }
+  //
+  // }
 
 
 }

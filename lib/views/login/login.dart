@@ -19,29 +19,82 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
 
-  final FirebaseAuthService _auth=FirebaseAuthService();
-
-  final _formKey=GlobalKey<FormState>();
-  final _ema=TextEditingController();
-  final _pass=TextEditingController();
-
-
-
+  // final FirebaseAuthService _auth=FirebaseAuthService();
+  //
+  // final _formKey=GlobalKey<FormState>();
+  // final _ema=TextEditingController();
+  // final _pass=TextEditingController();
+  //
+  //
+  //
   bool _secureText = true;
-
+  //
   showHide() {
     setState(() {
       _secureText = !_secureText;
     });
   }
-
-  @override
+  //
+  // @override
   void dispose() {
-
-    _ema.text;
-    _pass.text;
+    _email;
+    _password;
     // TODO: implement dispose
     super.dispose();
+  }
+  // jude
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  late String _email, _password;
+  checkAuthentication() async {
+    _auth.authStateChanges().listen((event) {
+      if (_auth.currentUser != null) {
+              Navigator.pushReplacementNamed(context,Dashboard.id);
+      }
+    });
+  }
+
+  signout() async {
+    _auth.signOut();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    this.checkAuthentication();
+  }
+
+  _Login() async {
+    if (_formkey.currentState!.validate()) {
+      _formkey.currentState!.save();
+      try {
+        UserCredential user = await _auth.signInWithEmailAndPassword(
+            email: _email, password: _password);
+      } catch (e) {
+        showError(e.toString());
+      }
+    }
+  }
+
+
+  showError(String errormessage) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('error'),
+            content: Text(errormessage),
+            actions: [
+              MaterialButton(
+                color: Colors.blue,
+                onPressed: () {
+                },
+                child: Text('ok'),
+              )
+            ],
+          );
+        });
   }
 
   @override
@@ -53,7 +106,7 @@ class _LoginState extends State<Login> {
         body: SafeArea(
 
             child:Form(
-              key: _formKey,
+              key: _formkey,
               child: ListView(
                 padding:const EdgeInsets.only(left: 10,right: 10),
                 children:  [
@@ -81,7 +134,7 @@ class _LoginState extends State<Login> {
 
                   //email textfield
                   TextFormField(
-                      controller: _ema,
+                      // controller: _ema,
                       cursorColor: Colors.blue.shade200,
                       decoration: InputDecoration(
                           hintText: 'Email',
@@ -97,19 +150,20 @@ class _LoginState extends State<Login> {
                             borderSide: const BorderSide(color: Colors.blue),
                           )
                       ),
+
                       validator: (value){
                         if(value!.isEmpty){
-
                           return 'Enter Email';
                         }
                         bool _isValid= (EmailValidator.validate(value));
                         if(_isValid==false){
                           return 'Enter Valid Email Address';
-
                         }
                         return null;
 
-                      }
+                      },
+                    onSaved: (value) => _email = value!,
+
                   ),
 
                   const SizedBox(height: 10,),
@@ -117,7 +171,7 @@ class _LoginState extends State<Login> {
 
                   //password textfiled
                   TextFormField(
-                      controller: _pass,
+                      // controller: _pass,
                       cursorColor: Colors.blue.shade200,
                       obscureText: _secureText,
                       decoration: InputDecoration(
@@ -148,14 +202,15 @@ class _LoginState extends State<Login> {
                             borderSide: const BorderSide(color: Colors.blue),
                           )
                       ),
-
                       validator: (value){
                         if(value!.isEmpty){
                           return 'Enter your Password';
 
                         }
                         return null;
-                      }
+                      },
+                    onSaved: (value) => _password = value!,
+
 
                   ),
 
@@ -178,15 +233,13 @@ class _LoginState extends State<Login> {
             padding: const EdgeInsets.only(left: 20,right: 20),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              onPressed: (){
-
-                _signIn(context);
+              onPressed: _Login,
 
 
                 //FirebaseAuth.instance.signInWithEmailAndPassword(email:_ema.text, password:_pass.text);
 
 
-              }, child:const Text('Login',style: TextStyle(color: Colors.white),),
+               child:const Text('Login',style: TextStyle(color: Colors.white),),
             ),
           ),
 
@@ -217,32 +270,29 @@ class _LoginState extends State<Login> {
     );
   }
 
-  void _signIn(BuildContext context) async{
-
-    String email=_ema.text;
-    String pass=_pass.text;
-
-
-    User? user = await _auth.signInWithEmailAndPassword(email,pass);
-
-    if(user != null){
-
-      print("user successfully signed in");
-
-      if(context.mounted){
-        Navigator.pushReplacementNamed(context,Dashboard.id);
-      }
-
-
-    }else{
-
-      print("some error ocurred");
-
-    }
-
-
-
-
-  }
+  // void _signIn(BuildContext context) async{
+  //
+  //   String email=_ema.text;
+  //   String pass=_pass.text;
+  //
+  //
+  //   User? user = await _auth.signInWithEmailAndPassword(email,pass);
+  //
+  //   if(user != null){
+  //
+  //     print("user successfully signed in");
+  //
+  //     if(context.mounted){
+  //       Navigator.pushReplacementNamed(context,Dashboard.id);
+  //     }
+  //
+  //
+  //   }else{
+  //
+  //     print("some error ocurred");
+  //
+  //   }
+  //
+  // }
 
 }
