@@ -9,6 +9,7 @@ import 'package:yookatale/views/cart.dart';
 import 'package:yookatale/views/home.dart';
 import 'package:yookatale/views/login/login.dart';
 import 'package:yookatale/views/login/register.dart';
+import 'package:yookatale/views/splashscreen/getSign.dart';
 import 'package:yookatale/views/splashscreen/getStarted.dart';
 import 'package:yookatale/views/splashscreen/splash.dart';
 
@@ -59,7 +60,8 @@ class MyApp extends StatelessWidget {
         Register.id:(context)=>const Register(),
         Login.id:(context)=>const Login(),
         Dashboard.id:(context)=>const Dashboard(),
-        GetStartedScreen.id:(context) =>const GetStartedScreen()
+        GetStartedScreen.id:(context) =>const GetStartedScreen(),
+        GetStartedSignIn.id:(context) =>  GetStartedSignIn()
       },
     );
   }
