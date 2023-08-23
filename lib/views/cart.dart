@@ -50,8 +50,7 @@ class _CartPageState extends State<CartPage> {
                 topRight: Radius.circular(30))),
         child: Column(
           children: [
-
-          const Row(
+           Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
 

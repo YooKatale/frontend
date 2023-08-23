@@ -9,6 +9,8 @@ import 'package:yookatale/views/cart.dart';
 import 'package:yookatale/views/home.dart';
 import 'package:yookatale/views/login/login.dart';
 import 'package:yookatale/views/login/register.dart';
+import 'package:yookatale/views/splashscreen/getSign.dart';
+import 'package:yookatale/views/splashscreen/getStarted.dart';
 import 'package:yookatale/views/splashscreen/splash.dart';
 
 import 'firebase_options.dart';
@@ -48,16 +50,18 @@ class MyApp extends StatelessWidget {
 
           }else{
 
-            return const Login();
+            return const SplashScreen();
           }
         },
       ),
-      //initialRoute: ,// first route
+      // initialRoute: ,// first route
       routes: {
         SplashScreen.id:(context)=>const SplashScreen(),
         Register.id:(context)=>const Register(),
         Login.id:(context)=>const Login(),
         Dashboard.id:(context)=>const Dashboard(),
+        GetStartedScreen.id:(context) =>const GetStartedScreen(),
+        GetStartedSignIn.id:(context) =>  GetStartedSignIn()
       },
     );
   }

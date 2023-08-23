@@ -72,7 +72,7 @@ class HomePage extends StatelessWidget {
                 SizedBox(
                   height: 20,
                   width: MediaQuery.of(context).size.width,
-                  child: const Row(
+                  child:  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
 

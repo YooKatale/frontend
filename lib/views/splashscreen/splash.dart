@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:yookatale/views/splashscreen/getStarted.dart';
 
 import '../login/login.dart';
 
@@ -24,10 +25,10 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
 
 
-    Timer( const Duration(seconds: 3,),(){
+    Timer( const Duration(seconds: 4,),(){
 
 
-      Navigator.pushReplacementNamed(context,Login.id);
+      Navigator.pushReplacementNamed(context,GetStartedScreen.id);
 
 
     });
@@ -40,15 +41,23 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.network('https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75',height: 200,),
-            const SizedBox(height: 10,),
-          ],
-        ),
+      backgroundColor: Colors.white,
+      body: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          const SizedBox(height: 200,),
+          Image.asset('images/logo.jpg',height: 200,),          
+          const SizedBox(height: 10,),
+          const Spacer(),
+          Container(
+            height: 200,
+            width: double.infinity,
+            decoration:  const BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage('images/fruits.png'),
+                  fit: BoxFit.cover),
+            ),)
+        ],
       ),
     );
   }
