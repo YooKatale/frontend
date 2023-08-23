@@ -229,9 +229,9 @@ class _LoginState extends State<Login> {
 
       print("user successfully signed in");
 
-      if(context.mounted){
+      // if(context.mounted){
         Navigator.pushReplacementNamed(context,Dashboard.id);
-      }
+      // }
 
 
     }else{
