@@ -68,7 +68,7 @@ class AllProductsPage extends StatelessWidget {
                             height: 60,
                             fit: BoxFit.contain,
                           ),
-                          const Row(
+                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
@@ -85,7 +85,7 @@ class AllProductsPage extends StatelessWidget {
                           // ignore: prefer_const_constructors
                           Padding(
                             padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-                            child: const Row(
+                            child:  Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
@@ -147,7 +147,7 @@ class AllProductsPage extends StatelessWidget {
                             height: 60,
                             fit: BoxFit.contain,
                           ),
-                          const Row(
+                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
@@ -161,7 +161,7 @@ class AllProductsPage extends StatelessWidget {
                               Icon(Icons.favorite_outline),
                             ],
                           ),
-                          const Padding(
+                           Padding(
                             padding: EdgeInsets.only(top: 4.0, bottom:4.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -217,7 +217,7 @@ class AllProductsPage extends StatelessWidget {
                             height: 60,
                             fit: BoxFit.contain,
                           ),
-                          const Row(
+                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
@@ -234,7 +234,7 @@ class AllProductsPage extends StatelessWidget {
                           // ignore: prefer_const_constructors
                           Padding(
                             padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-                            child: const Row(
+                            child:  Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
@@ -288,7 +288,7 @@ class AllProductsPage extends StatelessWidget {
                             height: 60,
                             fit: BoxFit.contain,
                           ),
-                          const Row(
+                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
@@ -302,7 +302,7 @@ class AllProductsPage extends StatelessWidget {
                               Icon(Icons.favorite_outline),
                             ],
                           ),
-                          const Padding(
+                           Padding(
                             padding: EdgeInsets.only(top: 4.0, bottom:4.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -366,7 +366,7 @@ class AllProductsPage extends StatelessWidget {
                             height: 60,
                             fit: BoxFit.contain,
                           ),
-                          const Row(
+                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
@@ -383,7 +383,7 @@ class AllProductsPage extends StatelessWidget {
                           // ignore: prefer_const_constructors
                           Padding(
                             padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-                            child: const Row(
+                            child:  Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
@@ -437,7 +437,7 @@ class AllProductsPage extends StatelessWidget {
                             height: 60,
                             fit: BoxFit.contain,
                           ),
-                          const Row(
+                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
@@ -454,7 +454,7 @@ class AllProductsPage extends StatelessWidget {
                           // ignore: prefer_const_constructors
                           Padding(
                             padding: const EdgeInsets.only(top: 4.0,bottom: 4.0),
-                            child: const Row(
+                            child:  Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(

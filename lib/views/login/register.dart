@@ -229,9 +229,9 @@ class _RegisterState extends State<Register> {
 
       print("user successfully registered");
 
-      if(context.mounted){
+      // if(context.mounted){
         Navigator.pushReplacementNamed(context,Dashboard.id);
-      }
+      // }
 
       
     }else{

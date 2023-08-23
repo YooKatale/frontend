@@ -1,4 +1,5 @@
 
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 
 import '../views/account.dart';
@@ -43,7 +44,7 @@ class _DashboardState extends State<Dashboard> {
           selectedItemColor: Colors.green.shade900,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
-          items: const [
+          items:  [
             BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,
                 icon: Icon(Icons.home_outlined),
@@ -61,8 +62,11 @@ class _DashboardState extends State<Dashboard> {
                         top: 0,
                         right: 0,
                         child: Badge(
-                          backgroundColor: Colors.blue,
-                          label: Text("4"),
+                          badgeStyle: BadgeStyle(
+                            badgeColor: Colors.blue,
+                          ),
+                          // backgroundColor: 
+                          child: Text("4"),
                         )),
                   ],
                 ),

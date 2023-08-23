@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart' as badges;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -159,13 +160,14 @@ class _AccountPageState extends State<AccountPage> {
                     child: Padding(
                       padding:const EdgeInsets.only(top: 20),
                       child:InkWell(
-                        child:const Badge(
-                          label:Text('0',style: TextStyle(color: Colors.white,fontSize: 10),),
-                          child:Icon(Icons.notifications,color:Colors.purple,size: 35,) ,
-                        ),
                         onTap: (){
-
                         },
+                        child: const badges.Badge(
+                              badgeContent: Text('0',style: TextStyle(color: Colors.white,fontSize: 10),),
+                              child: Icon(Icons.notifications,color:Colors.purple,size: 35,),
+                            )
+                        
+                        
                       ),
                     ),
                   ),
@@ -192,8 +194,8 @@ class _AccountPageState extends State<AccountPage> {
                     child: Padding(
                       padding:const EdgeInsets.only(top: 20),
                       child:InkWell(
-                        child:const Badge(
-                          label:Text('4',style: TextStyle(color: Colors.white,fontSize: 10),),
+                        child:const badges.Badge(
+                          badgeContent:Text('4',style: TextStyle(color: Colors.white,fontSize: 10),),
                           child:Icon(Icons.shopping_cart,color:Colors.green,size: 35,) ,
                         ),
                         onTap: (){
