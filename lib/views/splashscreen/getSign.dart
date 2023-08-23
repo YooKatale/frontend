@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:yookatale/views/login/register.dart';
 
 class GetStartedSignIn extends StatefulWidget {
-  GetStartedSignIn({Key? key}) : super(key: key);
   static const  String id='getSignIn';
+  GetStartedSignIn({Key? key}) : super(key: key);
+  
 
   @override
   State<GetStartedSignIn> createState() => _GetStartedSignInState();
@@ -55,7 +57,7 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
                   child: Text('Continue',style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 25)),
                 )),
                   const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20,vertical: 8),
+                    padding: EdgeInsets.symmetric(horizontal: 15,vertical: 8),
                     child: Text.rich(
                       TextSpan(
                                   text: 'By clicking on Continue you are agree to our  ',
@@ -87,8 +89,14 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
           
                 ],
               ),
-              const SizedBox(height: 30,),
-              Text("Skip >", style: TextStyle(fontSize: 20, color: Colors.green[400], fontWeight: FontWeight.w400),)
+              const SizedBox(height: 100,),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: InkWell(
+                  onTap: (){
+                    Navigator.pushNamed(context,Register.id);
+                  },
+                  child: Text("Skip >", style: TextStyle(fontSize: 20, color: Colors.green[400], fontWeight: FontWeight.w400),)))
              
             ],
           ),
