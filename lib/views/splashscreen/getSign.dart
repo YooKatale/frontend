@@ -19,14 +19,12 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
       body: SingleChildScrollView(
         child: Container(
           child: Column(
-            // mainAxisSize: MainAxisSize.max,
             children: [
               const SizedBox(height: 50,),
               Image.asset('images/logo.jpg',height: 200,),
-              const SizedBox(height: 10,),
               const SizedBox(height: 30,),
               const Text('Sign In', style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500, fontSize: 28, fontStyle: FontStyle.normal),),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal:40, vertical: 0),
                 child: Row(
