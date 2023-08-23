@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yookatale/views/splashscreen/getSign.dart';
 
 class GetStartedScreen extends StatelessWidget {
   const GetStartedScreen({Key? key}) : super(key: key);
@@ -20,7 +21,9 @@ class GetStartedScreen extends StatelessWidget {
           const SizedBox(height: 20),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800]),
-            onPressed: (){}, child: const Padding(
+            onPressed: (){
+              Navigator.pushReplacementNamed(context,GetStartedSignIn.id);
+            }, child: const Padding(
               padding: EdgeInsets.all(8.0),
               child: Text('Get Started',style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 25)),
             )),
