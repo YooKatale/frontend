@@ -1,6 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:yookatale/views/login/getLocation.dart';
 
 import '../../firebase_auth_implementation/auth_fire.dart';
 import '../../gradient/dashboard.dart';
@@ -233,7 +234,7 @@ class _RegisterState extends State<Register> {
                 alignment: Alignment.bottomCenter,
                 child: InkWell(
                   onTap: (){
-                    Navigator.pushNamed(context,Register.id);
+                    Navigator.pushNamed(context,GetLocationScreen.id);
                   },
                   child: Text("Skip >", style: TextStyle(fontSize: 20, color: Colors.green[400], fontWeight: FontWeight.w400),)))
             ],

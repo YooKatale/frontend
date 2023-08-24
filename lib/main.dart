@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:yookatale/views/account.dart';
 import 'package:yookatale/views/cart.dart';
 import 'package:yookatale/views/home.dart';
+import 'package:yookatale/views/login/getLocation.dart';
 import 'package:yookatale/views/login/login.dart';
 import 'package:yookatale/views/login/register.dart';
 import 'package:yookatale/views/splashscreen/getSign.dart';
@@ -61,7 +62,8 @@ class MyApp extends StatelessWidget {
         Login.id:(context)=>const Login(),
         Dashboard.id:(context)=>const Dashboard(),
         GetStartedScreen.id:(context) =>const GetStartedScreen(),
-        GetStartedSignIn.id:(context) =>  GetStartedSignIn()
+        GetStartedSignIn.id:(context) =>  GetStartedSignIn(),
+        GetLocationScreen.id:(context) => GetLocationScreen()
       },
     );
   }

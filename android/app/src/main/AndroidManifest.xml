@@ -30,5 +30,7 @@ package="com.example.yookataleapp">
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="AIzaSyDhbytrBgo8gUz5tgkprBXcTFiJ2BX386M"/>
     </application>
 </manifest>
