@@ -17,93 +17,87 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.lightGreen,
+        // backgroundColor: Colors.lightGreen,
         leading:Padding(
           padding: const EdgeInsets.all(2.0),
-          child: Image.network('https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75',height: 50,width: 50,),
+          child: Icon(Icons.menu),
         ) ,
-        title: const Center(child: Text("Yookatale",style:TextStyle(color: Colors.white),)),
+        title:Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Good Morning,", style: TextStyle(fontSize: 14, color: Colors.green),),
+            Text("Vincent", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),)
+          ],
+        ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            
+            children: const [
+              Icon(Icons.location_pin),
+          SizedBox(width: 5,),
+          Text('Home', style: TextStyle(color: Colors.green),),
+          SizedBox(width: 10,),
+          Icon(Icons.shopping_cart),
+          SizedBox(width: 10,),
+            ],
+          )
+        ],
         bottom:  PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child:Padding(
             padding: const EdgeInsets.only(left: 10,right: 10),
             child: Column(
               children: [
-                Row(
-                  children: [
-
-                    Expanded(
-                      child:InkWell(
-                        onTap: () {
-
-
-                        },
-                        child: Container(
-                          child:TextField(
-                            enabled: false,
-                            decoration: InputDecoration(
-                              hintText: 'Search a product',
-                              prefixIcon: const Icon(Icons.search,color:Colors.grey ,),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(4),
-                                borderSide: BorderSide.none,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child:InkWell(
+                          onTap: () {
+                          },
+                          child: Container(
+                                                       
+                           child:TextField(
+                              enabled: false,
+                              decoration: InputDecoration(
+                                hintText: 'Search category',
+                                prefixIcon: const Icon(Icons.search,color:Colors.grey ,),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey, width: 1.5),
+                                ),
+                                contentPadding: EdgeInsets.zero,
+                                filled: true,
+                                fillColor:Colors.white,
+                                suffixIcon: IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: ((context) => const CartPage())));
+                          },
+                          icon: const Icon(Icons.speaker,color: Colors.grey,)),
                               ),
-                              contentPadding: EdgeInsets.zero,
-                              filled: true,
-                              fillColor:Colors.grey.shade200,
-                            ),
 
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: ((context) => const CartPage())));
-                        },
-                        icon: const Icon(Icons.shopping_bag,color: Colors.white,)),
-                  ],
-                ),
-                const SizedBox(height: 10,),
-                SizedBox(
-                  height: 20,
-                  width: MediaQuery.of(context).size.width,
-                  child:  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-
-                      Row(
-                        children: [
-                          Icon(Icons.info_outline,size:12,color:Colors.white),
-                          Text('100 % Genuine',style: TextStyle(color: Colors.white,fontSize:12 ),)
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.work,size:12,color:Colors.white),
-                          Text('24-7 working days',style: TextStyle(color: Colors.white,fontSize:12 ),)
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.production_quantity_limits,size:12,color:Colors.white),
-                          Text('Trusted Products',style: TextStyle(color: Colors.white,fontSize:12 ),)
-                        ],
-                      ),
+                      
                     ],
                   ),
-
                 ),
+               SizedBox(height: 10,)
               ],
             ),
           ) ,
         ),
 
       ),
+     
       body:ListView(
         padding: const EdgeInsets.only(left: 8,top: 10,right: 10),
         children: [

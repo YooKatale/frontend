@@ -1,6 +1,7 @@
 
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:yookatale/views/static/scanner.dart';
 
 import '../views/account.dart';
 import '../views/cart.dart';
@@ -21,11 +22,12 @@ class _DashboardState extends State<Dashboard> {
 
   int _selectedIndex = 0;
 
-  List pages = const [
-    HomePage(),
-    CategoriesPageDynamic(),
-    CartPage(),
-    AccountPage(),
+  List pages =  [
+    const HomePage(),
+    const CartPage(),    
+    ScannerScreen(),
+    const CategoriesPageDynamic(),
+    const AccountPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -40,41 +42,41 @@ class _DashboardState extends State<Dashboard> {
     return Scaffold(
       body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-          showSelectedLabels: false,
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+        selectedFontSize: 13,
+        unselectedFontSize: 13,
+        type: BottomNavigationBarType.fixed,  
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
           selectedItemColor: Colors.green.shade900,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
           items:  [
             BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,
-                icon: Icon(Icons.home_outlined),
+                icon: Icon(Icons.home, size: 30,),
+                activeIcon: Icon(Icons.home, color: Colors.green[600], size: 30,),
                 label: "Home"),
             BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,
-                icon: Icon(Icons.window),
-                label: "Categories"),
+                icon: Icon(Icons.shopping_cart_outlined, size: 30,),
+                activeIcon: Icon(Icons.shopping_cart_outlined, color: Colors.green[600], size: 30,),
+                label: "Cart"),                            
+                BottomNavigationBarItem(
+                backgroundColor: Colors.lightGreen,
+                icon: Icon(Icons.scanner, size: 30,),
+                activeIcon: Icon(Icons.scanner_outlined, color: Colors.green[600], size: 30,),
+                label: "Scanner"),
+                BottomNavigationBarItem(
+                backgroundColor: Colors.lightGreen,
+                icon: Icon(Icons.list, size: 30,),
+                activeIcon: Icon(Icons.list, color: Colors.green[600], size: 30,),
+                label: "List"),
             BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,
-                icon: Stack(
-                  children: [
-                    Icon(Icons.shopping_cart_outlined),
-                    Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Badge(
-                          badgeStyle: BadgeStyle(
-                            badgeColor: Colors.blue,
-                          ),
-                          // backgroundColor: 
-                          child: Text("4"),
-                        )),
-                  ],
-                ),
-                label: "Cart"),
-            BottomNavigationBarItem(
-                backgroundColor: Colors.lightGreen,
-                icon: Icon(Icons.people_alt_outlined),
-                label: "Account"),
+                icon: Icon(Icons.person_outline, size: 30,),
+                activeIcon: Icon(Icons.person_outline, color: Colors.green[800], size: 30,),
+                label: "Profile"),
           ]),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:yookatale/gradient/dashboard.dart';
 
 class GetLocationScreen extends StatefulWidget {
   static const  String id='getLocation';
@@ -12,6 +13,9 @@ class GetLocationScreen extends StatefulWidget {
 }
 
 class _GetLocationScreenState extends State<GetLocationScreen> {
+
+  TextEditingController zoneTextController = TextEditingController();
+  TextEditingController areaTextController = TextEditingController();
   final Completer<GoogleMapController> _controllerGoogleMap =
       Completer<GoogleMapController>();
     late GoogleMapController newGoogleMapController;
@@ -29,6 +33,7 @@ class _GetLocationScreenState extends State<GetLocationScreen> {
           children: [
             const SizedBox(height: 40,),
                     Container(
+                      height: 200,
                       child: GoogleMap(
               // padding: EdgeInsets.only(bottom: bottomPaddingMap),
             initialCameraPosition: _kGooglePlex, mapType: MapType.normal,
@@ -40,7 +45,6 @@ class _GetLocationScreenState extends State<GetLocationScreen> {
               // locatePosition();
             },
             ),
-            height: 200,
             ),
                     // const SizedBox(height: 10,),
                     const Text('Select your location', style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500, fontSize: 28, fontStyle: FontStyle.normal),),
@@ -90,6 +94,7 @@ class _GetLocationScreenState extends State<GetLocationScreen> {
                       child: ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800]),
                   onPressed: (){ 
+                    Navigator.pushReplacementNamed(context,Dashboard.id);
                   }, child: const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text('Proceed',style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 25)),
@@ -102,7 +107,7 @@ class _GetLocationScreenState extends State<GetLocationScreen> {
                   alignment: Alignment.bottomCenter,
                   child: InkWell(
                     onTap: (){
-                      Navigator.pushNamed(context,GetLocationScreen.id);
+                      Navigator.pushReplacementNamed(context,Dashboard.id);
                     },
                     child: Text("Skip >", style: TextStyle(fontSize: 20, color: Colors.green[400], fontWeight: FontWeight.w400),)))
           ],
