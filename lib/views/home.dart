@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'cart.dart';
@@ -6,117 +7,187 @@ import 'dynamic/categorieshorizontal.dart';
 import 'dynamic/products.dart';
 import 'dynamic/someproducts.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String greetings = '';
+
+  greeting(){
+    var hour = DateTime.now().hour;
+  if (hour < 12) {
+    setState(() {
+      greetings ='Good Morning';
+    });
+  } else if ((hour >= 12) && (hour <= 16)) {
+    setState(() {
+      greetings ='Good Afternoon';
+    });
+  } else if ((hour > 16) && (hour < 20)) {
+     setState(() {
+      greetings ='Good Evening';
+    });
+  } else {
+    setState(() {
+      greetings = 'Good Evening';
+    });
+  }
+  }
+
+
+  @override
+  void initState() {
+    greeting();    
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
 
 
-    final users= FirebaseAuth.instance.currentUser;
+    final users= FirebaseAuth.instance.currentUser; 
+
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.lightGreen,
+        // backgroundColor: Colors.lightGreen,
         leading:Padding(
           padding: const EdgeInsets.all(2.0),
-          child: Image.network('https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75',height: 50,width: 50,),
+          child: Icon(Icons.menu),
         ) ,
-        title: const Center(child: Text("Yookatale",style:TextStyle(color: Colors.white),)),
+        title:Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(greetings, style: const TextStyle(fontSize: 14, color: Colors.green),),
+            const Text("Vincent", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),)
+          ],
+        ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            
+            children: const [
+              Icon(Icons.location_pin),
+          SizedBox(width: 5,),
+          Text('Home', style: TextStyle(color: Colors.green),),
+          SizedBox(width: 10,),
+          Icon(Icons.shopping_cart),
+          SizedBox(width: 10,),
+            ],
+          )
+        ],
         bottom:  PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child:Padding(
             padding: const EdgeInsets.only(left: 10,right: 10),
             child: Column(
               children: [
-                Row(
-                  children: [
-
-                    Expanded(
-                      child:InkWell(
-                        onTap: () {
-
-
-                        },
-                        child: Container(
-                          child:TextField(
-                            enabled: false,
-                            decoration: InputDecoration(
-                              hintText: 'Search a product',
-                              prefixIcon: const Icon(Icons.search,color:Colors.grey ,),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(4),
-                                borderSide: BorderSide.none,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child:InkWell(
+                          onTap: () {
+                          },
+                          child: Container(
+                                                       
+                           child:TextField(
+                              enabled: false,
+                              decoration: InputDecoration(
+                                hintText: 'Search category',
+                                prefixIcon: const Icon(Icons.search,color:Colors.grey ,),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey, width: 1.5),
+                                ),
+                                contentPadding: EdgeInsets.zero,
+                                filled: true,
+                                fillColor:Colors.white,
+                                suffixIcon: IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: ((context) => const CartPage())));
+                          },
+                          icon: const Icon(Icons.speaker,color: Colors.grey,)),
                               ),
-                              contentPadding: EdgeInsets.zero,
-                              filled: true,
-                              fillColor:Colors.grey.shade200,
-                            ),
 
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: ((context) => const CartPage())));
-                        },
-                        icon: const Icon(Icons.shopping_bag,color: Colors.white,)),
-                  ],
-                ),
-                const SizedBox(height: 10,),
-                SizedBox(
-                  height: 20,
-                  width: MediaQuery.of(context).size.width,
-                  child:  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-
-                      Row(
-                        children: [
-                          Icon(Icons.info_outline,size:12,color:Colors.white),
-                          Text('100 % Genuine',style: TextStyle(color: Colors.white,fontSize:12 ),)
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.work,size:12,color:Colors.white),
-                          Text('24-7 working days',style: TextStyle(color: Colors.white,fontSize:12 ),)
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.production_quantity_limits,size:12,color:Colors.white),
-                          Text('Trusted Products',style: TextStyle(color: Colors.white,fontSize:12 ),)
-                        ],
-                      ),
+                      
                     ],
                   ),
-
                 ),
+               const SizedBox(height: 10,)
               ],
             ),
           ) ,
         ),
 
       ),
+     
       body:ListView(
         padding: const EdgeInsets.only(left: 8,top: 10,right: 10),
         children: [
+          Stack(
+                  children: <Widget>[
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20)
+                      ),
+                      height: 150,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: CachedNetworkImage(
+                          height: 150,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          imageUrl: "https://cdn.pixabay.com/photo/2015/05/04/10/16/vegetables-752153_1280.jpg"),
+                      ),
+                        
+                      ),
+                    // ),
+                    const Positioned(
+                      left: 200,
+                          right: 10,
+                          top: 20,
+                      child: Text(                        
+                        'Special deal of the day',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18.0, fontStyle: FontStyle.normal), textAlign: TextAlign.center,
+                      ),
+                    ),
+
+                        Positioned(
+                          left: 200,
+                          right: 30,
+                          top: 80,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red
+                            ),
+                            onPressed: (){}, child: Text('Order Now', style: TextStyle(color: Colors.white),)))
+                  ],
+                ),
+
+          const SizedBox(height: 10,),
 
           Container(
-            height: 140,
+            height: 200,
             child:  Column(
-              children: [
-
+              children: [           
+    
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Categories',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                    const Text('Categories',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold, color: Colors.green),),
                     InkWell(
                       onTap: (){
 
@@ -125,7 +196,7 @@ class HomePage extends StatelessWidget {
                             MaterialPageRoute(
                                 builder: ((context) => const CategoriesPageDynamic())));
                       },
-                        child: const Text('View more.',style: TextStyle(fontSize: 16),)
+                        child: const Text('View more.',style: TextStyle(fontSize: 16, color: Colors.green),)
                     ),
 
                   ],
@@ -148,18 +219,9 @@ class HomePage extends StatelessWidget {
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Best Products',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
-                    InkWell(
-                        onTap: (){
-
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: ((context) => const AllProductsPageDynamic())));
-                        },
-                        child: const Text('View more.',style: TextStyle(fontSize: 16),)
-                    ),
+                  children: const [
+                    Text('Popular Products',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold, color: Colors.green),),
+                    
 
                   ],
                 ),
