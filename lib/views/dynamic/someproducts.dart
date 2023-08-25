@@ -103,12 +103,8 @@ class _SomeProductsState extends State<SomeProducts> {
               crossAxisSpacing: 7,
               mainAxisSpacing: 7),
           itemBuilder: (BuildContext context, int index) {
-
-
             return InkWell(
               onTap: (){
-
-
                 Navigator.push(context, MaterialPageRoute(builder:(context)=> ProductDetails(
                     im:itemsTemp[index]['img'],nem:itemsTemp[index]['name'],price:itemsTemp[index]['price'].toString(),
                     cross:itemsTemp[index]['crossedPrice'].toString()!!,unit:itemsTemp[index]['unit'].toString(),wei:itemsTemp[index]['Weight'].toString()
@@ -120,88 +116,90 @@ class _SomeProductsState extends State<SomeProducts> {
                           padding: const EdgeInsets.only(
                               left: 2.0, right: 2.0),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              CachedNetworkImage(
-                                imageUrl:'${itemsTemp[index]['img']}',
+                              Container(
                                 width: double.infinity,
-                                height: 50,
-                                fit: BoxFit.contain,
+                                // color: Colors.red,
+                                height: 55,
+                                child: CachedNetworkImage(
+                                  height: 60,
+                                  imageUrl: '${itemsTemp[index]['img']}', fit: BoxFit.cover,)
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                              Column(
                                 children: [
                                   Padding(
                                     padding:
-                                    const EdgeInsets.only(left: 8.0),
+                                    const EdgeInsets.only(left:2,top: 2),
                                     child: Text(
                                       itemsTemp[index]["name"],
                                       style: const TextStyle(
                                           fontSize: 16,
-                                          fontWeight: FontWeight.bold),
+                                          fontWeight: FontWeight.bold, color: Colors.green),
                                     ),
                                   ),
-                                  InkWell(
-                                      onTap: (){
-
-                                save();
-                              },
-                              child: const Icon(Icons.favorite_outline,color: Colors.red,)
-                          ),
+                         
                         ],
                       ),
-                      Row(
+                      Column(
                         mainAxisAlignment:
                         MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
                             children: [
-                              Text(
-                                "\$${itemsTemp[index]['price'].toStringAsFixed(2)}",
-                                style: const TextStyle(
-                                    color: Colors.green,
-                                    fontSize: 18),
-                              ),
-                              if (itemsTemp[index]['crossedPrice'] !=
-                                  null) ...[
-                                Padding(
-                                  padding:
-                                  const EdgeInsets.only(
-                                      left: 3.0),
-                                  child: Text(
-                                    "\$${itemsTemp[index]['crossedPrice'].toStringAsFixed(2)}",
-                                    style: const TextStyle(
-                                        decoration:
-                                        TextDecoration
-                                            .lineThrough),
-                                  ),
+                              Padding(
+                                padding: const EdgeInsets.only(left:4.0),
+                                child: Text(
+                                  itemsTemp[index]["unit"],
+                                  style: const TextStyle(
+                                      fontSize: 16,),
                                 ),
-                              ],
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                itemsTemp[index]["unit"],
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight:
-                                    FontWeight.bold),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(
                                     left: 4.0, right: 8.0),
                                 child: Text(
-                                  "${itemsTemp[index]['Weight']}",
+                                  "${itemsTemp[index]['Weight']},",
                                   style: const TextStyle(
                                       fontSize: 16),
                                 ),
                               ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 4.0, right: 8.0),
+                                child: Text('Price',
+                                  style: const TextStyle(
+                                      fontSize: 16),
+                                ),
+                              ),
+                              
                             ],
                           ),
-                        ],
-                      ),
-                      TextButton(
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "\$${itemsTemp[index]['price'].toStringAsFixed(2)}",
+                                style: const TextStyle(
+                                    color: Colors.black,fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                              ),
+                              // if (itemsTemp[index]['crossedPrice'] !=
+                              //     null) ...[
+                              //   Padding(
+                              //     padding:
+                              //     const EdgeInsets.only(
+                              //         left: 3.0),
+                              //     child: Text(
+                              //       "\$${itemsTemp[index]['crossedPrice'].toStringAsFixed(2)}",
+                              //       style: const TextStyle(
+                              //           decoration:
+                              //           TextDecoration
+                              //               .lineThrough),
+                              //     ),
+                              //   ),
+                              // ],
+                              TextButton(
                         onPressed: () {
 
                           cart();
@@ -209,9 +207,14 @@ class _SomeProductsState extends State<SomeProducts> {
                         child: const Text(
                           "Add to cart",
                           style: TextStyle(
-                              color: Colors.black, fontSize: 18),
+                              color: Colors.green, fontSize: 16),
                         ),
                       ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      
                     ],
                   ),
                 ),
