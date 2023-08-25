@@ -61,8 +61,8 @@ class _HomePageState extends State<HomePage> {
         title:Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(greetings, style: TextStyle(fontSize: 14, color: Colors.green),),
-            Text("Vincent", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),)
+            Text(greetings, style: const TextStyle(fontSize: 14, color: Colors.green),),
+            const Text("Vincent", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),)
           ],
         ),
         actions: [
@@ -126,7 +126,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-               SizedBox(height: 10,)
+               const SizedBox(height: 10,)
               ],
             ),
           ) ,
