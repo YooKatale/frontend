@@ -19,11 +19,11 @@ class _HomePageState extends State<HomePage> {
 
   greeting(){
     var hour = DateTime.now().hour;
-  if (hour <= 12) {
+  if (hour < 12) {
     setState(() {
       greetings ='Good Morning';
     });
-  } else if ((hour > 12) && (hour <= 16)) {
+  } else if ((hour >= 12) && (hour <= 16)) {
     setState(() {
       greetings ='Good Afternoon';
     });
@@ -155,12 +155,11 @@ class _HomePageState extends State<HomePage> {
                         
                       ),
                     // ),
-                    Positioned(
+                    const Positioned(
                       left: 200,
                           right: 10,
                           top: 20,
-                      child: Text(
-                        
+                      child: Text(                        
                         'Special deal of the day',
                         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18.0, fontStyle: FontStyle.normal), textAlign: TextAlign.center,
                       ),
@@ -181,14 +180,14 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 10,),
 
           Container(
-            height: 140,
+            height: 200,
             child:  Column(
               children: [           
     
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Categories',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                    const Text('Categories',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold, color: Colors.green),),
                     InkWell(
                       onTap: (){
 
@@ -197,7 +196,7 @@ class _HomePageState extends State<HomePage> {
                             MaterialPageRoute(
                                 builder: ((context) => const CategoriesPageDynamic())));
                       },
-                        child: const Text('View more.',style: TextStyle(fontSize: 16),)
+                        child: const Text('View more.',style: TextStyle(fontSize: 16, color: Colors.green),)
                     ),
 
                   ],
@@ -220,18 +219,9 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Best Products',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
-                    InkWell(
-                        onTap: (){
-
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: ((context) => const AllProductsPageDynamic())));
-                        },
-                        child: const Text('View more.',style: TextStyle(fontSize: 16),)
-                    ),
+                  children: const [
+                    Text('Popular Products',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold, color: Colors.green),),
+                    
 
                   ],
                 ),

@@ -31,12 +31,12 @@ class _CategoriesHorizontalState extends State<CategoriesHorizontal> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: ListView.builder(
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
           itemCount:itemLength,
           physics: const BouncingScrollPhysics(),
-          scrollDirection:Axis.horizontal,
+          // scrollDirection:Axis.horizontal,
           itemBuilder: (BuildContext context, int index) {
-
             return InkWell(
               onTap: (){
 
@@ -49,27 +49,30 @@ class _CategoriesHorizontalState extends State<CategoriesHorizontal> {
                         ))));
               },
               child: Padding(
-                padding: const EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(2.0),
                 child: Container(
-                  height: 50,
-                  width: 100,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Color.fromRGBO(
-                        itemsTemp[index]['red'], itemsTemp[index]['green'], itemsTemp[index]['blue'], 1),
-                  ),
                   child: Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(3.0),
-                        child: CachedNetworkImage(
-                          imageUrl:'${itemsTemp[index]['img']}',height: 40,width: 40,fit: BoxFit.cover,),
+                      Container(
+                        height: 55,
+                        width: 60,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          color: Color.fromRGBO(
+                              itemsTemp[index]['red'], itemsTemp[index]['green'], itemsTemp[index]['blue'], 1),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(1.0),
+                          child: CachedNetworkImage(
+                            imageUrl:'${itemsTemp[index]['img']}',height: 55,width: 40,fit: BoxFit.cover,),
+                        ),
                       ),
+                      const SizedBox(height:5,),
                       Text(
-                        itemsTemp[index]['name'],
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
+                          itemsTemp[index]['name'],
+                          style: const TextStyle(
+                               fontSize: 14, color: Colors.green),
+                        ),
                     ],
                   ),
                 ),
