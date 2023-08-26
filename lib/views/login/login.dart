@@ -50,166 +50,311 @@ class _LoginState extends State<Login> {
       child: Scaffold(
         //resizeToAvoidBottomInset: false,
         backgroundColor:Colors.white,
-        body: SafeArea(
-
-            child:Form(
-              key: _formKey,
-              child: ListView(
-                padding:const EdgeInsets.only(left: 10,right: 10),
-                children:  [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 30.0,bottom: 30),
-                    child: Center(child: Text('LOGIN',style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold))),
-                  ),
-
-
-
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                        height: 30,
-                      ),
-
-                      Image.network('https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75',width: 115),
-
-                      const SizedBox(height: 30,),
-                    ],
-                  ),
-
-
-                  //email textfield
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 40,),
+                  Image.asset('images/logo.jpg',height: 200,),
+                  // const SizedBox(height: 10,),
+                  const Text('Sign In', style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500, fontSize: 28, fontStyle: FontStyle.normal),),
+                  const SizedBox(height: 20),
+            Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                // padding:const EdgeInsets.only(left: 10,right: 10),
+                children:  [                    
+                  //email
                   TextFormField(
                       controller: _ema,
                       cursorColor: Colors.blue.shade200,
                       decoration: InputDecoration(
                           hintText: 'Email',
-                          prefixIcon:const Icon(Icons.email,size: 18,color:Colors.grey,),
+                          prefixIcon: const Icon(Icons.email,size: 18,color:Colors.green,),
                           filled: true,
-                          fillColor:Colors.grey.shade200,
-                          enabledBorder: UnderlineInputBorder(
-                            borderRadius: BorderRadius.circular(4),
-                            borderSide: BorderSide.none,
+                          fillColor:Colors.white,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(color: Colors.grey, width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(4),
-                            borderSide: const BorderSide(color: Colors.blue),
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(color: Colors.green, width: 2),
                           )
                       ),
                       validator: (value){
                         if(value!.isEmpty){
-
+        
                           return 'Enter Email';
                         }
                         bool _isValid= (EmailValidator.validate(value));
                         if(_isValid==false){
                           return 'Enter Valid Email Address';
-
+        
                         }
                         return null;
-
+        
                       }
                   ),
-
-                  const SizedBox(height: 10,),
-
-
-                  //password textfiled
+        
+                  const SizedBox(height: 20,),        
+                  //password
                   TextFormField(
                       controller: _pass,
                       cursorColor: Colors.blue.shade200,
                       obscureText: _secureText,
                       decoration: InputDecoration(
                           hintText: 'Password',
-                          prefixIcon: const Icon(Icons.lock,size: 18,color:Colors.grey,),
+                          prefixIcon:const Icon(Icons.lock,size: 18,color:Colors.green,),
                           suffixIcon: IconButton(
                             onPressed: showHide,
                             icon: _secureText
                                 ? const Icon(
                               Icons.visibility_off,
-                              color: Colors.grey,
+                              color: Colors.green,
                               size: 20,
                             )
                                 : const Icon(
                               Icons.visibility,
-                              color: Colors.grey,
+                              color: Colors.green,
                               size: 20,
                             ),
                           ),
                           filled: true,
-                          fillColor:Colors.grey.shade200,
-                          enabledBorder: UnderlineInputBorder(
-                            borderRadius: BorderRadius.circular(4),
-                            borderSide: BorderSide.none,
+                          fillColor:Colors.white,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(color: Colors.grey, width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(4),
-                            borderSide: const BorderSide(color: Colors.blue),
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(color: Colors.green, width: 2),
                           )
                       ),
-
+        
                       validator: (value){
                         if(value!.isEmpty){
                           return 'Enter your Password';
-
+        
                         }
                         return null;
                       }
-
+        
                   ),
-
-                  const SizedBox(height: 10,),
-
-                  Align(
+        
+                  const SizedBox(height: 10,),  
+                ],
+              ),
+            ),
+          ),
+          Align(
                       alignment: Alignment.centerRight,
                       child: InkWell(
                         onTap: (){
-
-
                         },
-                        child:  const Text('Forgot password?',style: TextStyle(color: Colors.blue),
+                        child:  const Padding(
+                          padding: EdgeInsets.only(right: 15.0),
+                          child: Text('Forgot password?',style: TextStyle(color: Colors.grey),
+                          ),
                         ),
                       )),
 
                   const SizedBox(height: 20,),
-
-                Padding(
-            padding: const EdgeInsets.only(left: 20,right: 20),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              onPressed: (){
-
-                _signIn(context);
-
-
-                //FirebaseAuth.instance.signInWithEmailAndPassword(email:_ema.text, password:_pass.text);
-
-
-              }, child:const Text('Login',style: TextStyle(color: Colors.white),),
-            ),
-          ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20,right: 20),
+                    child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800]),
+                onPressed: (){
+                  _signIn(context);        
+                        FirebaseAuth.instance.createUserWithEmailAndPassword(email:_ema.text.trim(), password:_pass.text.trim());
+                }, child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text('Login',style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 25)),
+                )), ),
 
                   const SizedBox(height: 20,),
-
-                  Align(
-                      alignment: Alignment.centerLeft,
+                 Align(
+                      alignment: Alignment.center,
                       child: InkWell(
                         onTap: (){
 
                           Navigator.pushReplacementNamed(context,Register.id);
 
                         },
-                        child:   const Text('Dont have an account? ${'Sign Up'}',style: TextStyle(color: Colors.blue),
+                        child:   const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 15),
+                          child: Text('Dont have an account? ${'Sign Up'}',style: TextStyle(color: Colors.grey, fontSize: 16),
+                          ),
                         ),
-                      )),
-
-                  const SizedBox(height: 50,),
-                ],
-              ),
-            )
+                      )),          
+            ],
+          ),
         ),
       ),
+      // child: Scaffold(
+      //   //resizeToAvoidBottomInset: false,
+      //   backgroundColor:Colors.white,
+      //   body: SafeArea(
+
+      //       child:Form(
+      //         key: _formKey,
+      //         child: ListView(
+      //           padding:const EdgeInsets.only(left: 10,right: 10),
+      //           children:  [
+      //             const Padding(
+      //               padding: EdgeInsets.only(top: 30.0,bottom: 30),
+      //               child: Center(child: Text('LOGIN',style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold))),
+      //             ),
+
+
+
+      //             Column(
+      //               mainAxisAlignment: MainAxisAlignment.start,
+      //               crossAxisAlignment: CrossAxisAlignment.start,
+      //               children: [
+      //                 const SizedBox(
+      //                   height: 30,
+      //                 ),
+
+      //                 Image.network('https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75',width: 115),
+
+      //                 const SizedBox(height: 30,),
+      //               ],
+      //             ),
+
+
+      //             //email textfield
+      //             TextFormField(
+      //                 controller: _ema,
+      //                 cursorColor: Colors.blue.shade200,
+      //                 decoration: InputDecoration(
+      //                     hintText: 'Email',
+      //                     prefixIcon:const Icon(Icons.email,size: 18,color:Colors.grey,),
+      //                     filled: true,
+      //                     fillColor:Colors.grey.shade200,
+      //                     enabledBorder: UnderlineInputBorder(
+      //                       borderRadius: BorderRadius.circular(4),
+      //                       borderSide: BorderSide.none,
+      //                     ),
+      //                     focusedBorder: OutlineInputBorder(
+      //                       borderRadius: BorderRadius.circular(4),
+      //                       borderSide: const BorderSide(color: Colors.blue),
+      //                     )
+      //                 ),
+      //                 validator: (value){
+      //                   if(value!.isEmpty){
+
+      //                     return 'Enter Email';
+      //                   }
+      //                   bool _isValid= (EmailValidator.validate(value));
+      //                   if(_isValid==false){
+      //                     return 'Enter Valid Email Address';
+
+      //                   }
+      //                   return null;
+
+      //                 }
+      //             ),
+
+      //             const SizedBox(height: 10,),
+
+
+      //             //password textfiled
+      //             TextFormField(
+      //                 controller: _pass,
+      //                 cursorColor: Colors.blue.shade200,
+      //                 obscureText: _secureText,
+      //                 decoration: InputDecoration(
+      //                     hintText: 'Password',
+      //                     prefixIcon: const Icon(Icons.lock,size: 18,color:Colors.grey,),
+      //                     suffixIcon: IconButton(
+      //                       onPressed: showHide,
+      //                       icon: _secureText
+      //                           ? const Icon(
+      //                         Icons.visibility_off,
+      //                         color: Colors.grey,
+      //                         size: 20,
+      //                       )
+      //                           : const Icon(
+      //                         Icons.visibility,
+      //                         color: Colors.grey,
+      //                         size: 20,
+      //                       ),
+      //                     ),
+      //                     filled: true,
+      //                     fillColor:Colors.grey.shade200,
+      //                     enabledBorder: UnderlineInputBorder(
+      //                       borderRadius: BorderRadius.circular(4),
+      //                       borderSide: BorderSide.none,
+      //                     ),
+      //                     focusedBorder: OutlineInputBorder(
+      //                       borderRadius: BorderRadius.circular(4),
+      //                       borderSide: const BorderSide(color: Colors.blue),
+      //                     )
+      //                 ),
+
+      //                 validator: (value){
+      //                   if(value!.isEmpty){
+      //                     return 'Enter your Password';
+
+      //                   }
+      //                   return null;
+      //                 }
+
+      //             ),
+
+      //             const SizedBox(height: 10,),
+
+      //             Align(
+      //                 alignment: Alignment.centerRight,
+      //                 child: InkWell(
+      //                   onTap: (){
+
+
+      //                   },
+      //                   child:  const Text('Forgot password?',style: TextStyle(color: Colors.blue),
+      //                   ),
+      //                 )),
+
+      //             const SizedBox(height: 20,),
+
+      //           Padding(
+      //       padding: const EdgeInsets.only(left: 20,right: 20),
+      //       child: ElevatedButton(
+      //         style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+      //         onPressed: (){
+
+      //           _signIn(context);
+
+
+      //           //FirebaseAuth.instance.signInWithEmailAndPassword(email:_ema.text, password:_pass.text);
+
+
+      //         }, child:const Text('Login',style: TextStyle(color: Colors.white),),
+      //       ),
+      //     ),
+
+      //             const SizedBox(height: 20,),
+
+      //             Align(
+      //                 alignment: Alignment.centerLeft,
+      //                 child: InkWell(
+      //                   onTap: (){
+
+      //                     Navigator.pushReplacementNamed(context,Register.id);
+
+      //                   },
+      //                   child:   const Text('Dont have an account? ${'Sign Up'}',style: TextStyle(color: Colors.blue),
+      //                   ),
+      //                 )),
+
+      //             const SizedBox(height: 50,),
+      //           ],
+      //         ),
+      //       )
+      //   ),
+      // ),
       onWillPop:() async{
 
         return false;
