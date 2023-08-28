@@ -2,6 +2,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:yookatale/views/Widgets/editProfile.dart';
 import 'package:yookatale/views/pdfs/invoicelist.dart';
 
 
@@ -87,32 +88,36 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.lightGreen,
+        toolbarHeight: 70,
+        automaticallyImplyLeading: false,        
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
-        title:const Text('Account',maxLines: 1,overflow:TextOverflow.ellipsis,style: TextStyle(color: Colors.white)),
+        title:Column(
+          children:   [
+            const SizedBox(height: 10,),
+            ListTile(
+                  leading: const CircleAvatar(
+                     backgroundColor: Colors.grey,
+                     radius: 33,
+                    child: CircleAvatar(
+                      radius: 30,
+                      backgroundImage: AssetImage('images/logo.jpg'),
+                    ),
+                  ),
+                  title: const Text('Profile',style: TextStyle(fontSize: 20),),
+                  subtitle: InkWell(
+                    onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfile())),
+                    child: const Text('Edit Profile')),
+                ),
+          ],
+        )
       ),
 
       body: ListView(
         padding: const EdgeInsets.only(left: 10,right: 10,top:10,bottom: 60),
-        children:  [
-
-          Container(
-            decoration: BoxDecoration(
-              color:Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child:  const ListTile(
-              leading: CircleAvatar(
-                radius: 30,
-                backgroundImage: NetworkImage('https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75'),
-              ),
-              title: Text('Profile',style: TextStyle(fontSize: 20),),
-              subtitle: Text('Profile'),
-            ),
-          ),
+        children:  [         
           const SizedBox(height: 5),
           const Divider(height: 5,thickness: 5,),
 
