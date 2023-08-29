@@ -44,39 +44,40 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC8pPNA-l4WFKXelM3TxuGJqp-ByPE3M4s',
-    appId: '1:1085598173623:web:ccbf96b1ba6bca2a774032',
-    messagingSenderId: '1085598173623',
-    projectId: 'yokatale-70625',
-    authDomain: 'yokatale-70625.firebaseapp.com',
-    storageBucket: 'yokatale-70625.appspot.com',
+    apiKey: 'AIzaSyC-7kaqMQSnWTywa0oz3IfMWPP7yS6GrJA',
+    appId: '1:1091927934214:web:5898dcf958cacc4af0ca87',
+    messagingSenderId: '1091927934214',
+    projectId: 'yookatale-aa476',
+    authDomain: 'yookatale-aa476.firebaseapp.com',
+    storageBucket: 'yookatale-aa476.appspot.com',
+    measurementId: 'G-V89W3PMDKY',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCi0tTkiPDleVC-3a50L6bGktzyzbFyKBU',
-    appId: '1:1085598173623:android:b48ca06dda7e89ca774032',
-    messagingSenderId: '1085598173623',
-    projectId: 'yokatale-70625',
-    storageBucket: 'yokatale-70625.appspot.com',
+    apiKey: 'AIzaSyDGWEgCpdgM2qeHkmPmKN9ikWHWexb_UpY',
+    appId: '1:1091927934214:android:7f728f56c7a683d7f0ca87',
+    messagingSenderId: '1091927934214',
+    projectId: 'yookatale-aa476',
+    storageBucket: 'yookatale-aa476.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAy-6b3RBDw8cOsaauQUQlt5YrIlk9Sbn0',
-    appId: '1:1085598173623:ios:19e00ea9003d3909774032',
-    messagingSenderId: '1085598173623',
-    projectId: 'yokatale-70625',
-    storageBucket: 'yokatale-70625.appspot.com',
-    iosClientId: '1085598173623-4gfc1snepuk60thsuqonrlufg1dlfhk9.apps.googleusercontent.com',
+    apiKey: 'AIzaSyAxCo2bbbzuS3khclVY1aAdD7-cW0M7xO8',
+    appId: '1:1091927934214:ios:6c76d679ec45ce88f0ca87',
+    messagingSenderId: '1091927934214',
+    projectId: 'yookatale-aa476',
+    storageBucket: 'yookatale-aa476.appspot.com',
+    iosClientId: '1091927934214-fujsu0oqkpsdoaglifar4ut2tu8hiha8.apps.googleusercontent.com',
     iosBundleId: 'com.example.yookatale',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAy-6b3RBDw8cOsaauQUQlt5YrIlk9Sbn0',
-    appId: '1:1085598173623:ios:8ef335d110d5076c774032',
-    messagingSenderId: '1085598173623',
-    projectId: 'yokatale-70625',
-    storageBucket: 'yokatale-70625.appspot.com',
-    iosClientId: '1085598173623-8qnq7colp5ag7k9bpjflss0bj46lv1ec.apps.googleusercontent.com',
+    apiKey: 'AIzaSyAxCo2bbbzuS3khclVY1aAdD7-cW0M7xO8',
+    appId: '1:1091927934214:ios:228b898a4faea7fbf0ca87',
+    messagingSenderId: '1091927934214',
+    projectId: 'yookatale-aa476',
+    storageBucket: 'yookatale-aa476.appspot.com',
+    iosClientId: '1091927934214-d25rn2aa9ntoar55cuvnmgnkeu79kr9h.apps.googleusercontent.com',
     iosBundleId: 'com.example.yookatale.RunnerTests',
   );
 }
