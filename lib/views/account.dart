@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yookatale/views/Widgets/editProfile.dart';
+import 'package:yookatale/views/Widgets/trackDelivery.dart';
 import 'package:yookatale/views/pdfs/invoicelist.dart';
 
 
@@ -106,10 +107,10 @@ class _AccountPageState extends State<AccountPage> {
                       backgroundImage: AssetImage('images/logo.jpg'),
                     ),
                   ),
-                  title: const Text('Profile',style: TextStyle(fontSize: 20),),
-                  subtitle: InkWell(
-                    onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfile())),
-                    child: const Text('Edit Profile')),
+                  title: const Text('Vincent Kogei',style: TextStyle(fontSize: 20),),
+                  // subtitle: InkWell(
+                  //   onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfile())),
+                  //   child: const Text('Edit Profile')),
                 ),
           ],
         )
@@ -143,8 +144,10 @@ class _AccountPageState extends State<AccountPage> {
                     ),
                     child: const Icon(Icons.person,color: Colors.blue,size: 35,),
                   ),
-                  title: const Text('Account',style: TextStyle(fontSize: 18),),
-                  trailing:const Icon(Icons.arrow_forward_ios_outlined),
+                  title: const Text('Edit Profile',style: TextStyle(fontSize: 18),),
+                  trailing:InkWell(
+                    onTap: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfile())),
+                    child: const Icon(Icons.arrow_forward_ios_outlined)),
 
                 ),
 
@@ -162,22 +165,13 @@ class _AccountPageState extends State<AccountPage> {
                       color: Colors.purple.shade100,
                       shape: BoxShape.circle,
                     ),
-                    child: Padding(
-                      padding:const EdgeInsets.only(top: 20),
-                      child:InkWell(
-                        onTap: (){
-                        },
-                        child: const badges.Badge(
-                              badgeContent: Text('0',style: TextStyle(color: Colors.white,fontSize: 10),),
-                              child: Icon(Icons.notifications,color:Colors.purple,size: 35,),
-                            )
-                        
-                        
-                      ),
-                    ),
+                    child:  const Icon(Icons.delivery_dining,color:Colors.purple,size: 35,),
+                        // ),
                   ),
-                  title: const Text('Notifications',style: TextStyle(fontSize: 18),),
-                  trailing:const Icon(Icons.arrow_forward_ios_outlined),
+                  title: const Text('Track Delivery',style: TextStyle(fontSize: 18),),
+                  trailing:InkWell(
+                    onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=> TrackDelivery())),
+                    child: const Icon(Icons.arrow_forward_ios_outlined)),
 
                 ),
 
@@ -186,32 +180,27 @@ class _AccountPageState extends State<AccountPage> {
 
                 //cart
                 ListTile(
-                  onTap: (){
-
-                    Navigator.push(context,MaterialPageRoute(builder: (context)=> const CartPage()));
-
+                  onTap: (){Navigator.push(context,MaterialPageRoute(builder: (context)=> const CartPage()));
                   },
                   leading: Container(
                     decoration: BoxDecoration(
                       color: Colors.purple.shade100,
                       shape: BoxShape.circle,
                     ),
-                    child: Padding(
-                      padding:const EdgeInsets.only(top: 20),
-                      child:InkWell(
-                        child:const badges.Badge(
-                          badgeContent:Text('4',style: TextStyle(color: Colors.white,fontSize: 10),),
-                          child:Icon(Icons.shopping_cart,color:Colors.green,size: 35,) ,
-                        ),
-                        onTap: (){
-
+                    // child: Padding(
+                    //   padding:const EdgeInsets.only(top: 20),
+                      child:Icon(Icons.subscriptions_outlined,color:Colors.green,size: 35,) ,
+                        // ),
+                        
+                      // ),
+                    // ),
+                  ),
+                  title: const Text('Subscription',style: TextStyle(fontSize: 18),),
+                  trailing:InkWell(
+                    onTap: (){
                           Navigator.push(context,MaterialPageRoute(builder: (context)=> const CartPage()));
                         },
-                      ),
-                    ),
-                  ),
-                  title: const Text('Cart',style: TextStyle(fontSize: 18),),
-                  trailing:const Icon(Icons.arrow_forward_ios_outlined),
+                    child: const Icon(Icons.arrow_forward_ios_outlined)),
 
                 ),
 
@@ -220,9 +209,7 @@ class _AccountPageState extends State<AccountPage> {
                 //orders
                 ListTile(
                   onTap: (){
-
                     Navigator.push(context,MaterialPageRoute(builder: (context)=> const Orders()));
-
                   },
                   leading: Container(
                     decoration: BoxDecoration(
@@ -240,13 +227,7 @@ class _AccountPageState extends State<AccountPage> {
 
                 ListTile(
                   onTap: (){
-
-
-
-
                     Navigator.push(context,MaterialPageRoute(builder: (context)=> const InvoiceList()));
-
-
                   },
                   leading: Container(
                     decoration: BoxDecoration(
@@ -259,19 +240,11 @@ class _AccountPageState extends State<AccountPage> {
                   trailing:const Icon(Icons.arrow_forward_ios_outlined),
 
                 ),
-
                 const SizedBox(height: 10,),
 
 
                 ListTile(
-                  onTap: (){
-
-
-
-
-                    Navigator.push(context,MaterialPageRoute(builder: (context)=> const LoyaltyPoints()));
-
-
+                  onTap: (){Navigator.push(context,MaterialPageRoute(builder: (context)=> const LoyaltyPoints()));
                   },
                   leading: Container(
                     decoration: BoxDecoration(
@@ -290,24 +263,67 @@ class _AccountPageState extends State<AccountPage> {
                 //about us
                 ListTile(
                   onTap: (){
-
-
                     Navigator.push(context, MaterialPageRoute(builder:(context)=>const ContactUs()));
-
-
                   },
                   leading: Container(
                     decoration: BoxDecoration(
-                      color: Colors.orange.shade100,
+                      color: Colors.blue.shade100,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.mail,color: Colors.orange,size: 35,),
+                    child: const Icon(Icons.mail,color: Colors.blue,size: 35,),
                   ),
-                  title: const Text('Contact us',style: TextStyle(fontSize: 18),),
+                  title: const Text('Customer Support',style: TextStyle(fontSize: 18),),
                   trailing:const Icon(Icons.arrow_forward_ios_outlined),
 
                 ),
+                const SizedBox(height: 10,),
+                 ListTile(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder:(context)=>const ContactUs()));
+                  },
+                  leading: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.purple.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.share,color: Colors.purple,size: 35,),
+                  ),
+                  title: const Text('Invite a Friend',style: TextStyle(fontSize: 18),),
+                  trailing:const Icon(Icons.arrow_forward_ios_outlined),
 
+                ),
+                const SizedBox(height: 10,),
+                 ListTile(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder:(context)=>const ContactUs()));
+                  },
+                  leading: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.share,color: Colors.green,size: 35,),
+                  ),
+                  title: const Text('FAQs',style: TextStyle(fontSize: 18),),
+                  trailing:const Icon(Icons.arrow_forward_ios_outlined),
+
+                ),
+                const SizedBox(height: 10,),
+                ListTile(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder:(context)=>const ContactUs()));
+                  },
+                  leading: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.policy,color: Colors.deepPurple,size: 35,),
+                  ),
+                  title: const Text('Terms & Conditions',style: TextStyle(fontSize: 18),),
+                  trailing:const Icon(Icons.arrow_forward_ios_outlined),
+
+                ),
                 const SizedBox(height: 10,),
 
 
