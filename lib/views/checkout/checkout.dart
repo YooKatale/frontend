@@ -18,97 +18,50 @@ class _CheckoutState extends State<Checkout> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.lightGreen,
-        title: const Text("Checkout",style:TextStyle(color: Colors.white),),
+        automaticallyImplyLeading: false,
       ),
-      body:ListView(
-        children: [
-          Center(
-            child: Column(
-              children: [
+      body:Center(
+        child: Column(
+          children: [
+          const SizedBox(height: 50,),
+            Icon(Icons.check_circle, color: Colors.green.shade400, size: 200,),
+            const SizedBox(
+                  height: 30,
+                ),
+         const Text("Order Placed Successfully", style:TextStyle(fontSize: 20, color: Colors.green),
+           textAlign: TextAlign.center,
+                    ),
 
+                    
                 const SizedBox(
-                  height: 20,
+                  height: 70,
                 ),
-                Image.network(
-                  "https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75",
-                  width: 115,
-                ),
-                ListView(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.all(24),
-                  children: [
-                    const SizedBox(
-                      height: 20,
+
+                Padding(
+                  padding: const EdgeInsets.only(left: 20,right: 20),
+                  child: Container(
+                    width: 200,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      
                     ),
-
-                    Column(
-                      children: [
-                        Image.asset(
-                          'assets/images/successful.png',
-                          width: 250,
-                        ),
-
-                        const SizedBox(
-                          height: 15,
-                        ),
-
-                        const Text(
-                          "Your order was successful",
-                          style:TextStyle(fontSize: 25),
-                          textAlign: TextAlign.center,
-                        ),
-
-                        const SizedBox(
-                          height: 16,
-                        ),
-
-                        const Text(
-                          'continue shopping',
-                          style:TextStyle(
-                              fontSize: 15, color:Colors.grey),
-                        ),
-
-                        const SizedBox(
-                          height: 8,
-                        ),
-
-                      ],
-                    ),
-
-                    const SizedBox(
-                      height: 30,
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20,right: 20),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          gradient: LinearGradient(
-                            colors:[
-                              blueGradient.darkShade,
-                              blueGradient.lightShade,
-                            ],
-                          ),
-                        ),
-                        child: MaterialButton(
-                          //color: Colors.green.shade700,
-                          child:const Text("Continue shopping",style: TextStyle(color: Colors.white),),
-                          onPressed: () {
-
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>const Dashboard()));
-
-                          },
-                        ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade700,
                       ),
+                      child:const Text("Keep shopping",style: TextStyle(color: Colors.white, fontSize: 18),),
+                      onPressed: () {
+
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>const Dashboard()));
+
+                      },
                     ),
-                  ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-        ],
+              
+          ],
+        ),
       ),
     );
   }
