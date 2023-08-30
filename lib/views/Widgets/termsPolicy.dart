@@ -26,7 +26,7 @@ class _TermsPolicyState extends State<TermsPolicy> {
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: const [
                     Text('Terms and Condition', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),),
                     SizedBox(height: 10,),
                     Text('These terms and conditions outline the rules and regulations for the use of Flutter Today’s Website, located at https://www.flutterdecode.com/.By accessing this website we assume you accept these terms and conditions. Do not continue to use Flutter Today if you do not agree to take all of the terms and conditions stated on this page.'),

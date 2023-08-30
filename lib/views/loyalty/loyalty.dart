@@ -15,7 +15,7 @@ class _LoyaltyPointsState extends State<LoyaltyPoints> {
     return Scaffold(
       backgroundColor:Colors.white,
       appBar: AppBar(
-        title: const Text("Loyality Points",style:TextStyle(),),
+        title: const Text("Loyality Points",style:TextStyle(fontWeight: FontWeight.bold),),
         backgroundColor:Colors.white,
         leading: InkWell(
           onTap: ()=> Navigator.of(context).pop(),

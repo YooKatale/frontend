@@ -26,8 +26,8 @@ bool _secureText = true;
       appBar: AppBar(actions: [],
       leading: InkWell(
         onTap: ()=> Navigator.of(context).pop(),
-        child: Icon(Icons.arrow_back_ios_new)),
-      title: Text('Edit Profile'),
+        child: const Icon(Icons.arrow_back_ios_new)),
+      title: const Text('Edit Profile', style: TextStyle(fontWeight: FontWeight.bold),),
       centerTitle: true,
       
       ),

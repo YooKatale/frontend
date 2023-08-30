@@ -17,7 +17,7 @@ TextEditingController field = TextEditingController(text: 'InviteYOOKATALE2023')
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Invite a Friend'),
+        title: const Text('Invite a Friend', style: TextStyle(fontWeight: FontWeight.bold),),
         leading: InkWell(
           onTap: ()=> Navigator.of(context).pop(),
           child: const Icon(Icons.arrow_back_ios_new_outlined)),
