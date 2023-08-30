@@ -47,6 +47,10 @@ dependencies:
   font_awesome_flutter: ^10.4.0
   google_maps_flutter: ^2.3.0
   order_tracker: ^0.0.2
+  clipboard: ^0.1.3
+  fluttertoast: ^8.2.2
+  rating_dialog: ^2.0.4
+  in_app_review: ^2.0.3
 
 dev_dependencies:
   flutter_test:

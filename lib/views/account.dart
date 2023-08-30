@@ -2,7 +2,11 @@ import 'package:badges/badges.dart' as badges;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:in_app_review/in_app_review.dart';
+import 'package:rating_dialog/rating_dialog.dart';
 import 'package:yookatale/views/Widgets/editProfile.dart';
+import 'package:yookatale/views/Widgets/inviteFriend.dart';
 import 'package:yookatale/views/Widgets/trackDelivery.dart';
 import 'package:yookatale/views/pdfs/invoicelist.dart';
 
@@ -21,6 +25,69 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+
+  void _showRatingDialog() {
+    // actual store listing review & rating
+    void _rateAndReviewApp() async {
+      // refer to: https://pub.dev/packages/in_app_review
+      final _inAppReview = InAppReview.instance;
+
+      if (await _inAppReview.isAvailable()) {
+        print('request actual review from store');
+        _inAppReview.requestReview();
+      } else {
+        print('open actual store listing');
+        // TODO: use your own store ids
+        _inAppReview.openStoreListing(
+          appStoreId: '<your app store id>',
+          microsoftStoreId: '<your microsoft store id>',
+        );
+      }
+    }
+
+    final _dialog = RatingDialog(
+      initialRating: 1.0,
+      // your app's name?
+      title: const Text(
+        'Rating Dialog',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 25,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      // encourage your user to leave a high rating?
+      message: const Text(
+        'Tap a star to set your rating. Add more description here if you want.',
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 15),
+      ),
+      // your app's logo?
+      image: Image.asset('images/logo.jpg'),
+      submitButtonText: 'Submit',
+      commentHint: 'Set your custom comment hint',
+      onCancelled: () => print('cancelled'),
+      onSubmitted: (response) {
+        print('rating: ${response.rating}, comment: ${response.comment}');
+        Fluttertoast.showToast(msg: "Thank You!. You have sucessfully submited your feedback");
+
+        // TODO: add your own logic
+        if (response.rating < 3.0) {
+          // send their comments to your email or anywhere you wish
+          // ask the user to contact you instead of leaving a bad review
+        } else {
+          _rateAndReviewApp();
+        }
+      },
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      barrierDismissible: true, // set to false if you want to force a rating
+      builder: (context) => _dialog,
+    );
+  }
 
 
   cart(){
@@ -279,7 +346,7 @@ class _AccountPageState extends State<AccountPage> {
                 const SizedBox(height: 10,),
                  ListTile(
                   onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder:(context)=>const ContactUs()));
+                    Navigator.push(context, MaterialPageRoute(builder:(context)=> InviteFriend()));
                   },
                   leading: Container(
                     decoration: BoxDecoration(
@@ -289,6 +356,20 @@ class _AccountPageState extends State<AccountPage> {
                     child: const Icon(Icons.share,color: Colors.purple,size: 35,),
                   ),
                   title: const Text('Invite a Friend',style: TextStyle(fontSize: 18),),
+                  trailing:const Icon(Icons.arrow_forward_ios_outlined),
+
+                ),
+                const SizedBox(height: 10,),
+                 ListTile(
+                  onTap: _showRatingDialog,
+                  leading: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.feedback_outlined,color: Colors.orange,size: 35,),
+                  ),
+                  title: const Text('FeedBack ',style: TextStyle(fontSize: 18),),
                   trailing:const Icon(Icons.arrow_forward_ios_outlined),
 
                 ),
