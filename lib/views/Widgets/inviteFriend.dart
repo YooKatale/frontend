@@ -27,7 +27,7 @@ TextEditingController field = TextEditingController(text: 'InviteYOOKATALE2023')
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Card(
-              color: Colors.grey.shade400,
+              color: Colors.grey.shade300,
               elevation: 0,
               margin: const EdgeInsets.all(4),
               child: Padding(
@@ -55,11 +55,11 @@ TextEditingController field = TextEditingController(text: 'InviteYOOKATALE2023')
                           FlutterClipboard.copy(field.text).then(( value ) =>
                               // print('copied')
                               Fluttertoast.showToast(
-                              msg: "This is Center Short Toast",
+                              msg: "You have copied the invite code",
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.BOTTOM,
                               timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.red,
+                              backgroundColor: Colors.green,
                               textColor: Colors.white,
                               fontSize: 16.0
                           ));

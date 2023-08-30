@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:rating_dialog/rating_dialog.dart';
 import 'package:yookatale/views/Widgets/editProfile.dart';
+import 'package:yookatale/views/Widgets/faqScreen.dart';
 import 'package:yookatale/views/Widgets/inviteFriend.dart';
 import 'package:yookatale/views/Widgets/trackDelivery.dart';
 import 'package:yookatale/views/pdfs/invoicelist.dart';
@@ -376,7 +377,7 @@ class _AccountPageState extends State<AccountPage> {
                 const SizedBox(height: 10,),
                  ListTile(
                   onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder:(context)=>const ContactUs()));
+                    Navigator.push(context, MaterialPageRoute(builder:(context)=> FAQScreen()));
                   },
                   leading: Container(
                     decoration: BoxDecoration(

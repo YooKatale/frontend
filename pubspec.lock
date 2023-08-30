@@ -134,6 +134,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.17"
+  expandable_widgets:
+    dependency: transitive
+    description:
+      name: expandable_widgets
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.3+1"
   fake_async:
     dependency: transitive
     description:
@@ -141,6 +148,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.1"
+  faqflutter:
+    dependency: "direct main"
+    description:
+      name: faqflutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.1"
   ffi:
     dependency: transitive
     description:
