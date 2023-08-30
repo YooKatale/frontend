@@ -52,7 +52,7 @@ class _OrdersState extends State<Orders> {
                     padding: const EdgeInsets.only(left:6.0, right: 6),
                     child: Card(
                       elevation: 4,
-                      color: Colors.transparent,
+                      color: Color(0xffffffff),
                       margin: const EdgeInsets.only(left:5,right: 5,top: 5,bottom: 5),
                       child:ListTile(
                         horizontalTitleGap: 0,
