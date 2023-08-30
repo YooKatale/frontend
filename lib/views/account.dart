@@ -87,7 +87,7 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.deepPurpleAccent[100],
       appBar: AppBar(
         backgroundColor: Colors.lightGreen,
         elevation: 0,
@@ -98,10 +98,9 @@ class _AccountPageState extends State<AccountPage> {
       body: ListView(
         padding: const EdgeInsets.only(left: 10,right: 10,top:10,bottom: 60),
         children:  [
-
           Container(
             decoration: BoxDecoration(
-              color:Colors.grey.shade200,
+              color:Colors.white,
               borderRadius: BorderRadius.circular(4),
             ),
             child:  const ListTile(
