@@ -38,8 +38,11 @@ class _CategoriesPageDynamicState extends State<CategoriesPageDynamic> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.lightGreen,
-        title: const Text("Categories",style:TextStyle(color: Colors.white),),
+        backgroundColor: Colors.white,
+        title: const Text("Categories",style:TextStyle(fontWeight: FontWeight.bold),),
+        leading: InkWell(
+          onTap: ()=> Navigator.of(context).pop(),
+          child: const Icon(Icons.arrow_back_ios_new_outlined)),
       ),
       body: GridView.builder(
           //scrollDirection: Axis.horizontal,
