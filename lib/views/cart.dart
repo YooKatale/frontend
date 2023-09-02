@@ -110,109 +110,35 @@ class _CartPageState extends State<CartPage> {
       ),
       
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Icon(Icons.payment),
-      // floatingActionButton:Container(
-      //   padding: const EdgeInsets.all(15),
-      //   height: 120,
-      //   // margin: const EdgeInsets.only(bottom: 10),
-      //   // width: MediaQuery.of(context).size.width,
-      //   decoration:BoxDecoration(
-      //       color: Colors.green.withOpacity(0.9),
-      //       borderRadius: const BorderRadius.only(
-      //           topLeft: Radius.circular(30),
-      //           topRight: Radius.circular(30))),
-      //   child: Column(
-      //     children: [
-      //      Row(
-      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //     children: [
+      floatingActionButton: Wrap( //will break to another line on overflow
+                  direction: Axis.horizontal, //use vertical to show  on vertical axis
+                  children: <Widget>[
+                        Container( 
+                          margin:EdgeInsets.all(10),
+                          child: FloatingActionButton(
+                            onPressed: (){
+                                //action code for button 1
+                            },
+                            child: Icon(Icons.call, color: Colors.lightBlueAccent,),
+                          )
+                        ), //button first
 
-      //       Text(
-      //         "Total Payment",
-      //         style: TextStyle(
-      //             fontSize: 15,fontWeight: FontWeight.bold,color: Colors.white),
-      //       ),
+                        Container( 
+                          margin:EdgeInsets.all(10),
+                          child: FloatingActionButton(
+                            onPressed: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ItemsCart())),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green.shade400
+                              ),
+                              onPressed: (){}, child: const Text('Checkout')),
+                          )
+                        ),
 
-      //       Text(
-      //          " Shs 0",
-      //         style:TextStyle(fontSize: 15,fontWeight: FontWeight.bold,color: Colors.white),
-      //       ),
-
-
-      //     ],
-      //   ),
-
-      //        Row(
-      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //         children: [
-
-      //           TextFormField(
-      //               //controller: _ema,
-      //               cursorColor: Colors.blue.shade200,
-      //               decoration: InputDecoration(
-      //                   hintText: 'Enter Coupon Code',
-      //                   prefixIcon: const Icon(Icons.email,size: 18,color:Colors.grey,),
-      //                   filled: true,
-      //                   fillColor:Colors.grey.shade200,
-      //                   enabledBorder: UnderlineInputBorder(
-      //                     borderRadius: BorderRadius.circular(4),
-      //                     borderSide: BorderSide.none,
-      //                   ),
-      //                   focusedBorder: OutlineInputBorder(
-      //                     borderRadius: BorderRadius.circular(4),
-      //                     borderSide: const BorderSide(color: Colors.blue),
-      //                   )
-      //               ),
-      //               validator: (value){
-
-      //                 return null;
-
-      //               }
-      //           ),
-
-      //         ],
-      //       ),
-
-      //       const SizedBox(
-      //         height: 4,
-      //       ),
-      //       Container(
-      //         width: MediaQuery.of(context).size.width,
-      //         decoration: BoxDecoration(
-      //           borderRadius: BorderRadius.circular(10),
-      //           //color: Colors.green.shade700,
-      //           //shape: BoxShape.circle,
-      //           gradient:LinearGradient(
-      //             colors:[
-      //               blueGradient.darkShade,
-      //               blueGradient.lightShade,
-      //             ],
-      //           ),
-      //         ),
-      //         child:Container(
-      //           decoration: BoxDecoration(
-      //             borderRadius: BorderRadius.circular(5),
-      //             gradient: LinearGradient(
-      //               colors:[
-      //                 blueGradient.darkShade,
-      //                 blueGradient.lightShade,
-      //               ],
-      //             ),
-      //           ),
-      //           child:MaterialButton(
-      //             // color: Colors.green.shade700,
-      //             child:const Text("CHECKOUT NOW",style: TextStyle(color: Colors.white),),
-      //             onPressed: () {
-
-      //               Navigator.push(context,MaterialPageRoute(builder: (context)=> const DeliveryDetails()));
-
-      //             },
-      //           ) ,
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
+                        // Add more buttons here
+                ],
+            ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
