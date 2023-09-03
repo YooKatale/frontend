@@ -62,52 +62,59 @@ class _InvoiceListState extends State<InvoiceList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade300,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.lightGreen,
-        title: const Text("Invoices",style:TextStyle(color: Colors.white),),
+        backgroundColor: Colors.white,
+        title: const Text("Invoices",style:TextStyle(fontWeight: FontWeight.bold),),
+        leading: InkWell(
+          onTap: ()=> Navigator.of(context).pop(),
+          child: const Icon(Icons.arrow_back_ios_new_outlined)),
       ),
       body:ListView.builder(
           itemCount:itemLength,
           itemBuilder:(context,index){
 
             return Container(
-              color:Colors.grey.shade300,
+              color:Colors.white,
               child:Column(
 
                 children: [
 
-                  Card(
-                    elevation: 4,
-                    margin: const EdgeInsets.only(left:5,right: 5,top: 3,bottom: 3),
-                    child:ListTile(
-                      horizontalTitleGap: 0,
-                      onTap: (){
-
-                        // Navigator.push(context,MaterialPageRoute(builder:(context)=>OrdersDetail(
-                        //     id:itemsTemp[index]['orderid'],im:itemsTemp[index]['img'],nem:itemsTemp[index]['name'],quant:itemsTemp[index]['quant'],
-                        //     price:itemsTemp[index]['price'],tot:itemsTemp[index]['total'],stat:itemsTemp[index]['status'],date:itemsTemp[index]['date'],
-                        //     unit:itemsTemp[index]['unit']
-                        // )));
-                      },
-                      leading:   CircleAvatar(
-                        backgroundColor: Colors.lime.shade100,
-                        radius: 14,
-                        child:Image.network('https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75',),
-                      ),
-                      title: Center(
-                        child: Text(itemsTemp[index]['in'],style:  const TextStyle(fontSize: 14,
-                            color:Colors.black,fontWeight: FontWeight.bold),),
-                      ),
-                     // subtitle: Text(itemsTemp[index]['date']),
-                      trailing:InkWell(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                    child: Card(
+                      color: Colors.white,
+                      elevation: 4,
+                      margin: const EdgeInsets.only(left:5,right: 5,top: 3,bottom: 3),
+                      child:ListTile(
+                        horizontalTitleGap: 0,
                         onTap: (){
-                          download();
 
+                          // Navigator.push(context,MaterialPageRoute(builder:(context)=>OrdersDetail(
+                          //     id:itemsTemp[index]['orderid'],im:itemsTemp[index]['img'],nem:itemsTemp[index]['name'],quant:itemsTemp[index]['quant'],
+                          //     price:itemsTemp[index]['price'],tot:itemsTemp[index]['total'],stat:itemsTemp[index]['status'],date:itemsTemp[index]['date'],
+                          //     unit:itemsTemp[index]['unit']
+                          // )));
                         },
-                          child: const Icon(Icons.download,color:Colors.green,)
-                      ),
+                        leading:   CircleAvatar(
+                          backgroundColor: Colors.white,
+                          radius: 14,
+                          child:Image.network('https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75',),
+                        ),
+                        title: Center(
+                          child: Text(itemsTemp[index]['in'],style:  const TextStyle(fontSize: 14,
+                              color:Colors.black,fontWeight: FontWeight.bold),),
+                        ),
+                       // subtitle: Text(itemsTemp[index]['date']),
+                        trailing:InkWell(
+                          onTap: (){
+                            download();
 
+                          },
+                            child: const Icon(Icons.download,color:Colors.green,)
+                        ),
+
+                      ),
                     ),
                   ),
 

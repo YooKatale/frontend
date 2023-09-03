@@ -39,6 +39,9 @@ class _CategoryProductState extends State<CategoryProduct> {
     return Scaffold(
       appBar: AppBar(
         title:Text(widget.name,style: const TextStyle(fontWeight: FontWeight.bold),),
+        leading: InkWell(
+          onTap: ()=> Navigator.of(context).pop(),
+          child: const Icon(Icons.arrow_back_ios_new_outlined)),
       ),
       body:Padding(
         padding: const EdgeInsets.all(8.0),
@@ -50,7 +53,7 @@ class _CategoryProductState extends State<CategoryProduct> {
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
+                  return Center(child: const CircularProgressIndicator());
                 } else if (snapshot.hasData) {
                   List<QueryDocumentSnapshot> documents =
                       snapshot.data!.docs;
@@ -172,7 +175,7 @@ class _CategoryProductState extends State<CategoryProduct> {
                       });
                 }
                 // if snapshot.hasError
-                return const Text('Something went wrong');
+                return const Center(child: Text('Something went wrong'));
               }),
         ),
       ),

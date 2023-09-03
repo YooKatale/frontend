@@ -24,8 +24,11 @@ class _OrdersDetailState extends State<OrdersDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.lightGreen,
-        title: const Text("Orders Details",style:TextStyle(color: Colors.white),),
+        // backgroundColor: Colors.lightGreen,
+        title: const Text("Orders Details",style:TextStyle(fontWeight: FontWeight.bold),),
+        leading: InkWell(
+          onTap: ()=> Navigator.of(context).pop(),
+          child: const Icon(Icons.arrow_back_ios_new_outlined)),
       ),
       body:Container(
         //color:themeProvider.isDarkMode ? Colors.grey.shade500 :Colors.grey.shade300,
