@@ -37,21 +37,21 @@ class _CartPageState extends State<CartPage> {
       appBar: AppBar(
         title: const Text("Cart",style:TextStyle(),),
         leading: InkWell(
-          onTap: () => Navigator.of(context).pop(),
-          child: const Icon(Icons.arrow_back_ios_new)),
+            onTap: () => Navigator.of(context).pop(),
+            child: const Icon(Icons.arrow_back_ios_new)),
         actions: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            
+
             children:  [
-          const Icon(Icons.location_pin),
-          const SizedBox(width: 5,),
-          const Text('Home', style: TextStyle(color: Colors.green),),
-          const SizedBox(width: 10,),
-          InkWell(
-            onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ItemsCart())),
-            child: const Icon(Icons.shopping_cart)),
-          const SizedBox(width: 10,),
+              const Icon(Icons.location_pin),
+              const SizedBox(width: 5,),
+              const Text('Home', style: TextStyle(color: Colors.green),),
+              const SizedBox(width: 10,),
+              InkWell(
+                  onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ItemsCart())),
+                  child: const Icon(Icons.shopping_cart)),
+              const SizedBox(width: 10,),
             ],
           )
         ],
@@ -70,8 +70,8 @@ class _CartPageState extends State<CartPage> {
                           onTap: () {
                           },
                           child: Container(
-                                                       
-                           child:TextField(
+
+                            child:TextField(
                               enabled: false,
                               decoration: InputDecoration(
                                 hintText: 'Search category',
@@ -84,13 +84,13 @@ class _CartPageState extends State<CartPage> {
                                 filled: true,
                                 fillColor:Colors.white,
                                 suffixIcon: IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: ((context) => const CartPage())));
-                          },
-                          icon: const Icon(Icons.speaker,color: Colors.grey,)),
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: ((context) => const CartPage())));
+                                    },
+                                    icon: const Icon(Icons.speaker,color: Colors.grey,)),
                               ),
 
                             ),
@@ -98,121 +98,47 @@ class _CartPageState extends State<CartPage> {
                         ),
                       ),
 
-                      
+
                     ],
                   ),
                 ),
-               const SizedBox(height: 10,)
+                const SizedBox(height: 10,)
               ],
             ),
           ) ,
         ),
       ),
-      
+
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Icon(Icons.payment),
-      // floatingActionButton:Container(
-      //   padding: const EdgeInsets.all(15),
-      //   height: 120,
-      //   // margin: const EdgeInsets.only(bottom: 10),
-      //   // width: MediaQuery.of(context).size.width,
-      //   decoration:BoxDecoration(
-      //       color: Colors.green.withOpacity(0.9),
-      //       borderRadius: const BorderRadius.only(
-      //           topLeft: Radius.circular(30),
-      //           topRight: Radius.circular(30))),
-      //   child: Column(
-      //     children: [
-      //      Row(
-      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //     children: [
+      floatingActionButton: Wrap( //will break to another line on overflow
+        direction: Axis.horizontal, //use vertical to show  on vertical axis
+        children: <Widget>[
+          Container(
+              margin:EdgeInsets.all(10),
+              child: FloatingActionButton(
+                onPressed: (){
+                  //action code for button 1
+                },
+                child: Icon(Icons.call, color: Colors.lightBlueAccent,),
+              )
+          ), //button first
 
-      //       Text(
-      //         "Total Payment",
-      //         style: TextStyle(
-      //             fontSize: 15,fontWeight: FontWeight.bold,color: Colors.white),
-      //       ),
+          Container(
+              margin:EdgeInsets.all(10),
+              child: FloatingActionButton(
+                onPressed: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ItemsCart())),
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade400
+                    ),
+                    onPressed: (){}, child: const Text('Checkout')),
+              )
+          ),
 
-      //       Text(
-      //          " Shs 0",
-      //         style:TextStyle(fontSize: 15,fontWeight: FontWeight.bold,color: Colors.white),
-      //       ),
-
-
-      //     ],
-      //   ),
-
-      //        Row(
-      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //         children: [
-
-      //           TextFormField(
-      //               //controller: _ema,
-      //               cursorColor: Colors.blue.shade200,
-      //               decoration: InputDecoration(
-      //                   hintText: 'Enter Coupon Code',
-      //                   prefixIcon: const Icon(Icons.email,size: 18,color:Colors.grey,),
-      //                   filled: true,
-      //                   fillColor:Colors.grey.shade200,
-      //                   enabledBorder: UnderlineInputBorder(
-      //                     borderRadius: BorderRadius.circular(4),
-      //                     borderSide: BorderSide.none,
-      //                   ),
-      //                   focusedBorder: OutlineInputBorder(
-      //                     borderRadius: BorderRadius.circular(4),
-      //                     borderSide: const BorderSide(color: Colors.blue),
-      //                   )
-      //               ),
-      //               validator: (value){
-
-      //                 return null;
-
-      //               }
-      //           ),
-
-      //         ],
-      //       ),
-
-      //       const SizedBox(
-      //         height: 4,
-      //       ),
-      //       Container(
-      //         width: MediaQuery.of(context).size.width,
-      //         decoration: BoxDecoration(
-      //           borderRadius: BorderRadius.circular(10),
-      //           //color: Colors.green.shade700,
-      //           //shape: BoxShape.circle,
-      //           gradient:LinearGradient(
-      //             colors:[
-      //               blueGradient.darkShade,
-      //               blueGradient.lightShade,
-      //             ],
-      //           ),
-      //         ),
-      //         child:Container(
-      //           decoration: BoxDecoration(
-      //             borderRadius: BorderRadius.circular(5),
-      //             gradient: LinearGradient(
-      //               colors:[
-      //                 blueGradient.darkShade,
-      //                 blueGradient.lightShade,
-      //               ],
-      //             ),
-      //           ),
-      //           child:MaterialButton(
-      //             // color: Colors.green.shade700,
-      //             child:const Text("CHECKOUT NOW",style: TextStyle(color: Colors.white),),
-      //             onPressed: () {
-
-      //               Navigator.push(context,MaterialPageRoute(builder: (context)=> const DeliveryDetails()));
-
-      //             },
-      //           ) ,
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
+          // Add more buttons here
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
@@ -226,8 +152,8 @@ class _CartPageState extends State<CartPage> {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemCount:itemLength,
-                itemBuilder: (BuildContext context, int index) {          
-                
+                itemBuilder: (BuildContext context, int index) {
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                     child: Card(
@@ -245,18 +171,18 @@ class _CartPageState extends State<CartPage> {
                         child: Column(
                           children: [
                             Row(mainAxisAlignment: MainAxisAlignment
-                                  .spaceBetween,
+                                .spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment
                                   .start,
-                              children: [                                
-                                
+                              children: [
+
                                 CachedNetworkImage(
                                   imageUrl:'${itemsTemp[index]['img']}',
                                   width:100,
                                   height:100,
                                   fit: BoxFit.cover,
                                 ),
-                                
+
                                 Container(
                                   // width: MediaQuery
                                   //     .of(context)
@@ -265,9 +191,9 @@ class _CartPageState extends State<CartPage> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment
                                         .start,
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                
+
                                       Text( itemsTemp[index]["name"],
                                         style: const TextStyle(
                                             color: Colors.black,
@@ -276,8 +202,8 @@ class _CartPageState extends State<CartPage> {
                                                 .bold),),
                                       Row(
                                         children: [
-                                
-                                
+
+
                                           // IconButton(
                                           //     icon: const Icon(
                                           //       Icons.add_circle,
@@ -286,13 +212,13 @@ class _CartPageState extends State<CartPage> {
                                           //     onPressed: () {
                                           //       //shop.updateQuanity(catid:pros[index].id, quant: 'adding',context: context);
                                           //     }),
-                                
-                                
+
+
                                           Text(itemsTemp[index]["quant"].toString(),
                                             style: const TextStyle(
-                                              color: Colors.black),),
-                                
-                                
+                                                color: Colors.black),),
+
+
                                           // IconButton(
                                           //     icon: const Icon(
                                           //       Icons.remove_circle,
@@ -300,13 +226,13 @@ class _CartPageState extends State<CartPage> {
                                           //     ),
                                           //     onPressed: () {
                                           //       // shop.updateQuanity( catid:pros[index].id, quant: 'sub',context:context);
-                                
+
                                           //     }),
-                                
-                                
+
+
                                         ],
                                       ),
-                                
+
                                       Text('Price:${ itemsTemp[index]['price']} ',
                                         style: const TextStyle(
                                             color: Colors.black,
@@ -314,13 +240,13 @@ class _CartPageState extends State<CartPage> {
                                     ],
                                   ),
                                 ),
-                                
+
                                 // IconButton(onPressed: () {
                                 //   // shop.deleteCartItem(catid:pros[index].id, context:context);
-                                
+
                                 // }, icon: const Icon(Icons.delete,
                                 //   color: Colors.red,)),
-            
+
                                 Column(
                                   children: const [
                                     Icon(Icons.favorite_outline,color: Colors.green,),
@@ -328,8 +254,8 @@ class _CartPageState extends State<CartPage> {
                                     Text("Add to Cart", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),)
                                   ],
                                 )
-                                
-                                
+
+
                               ],
                             ),
                           ],
