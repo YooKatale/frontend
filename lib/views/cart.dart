@@ -37,6 +37,7 @@ class _CartPageState extends State<CartPage> {
       appBar: AppBar(
         title: const Text("Cart",style:TextStyle(),),
         leading: InkWell(
+
           onTap: () => Navigator.of(context).pop(),
           child: const Icon(Icons.arrow_back_ios_new)),
         actions: [
@@ -52,6 +53,7 @@ class _CartPageState extends State<CartPage> {
             onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ItemsCart())),
             child: const Icon(Icons.shopping_cart)),
           const SizedBox(width: 10,),
+
             ],
           )
         ],
@@ -72,6 +74,7 @@ class _CartPageState extends State<CartPage> {
                           child: Container(
                                                        
                            child:TextField(
+
                               enabled: false,
                               decoration: InputDecoration(
                                 hintText: 'Search category',
@@ -84,6 +87,8 @@ class _CartPageState extends State<CartPage> {
                                 filled: true,
                                 fillColor:Colors.white,
                                 suffixIcon: IconButton(
+
+
                           onPressed: () {
                             Navigator.push(
                                 context,
@@ -98,16 +103,21 @@ class _CartPageState extends State<CartPage> {
                         ),
                       ),
 
+
+
                       
                     ],
                   ),
                 ),
                const SizedBox(height: 10,)
+ 
               ],
             ),
           ) ,
         ),
       ),
+
+
       
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Wrap( //will break to another line on overflow
@@ -138,6 +148,7 @@ class _CartPageState extends State<CartPage> {
                         // Add more buttons here
                 ],
             ),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -152,6 +163,9 @@ class _CartPageState extends State<CartPage> {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemCount:itemLength,
+
+
+
                 itemBuilder: (BuildContext context, int index) {          
                 
                   return Padding(
@@ -171,6 +185,7 @@ class _CartPageState extends State<CartPage> {
                         child: Column(
                           children: [
                             Row(mainAxisAlignment: MainAxisAlignment
+
                                   .spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment
                                   .start,
@@ -191,6 +206,9 @@ class _CartPageState extends State<CartPage> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment
                                         .start,
+
+
+
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                 
@@ -202,6 +220,7 @@ class _CartPageState extends State<CartPage> {
                                                 .bold),),
                                       Row(
                                         children: [
+
                                 
                                 
                                           // IconButton(
@@ -212,6 +231,7 @@ class _CartPageState extends State<CartPage> {
                                           //     onPressed: () {
                                           //       //shop.updateQuanity(catid:pros[index].id, quant: 'adding',context: context);
                                           //     }),
+
                                 
                                 
                                           Text(itemsTemp[index]["quant"].toString(),
@@ -226,6 +246,7 @@ class _CartPageState extends State<CartPage> {
                                           //     ),
                                           //     onPressed: () {
                                           //       // shop.updateQuanity( catid:pros[index].id, quant: 'sub',context:context);
+
                                 
                                           //     }),
                                 
@@ -240,6 +261,9 @@ class _CartPageState extends State<CartPage> {
                                     ],
                                   ),
                                 ),
+
+
+
                                 
                                 // IconButton(onPressed: () {
                                 //   // shop.deleteCartItem(catid:pros[index].id, context:context);
@@ -254,8 +278,9 @@ class _CartPageState extends State<CartPage> {
                                     Text("Add to Cart", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),)
                                   ],
                                 )
+
                                 
-                                
+  
                               ],
                             ),
                           ],
