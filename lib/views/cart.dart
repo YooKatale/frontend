@@ -37,21 +37,23 @@ class _CartPageState extends State<CartPage> {
       appBar: AppBar(
         title: const Text("Cart",style:TextStyle(),),
         leading: InkWell(
-            onTap: () => Navigator.of(context).pop(),
-            child: const Icon(Icons.arrow_back_ios_new)),
+
+          onTap: () => Navigator.of(context).pop(),
+          child: const Icon(Icons.arrow_back_ios_new)),
         actions: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-
+            
             children:  [
-              const Icon(Icons.location_pin),
-              const SizedBox(width: 5,),
-              const Text('Home', style: TextStyle(color: Colors.green),),
-              const SizedBox(width: 10,),
-              InkWell(
-                  onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ItemsCart())),
-                  child: const Icon(Icons.shopping_cart)),
-              const SizedBox(width: 10,),
+          const Icon(Icons.location_pin),
+          const SizedBox(width: 5,),
+          const Text('Home', style: TextStyle(color: Colors.green),),
+          const SizedBox(width: 10,),
+          InkWell(
+            onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ItemsCart())),
+            child: const Icon(Icons.shopping_cart)),
+          const SizedBox(width: 10,),
+
             ],
           )
         ],
@@ -70,8 +72,9 @@ class _CartPageState extends State<CartPage> {
                           onTap: () {
                           },
                           child: Container(
+                                                       
+                           child:TextField(
 
-                            child:TextField(
                               enabled: false,
                               decoration: InputDecoration(
                                 hintText: 'Search category',
@@ -84,13 +87,15 @@ class _CartPageState extends State<CartPage> {
                                 filled: true,
                                 fillColor:Colors.white,
                                 suffixIcon: IconButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: ((context) => const CartPage())));
-                                    },
-                                    icon: const Icon(Icons.speaker,color: Colors.grey,)),
+
+
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: ((context) => const CartPage())));
+                          },
+                          icon: const Icon(Icons.speaker,color: Colors.grey,)),
                               ),
 
                             ),
@@ -99,45 +104,51 @@ class _CartPageState extends State<CartPage> {
                       ),
 
 
+
+                      
                     ],
                   ),
                 ),
-                const SizedBox(height: 10,)
+               const SizedBox(height: 10,)
+ 
               ],
             ),
           ) ,
         ),
       ),
 
+
+      
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Wrap( //will break to another line on overflow
-        direction: Axis.horizontal, //use vertical to show  on vertical axis
-        children: <Widget>[
-          Container(
-              margin:EdgeInsets.all(10),
-              child: FloatingActionButton(
-                onPressed: (){
-                  //action code for button 1
-                },
-                child: Icon(Icons.call, color: Colors.lightBlueAccent,),
-              )
-          ), //button first
+                  direction: Axis.horizontal, //use vertical to show  on vertical axis
+                  children: <Widget>[
+                        Container( 
+                          margin:EdgeInsets.all(10),
+                          child: FloatingActionButton(
+                            onPressed: (){
+                                //action code for button 1
+                            },
+                            child: Icon(Icons.call, color: Colors.lightBlueAccent,),
+                          )
+                        ), //button first
 
-          Container(
-              margin:EdgeInsets.all(10),
-              child: FloatingActionButton(
-                onPressed: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ItemsCart())),
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade400
-                    ),
-                    onPressed: (){}, child: const Text('Checkout')),
-              )
-          ),
+                        Container( 
+                          margin:EdgeInsets.all(10),
+                          child: FloatingActionButton(
+                            onPressed: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ItemsCart())),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green.shade400
+                              ),
+                              onPressed: (){}, child: const Text('Checkout')),
+                          )
+                        ),
 
-          // Add more buttons here
-        ],
-      ),
+                        // Add more buttons here
+                ],
+            ),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -152,8 +163,11 @@ class _CartPageState extends State<CartPage> {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemCount:itemLength,
-                itemBuilder: (BuildContext context, int index) {
 
+
+
+                itemBuilder: (BuildContext context, int index) {          
+                
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                     child: Card(
@@ -171,18 +185,19 @@ class _CartPageState extends State<CartPage> {
                         child: Column(
                           children: [
                             Row(mainAxisAlignment: MainAxisAlignment
-                                .spaceBetween,
+
+                                  .spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment
                                   .start,
-                              children: [
-
+                              children: [                                
+                                
                                 CachedNetworkImage(
                                   imageUrl:'${itemsTemp[index]['img']}',
                                   width:100,
                                   height:100,
                                   fit: BoxFit.cover,
                                 ),
-
+                                
                                 Container(
                                   // width: MediaQuery
                                   //     .of(context)
@@ -191,9 +206,12 @@ class _CartPageState extends State<CartPage> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment
                                         .start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
 
+
+
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                
                                       Text( itemsTemp[index]["name"],
                                         style: const TextStyle(
                                             color: Colors.black,
@@ -203,7 +221,8 @@ class _CartPageState extends State<CartPage> {
                                       Row(
                                         children: [
 
-
+                                
+                                
                                           // IconButton(
                                           //     icon: const Icon(
                                           //       Icons.add_circle,
@@ -213,12 +232,13 @@ class _CartPageState extends State<CartPage> {
                                           //       //shop.updateQuanity(catid:pros[index].id, quant: 'adding',context: context);
                                           //     }),
 
-
+                                
+                                
                                           Text(itemsTemp[index]["quant"].toString(),
                                             style: const TextStyle(
-                                                color: Colors.black),),
-
-
+                                              color: Colors.black),),
+                                
+                                
                                           // IconButton(
                                           //     icon: const Icon(
                                           //       Icons.remove_circle,
@@ -227,12 +247,13 @@ class _CartPageState extends State<CartPage> {
                                           //     onPressed: () {
                                           //       // shop.updateQuanity( catid:pros[index].id, quant: 'sub',context:context);
 
+                                
                                           //     }),
-
-
+                                
+                                
                                         ],
                                       ),
-
+                                
                                       Text('Price:${ itemsTemp[index]['price']} ',
                                         style: const TextStyle(
                                             color: Colors.black,
@@ -241,12 +262,15 @@ class _CartPageState extends State<CartPage> {
                                   ),
                                 ),
 
+
+
+                                
                                 // IconButton(onPressed: () {
                                 //   // shop.deleteCartItem(catid:pros[index].id, context:context);
-
+                                
                                 // }, icon: const Icon(Icons.delete,
                                 //   color: Colors.red,)),
-
+            
                                 Column(
                                   children: const [
                                     Icon(Icons.favorite_outline,color: Colors.green,),
@@ -255,7 +279,8 @@ class _CartPageState extends State<CartPage> {
                                   ],
                                 )
 
-
+                                
+  
                               ],
                             ),
                           ],
