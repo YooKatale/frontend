@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'otp_page.dart';
+
 class GetStartedSignIn extends StatefulWidget {
   static const String id = 'getSignIn';
   GetStartedSignIn({Key? key}) : super(key: key);
@@ -103,6 +105,7 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
       body: SingleChildScrollView(
         child: Container(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(
                 height: 50,
@@ -127,6 +130,8 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Country code
                     const Text(
@@ -136,7 +141,7 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
                           fontSize: 18,
                           fontStyle: FontStyle.normal),
                     ),
-                    const SizedBox(width: 5),
+                    const SizedBox(width: 15),
                     Container(
                       width: 200,
                       child: const TextField(

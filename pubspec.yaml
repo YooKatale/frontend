@@ -55,6 +55,7 @@ dependencies:
   shared_preferences: ^2.2.0
   country_picker: ^2.0.21
   get: ^4.6.5
+  pinput: ^2.2.16
 
 dev_dependencies:
   flutter_test:
