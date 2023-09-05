@@ -134,24 +134,42 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Country code
-                    const Text(
-                      '+256',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontStyle: FontStyle.normal),
+                    InkWell(
+                      onTap: () {
+                        showCountryPicker(
+                            context: context,
+                            countryListTheme: const CountryListThemeData(
+                              bottomSheetHeight: 550,
+                            ),
+                            onSelect: (value) {
+                              setState(() {
+                                selectedCountry = value;
+                              });
+                            });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        child: const Text(
+                          "+256",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontStyle: FontStyle.normal),
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 15),
                     Container(
                       width: 200,
-                      child: const TextField(
+                      child: TextField(
+                        controller: phoneController,
                         style: TextStyle(fontSize: 18),
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
                             hintText: 'Enter your Mobile No',
                             hintStyle: TextStyle(color: Colors.grey)),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -168,7 +186,7 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green[800]),
-                  onPressed: () {},
+                  onPressed: _userLogin,
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text('Continue',

@@ -1,13 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:firebase_login/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 
 import '../home.dart';
 
+// ignore: use_key_in_widget_constructors
 class OtpPage extends StatefulWidget {
   @override
+  // ignore: library_private_types_in_public_api
   _OtpPageState createState() => _OtpPageState();
 }
 
@@ -43,7 +44,7 @@ class _OtpPageState extends State<OtpPage> {
           verificationId: verificationId, smsCode: userOtp);
       User? user = (await auth.signInWithCredential(creds)).user;
       if (user != null) {
-        Get.to(HomePage());
+        Get.to(const HomePage());
       }
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
@@ -66,21 +67,9 @@ class _OtpPageState extends State<OtpPage> {
     }
   }
 
-  _buildSocialLogo(file) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Image.asset(
-          file,
-          height: 38.5,
-        ),
-      ],
-    );
-  }
-
   final ButtonStyle style = ElevatedButton.styleFrom(
-      minimumSize: Size(188, 48),
-      backgroundColor: Color(0xFFFD7877),
+      minimumSize: const Size(188, 48),
+      backgroundColor: const Color(0xFFFD7877),
       elevation: 6,
       textStyle: const TextStyle(fontSize: 16),
       shape: const RoundedRectangleBorder(
@@ -91,7 +80,7 @@ class _OtpPageState extends State<OtpPage> {
   Widget buildText(String text) => Center(
         child: Text(
           text,
-          style: TextStyle(fontSize: 24, color: Colors.white),
+          style: const TextStyle(fontSize: 24, color: Colors.white),
         ),
       );
 
