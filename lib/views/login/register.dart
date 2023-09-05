@@ -247,7 +247,8 @@ class _RegisterState extends State<Register> {
                         backgroundColor: Colors.green[800]),
                     onPressed: () {
                       _signUp(context);
-                      //FirebaseAuth.instance.createUserWithEmailAndPassword(email:_ema.text.trim(), password:_pass.text.trim());
+                      FirebaseAuth.instance.createUserWithEmailAndPassword(
+                          email: _ema.text.trim(), password: _pass.text.trim());
                     },
                     child: const Padding(
                       padding: EdgeInsets.all(8.0),
@@ -299,6 +300,7 @@ class _RegisterState extends State<Register> {
       print("user successfully registered");
 
       // if(context.mounted){
+      // ignore: use_build_context_synchronously
       Navigator.pushReplacementNamed(context, Dashboard.id);
       // }
     } else {
