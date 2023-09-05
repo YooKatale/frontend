@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:yookatale/views/login/register.dart';
 
+import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:country_picker/country_picker.dart';
 import 'package:get/get.dart';
 
@@ -20,6 +22,9 @@ class GetStartedSignIn extends StatefulWidget {
 
 class _GetStartedSignInState extends State<GetStartedSignIn> {
   final TextEditingController phoneController = TextEditingController();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // Function to sign in with Phone number
   Future<void> signInWithPhoneNumber(String phoneNumber) async {
@@ -65,6 +70,20 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
     e164Key: "",
   );
 
+  // Handle Google Sign In
+  // Future<FirebaseUser> _handleGoogleSignIn() async {
+  //   final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+  //   final GoogleSignInAuthentication googleAuth =
+  //       await googleUser.authentication;
+  //   final AuthCredential credential = GoogleAuthProvider.getCredential(
+  //     accessToken: googleAuth.accessToken,
+  //     idToken: googleAuth.idToken,
+  //   );
+  //   final FirebaseUser user =
+  //       (await _auth.signInWithCredential(credential)).user;
+  //   return user;
+  // }
+
   // user login
   void _userLogin() async {
     String mobile = phoneController.text;
@@ -72,7 +91,7 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
       Get.snackbar(
         "Please enter the mobile number!",
         "Failed",
-        colorText: Colors.amberAccent,
+        colorText: Colors.orange,
       );
     } else {
       signInWithPhoneNumber("+${selectedCountry.phoneCode}$mobile");
@@ -195,6 +214,7 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
                             fontWeight: FontWeight.w400,
                             fontSize: 25)),
                   )),
+              const SizedBox(height: 5),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
                 child: Text.rich(TextSpan(
@@ -215,6 +235,7 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
                       )
                     ])),
               ),
+              const SizedBox(height: 20),
               Text('Or With',
                   style: TextStyle(
                       fontSize: 20,
@@ -235,11 +256,17 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
                   const SizedBox(
                     width: 10,
                   ),
-                  CachedNetworkImage(
-                    imageUrl:
-                        "https://www.tramvietnam.com.au/wp-content/uploads/2021/07/Illustration-of-Google-icon-on-transparent-background-PNG.png",
-                    width: 40,
-                    height: 30,
+                  GestureDetector(
+                    onTap: () async {
+                      // FirebaseUser user = await _handleGoogleSignIn();
+                      // Do something with the user (e.g. show a welcome message)
+                    },
+                    child: CachedNetworkImage(
+                      imageUrl:
+                          "https://www.tramvietnam.com.au/wp-content/uploads/2021/07/Illustration-of-Google-icon-on-transparent-background-PNG.png",
+                      width: 40,
+                      height: 30,
+                    ),
                   ),
                   // const Icon(
                   //   FontAwesomeIcons.google,

@@ -56,6 +56,7 @@ dependencies:
   country_picker: ^2.0.21
   get: ^4.6.5
   pinput: ^2.2.16
+  google_sign_in: ^6.1.5
 
 dev_dependencies:
   flutter_test:
