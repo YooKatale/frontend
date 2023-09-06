@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:yookatale/views/Address/deliverySlot.dart';
 
 class DeliveryAddress extends StatefulWidget {
   DeliveryAddress({Key? key}) : super(key: key);
@@ -51,7 +52,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                                 ),
                                 backgroundColor: Colors.green.shade600
                               ),
-                              onPressed: (){}, child: const Text('Delivery to this address', style: TextStyle(color: Colors.white),)),
+                              onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>DeliverySlot())), child: const Text('Delivery to this address', style: TextStyle(color: Colors.white, fontSize: 18),)),
                           ),
                         ),
                       ),
@@ -96,7 +97,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                                 ),
                                 backgroundColor: Colors.green.shade600
                               ),
-                              onPressed: (){}, label: Text('Pick up from store address', style: TextStyle(color: Colors.white),)),
+                              onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>DeliverySlot())), label: Text('Pick up from store address', style: TextStyle(color: Colors.white, fontSize: 18),)),
                           ),
                         ),
                       ),
@@ -114,7 +115,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                                 ),
                                 backgroundColor: Colors.green.shade600
                               ),
-                              onPressed: (){}, child: Text('Add a new Address', style: TextStyle(color: Colors.white),)),
+                              onPressed: (){}, child: Text('Add a new Address', style: TextStyle(color: Colors.white, fontSize: 18),)),
                           ),
                         ),
                       ),
