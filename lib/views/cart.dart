@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:yookatale/views/Address/deliveryAddress.dart';
 import 'package:yookatale/views/Widgets/itemsCart.dart';
 import 'package:yookatale/views/product_categoryjson/cart_json.dart';
 
@@ -124,31 +125,33 @@ class _CartPageState extends State<CartPage> {
                   direction: Axis.horizontal, //use vertical to show  on vertical axis
                   children: <Widget>[
                         Container( 
-                          margin:EdgeInsets.all(10),
+                          // color: Colors.white,
+                          margin:const EdgeInsets.all(10),
                           child: FloatingActionButton(
+                            backgroundColor:  Colors.white,
                             onPressed: (){
                                 //action code for button 1
                             },
-                            child: Icon(Icons.call, color: Colors.lightBlueAccent,),
+                            child: Icon(Icons.call, color: Colors.green.shade400,),
+
                           )
                         ), //button first
 
                         Container( 
+                          width: 220,
+                          height: 50,
                           margin:EdgeInsets.all(10),
-                          child: FloatingActionButton(
-                            onPressed: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ItemsCart())),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green.shade400
-                              ),
-                              onPressed: (){}, child: const Text('Checkout')),
-                          )
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green.shade400
+                            ),
+                            onPressed: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>DeliveryAddress())), child: const Text('CHECKOUT', style: TextStyle(color: Colors.white),))
+
                         ),
 
                         // Add more buttons here
                 ],
             ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
