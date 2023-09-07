@@ -91,7 +91,7 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     final User? user = FirebaseAuth.instance.currentUser;
-    final displayName = user?.displayName ?? 'Vincent Kogei';
+    final displayName = user?.displayName ?? 'YooKatale';
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
