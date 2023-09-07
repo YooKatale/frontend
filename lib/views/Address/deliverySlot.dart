@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yookatale/views/Widgets/itemsCart.dart';
+import 'package:yookatale/views/checkout/selectpayment.dart';
 import 'package:yookatale/views/deliverydetils/deliverydetail.dart';
 
 class DeliverySlot extends StatefulWidget {
@@ -136,7 +137,7 @@ class _DeliverySlotState extends State<DeliverySlot> {
                                 ),
                                 backgroundColor: Colors.green.shade600
                               ),
-                              onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ItemsCart())), child: Text('Proceed pay', style: TextStyle(color: Colors.white, fontSize: 18),)),
+                              onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>SelectPayment())), child: Text('Proceed pay', style: TextStyle(color: Colors.white, fontSize: 18),)),
                           ),
                         ),
                       ),
