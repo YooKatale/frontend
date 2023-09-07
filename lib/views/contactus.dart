@@ -1,4 +1,6 @@
 
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -35,21 +37,13 @@ class _ContactUsState extends State<ContactUs> {
       body:ListView(
         padding: const EdgeInsets.only(left: 10,right: 10,top: 10),
         children: [
-
-
           Padding(
             padding:const EdgeInsets.only(top: 10,bottom: 10),
             child:Image.network('https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75',height: 100,),
           ),
-
-
           ListTile(
-
             onTap: (){
-
-
               //launch('tel:0754615840');
-
               _makePhoneCall('+256754615840');
             },
             leading:Container(
@@ -62,17 +56,11 @@ class _ContactUsState extends State<ContactUs> {
             title: const Text('0754615840',style: TextStyle(fontSize: 18),),
             trailing:const Icon(Icons.arrow_forward_ios_outlined) ,
           ),
-
           const SizedBox(height: 10,),
-
           ListTile(
-
             onTap: () async {
-
               launch('mailto:info@yookatale.com?subject=Inquiry&body=');
-
             },
-
             leading:Container(
               decoration: BoxDecoration(
                 color: Colors.green.shade100,
@@ -83,15 +71,11 @@ class _ContactUsState extends State<ContactUs> {
             title: const Text('info@yookatale.com',style: TextStyle(fontSize: 18),),
             trailing:const Icon(Icons.arrow_forward_ios_outlined) ,
           ),
-
           const SizedBox(height: 10,),
-
           ListTile(
 
             onTap: () async {
-
               launch('https://twitter.com/YooKatale?t=3Q96I9JR98HgA69gisdXdA&s=09');
-
             },
             leading:Container(
               decoration: BoxDecoration(
@@ -103,15 +87,10 @@ class _ContactUsState extends State<ContactUs> {
             title: const Text('Twitter',style: TextStyle(fontSize: 18),),
             trailing:const Icon(Icons.arrow_forward_ios_outlined) ,
           ),
-
           const SizedBox(height: 10,),
-
           ListTile(
-
             onTap: () async {
-
               openWhatsapp();
-
             },
             leading:Container(
               decoration: BoxDecoration(
@@ -123,16 +102,10 @@ class _ContactUsState extends State<ContactUs> {
             title: const Text('Whatsapp',style: TextStyle(fontSize: 18),),
             trailing:const Icon(Icons.arrow_forward_ios_outlined) ,
           ),
-
-
           const SizedBox(height: 10,),
-
           ListTile(
-
             onTap: () async {
-
               launch("https://www.facebook.com/profile.php?id=100094194942669&mibextid=LQQJ4d");
-
             },
             leading:Container(
               decoration: BoxDecoration(
@@ -144,15 +117,10 @@ class _ContactUsState extends State<ContactUs> {
             title: const Text('Facebook',style: TextStyle(fontSize: 18),),
             trailing:const Icon(Icons.arrow_forward_ios_outlined) ,
           ),
-
           const SizedBox(height: 10,),
-
           ListTile(
-
             onTap: () async {
-
               launch("https://www.instagram.com/p/CuHdaksN5UW/?igshid=NTc4MTIwNjQ2YQ%3D%3D");
-
             },
             leading:Container(
               decoration: BoxDecoration(
@@ -164,15 +132,10 @@ class _ContactUsState extends State<ContactUs> {
             title: const Text('Instagram',style: TextStyle(fontSize: 18),),
             trailing:const Icon(Icons.arrow_forward_ios_outlined) ,
           ),
-
           const SizedBox(height: 10,),
-
           ListTile(
-
             onTap: () async {
-
               launch("https://www.linkedin.com/company/yookatale/");
-
             },
             leading:Container(
               decoration: BoxDecoration(
@@ -184,7 +147,6 @@ class _ContactUsState extends State<ContactUs> {
             title: const Text('LinkedIn',style: TextStyle(fontSize: 18),),
             trailing:const Icon(Icons.arrow_forward_ios_outlined) ,
           ),
-
         ],
       ),
     );
@@ -200,9 +162,7 @@ class _ContactUsState extends State<ContactUs> {
     await launchUrl(launchUri);
   }
 
-
   openWhatsapp() async {
-
     String whatsapp = '+256754615840';
     String whatsappURlAndroid = "whatsapp://send?phone=$whatsapp&text=Hallo Yookatale";
     String whatsappURLIos =
@@ -221,6 +181,4 @@ class _ContactUsState extends State<ContactUs> {
       }
     }
   }
-
-
 }
