@@ -1,12 +1,17 @@
 
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:yookatale/models/delivery_details_model.dart';
 
 import '../../gradient/grad.dart';
 import '../checkout/checkout.dart';
 class DeliveryDetails extends StatefulWidget {
-  const DeliveryDetails({super.key});
+  final double totalPrice;
+  const DeliveryDetails({super.key, required this.totalPrice});
 
   @override
   State<DeliveryDetails> createState() => _DeliveryDetailsState();
@@ -21,10 +26,10 @@ class _DeliveryDetailsState extends State<DeliveryDetails> {
   final _fi=TextEditingController();
   final _las=TextEditingController();
   final _phon=TextEditingController();
-  final _coun=TextEditingController();
+  // final _coun=TextEditingController();
   final _add=TextEditingController();
   final _ema=TextEditingController();
-  final _city=TextEditingController();
+  // final _city=TextEditingController();
 
 
   @override
@@ -52,14 +57,19 @@ class _DeliveryDetailsState extends State<DeliveryDetails> {
                 const SizedBox(
                   height: 10,
                 ),
-
                 Image.network('https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75',width: 115),
-
-                const SizedBox(height: 30,),
+                const SizedBox(height: 20,),
+                Text(
+                 'Shs.${widget.totalPrice}',
+                 style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold
+                 ),
+                )
               ],
             ),
-
-
+            const SizedBox(height: 20,),
             //first name
             TextFormField(
                 controller: _fi,
@@ -171,11 +181,9 @@ class _DeliveryDetailsState extends State<DeliveryDetails> {
                       borderSide: const BorderSide(color: Colors.blue),
                     )
                 ),
-
                 validator: (value){
                   if(value!.isEmpty){
                     return 'Enter your Address';
-
                   }
                   return null;
                 }
@@ -204,11 +212,9 @@ class _DeliveryDetailsState extends State<DeliveryDetails> {
                 ),
                 validator: (value){
                   if(value!.isEmpty){
-
-                    return 'Enter Email';
-                  }
-                  bool _isValid= (EmailValidator.validate(value));
-                  if(_isValid==false){
+                    return 'Enter Email';                  }
+                  bool isValid= (EmailValidator.validate(value));
+                  if(isValid==false){
                     return 'Enter Valid Email Address';
 
                   }
@@ -216,11 +222,7 @@ class _DeliveryDetailsState extends State<DeliveryDetails> {
 
                 }
             ),
-
             const SizedBox(height: 10,),
-
-
-
             //sign up
             Container(
               decoration: BoxDecoration(
@@ -233,22 +235,35 @@ class _DeliveryDetailsState extends State<DeliveryDetails> {
                 ),
               ),
               child: MaterialButton(
-                //color: Colors.green.shade700,
-                child:const Text("Continue",style: TextStyle(color: Colors.white),),
-                onPressed: () {
+                child:const Text(
+                  "Continue",style: TextStyle(color: Colors.white),),
+                onPressed: () async {
+                    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+                    User? user = firebaseAuth.currentUser;
+                    if (user != null && _formKey.currentState!.validate()) {
+                      DeliveryDetailsModel deliveryDetailsModel = DeliveryDetailsModel(
+                        firstName: _fi.text,
+                        lastName: _las.text,
+                        phoneNumber: _phon.text,
+                        address: _add.text,
+                        email: _ema.text,
+                        price: widget.totalPrice.toString()
+                      );
+                      try {                        
+                        CollectionReference orders = FirebaseFirestore.instance.collection('orders');
+                        DocumentReference userOrderDoc = orders.doc(user.uid);
+                        await userOrderDoc.set(deliveryDetailsModel.toJson());
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const Checkout()));
+                      } catch (e) {
+                        // Handle any errors
+                        print('Error saving delivery details: $e');
+                      }
+                    }
+                  },
 
-
-
-                  Navigator.push(context,MaterialPageRoute(builder: (context)=> const Checkout()));
-
-                },
               ),
             ),
-
             const SizedBox(height: 20,),
-
-
-
           ],
         ),
       ),
