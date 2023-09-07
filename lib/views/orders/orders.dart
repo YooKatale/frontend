@@ -43,7 +43,6 @@ class _OrdersState extends State<Orders> {
       body:ListView.builder(
           itemCount:itemLength,
           itemBuilder:(context,index){
-
             return Container(
               color:Colors.white,
               child:Column(
@@ -84,7 +83,6 @@ class _OrdersState extends State<Orders> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-
                             Text('Order ID:${itemsTemp[index]['orderid']}',style: const TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
                             const Text('Payment Type:Cash on Delivery',style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
                             Text('Amount:Shs${itemsTemp[index]['total']}',style: const TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
