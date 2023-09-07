@@ -106,7 +106,7 @@ class _ItemsCartState extends State<ItemsCart> {
                 // color: Colors.green.shade700,
                 child:const Text("CHECKOUT NOW",style: TextStyle(color: Colors.white),),
                 onPressed: () {      
-                  Navigator.push(context,MaterialPageRoute(builder: (context)=> const DeliveryDetails()));      
+                  Navigator.push(context,MaterialPageRoute(builder: (context)=> DeliveryDetails(totalPrice: tottalPrice,)));      
                 },
               ) ,
             ),
