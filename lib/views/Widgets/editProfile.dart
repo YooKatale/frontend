@@ -1,4 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class EditProfile extends StatefulWidget {
@@ -73,8 +75,7 @@ bool _secureText = true;
         
                             validator: (value){
                               if(value!.isEmpty){
-                                return 'Enter your name';
-        
+                                return 'Enter your name';        
                               }
                               return null;
                             }
@@ -114,8 +115,7 @@ bool _secureText = true;
         
                             validator: (value){
                               if(value!.isEmpty){
-                                return 'Enter your Password';
-        
+                                return 'Enter your Password';        
                               }
                               return null;
                             }
@@ -152,12 +152,10 @@ bool _secureText = true;
                                   borderRadius: BorderRadius.circular(15),
                                   borderSide: const BorderSide(color: Colors.green, width: 2),
                                 )
-                            ),
-        
+                            ),        
                             validator: (value){
                               if(value!.isEmpty){
-                                return 'Enter your Password';
-        
+                                return 'Enter your Password';        
                               }
                               return null;
                             }
@@ -170,8 +168,7 @@ bool _secureText = true;
                     child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800]),
                 onPressed: (){
-                  // _signIn(context);        
-                  //       FirebaseAuth.instance.createUserWithEmailAndPassword(email:_ema.text.trim(), password:_pass.text.trim());
+                 updateUserDetails();
                 }, child: const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Text('Update Info',style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 20)),
@@ -184,4 +181,34 @@ bool _secureText = true;
       ),
     );
   }
+  void updateUserDetails() {
+    String newName = name.text;
+    String newPassword = pass.text;
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    FirebaseFirestore.instance.collection('users')
+    .doc(uid).update({
+      'name': newName,
+      "pass": newPassword,
+      }
+    ).then((value) {
+      showDialog(
+        context: context, 
+        builder: (context) {
+          return const AlertDialog(
+            title: Text('Update status'),
+            content: Text('Profile updated successfully'),
+          );
+        },
+        );
+    }).catchError((error){
+      showDialog(
+        context: context, 
+        builder: (context) {
+          return const AlertDialog(
+            title: Text('Update status'),
+            content: Text('Error updating profile'),
+          );
+        },
+        );
+    });  }
 }
