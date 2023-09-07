@@ -52,12 +52,11 @@ class _OrdersState extends State<Orders> {
                     padding: const EdgeInsets.only(left:6.0, right: 6),
                     child: Card(
                       elevation: 4,
-                      color: Color(0xffffffff),
+                      color: const Color(0xffffffff),
                       margin: const EdgeInsets.only(left:5,right: 5,top: 5,bottom: 5),
                       child:ListTile(
                         horizontalTitleGap: 0,
                         onTap: (){
-
                           Navigator.push(context,MaterialPageRoute(builder:(context)=>OrdersDetail(
                               id:itemsTemp[index]['orderid'],im:itemsTemp[index]['img'],nem:itemsTemp[index]['name'],quant:itemsTemp[index]['quant'],
                             price:itemsTemp[index]['price'],tot:itemsTemp[index]['total'],stat:itemsTemp[index]['status'],date:itemsTemp[index]['date'],
