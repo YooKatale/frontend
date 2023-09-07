@@ -43,7 +43,6 @@ class _OrdersState extends State<Orders> {
       body:ListView.builder(
           itemCount:itemLength,
           itemBuilder:(context,index){
-
             return Container(
               color:Colors.white,
               child:Column(
@@ -52,7 +51,7 @@ class _OrdersState extends State<Orders> {
                     padding: const EdgeInsets.only(left:6.0, right: 6),
                     child: Card(
                       elevation: 4,
-                      color: Color(0xffffffff),
+                      color: const Color(0xffffffff),
                       margin: const EdgeInsets.only(left:5,right: 5,top: 5,bottom: 5),
                       child:ListTile(
                         horizontalTitleGap: 0,
@@ -85,7 +84,6 @@ class _OrdersState extends State<Orders> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-
                             Text('Order ID:${itemsTemp[index]['orderid']}',style: const TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
                             const Text('Payment Type:Cash on Delivery',style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
                             Text('Amount:Shs${itemsTemp[index]['total']}',style: const TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
