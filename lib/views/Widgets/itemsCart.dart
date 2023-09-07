@@ -3,13 +3,30 @@ import 'package:yookatale/gradient/grad.dart';
 import 'package:yookatale/views/deliverydetils/deliverydetail.dart';
 
 class ItemsCart extends StatefulWidget {
-  ItemsCart({Key? key}) : super(key: key);
+  final List<Map<String, dynamic>> cartItems;
+  const ItemsCart({Key? key, required this.cartItems}) : super(key: key);
 
   @override
   State<ItemsCart> createState() => _ItemsCartState();
 }
 
 class _ItemsCartState extends State<ItemsCart> {
+  double tottalPrice =0;
+  @override
+  void initState() {
+    super.initState();
+    calculateTotalPrice();
+  }
+  void calculateTotalPrice () {
+    double tottal =0;
+    for(final item in widget.cartItems) {
+      final itemPrice =item['price'];
+      tottal += itemPrice;
+    }
+    setState(() {
+      tottalPrice = tottal;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,78 +37,81 @@ class _ItemsCartState extends State<ItemsCart> {
           child: const Icon(Icons.arrow_back_ios_new_outlined)),
         title: const Text("Items on Cart",style:TextStyle(color: Colors.black),),
       ),
-      body: Container(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          child: Column(
-            children: [
-              Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-      
-              Text(
-                "Total Payment",
-                style: TextStyle(
-                    fontSize: 15,fontWeight: FontWeight.bold,color: Colors.black),
-              ),
-      
-              Text(
-                 " Shs 0",
-                style:TextStyle(fontSize: 15,fontWeight: FontWeight.bold,color: Colors.black),
-              ),
-      
-      
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: TextFormField(
-                        //controller: _ema,
-                        cursorColor: Colors.blue.shade200,
-                        decoration: InputDecoration(
-                            hintText: 'Enter Coupon Code',
-                            prefixIcon: const Icon(Icons.email,size: 18,color:Colors.grey,),
-                            filled: true,
-                            fillColor:Colors.grey.shade200,
-                            enabledBorder: UnderlineInputBorder(
-                              borderRadius: BorderRadius.circular(4),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(4),
-                              borderSide: const BorderSide(color: Colors.blue),
-                            )
-                        ),
-                        validator: (value){
-      
-                          return null;
-      
-                        }
-                    ),
-          ),
-          
-          Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  gradient: LinearGradient(
-                    colors:[
-                      blueGradient.darkShade,
-                      blueGradient.lightShade,
-                    ],
-                  ),
-                ),
-                child:MaterialButton(
-                  // color: Colors.green.shade700,
-                  child:const Text("CHECKOUT NOW",style: TextStyle(color: Colors.white),),
-                  onPressed: () {
-      
-                    Navigator.push(context,MaterialPageRoute(builder: (context)=> const DeliveryDetails()));
-      
-                  },
-                ) ,
-              ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        child: Column(
+          children: [
+             Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [      
+            const Text(
+              "Total Payment",
+              style: TextStyle(
+                  fontSize: 15,fontWeight: FontWeight.bold,color: Colors.black),
+            ),      
+            Text(
+               'Shs.$tottalPrice',
+              style:const TextStyle(fontSize: 15,fontWeight: FontWeight.bold,color: Colors.black),
+            ),            
           ],
-          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: TextFormField(
+                      //controller: _ema,
+                      cursorColor: Colors.blue.shade200,
+                      decoration: InputDecoration(
+                          hintText: 'Enter Coupon Code',
+                          prefixIcon: const Icon(Icons.email,size: 18,color:Colors.grey,),
+                          filled: true,
+                          fillColor:Colors.grey.shade200,
+                          enabledBorder: UnderlineInputBorder(
+                            borderRadius: BorderRadius.circular(4),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(4),
+                            borderSide: const BorderSide(color: Colors.blue),
+                          )
+                      ),
+                      validator: (value){      
+                        return null;      
+                      }
+                  ),
+        ),
+        Container(
+          height: 500,
+          padding: const EdgeInsets.all(10),
+        child: ListView.builder(
+        itemCount: widget.cartItems.length,
+        itemBuilder: (context, index) {
+          final item = widget.cartItems[index];
+          return ListTile(
+            title: Text(item['name']),
+          );
+        },
+      ),
+        ),
+        Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                gradient: LinearGradient(
+                  colors:[
+                    blueGradient.darkShade,
+                    blueGradient.lightShade,
+                  ],
+                ),
+              ),
+              child:MaterialButton(
+                // color: Colors.green.shade700,
+                child:const Text("CHECKOUT NOW",style: TextStyle(color: Colors.white),),
+                onPressed: () {      
+                  Navigator.push(context,MaterialPageRoute(builder: (context)=> const DeliveryDetails()));      
+                },
+              ) ,
+            ),
+            
+        ],
         ),
       )
       // Container(
