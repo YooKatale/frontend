@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:share_plus/share_plus.dart';
 
 class InviteFriend extends StatefulWidget {
   InviteFriend({Key? key}) : super(key: key);
@@ -36,7 +37,7 @@ TextEditingController field = TextEditingController(text: 'InviteYOOKATALE2023')
                   child: Column(
                     children: [
                       Icon(Icons.people, size: 60, color: Colors.green.shade700,),
-                      Text('Invite friends by sharing this link'),
+                      const Text('Invite friends by sharing this link'),
                       TextFormField(
                   controller: field,
                   // initialValue: 'AJJDODMVMVLSMCSCMCC',
@@ -77,21 +78,24 @@ TextEditingController field = TextEditingController(text: 'InviteYOOKATALE2023')
             ),
           ),
           Icon(Icons.person_add, size: 100, color: Colors.green.shade600,),
-          Text('You have no friends yet, \nInvite them now', textAlign: TextAlign.center,),
+          const Text('You have no friends yet, \nInvite them now', textAlign: TextAlign.center,),
           Padding(
-                    padding: const EdgeInsets.only(left: 20,right: 20, top: 50),
-                    child: Container(
-                      width: 200,
-                      child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800]),
-                onPressed: (){
-                  // _signIn(context);        
-                  //       FirebaseAuth.instance.createUserWithEmailAndPassword(email:_ema.text.trim(), password:_pass.text.trim());
-                }, child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Invite',style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 25)),
-                )),
-                    ), ),
+          padding: const EdgeInsets.only(left: 20,right: 20, top: 50),
+          child: SizedBox(
+          width: 200,
+          child: ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800]),
+          onPressed: (){
+            // Use Firebase Dynamic Links to get create the app's link.
+            // Won't work past AUg 2025
+            // String deepLink ='';
+            String message ='Get your food delivered now in minutes!!\n Download the app here ${field.text}';
+            Share.share(message, subject: 'Yookatale Invitation');
+          }, child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text('Invite',style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 25)),
+          )),
+              ), ),
         ],
       ),
     );
