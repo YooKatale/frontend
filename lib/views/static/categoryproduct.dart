@@ -75,7 +75,7 @@ class _CategoryProductState extends State<CategoryProduct> {
 
                             Navigator.push(context, MaterialPageRoute(builder:(context)=> ProductDetails(
                                 im:data['imageUrl'],nem:data['name'],price:data['price'].toString(),
-                                cross:data['crossedPrice'].toString()!!,unit:data['unit'].toString(),wei:data['weight'].toString()
+                                cross:data['crossedPrice'].toString(),unit:data['unit'].toString(),wei:data['weight'].toString()
                             )));
                           },
                           child:Card(
