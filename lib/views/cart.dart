@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:yookatale/views/Widgets/favorite_items.dart';
 import 'package:yookatale/views/Widgets/itemsCart.dart';
 import 'package:yookatale/views/product_categoryjson/cart_json.dart';
 

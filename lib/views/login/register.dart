@@ -7,7 +7,6 @@ import 'package:yookatale/views/login/getLocation.dart';
 
 import '../../firebase_auth_implementation/auth_fire.dart';
 import '../../gradient/dashboard.dart';
-import 'login.dart';
 
 class Register extends StatefulWidget {
   static const String id = 'register';

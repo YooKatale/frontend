@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../gradient/grad.dart';
-
 class LoyaltyPoints extends StatefulWidget {
   const LoyaltyPoints({super.key});
 

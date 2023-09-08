@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../product_categoryjson/productjson.dart';
@@ -107,7 +106,7 @@ class _SomeProductsState extends State<SomeProducts> {
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder:(context)=> ProductDetails(
                     im:itemsTemp[index]['img'],nem:itemsTemp[index]['name'],price:itemsTemp[index]['price'].toString(),
-                    cross:itemsTemp[index]['crossedPrice'].toString()!!,unit:itemsTemp[index]['unit'].toString(),wei:itemsTemp[index]['Weight'].toString()
+                    cross:itemsTemp[index]['crossedPrice'].toString(),unit:itemsTemp[index]['unit'].toString(),wei:itemsTemp[index]['Weight'].toString()
                 )));
                       },
                       child:Card(
