@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, unused_field, avoid_print
+// ignore_for_file: file_names, unused_field, avoid_print, body_might_complete_normally_nullable
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +22,7 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
   final TextEditingController phoneController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  bool _isChecked =false;
+  bool _isChecked = false;
 
   // Function to sign in with Phone number
   Future<void> signInWithPhoneNumber(String phoneNumber) async {
@@ -144,8 +144,7 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
             ),
             const SizedBox(height: 30),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -169,17 +168,23 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
                       child: const Text(
                         "+256",
                         style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontStyle: FontStyle.normal),
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontStyle: FontStyle.normal,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 15),
                   Container(
                     width: 200,
-                    child: TextField(
+                    child: TextFormField(
                       controller: phoneController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your phone number';
+                        }
+                      },
                       style: const TextStyle(fontSize: 18),
                       keyboardType: TextInputType.phone,
                       decoration: const InputDecoration(
@@ -213,42 +218,46 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
                           fontSize: 25)),
                 )),
             const SizedBox(height: 5),
-             Padding(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
               child: Row(
                 children: [
                   Checkbox(
-                  activeColor: Colors.green,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
-                  value: _isChecked,
-                  onChanged: (value) {
-                        setState(() {	
-                _isChecked = value!;	                
-                });
-                 },
-                ),
-                  const Text.rich(TextSpan(
-                      text: 'By clicking on Continue you are agreeing to our  ',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      children: <InlineSpan>[
-                        TextSpan(
-                          text: 'terms of use',
-                          style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline),
-                        )
-                      ])),
+                    activeColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                    value: _isChecked,
+                    onChanged: (value) {
+                      setState(() {
+                        _isChecked = value!;
+                      });
+                    },
+                  ),
+                  const Center(
+                    child: Text.rich(TextSpan(
+                        text:
+                            'By clicking on Continue you are agreeing to our ',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        children: <InlineSpan>[
+                          TextSpan(
+                            text: 'terms of use',
+                            style: TextStyle(
+                                color: Colors.green,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline),
+                          )
+                        ])),
+                  ),
                 ],
               ),
-            ),            
+            ),
             const SizedBox(height: 20),
             Text('Or With',
                 style: TextStyle(
