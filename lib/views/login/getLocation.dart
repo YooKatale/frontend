@@ -71,6 +71,13 @@ Future<String> getAddressFromCoordinates(double latitude, double longitude) asyn
   void onMapCreated (mapController) {
     controller =  mapController;
   }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentLocation();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
