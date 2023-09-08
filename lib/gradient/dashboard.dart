@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-import 'package:flutter/cupertino.dart';
-=======
-import 'package:badges/badges.dart';
->>>>>>> 6befd4eb8627af9b39c90edcd08ba056e6a9057e
 import 'package:flutter/material.dart';
 import 'package:yookatale/views/account.dart';
 import 'package:yookatale/views/static/scanner.dart';
@@ -21,16 +16,11 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   int _selectedIndex = 0;
-<<<<<<< HEAD
   List pages =  [
     const HomePage(),
-    const CartPage(),    
-=======
-
-  List pages = [
+    const CartPage(),
     const HomePage(),
     const CartPage(),
->>>>>>> 6befd4eb8627af9b39c90edcd08ba056e6a9057e
     const ScannerScreen(),
     const CategoriesPageDynamic(),
     const AccountPage(),
@@ -83,10 +73,6 @@ class _DashboardState extends State<Dashboard> {
                 label: "Cart"),
             BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,
-<<<<<<< HEAD
-                icon: const Icon(CupertinoIcons.qrcode_viewfinder, size: 30,),
-                activeIcon: Icon(CupertinoIcons.qrcode_viewfinder, color: Colors.green[600], size: 30,),
-=======
                 icon: const Icon(
                   Icons.scanner,
                   size: 30,
@@ -96,7 +82,6 @@ class _DashboardState extends State<Dashboard> {
                   color: Colors.green[600],
                   size: 30,
                 ),
->>>>>>> 6befd4eb8627af9b39c90edcd08ba056e6a9057e
                 label: "Scanner"),
             BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,
