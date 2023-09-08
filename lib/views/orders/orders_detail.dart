@@ -13,7 +13,7 @@ class OrdersDetail extends StatefulWidget {
   final String date;
   final String unit;
 
-  OrdersDetail({required this.id, required this.im, required this.nem, required this.quant, required this.price, required this.tot, required this.stat, required this.date, required this.unit, });
+  const OrdersDetail({super.key, required this.id, required this.im, required this.nem, required this.quant, required this.price, required this.tot, required this.stat, required this.date, required this.unit, });
 
   @override
   State<OrdersDetail> createState() => _OrdersDetailState();
@@ -30,21 +30,18 @@ class _OrdersDetailState extends State<OrdersDetail> {
           onTap: ()=> Navigator.of(context).pop(),
           child: const Icon(Icons.arrow_back_ios_new_outlined)),
       ),
-      body:Container(
-        //color:themeProvider.isDarkMode ? Colors.grey.shade500 :Colors.grey.shade300,
-        child:ListTile(
-          leading:Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10)
-            ),
-            child: CachedNetworkImage(
-              imageUrl:'${widget.im}',
-            ) ,
+      body:ListTile(
+        leading:Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10)
           ),
-          title: Text(widget.nem),
-          subtitle: Text('quantity: ${widget.quant}'),
-          trailing:Text('Shs:${widget.price}'),
+          child: CachedNetworkImage(
+            imageUrl:widget.im,
+          ) ,
         ),
+        title: Text(widget.nem),
+        subtitle: Text('quantity: ${widget.quant}'),
+        trailing:Text('Shs:${widget.price}'),
       ) ,
     );
   }

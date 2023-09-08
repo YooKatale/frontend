@@ -2,9 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:yookatale/gradient/dashboard.dart';
 
-import '../../gradient/grad.dart';
-import '../../main.dart';
-
 
 class Checkout extends StatefulWidget {
   const Checkout({super.key});

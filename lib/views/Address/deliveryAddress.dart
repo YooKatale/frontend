@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:yookatale/views/Address/deliverySlot.dart';
+import 'package:yookatale/views/Address/deliveryslot.dart';
 
 class DeliveryAddress extends StatefulWidget {
-  DeliveryAddress({Key? key}) : super(key: key);
+  const DeliveryAddress({Key? key}) : super(key: key);
 
   @override
   State<DeliveryAddress> createState() => _DeliveryAddressState();
@@ -26,8 +25,8 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               Row(
-                 children:const  [
+               const Row(
+                 children:[
                   Icon(Icons.circle, color: Colors.black,),
                   SizedBox(width: 10,),
                    Text("Recently Used", style: TextStyle(fontSize: 16),),
@@ -38,11 +37,11 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                           hintText: '86,B/ Ministers Village'
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 0),
                         child: Center(
-                          child: Container(
+                          child: SizedBox(
                             width: double.infinity,
                             height: 45,
                             child: ElevatedButton(
@@ -52,12 +51,12 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                                 ),
                                 backgroundColor: Colors.green.shade600
                               ),
-                              onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>DeliverySlot())), child: const Text('Delivery to this address', style: TextStyle(color: Colors.white, fontSize: 18),)),
+                              onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const DeliverySlot())), child: const Text('Delivery to this address', style: TextStyle(color: Colors.white, fontSize: 18),)),
                           ),
                         ),
                       ),
                       const SizedBox(height: 15),
-                      Row(
+                      const Row(
                  children: [
                   Icon(Icons.circle, color: Colors.black,),
                   SizedBox(width: 10,),
@@ -69,9 +68,9 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                           hintText: '86,B/ Ministers Village'
                         ),
                       ),
-                      SizedBox(height: 15),
-                      Row(
-                 children: const [
+                      const SizedBox(height: 15),
+                      const Row(
+                 children: [
                   Icon(Icons.circle, color: Colors.black,),
                   SizedBox(width: 10,),
                    Text("Work", style: TextStyle(fontSize: 16),),
@@ -86,7 +85,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 0),
                         child: Center(
-                          child: Container(
+                          child: SizedBox(
                             width: double.infinity,
                             height: 50,
                             child: ElevatedButton.icon(
@@ -97,7 +96,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                                 ),
                                 backgroundColor: Colors.green.shade600
                               ),
-                              onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>DeliverySlot())), label: Text('Pick up from store address', style: TextStyle(color: Colors.white, fontSize: 18),)),
+                              onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const DeliverySlot())), label: const Text('Pick up from store address', style: TextStyle(color: Colors.white, fontSize: 18),)),
                           ),
                         ),
                       ),
@@ -105,7 +104,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 0),
                         child: Center(
-                          child: Container(
+                          child: SizedBox(
                             width: double.infinity,
                             height: 50,
                             child: ElevatedButton(
@@ -115,7 +114,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                                 ),
                                 backgroundColor: Colors.green.shade600
                               ),
-                              onPressed: (){}, child: Text('Add a new Address', style: TextStyle(color: Colors.white, fontSize: 18),)),
+                              onPressed: (){}, child: const Text('Add a new Address', style: TextStyle(color: Colors.white, fontSize: 18),)),
                           ),
                         ),
                       ),

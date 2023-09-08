@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 const List cat_json = [
   {
     "img": "https://i.ibb.co/w4h4R6g/fruits.png",

@@ -4,8 +4,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:yookatale/views/splashscreen/getStarted.dart';
 
-import '../login/login.dart';
-
 
 class SplashScreen extends StatefulWidget {
 

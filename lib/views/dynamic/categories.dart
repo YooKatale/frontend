@@ -1,8 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import '../product_categoryjson/cart_json.dart';
 import '../product_categoryjson/categoryjson.dart';
 import '../static/categoryproduct.dart';
 
@@ -20,7 +17,6 @@ class _CategoriesPageDynamicState extends State<CategoriesPageDynamic> {
   int itemLength = 0;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     setState(() {
       itemsTemp = cat_json ;

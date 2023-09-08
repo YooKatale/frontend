@@ -1,4 +1,6 @@
 
+// ignore_for_file: avoid_print, use_build_context_synchronously
+
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -84,12 +86,11 @@ class _LoginState extends State<Login> {
                           )
                       ),
                       validator: (value){
-                        if(value!.isEmpty){
-        
+                        if(value!.isEmpty){        
                           return 'Enter Email';
                         }
-                        bool _isValid= (EmailValidator.validate(value));
-                        if(_isValid==false){
+                        bool isValid= (EmailValidator.validate(value));
+                        if(isValid==false){
                           return 'Enter Valid Email Address';
         
                         }

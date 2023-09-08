@@ -1,29 +1,76 @@
-import 'dart:async';
+// ignore_for_file: file_names
+
+
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:yookatale/gradient/dashboard.dart';
+import 'package:location/location.dart'  as loc;
+import 'package:http/http.dart' as http;
 
 class GetLocationScreen extends StatefulWidget {
   static const  String id='getLocation';
-  GetLocationScreen({Key? key}) : super(key: key);
+  const GetLocationScreen({Key? key}) : super(key: key);
 
   @override
   State<GetLocationScreen> createState() => _GetLocationScreenState();
 }
 
 class _GetLocationScreenState extends State<GetLocationScreen> {
-
   TextEditingController zoneTextController = TextEditingController();
   TextEditingController areaTextController = TextEditingController();
-  final Completer<GoogleMapController> _controllerGoogleMap =
-      Completer<GoogleMapController>();
-    late GoogleMapController newGoogleMapController;
-   static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
+  late GoogleMapController controller;
+  final LatLng center = const LatLng(0.347596, 32.582520);
+  String googleApiKey ='AIzaSyDhbytrBgo8gUz5tgkprBXcTFiJ2BX386M';
   bool _isChecked = false;
+  loc.LocationData? currentLocation;
+  List<Marker> markers = [];
+
+  void getCurrentLocation() async {
+  loc.Location location = loc.Location();
+  location.getLocation().then((location) async {
+    currentLocation = location;
+    String currentAddress = await getAddressFromCoordinates(
+      location.latitude!, location.longitude!);
+    zoneTextController.text = currentAddress;
+  });
+  GoogleMapController googleMapController = controller;
+  location.onLocationChanged.listen((newLocation) {
+    currentLocation = newLocation;
+    // Update the map with the new location.
+    googleMapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          zoom: 11,
+          target: LatLng(
+            newLocation.latitude!, 
+            newLocation.longitude!,
+            ))));
+            setState(() {
+              
+            });
+  });
+}
+Future<String> getAddressFromCoordinates(double latitude, double longitude) async {
+    final apiKey = googleApiKey;
+    final apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$apiKey';
+    try {
+      var response = await http.get(Uri.parse(apiUrl));
+      if(response.statusCode == 200){
+        Map<String, dynamic> data = json.decode(response.body);
+        if(data['status'] == 'OK'){
+          return data['results'][0]['formatted_address'];
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return '';
+  }
+  void onMapCreated (mapController) {
+    controller =  mapController;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,35 +79,45 @@ class _GetLocationScreenState extends State<GetLocationScreen> {
         child: Column(
           children: [
             const SizedBox(height: 40,),
-                    Container(
+                    SizedBox(
                       height: 200,
                       child: GoogleMap(
-              // padding: EdgeInsets.only(bottom: bottomPaddingMap),
-            initialCameraPosition: _kGooglePlex, mapType: MapType.normal,
-            myLocationEnabled: true, zoomGesturesEnabled: true, zoomControlsEnabled: true,
-            myLocationButtonEnabled: true, onMapCreated: (GoogleMapController controller) {
-              _controllerGoogleMap.complete(controller);
-              newGoogleMapController =controller;              
-
-              // locatePosition();
-            },
-            ),
-            ),
+                        initialCameraPosition: CameraPosition(target: center, zoom: 11.5), 
+                        mapType: MapType.normal,
+                        myLocationEnabled: true, 
+                        zoomGesturesEnabled: true, 
+                        zoomControlsEnabled: true,
+                        myLocationButtonEnabled: true, 
+                        onMapCreated: onMapCreated,
+                        markers: {
+                      ...markers.toSet(),                
+                      if(currentLocation!=null)
+                      Marker(
+                        markerId: const MarkerId('current_location'),
+                        position: LatLng(
+                          currentLocation!.latitude!,
+                          currentLocation!.longitude!
+                        ),                  
+                      ),                
+                    },
+                        ),
+                        ),
                     // const SizedBox(height: 10,),
                     const Text('Select your location', style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500, fontSize: 28, fontStyle: FontStyle.normal),),
                     const SizedBox(height: 10),
                     const Text('Set your location', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500, fontSize: 20, fontStyle: FontStyle.normal),),
-            
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Your Zone", style: TextStyle(fontSize: 16),),
-                  TextField(),
-                  SizedBox(height: 10),
-                  Text("Your Area", style: TextStyle(fontSize: 16),),
-                  TextField(),
+                  const Text("Your Zone", style: TextStyle(fontSize: 16),),
+                  TextField(
+                    controller: zoneTextController,                    
+                  ),
+                  const SizedBox(height: 10),
+                  const Text("Your Area", style: TextStyle(fontSize: 16),),
+                  const TextField(),
                 ],
               ),
             ),
@@ -79,6 +136,9 @@ class _GetLocationScreenState extends State<GetLocationScreen> {
                   onChanged: (value) {
                         setState(() {	
                 _isChecked = value!;	
+                if(_isChecked) {
+                  getCurrentLocation();
+                }
                 });
                  },
                 ),    

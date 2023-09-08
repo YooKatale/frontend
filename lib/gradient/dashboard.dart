@@ -1,9 +1,7 @@
-
-import 'package:badges/badges.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:yookatale/views/account.dart';
 import 'package:yookatale/views/static/scanner.dart';
-
-import '../views/account.dart';
 import '../views/cart.dart';
 import '../views/dynamic/categories.dart';
 import '../views/home.dart';
@@ -19,13 +17,11 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-
   int _selectedIndex = 0;
-
   List pages =  [
     const HomePage(),
     const CartPage(),    
-    ScannerScreen(),
+    const ScannerScreen(),
     const CategoriesPageDynamic(),
     const AccountPage(),
   ];
@@ -64,8 +60,8 @@ class _DashboardState extends State<Dashboard> {
                 label: "Cart"),                            
                 BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,
-                icon: const Icon(Icons.scanner, size: 30,),
-                activeIcon: Icon(Icons.scanner_outlined, color: Colors.green[600], size: 30,),
+                icon: const Icon(CupertinoIcons.qrcode_viewfinder, size: 30,),
+                activeIcon: Icon(CupertinoIcons.qrcode_viewfinder, color: Colors.green[600], size: 30,),
                 label: "Scanner"),
                 BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,

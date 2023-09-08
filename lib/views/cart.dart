@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:yookatale/views/Widgets/favorite_items.dart';
 import 'package:yookatale/views/Widgets/itemsCart.dart';
 import 'package:yookatale/views/product_categoryjson/cart_json.dart';
 class CartPage extends StatefulWidget {
@@ -40,7 +41,6 @@ void decrementItemsToCart(String itemId) {
     setState(() {
       itemsTemp = cartjson;
       itemLength = cartjson.length;
-      cartItems = List.from(cartjson);
     });
   }
 
@@ -52,7 +52,7 @@ void decrementItemsToCart(String itemId) {
   await launchUrl(launchUri);
 }
 
-void addItemToCart(String itemId) {
+void addItemToFavorite(String itemId) {
   setState(() {
     final isFavorite = favoriteItems.any((item) => item['id'] == itemId);
     if (isFavorite) {
@@ -63,10 +63,15 @@ void addItemToCart(String itemId) {
     }
   });
 }
-
-void removeItemFromCart(String itemId) {
+void addItemToCart(String itemId) {
   setState(() {
-    favoriteItems.removeWhere((item) => item['id'] == itemId);
+    final isAddedToCart = cartItems.any((item) => item['id'] == itemId);
+    if (isAddedToCart) {
+      cartItems.removeWhere((item) => item['id'] == itemId);
+    } else {
+      final addItemToCart = itemsTemp.firstWhere((item) => item['id'] == itemId);
+      cartItems.add(addItemToCart);
+    }
   });
 }
 
@@ -74,25 +79,26 @@ void removeItemFromCart(String itemId) {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Cart",style:TextStyle(),),
         leading: InkWell(
-
           onTap: () => Navigator.of(context).pop(),
-          child: const Icon(Icons.arrow_back_ios_new)),
+          child: const Icon(Icons.arrow_back_ios_new,
+          color: Colors.green,)),
         actions: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            
+            mainAxisAlignment: MainAxisAlignment.center,            
+
             children:  [
           const Icon(Icons.location_pin),
           const SizedBox(width: 5,),
           const Text('Home', style: TextStyle(color: Colors.green),),
           const SizedBox(width: 10,),
           InkWell(
-            onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ItemsCart(cartItems: favoriteItems,))),
+            onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ItemsCart(cartItems: cartItems,))),
             child: const Icon(Icons.shopping_cart)),
+            InkWell(
+            onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=> FavoriteItems(favoriteItems: favoriteItems))),
+            child: const Icon(Icons.favorite)),
           const SizedBox(width: 10,),
-
             ],
           )
         ],
@@ -124,8 +130,6 @@ void removeItemFromCart(String itemId) {
                                filled: true,
                                fillColor:Colors.white,
                                suffixIcon: IconButton(
-
-
                           onPressed: () {
                            Navigator.push(
                                context,
@@ -147,32 +151,6 @@ void removeItemFromCart(String itemId) {
           ) ,
         ),
       ),
-      floatingActionButton: Wrap( 
-        //will break to another line on overflow
-          direction: Axis.horizontal, //use vertical to show  on vertical axis
-          children: <Widget>[
-                Container( 
-                  margin:const EdgeInsets.all(10),
-                  child: FloatingActionButton(
-                    onPressed: (){
-                        callFunction('+254796116642');
-                    },
-                    child: const Icon(Icons.call, color: Colors.lightBlueAccent,),
-                  )
-                ), //button first
-
-                Container( 
-                  margin:const EdgeInsets.all(10),
-                  child: FloatingActionButton(
-                    onPressed: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ItemsCart(cartItems: favoriteItems,))),
-                    child: const Icon(Icons.shopping_cart_checkout_rounded),
-                  )
-                ),
-
-                // Add more buttons here
-        ],
-            ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
@@ -192,6 +170,7 @@ void removeItemFromCart(String itemId) {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount:itemLength,
                 itemBuilder: (BuildContext context, int index) {   
+                  final isAddedToCart = cartItems.any((item) => item['id'] == itemsTemp[index]['id']);
                   final isFavorite = favoriteItems.any((item) => item['id'] == itemsTemp[index]['id']);            
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -201,8 +180,8 @@ void removeItemFromCart(String itemId) {
                       elevation: 10,
                       child: Container(
                         height: 110,
-                        padding: const EdgeInsets.all(5),
-                        margin: const EdgeInsets.only(top: 5),
+                        padding: const EdgeInsets.all(5),                        
+                        margin: const EdgeInsets.only(top: 5),  
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(4)
@@ -227,52 +206,31 @@ void removeItemFromCart(String itemId) {
                                           color: Colors.black,
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold
-                                              ),),
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                            icon: const Icon(
-                                              Icons.add_circle,
-                                              color: Colors.green,
-                                            ),
-                                            onPressed: () {
-                                              incrementItemsToCart(itemsTemp[index]['id']);
-                                              // shop.updateQuanity(catid:pros[index].id, quant: 'adding',context: context);
-                                            }),                                
-                                
-                                        Text(
-                                          itemsTemp[index]["quant"].toString(),
-                                          style: const TextStyle(
-                                            color: Colors.black),),                                                        
-                                        IconButton(
-                                            icon: const Icon(
-                                              Icons.remove_circle,
-                                              color: Colors.red,
-                                            ),
-                                            onPressed: () {                                             
-                                              decrementItemsToCart(itemsTemp[index]['id']);
-                                            }),
-                                      ],
-                                    ),                                
-                                    Text('Price:${ itemsTemp[index]['price']}',
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 15),)
+                                              ),),                                                                                            
+                                    
+                                    Text(
+                                      '${itemsTemp[index]['unit']}'
+                                    )
                                   ],
-                                ),
-                                IconButton(onPressed: () {
-                                  final itemId = itemsTemp[index]['id'];
-                                  if(itemId!=null) {
-                                 removeItemFromCart(itemsTemp[index]['id']);
-                                  }                                
-                                }, icon: const Icon(Icons.delete,
-                                  color: Colors.red,)),            
+                                ),                                                       
                                 Column(
-                                  children: [
+                                  children: [                                   
                                     IconButton(
                                       icon: Icon(
-                                        isFavorite ? Icons.favorite : Icons.favorite_outline,
-                                        color: isFavorite ? Colors.green : Colors.grey,
+                                        isFavorite ? Icons.favorite: Icons.favorite_border,
+                                        color: isFavorite ? Colors.green : Colors.grey,                               
+                                      ),
+                                      onPressed: () {
+                                        final itemId = itemsTemp[index]['id'];
+                                        if (itemId!= null) {
+                                          addItemToFavorite(itemId);
+                                        } else {
+                                        }
+                                      }),
+                                      IconButton(
+                                      icon: Icon(
+                                        isAddedToCart ? Icons.add_circle: Icons.add_circle_outline_rounded,
+                                        color: isAddedToCart ? Colors.green : Colors.grey,                               
                                       ),
                                       onPressed: () {
                                         final itemId = itemsTemp[index]['id'];
@@ -280,11 +238,7 @@ void removeItemFromCart(String itemId) {
                                           addItemToCart(itemId);
                                         } else {
                                         }
-                                      }),                                    
-                                    const Text(
-                                      "Add to Cart",
-                                      style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-                                    ),
+                                      }),
                                   ],
                                 )
                               ],

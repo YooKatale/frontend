@@ -1,8 +1,10 @@
+// ignore_for_file: file_names
+
 import 'package:faqflutter/faqflutter.dart';
 import 'package:flutter/material.dart';
 
 class FAQScreen extends StatefulWidget {
-  FAQScreen({Key? key}) : super(key: key);
+  const FAQScreen({Key? key}) : super(key: key);
 
   @override
   State<FAQScreen> createState() => _FAQScreenState();
@@ -13,14 +15,16 @@ class _FAQScreenState extends State<FAQScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('FAQs Sections', style: TextStyle(fontWeight: FontWeight.bold),),
+        title: const Text(
+          'FAQs Sections', 
+          style: TextStyle(fontWeight: FontWeight.bold),),
         leading: InkWell(
           onTap: ()=> Navigator.of(context).pop(),
           child: const Icon(Icons.arrow_back_ios_new_outlined)),
       ),
       body: Center(
         child: FaqFlutter(
-          data: [
+          data: const [
       [
         'Yookatale Shopping?',
         'the method is very easy, you just choose the category advisor, and choose the professional you want to consult after seeing the professional details you can buy the available timeslot, and after the purchase is confirmed please wait for the consultation time, the professional will immediately call you'

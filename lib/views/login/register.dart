@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field, avoid_print
+
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -111,8 +113,8 @@ class _RegisterState extends State<Register> {
                             if (value!.isEmpty) {
                               return 'Enter Email';
                             }
-                            bool _isValid = (EmailValidator.validate(value));
-                            if (_isValid == false) {
+                            bool isValid = (EmailValidator.validate(value));
+                            if (isValid == false) {
                               return 'Enter Valid Email Address';
                             }
                             return null;
@@ -147,8 +149,8 @@ class _RegisterState extends State<Register> {
                             if (value!.isEmpty) {
                               return 'Enter Email';
                             }
-                            bool _isValid = (EmailValidator.validate(value));
-                            if (_isValid == false) {
+                            bool isValid = (EmailValidator.validate(value));
+                            if (isValid == false) {
                               return 'Enter Valid Email Address';
                             }
                             return null;

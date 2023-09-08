@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 const List invoice_json = [
   {
     "img": "https://www.yookatale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo1.54d97587.png&w=384&q=75",

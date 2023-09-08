@@ -4,19 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:yookatale/views/account.dart';
-import 'package:yookatale/views/cart.dart';
-import 'package:yookatale/views/home.dart';
 import 'package:yookatale/views/login/getLocation.dart';
 import 'package:yookatale/views/login/login.dart';
 import 'package:yookatale/views/login/register.dart';
 import 'package:yookatale/views/splashscreen/getSign.dart';
 import 'package:yookatale/views/splashscreen/getStarted.dart';
 import 'package:yookatale/views/splashscreen/splash.dart';
-
 import 'firebase_options.dart';
 import 'gradient/dashboard.dart';
-import 'views/dynamic/categories.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

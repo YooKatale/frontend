@@ -1,10 +1,11 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'cart.dart';
 import 'dynamic/categories.dart';
 import 'dynamic/categorieshorizontal.dart';
-import 'dynamic/products.dart';
 import 'dynamic/someproducts.dart';
 
 class HomePage extends StatefulWidget {
@@ -46,16 +47,12 @@ class _HomePageState extends State<HomePage> {
   }
   @override
   Widget build(BuildContext context) {
-
-
     final users= FirebaseAuth.instance.currentUser; 
-
-
     return Scaffold(
       appBar: AppBar(
         // backgroundColor: Colors.lightGreen,
-        leading:Padding(
-          padding: const EdgeInsets.all(2.0),
+        leading:const Padding(
+          padding: EdgeInsets.all(2.0),
           child: Icon(Icons.menu),
         ) ,
         title:Column(
@@ -65,11 +62,10 @@ class _HomePageState extends State<HomePage> {
             const Text("Vincent", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),)
           ],
         ),
-        actions: [
+        actions: const [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            
-            children: const [
+            mainAxisAlignment: MainAxisAlignment.center,            
+            children: [
               Icon(Icons.location_pin),
           SizedBox(width: 5,),
           Text('Home', style: TextStyle(color: Colors.green),),
@@ -93,32 +89,29 @@ class _HomePageState extends State<HomePage> {
                         child:InkWell(
                           onTap: () {
                           },
-                          child: Container(
-                                                       
-                           child:TextField(
-                              enabled: false,
-                              decoration: InputDecoration(
-                                hintText: 'Search category',
-                                prefixIcon: const Icon(Icons.search,color:Colors.grey ,),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: Colors.grey, width: 1.5),
-                                ),
-                                contentPadding: EdgeInsets.zero,
-                                filled: true,
-                                fillColor:Colors.white,
-                                suffixIcon: IconButton(
+                          child: TextField(
+                             enabled: false,
+                             decoration: InputDecoration(
+                               hintText: 'Search category',
+                               prefixIcon: const Icon(Icons.search,color:Colors.grey ,),
+                               border: OutlineInputBorder(
+                                 borderRadius: BorderRadius.circular(10),
+                                 borderSide: const BorderSide(color: Colors.grey, width: 1.5),
+                               ),
+                               contentPadding: EdgeInsets.zero,
+                               filled: true,
+                               fillColor:Colors.white,
+                               suffixIcon: IconButton(
                           onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: ((context) => const CartPage())));
+                           Navigator.push(
+                               context,
+                               MaterialPageRoute(
+                                   builder: ((context) => const CartPage())));
                           },
                           icon: const Icon(Icons.speaker,color: Colors.grey,)),
-                              ),
+                             ),
 
-                            ),
-                          ),
+                           ),
                         ),
                       ),
 
@@ -173,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red
                             ),
-                            onPressed: (){}, child: Text('Order Now', style: TextStyle(color: Colors.white),)))
+                            onPressed: (){}, child: const Text('Order Now', style: TextStyle(color: Colors.white),)))
                   ],
                 ),
 
@@ -215,17 +208,17 @@ class _HomePageState extends State<HomePage> {
           Container(
             width: MediaQuery.of(context).size.width,
             height:MediaQuery.of(context).size.height,
-            child:Column(
+            child:const Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
+                  children: [
                     Text('Popular Products',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold, color: Colors.green),),
                     
 
                   ],
                 ),
-                const SomeProducts(),
+                SomeProducts(),
               ],
             ),
           ),
