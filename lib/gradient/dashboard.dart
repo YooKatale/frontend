@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import 'package:flutter/cupertino.dart';
+=======
+import 'package:badges/badges.dart';
+>>>>>>> 6befd4eb8627af9b39c90edcd08ba056e6a9057e
 import 'package:flutter/material.dart';
 import 'package:yookatale/views/account.dart';
 import 'package:yookatale/views/static/scanner.dart';
@@ -7,8 +11,7 @@ import '../views/dynamic/categories.dart';
 import '../views/home.dart';
 
 class Dashboard extends StatefulWidget {
-
-  static const  String id='dashboard';
+  static const String id = 'dashboard';
 
   const Dashboard({super.key});
 
@@ -18,9 +21,16 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   int _selectedIndex = 0;
+<<<<<<< HEAD
   List pages =  [
     const HomePage(),
     const CartPage(),    
+=======
+
+  List pages = [
+    const HomePage(),
+    const CartPage(),
+>>>>>>> 6befd4eb8627af9b39c90edcd08ba056e6a9057e
     const ScannerScreen(),
     const CategoriesPageDynamic(),
     const AccountPage(),
@@ -32,46 +42,85 @@ class _DashboardState extends State<Dashboard> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-        selectedFontSize: 13,
-        unselectedFontSize: 13,
-        type: BottomNavigationBarType.fixed,  
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          selectedFontSize: 13,
+          unselectedFontSize: 13,
+          type: BottomNavigationBarType.fixed,
           showSelectedLabels: true,
           showUnselectedLabels: true,
           selectedItemColor: Colors.green.shade600,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
-          items:  [
+          items: [
             BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,
-                icon: const Icon(Icons.home, size: 30,),
-                activeIcon: Icon(Icons.home, color: Colors.green[600], size: 30,),
+                icon: const Icon(
+                  Icons.home,
+                  size: 30,
+                ),
+                activeIcon: Icon(
+                  Icons.home,
+                  color: Colors.green[600],
+                  size: 30,
+                ),
                 label: "Home"),
             BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,
-                icon: const Icon(Icons.shopping_cart_outlined, size: 30,),
-                activeIcon: Icon(Icons.shopping_cart_outlined, color: Colors.green[600], size: 30,),
-                label: "Cart"),                            
-                BottomNavigationBarItem(
+                icon: const Icon(
+                  Icons.shopping_cart_outlined,
+                  size: 30,
+                ),
+                activeIcon: Icon(
+                  Icons.shopping_cart_outlined,
+                  color: Colors.green[600],
+                  size: 30,
+                ),
+                label: "Cart"),
+            BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,
+<<<<<<< HEAD
                 icon: const Icon(CupertinoIcons.qrcode_viewfinder, size: 30,),
                 activeIcon: Icon(CupertinoIcons.qrcode_viewfinder, color: Colors.green[600], size: 30,),
+=======
+                icon: const Icon(
+                  Icons.scanner,
+                  size: 30,
+                ),
+                activeIcon: Icon(
+                  Icons.scanner_outlined,
+                  color: Colors.green[600],
+                  size: 30,
+                ),
+>>>>>>> 6befd4eb8627af9b39c90edcd08ba056e6a9057e
                 label: "Scanner"),
-                BottomNavigationBarItem(
+            BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,
-                icon: const Icon(Icons.list, size: 30,),
-                activeIcon: Icon(Icons.list, color: Colors.green[600], size: 30,),
+                icon: const Icon(
+                  Icons.list,
+                  size: 30,
+                ),
+                activeIcon: Icon(
+                  Icons.list,
+                  color: Colors.green[600],
+                  size: 30,
+                ),
                 label: "List"),
             BottomNavigationBarItem(
                 backgroundColor: Colors.lightGreen,
-                icon: const Icon(Icons.person_outline, size: 30,),
-                activeIcon: Icon(Icons.person_outline, color: Colors.green[600], size: 30,),
+                icon: const Icon(
+                  Icons.person_outline,
+                  size: 30,
+                ),
+                activeIcon: Icon(
+                  Icons.person_outline,
+                  color: Colors.green[600],
+                  size: 30,
+                ),
                 label: "Profile"),
           ]),
     );

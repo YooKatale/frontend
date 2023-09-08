@@ -9,6 +9,7 @@ import cloud_firestore
 import firebase_auth
 import firebase_core
 import firebase_database
+import firebase_database
 import geolocator_apple
 import in_app_review
 import location
