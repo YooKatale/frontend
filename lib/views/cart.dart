@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:yookatale/views/Widgets/favorite_items.dart';
 import 'package:yookatale/views/Widgets/itemsCart.dart';
 import 'package:yookatale/views/product_categoryjson/cart_json.dart';
+import 'package:location/location.dart'  as loc;
+import 'package:http/http.dart' as http;
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -16,6 +22,11 @@ class _CartPageState extends State<CartPage> {
   int itemLength = 0;
   List<Map<String, dynamic>> favoriteItems = [];
   List<Map<String, dynamic>> cartItems = [];
+  String googleApiKey ='AIzaSyDhbytrBgo8gUz5tgkprBXcTFiJ2BX386M';
+  final LatLng center = const LatLng(0.347596, 32.582520);
+   loc.LocationData? currentLocation;
+   late GoogleMapController controller;
+   String currentAddress = 'Home';
 
   // get cartjson => cart_json;
 
@@ -56,45 +67,105 @@ class _CartPageState extends State<CartPage> {
     await launchUrl(launchUri);
   }
 
-void addItemToCart(String itemId) {
+void addItemToFavorite(String itemId) {
   setState(() {
     final isFavorite = favoriteItems.any((item) => item['id'] == itemId);
     if (isFavorite) {
       favoriteItems.removeWhere((item) => item['id'] == itemId);
     } else {
-      final addItemToCart = itemsTemp.firstWhere((item) => item['id'] == itemId);
-      favoriteItems.add(addItemToCart);
+      final addItemToFav = itemsTemp.firstWhere((item) => item['id'] == itemId);
+      favoriteItems.add(addItemToFav);
     }
   });
 }
 
-void removeItemFromCart(String itemId) {
+void removeItemFromFavorite(String itemId) {
   setState(() {
     favoriteItems.removeWhere((item) => item['id'] == itemId);
   });
 }
 
+void addItemToCart(String itemId) {
+  setState(() {
+    final isAddedToCart= cartItems.any((item) => item['id'] == itemId);
+    if (isAddedToCart) {
+      cartItems.removeWhere((item) => item['id'] == itemId);
+    } else {
+      final addItemToCart = itemsTemp.firstWhere((item) => item['id'] == itemId);
+      cartItems.add(addItemToCart);
+    }
+  });
+}
+
+  void getCurrentLocation() async {
+  loc.Location location = loc.Location();
+  location.getLocation().then((location) async {
+    currentLocation = location;
+    String newAddress = await getAddressFromCoordinates(
+      location.latitude!, location.longitude!);
+    currentAddress = newAddress;
+  });
+  setState(() {
+    
+  });
+  }
+  // GoogleMapController googleMapController = controller;
+  // location.onLocationChanged.listen((newLocation) {
+  //   currentLocation = newLocation;
+  //   // Update the map with the new location.
+  //   googleMapController.animateCamera(
+  //     CameraUpdate.newCameraPosition(
+  //       CameraPosition(
+  //         zoom: 11,
+  //         target: LatLng(
+  //           newLocation.latitude!, 
+  //           newLocation.longitude!,
+  //           )))
+  //           );
+  //           setState(() {
+              
+  //           });
+  // }
+
+Future<String> getAddressFromCoordinates(double latitude, double longitude) async {
+    final apiKey = googleApiKey;
+    final apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$apiKey';
+    try {
+      var response = await http.get(Uri.parse(apiUrl));
+      if(response.statusCode == 200){
+        Map<String, dynamic> data = json.decode(response.body);
+        if(data['status'] == 'OK'){
+          return data['results'][0]['formatted_address'];
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Cart",style:TextStyle(),),
         leading: InkWell(
-
           onTap: () => Navigator.of(context).pop(),
           child: const Icon(Icons.arrow_back_ios_new)),
         actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            
+          Row(mainAxisAlignment: MainAxisAlignment.center,            
             children:  [
           const Icon(Icons.location_pin),
-          const SizedBox(width: 5,),
-          const Text('Home', style: TextStyle(color: Colors.green),),
+          const SizedBox(width: 5,),          
+           Text(
+            currentAddress, style: const TextStyle(color: Colors.green),),
           const SizedBox(width: 10,),
           InkWell(
-            onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ItemsCart(cartItems: favoriteItems,))),
-            child: const Icon(Icons.shopping_cart)),
+            onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ItemsCart(cartItems: cartItems,))),
+            child: const Icon(Icons.shopping_cart,color: Colors.green,)),
+            InkWell(
+            onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=> FavoriteItems(favoriteItems: favoriteItems))),
+            child: const Icon(Icons.favorite,
+            color: Colors.green,)),
           const SizedBox(width: 10,),
 
             ],
@@ -152,32 +223,6 @@ void removeItemFromCart(String itemId) {
           ),
         ),
       ),
-      floatingActionButton: Wrap( 
-        //will break to another line on overflow
-          direction: Axis.horizontal, //use vertical to show  on vertical axis
-          children: <Widget>[
-                Container( 
-                  margin:const EdgeInsets.all(10),
-                  child: FloatingActionButton(
-                    onPressed: (){
-                        callFunction('+254796116642');
-                    },
-                    child: const Icon(Icons.call, color: Colors.lightBlueAccent,),
-                  )
-                ), //button first
-
-                Container( 
-                  margin:const EdgeInsets.all(10),
-                  child: FloatingActionButton(
-                    onPressed: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ItemsCart(cartItems: favoriteItems,))),
-                    child: const Icon(Icons.shopping_cart_checkout_rounded),
-                  )
-                ),
-
-                // Add more buttons here
-        ],
-            ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
@@ -198,7 +243,8 @@ void removeItemFromCart(String itemId) {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount:itemLength,
                 itemBuilder: (BuildContext context, int index) {   
-                  final isFavorite = favoriteItems.any((item) => item['id'] == itemsTemp[index]['id']);            
+                  final isFavorite = favoriteItems.any((item) => item['id'] == itemsTemp[index]['id']); 
+                  final isAddedToCart = cartItems.any((item) => item['id'] == itemsTemp[index]['id']);         
                   return Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -237,46 +283,17 @@ void removeItemFromCart(String itemId) {
                                           color: Colors.black,
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold
-                                              ),),
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                            icon: const Icon(
-                                              Icons.add_circle,
-                                              color: Colors.green,
-                                            ),
-                                            onPressed: () {
-                                              incrementItemsToCart(itemsTemp[index]['id']);
-                                              // shop.updateQuanity(catid:pros[index].id, quant: 'adding',context: context);
-                                            }),                                
-                                
-                                        Text(
-                                          itemsTemp[index]["quant"].toString(),
-                                          style: const TextStyle(
-                                            color: Colors.black),),                                                        
-                                        IconButton(
-                                            icon: const Icon(
-                                              Icons.remove_circle,
-                                              color: Colors.red,
-                                            ),
-                                            onPressed: () {                                             
-                                              decrementItemsToCart(itemsTemp[index]['id']);
-                                            }),
-                                      ],
-                                    ),                                
-                                    Text('Price:${ itemsTemp[index]['price']}',
+                                              ),),     
+                                         Text('Price:${ itemsTemp[index]['price']}',
+                                      style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 15),),                                                              
+                                    Text('Weight:${ itemsTemp[index]['unit']}',
                                       style: const TextStyle(
                                           color: Colors.black,
                                           fontSize: 15),)
                                   ],
-                                ),
-                                IconButton(onPressed: () {
-                                  final itemId = itemsTemp[index]['id'];
-                                  if(itemId!=null) {
-                                 removeItemFromCart(itemsTemp[index]['id']);
-                                  }                                
-                                }, icon: const Icon(Icons.delete,
-                                  color: Colors.red,)),            
+                                ),                                            
                                 Column(
                                   children: [                                   
                                     IconButton(
@@ -287,14 +304,22 @@ void removeItemFromCart(String itemId) {
                                       onPressed: () {
                                         final itemId = itemsTemp[index]['id'];
                                         if (itemId!= null) {
-                                          addItemToCart(itemId);
+                                          addItemToFavorite(itemId);
                                         } else {
                                         }
                                       }),                                    
-                                    const Text(
-                                      "Add to Cart",
-                                      style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-                                    ),
+                                     IconButton(
+                                      icon: Icon(
+                                        isAddedToCart ? Icons.add_circle_outline : Icons.add_circle,
+                                        color: isAddedToCart ? Colors.green : Colors.grey,
+                                      ),
+                                      onPressed: () {
+                                        final itemId = itemsTemp[index]['id'];
+                                        if (itemId!= null) {
+                                          addItemToCart(itemId);
+                                        } else {
+                                        }
+                                      }),
                                   ],
                                 )
                               ],

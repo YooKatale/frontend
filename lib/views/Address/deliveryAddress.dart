@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:yookatale/views/Address/deliveryslot.dart';
 
@@ -49,9 +51,10 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5)
                                 ),
-                                backgroundColor: Colors.green.shade600
+                                backgroundColor:  Colors.green.shade700
                               ),
-                              onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const DeliverySlot())), child: const Text('Delivery to this address', style: TextStyle(color: Colors.white, fontSize: 18),)),
+                              onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const DeliverySlot())),
+                               child: const Text('Delivery to this address', style: TextStyle(color: Colors.white, fontSize: 18),)),
                           ),
                         ),
                       ),
@@ -94,7 +97,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5)
                                 ),
-                                backgroundColor: Colors.green.shade600
+                                backgroundColor: Colors.green.shade700
                               ),
                               onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const DeliverySlot())), label: const Text('Pick up from store address', style: TextStyle(color: Colors.white, fontSize: 18),)),
                           ),
@@ -112,7 +115,7 @@ class _DeliveryAddressState extends State<DeliveryAddress> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5)
                                 ),
-                                backgroundColor: Colors.green.shade600
+                                backgroundColor:Colors.green.shade700
                               ),
                               onPressed: (){}, child: const Text('Add a new Address', style: TextStyle(color: Colors.white, fontSize: 18),)),
                           ),

@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
+import 'package:yookatale/views/checkout/selectpayment.dart';
 class DeliverySlot extends StatefulWidget {
   const DeliverySlot({Key? key}) : super(key: key);
 
@@ -8,9 +9,7 @@ class DeliverySlot extends StatefulWidget {
 }
 
 class _DeliverySlotState extends State<DeliverySlot> {
-
-  bool? _isChecked = false;
-
+List<bool> isCheckedList = [false, false, false, false];
   List<String> text = ['12:00 AM - 2:00 PM','2:00 PM - 4:00 PM', '4:00 PM - 6:00 PM','6:00 PM - 8:00 PM'];
 
   @override
@@ -77,15 +76,16 @@ class _DeliverySlotState extends State<DeliverySlot> {
                                 ),
                                 backgroundColor: Colors.green.shade600
                               ),
-                              onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const DeliverySlot())), label: const Text('Select a delivery slot', style: TextStyle(color: Colors.white, fontSize: 18),)),
+                              onPressed: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const DeliverySlot())), 
+                              label: const Text('Select a delivery slot', 
+                              style: TextStyle(color: Colors.white, fontSize: 18),)),
                           ),
                         ),
                       ),
-                     const  SizedBox(height: 15,),
-                    
+                     const  SizedBox(height: 15,),                    
           Card(
             elevation: 5,
-            color: Colors.grey.shade400,
+            color: Colors.white,
             margin: const EdgeInsets.all(10),
             child: SizedBox(
               height: 270.0,
@@ -100,22 +100,19 @@ class _DeliverySlotState extends State<DeliverySlot> {
                 itemCount: text.length,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context,index){
-                return CheckboxListTile(
-                  controlAffinity: ListTileControlAffinity.leading,
-                      title: Text(text[index]),
-                      value: _isChecked,
-                      selected: _isChecked!,
-                      onChanged: (val) {
-                        setState(() {
-                          _isChecked = val;
-                          if (val == true) {
-                            text[index];
-                          }
-                        });
-                      },
-                    );
-              })
+                itemBuilder: (context, index) {
+                  return CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(text[index]),
+                    value: isCheckedList[index],
+                    onChanged: (val) {
+                      setState(() {
+                        isCheckedList[index] = val!;
+                      });
+                    },
+                  );
+                },
+              )
             ],
               ),
             ),
@@ -134,9 +131,11 @@ class _DeliverySlotState extends State<DeliverySlot> {
                                 ),
                                 backgroundColor: Colors.green.shade600
                               ),
-                              onPressed: (){},
-                              // Navigator.of(context).push(
-                              //   MaterialPageRoute(builder: (context)=>ItemsCart())), 
+                              onPressed: (){
+                                Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => SelectPayment())
+                              );
+                              },                              
                                 child: const Text('Proceed pay', style: TextStyle(color: Colors.white, fontSize: 18),)),
                           ),
                         ),
