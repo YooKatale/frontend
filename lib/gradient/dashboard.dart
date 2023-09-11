@@ -19,8 +19,6 @@ class _DashboardState extends State<Dashboard> {
   List pages =  [
     const HomePage(),
     const CartPage(),
-    const HomePage(),
-    const CartPage(),
     const ScannerScreen(),
     const CategoriesPageDynamic(),
     const AccountPage(),
