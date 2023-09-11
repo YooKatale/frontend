@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../firebase_auth_implementation/auth_fire.dart';
 import 'otp_page.dart';
 
 class GetStartedSignIn extends StatefulWidget {
@@ -67,20 +68,6 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
     displayNameNoCountryCode: "UG",
     e164Key: "",
   );
-
-  // Handle Google Sign In
-  // Future<FirebaseUser> _handleGoogleSignIn() async {
-  //   final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-  //   final GoogleSignInAuthentication googleAuth =
-  //       await googleUser.authentication;
-  //   final AuthCredential credential = GoogleAuthProvider.getCredential(
-  //     accessToken: googleAuth.accessToken,
-  //     idToken: googleAuth.idToken,
-  //   );
-  //   final FirebaseUser user =
-  //       (await _auth.signInWithCredential(credential)).user;
-  //   return user;
-  // }
 
   // user login
   void _userLogin() async {
@@ -280,10 +267,7 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
                   width: 10,
                 ),
                 GestureDetector(
-                  onTap: () async {
-                    // FirebaseUser user = await _handleGoogleSignIn();
-                    // Do something with the user (e.g. show a welcome message)
-                  },
+                  onTap: () => FirebaseAuthService().signInWithGoogle(),
                   child: CachedNetworkImage(
                     imageUrl:
                         "https://www.tramvietnam.com.au/wp-content/uploads/2021/07/Illustration-of-Google-icon-on-transparent-background-PNG.png",
