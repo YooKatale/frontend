@@ -133,7 +133,7 @@ List<bool> isCheckedList = [false, false, false, false];
                               ),
                               onPressed: (){
                                 Navigator.of(context).push(
-                                MaterialPageRoute(builder: (_) => SelectPayment())
+                                MaterialPageRoute(builder: (_) => const SelectPayment())
                               );
                               },                              
                                 child: const Text('Proceed pay', style: TextStyle(color: Colors.white, fontSize: 18),)),
