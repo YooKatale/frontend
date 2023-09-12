@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(greetings, style: const TextStyle(fontSize: 14, color: Colors.green),),
-            const Text("Vincent", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),)
+            const Text("YooKatale", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),)
           ],
         ),
         actions: const [

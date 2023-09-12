@@ -6,16 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:rating_dialog/rating_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:yookatale/views/Widgets/editProfile.dart';
 import 'package:yookatale/views/Widgets/faqScreen.dart';
 import 'package:yookatale/views/Widgets/inviteFriend.dart';
 import 'package:yookatale/views/Widgets/termsPolicy.dart';
 import 'package:yookatale/views/Widgets/trackDelivery.dart';
 import 'package:yookatale/views/account_tiles.dart';
-import 'package:yookatale/views/cart.dart';
 import 'package:yookatale/views/contactus.dart';
 import 'package:yookatale/views/login/login.dart';
-import 'package:yookatale/views/loyalty/loyalty.dart';
 import 'package:yookatale/views/orders/orders.dart';
 import 'package:yookatale/views/pdfs/invoicelist.dart';
 
@@ -44,7 +43,6 @@ class _AccountPageState extends State<AccountPage> {
         );
       }
     }
-
     final dialog = RatingDialog(
       initialRating: 1.0,
       // your app's name?
@@ -87,6 +85,14 @@ class _AccountPageState extends State<AccountPage> {
       barrierDismissible: true, // set to false if you want to force a rating
       builder: (context) => dialog,
     );
+  }
+  Future openBroserUrl({required String url, bool inApp = false}) async {
+    Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(
+        uri
+      );
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -148,8 +154,9 @@ class _AccountPageState extends State<AccountPage> {
                       icon:Icons.subscriptions_outlined, 
                       title: 'Subscription',
                       withArrow: true,
-                      onTap: () {
-                        Navigator.push(context,MaterialPageRoute(builder: (context)=> const CartPage()));
+                      onTap: () async{
+                        String uri ='https://www.yookatale.com/subscription';
+                        openBroserUrl(url: uri);
                       },
                       ),
                       AccountPageTiles(
@@ -171,11 +178,35 @@ class _AccountPageState extends State<AccountPage> {
                           AccountPageTiles(
                             withArrow: true,
                             onTap: () {
-                               Navigator.push(context,MaterialPageRoute(builder: (context)=> const LoyaltyPoints()));
+                              // Display the referral link and loyalty points balance
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Your Referral Link'),
+                                    content: const Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text('Share this link with friends:'),
+                                        Text('https://yourapp.com/referral?code=yourReferralCode'),
+                                        Text('Loyalty Points: 1000'), // Display the user's loyalty points here
+                                      ],
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: const Text('Close'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             },
                             icon: CupertinoIcons.hand_point_right_fill, 
                             title: 'Loyalty points'
-                            ),
+                          ),
                             AccountPageTiles(
                               onTap: () {
                                 Navigator.push(context, MaterialPageRoute(builder:(context)=>const ContactUs()));
@@ -203,7 +234,7 @@ class _AccountPageState extends State<AccountPage> {
                               title: 'FAQS',
                               withArrow: true,
                               onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => FAQScreen()));
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FAQScreen()));
                               },
                             ),
                             AccountPageTiles(
@@ -211,7 +242,7 @@ class _AccountPageState extends State<AccountPage> {
                               title: 'Terms & Conditions',
                               withArrow: true,
                               onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => TermsPolicy()));
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TermsPolicy()));
                               },
                               ),
                             AccountPageTiles(
