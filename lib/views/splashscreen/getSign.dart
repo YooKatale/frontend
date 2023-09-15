@@ -297,8 +297,14 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
               ],
             ),
             const SizedBox(
-              height: 100,
+              height: 80,
             ),
+            ElevatedButton(
+                onPressed: () {
+                  // FirebaseAuthService().checkBiometricAvailability();
+                  // FirebaseAuthService().authenticateWithFingerprint(context);
+                },
+                child: const Text('Authenticate with Fingerprint')),
             Align(
                 alignment: Alignment.bottomCenter,
                 child: InkWell(

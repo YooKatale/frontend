@@ -23,11 +23,6 @@ class _CategoriesPageDynamicState extends State<CategoriesPageDynamic> {
       itemLength = cat_json.length;
     });
   }
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
 

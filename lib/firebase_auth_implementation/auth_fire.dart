@@ -1,15 +1,22 @@
+// ignore_for_file: avoid_print, use_build_context_synchronously
 import 'package:firebase_auth/firebase_auth.dart';
+// ignore: unused_import
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+// ignore: unused_import
+import 'package:local_auth/local_auth.dart';
+// ignore: unused_import
+import 'package:yookatale/gradient/dashboard.dart';
 
 class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  // final FirebaseAuth _auth=FirebaseAuth.instance;
   Future<User?> signUpWithEmailAndPassword(
       String email, String password) async {
     try {
       UserCredential credential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-
       return credential.user;
     } catch (e) {
       print("some error occured");
