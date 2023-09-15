@@ -4,7 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   firebase_core
-  share_plus
   geolocator_windows
   share_plus
   smart_auth

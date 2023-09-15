@@ -69,6 +69,20 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
     e164Key: "",
   );
 
+  // Handle Google Sign In
+  // Future<FirebaseUser> _handleGoogleSignIn() async {
+  //   final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+  //   final GoogleSignInAuthentication googleAuth =
+  //       await googleUser.authentication;
+  //   final AuthCredential credential = GoogleAuthProvider.getCredential(
+  //     accessToken: googleAuth.accessToken,
+  //     idToken: googleAuth.idToken,
+  //   );
+  //   final FirebaseUser user =
+  //       (await _auth.signInWithCredential(credential)).user;
+  //   return user;
+  // }
+
   // user login
   void _userLogin() async {
     String mobile = phoneController.text;
