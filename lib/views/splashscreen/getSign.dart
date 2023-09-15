@@ -11,6 +11,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../firebase_auth_implementation/auth_fire.dart';
 import 'otp_page.dart';
 
+// import 'package:your_package_name/firebase_auth_service.dart';
+
 class GetStartedSignIn extends StatefulWidget {
   static const String id = 'getSignIn';
   const GetStartedSignIn({Key? key}) : super(key: key);
@@ -301,8 +303,8 @@ class _GetStartedSignInState extends State<GetStartedSignIn> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  // FirebaseAuthService().checkBiometricAvailability();
-                  // FirebaseAuthService().authenticateWithFingerprint(context);
+                  FirebaseAuthService().checkBiometricAvailability();
+                  FirebaseAuthService().authenticateWithFingerprint(context);
                 },
                 child: const Text('Authenticate with Fingerprint')),
             Align(
