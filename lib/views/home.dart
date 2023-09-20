@@ -4,10 +4,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:yookatale/views/dynamic/products.dart';
+import 'package:yookatale/views/features/desktop_view/widgets/discount_page.dart';
+import 'package:yookatale/views/features/home_page/widgets/products.dart';
 import 'cart.dart';
 import 'dynamic/categories.dart';
 import 'dynamic/categorieshorizontal.dart';
 import 'dynamic/someproducts.dart';
+import 'features/desktop_view/widgets/categories_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -246,9 +249,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          const SizedBox(
-            height: 20,
-          ),
+          // const CategoriesPage(),
+
+          // ProductsPage(),
           Container(
             width: MediaQuery.of(context).size.width,
             child: Padding(
@@ -310,6 +313,10 @@ class _HomePageState extends State<HomePage> {
               child: const Text("View All Products"),
             ),
           ),
+          const SizedBox(
+            height: 20,
+          ),
+          const DiscountsPage(),
           const SizedBox(
             height: 20,
           ),
