@@ -251,7 +251,7 @@ class _RegisterState extends State<Register> {
                     child: const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 15),
                       child: Text(
-                        'Do you have an account? ${'Sign In'}',
+                        'Do you have an account? ${'Log In'}',
                         style: TextStyle(color: Colors.grey, fontSize: 16),
                       ),
                     ),
