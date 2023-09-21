@@ -52,9 +52,7 @@ class AllProductsPage extends StatelessWidget {
               GridView(
                 shrinkWrap: true,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 7,
-                    mainAxisSpacing: 7),
+                    crossAxisCount: 2, crossAxisSpacing: 7, mainAxisSpacing: 7),
                 children: [
                   Card(
                     color: const Color.fromRGBO(243, 253, 254, 1),
@@ -68,7 +66,7 @@ class AllProductsPage extends StatelessWidget {
                             height: 60,
                             fit: BoxFit.contain,
                           ),
-                           Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
@@ -76,7 +74,8 @@ class AllProductsPage extends StatelessWidget {
                                 child: Text(
                                   "Cowrie",
                                   style: TextStyle(
-                                      fontSize: 16, fontWeight: FontWeight.bold),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                               Icon(Icons.favorite_outline),
@@ -84,8 +83,9 @@ class AllProductsPage extends StatelessWidget {
                           ),
                           // ignore: prefer_const_constructors
                           Padding(
-                            padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-                            child:  Row(
+                            padding:
+                                const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
@@ -100,7 +100,8 @@ class AllProductsPage extends StatelessWidget {
                                       child: Text(
                                         "\$4.40",
                                         style: TextStyle(
-                                            decoration: TextDecoration.lineThrough),
+                                            decoration:
+                                                TextDecoration.lineThrough),
                                       ),
                                     ),
                                   ],
@@ -109,14 +110,17 @@ class AllProductsPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       "KG",
-                                      style:
-                                          TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.only(left: 4.0, right:8.0),
-                                      child: Text("1", style: TextStyle(fontSize: 16),),
+                                      padding: EdgeInsets.only(
+                                          left: 4.0, right: 8.0),
+                                      child: Text(
+                                        "1",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -135,7 +139,7 @@ class AllProductsPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                    Card(
+                  Card(
                     color: const Color.fromRGBO(243, 253, 254, 1),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -147,7 +151,7 @@ class AllProductsPage extends StatelessWidget {
                             height: 60,
                             fit: BoxFit.contain,
                           ),
-                           Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
@@ -155,14 +159,15 @@ class AllProductsPage extends StatelessWidget {
                                 child: Text(
                                   "Maize",
                                   style: TextStyle(
-                                      fontSize: 16, fontWeight: FontWeight.bold),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                               Icon(Icons.favorite_outline),
                             ],
                           ),
-                           Padding(
-                            padding: EdgeInsets.only(top: 4.0, bottom:4.0),
+                          Padding(
+                            padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -179,14 +184,17 @@ class AllProductsPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       "KG",
-                                      style:
-                                          TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.only(left: 4.0, right: 8.0),
-                                      child: Text("1", style: TextStyle(fontSize: 16),),
+                                      padding: EdgeInsets.only(
+                                          left: 4.0, right: 8.0),
+                                      child: Text(
+                                        "1",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -205,7 +213,7 @@ class AllProductsPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                    Card(
+                  Card(
                     color: const Color.fromRGBO(243, 253, 254, 1),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -217,15 +225,16 @@ class AllProductsPage extends StatelessWidget {
                             height: 60,
                             fit: BoxFit.contain,
                           ),
-                           Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
                                 padding: EdgeInsets.only(left: 8.0),
                                 child: Text(
-                                  "trial",
+                                  "Trial",
                                   style: TextStyle(
-                                      fontSize: 16, fontWeight: FontWeight.bold),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                               Icon(Icons.favorite_outline),
@@ -233,8 +242,9 @@ class AllProductsPage extends StatelessWidget {
                           ),
                           // ignore: prefer_const_constructors
                           Padding(
-                            padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-                            child:  Row(
+                            padding:
+                                const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
@@ -250,14 +260,17 @@ class AllProductsPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       "KG",
-                                      style:
-                                          TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.only(left: 4.0, right: 8.0),
-                                      child: Text("1", style: TextStyle(fontSize: 16),),
+                                      padding: EdgeInsets.only(
+                                          left: 4.0, right: 8.0),
+                                      child: Text(
+                                        "1",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -276,7 +289,7 @@ class AllProductsPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                    Card(
+                  Card(
                     color: const Color.fromRGBO(243, 253, 254, 1),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -288,22 +301,23 @@ class AllProductsPage extends StatelessWidget {
                             height: 60,
                             fit: BoxFit.contain,
                           ),
-                           Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
-                                padding: EdgeInsets.only(left:8.0),
+                                padding: EdgeInsets.only(left: 8.0),
                                 child: Text(
-                                  "beans",
+                                  "Beans",
                                   style: TextStyle(
-                                      fontSize: 16, fontWeight: FontWeight.bold),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                               Icon(Icons.favorite_outline),
                             ],
                           ),
-                           Padding(
-                            padding: EdgeInsets.only(top: 4.0, bottom:4.0),
+                          Padding(
+                            padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -319,7 +333,8 @@ class AllProductsPage extends StatelessWidget {
                                       child: Text(
                                         "\$5.10",
                                         style: TextStyle(
-                                            decoration: TextDecoration.lineThrough),
+                                            decoration:
+                                                TextDecoration.lineThrough),
                                       ),
                                     ),
                                   ],
@@ -328,14 +343,17 @@ class AllProductsPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       "KG",
-                                      style:
-                                          TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.only(left: 4.0, right:8.0),
-                                      child: Text("1", style: TextStyle(fontSize: 16),),
+                                      padding: EdgeInsets.only(
+                                          left: 4.0, right: 8.0),
+                                      child: Text(
+                                        "1",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -354,7 +372,7 @@ class AllProductsPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                    Card(
+                  Card(
                     color: const Color.fromRGBO(243, 253, 254, 1),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -366,15 +384,16 @@ class AllProductsPage extends StatelessWidget {
                             height: 60,
                             fit: BoxFit.contain,
                           ),
-                           Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
                                 padding: EdgeInsets.only(left: 8.0),
                                 child: Text(
-                                  "tomatos",
+                                  "Tomatoes",
                                   style: TextStyle(
-                                      fontSize: 16, fontWeight: FontWeight.bold),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                               Icon(Icons.favorite_outline),
@@ -382,8 +401,9 @@ class AllProductsPage extends StatelessWidget {
                           ),
                           // ignore: prefer_const_constructors
                           Padding(
-                            padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-                            child:  Row(
+                            padding:
+                                const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
@@ -399,14 +419,17 @@ class AllProductsPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       "KG",
-                                      style:
-                                          TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.only(left: 4.0, right: 8.0),
-                                      child: Text("1", style: TextStyle(fontSize: 16),),
+                                      padding: EdgeInsets.only(
+                                          left: 4.0, right: 8.0),
+                                      child: Text(
+                                        "1",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -425,7 +448,7 @@ class AllProductsPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                    Card(
+                  Card(
                     color: const Color.fromRGBO(243, 253, 254, 1),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -437,7 +460,7 @@ class AllProductsPage extends StatelessWidget {
                             height: 60,
                             fit: BoxFit.contain,
                           ),
-                           Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
@@ -445,7 +468,8 @@ class AllProductsPage extends StatelessWidget {
                                 child: Text(
                                   "Grapes",
                                   style: TextStyle(
-                                      fontSize: 16, fontWeight: FontWeight.bold),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                               Icon(Icons.favorite_outline),
@@ -453,8 +477,9 @@ class AllProductsPage extends StatelessWidget {
                           ),
                           // ignore: prefer_const_constructors
                           Padding(
-                            padding: const EdgeInsets.only(top: 4.0,bottom: 4.0),
-                            child:  Row(
+                            padding:
+                                const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
@@ -469,7 +494,8 @@ class AllProductsPage extends StatelessWidget {
                                       child: Text(
                                         "\$1.50",
                                         style: TextStyle(
-                                            decoration: TextDecoration.lineThrough),
+                                            decoration:
+                                                TextDecoration.lineThrough),
                                       ),
                                     ),
                                   ],
@@ -478,14 +504,17 @@ class AllProductsPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       "KG",
-                                      style:
-                                          TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.only(left: 4.0, right: 8.0),
-                                      child: Text("1", style: TextStyle(fontSize: 16),),
+                                      padding: EdgeInsets.only(
+                                          left: 4.0, right: 8.0),
+                                      child: Text(
+                                        "1",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
                                     ),
                                   ],
                                 ),

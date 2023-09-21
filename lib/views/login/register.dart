@@ -4,6 +4,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:yookatale/views/login/getLocation.dart';
+import 'package:yookatale/views/login/login.dart';
 
 import '../../firebase_auth_implementation/auth_fire.dart';
 import '../../gradient/dashboard.dart';
@@ -235,12 +236,30 @@ class _RegisterState extends State<Register> {
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
-                      )
+                      ),
                     ])),
               ),
               const SizedBox(
                 height: 50,
               ),
+              Align(
+                  alignment: Alignment.center,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, Login.id);
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      child: Text(
+                        'Do you have an account? ${'Log In'}',
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                      ),
+                    ),
+                  )),
+              const SizedBox(
+                height: 50,
+              ),
+
               Padding(
                 padding: const EdgeInsets.only(left: 20, right: 20),
                 child: ElevatedButton(
