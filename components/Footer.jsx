@@ -25,6 +25,8 @@ import {
   FaPhone,
   FaTwitter,
   FaWhatsapp,
+  FaGooglePlay,
+  FaAppStore,
 } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import ButtonComponent from "./Button";
@@ -564,8 +566,35 @@ const Footer = () => {
           </Box>
         </Flex>
       </Box>
+     <Text
+                color={ThemeColors.primaryColor}
+                padding={{ base: "0 0.2rem", md: "0 0.2rem", xl: "0 0.5rem" }}
+              >
+                <Link
+                  href="https://play.google.com/store/apps/details?id=com.yookatale"
+                  isExternal
+                >
+                  <FaGooglePlay size={32} color="green" />
+                </Link>
+              </Text>
+              <Text
+                color={ThemeColors.primaryColor}
+                padding={{ base: "0 0.2rem", md: "0 0.2rem", xl: "0 0.5rem" }}
+              >
+                <Link
+                  href="https://apps.apple.com/app/yookatale/id1234567890"
+                  isExternal
+                >
+                  <FaAppStore size={32} color="blue" />
+                </Link>
+              </Text>
+            </Flex>
+          </Box>
+        </Flex>
+      </Box>
     </>
   );
 };
 
 export default Footer;
+
