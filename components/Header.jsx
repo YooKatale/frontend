@@ -1,3 +1,9 @@
+// This component is a client component
+use client;
+
+// Import the Header component
+import Header from './Header';
+
 // Header.jsx
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
