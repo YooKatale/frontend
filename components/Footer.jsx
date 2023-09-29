@@ -31,84 +31,139 @@ import { useSelector } from "react-redux";
 import ButtonComponent from "./Button";
 import { useNewsletterPostMutation } from "@slices/usersApiSlice";
 import {
-  FacebookIcon,
   FacebookShareButton,
-  InstapaperIcon,
-  WhatsappIcon,
+  TwitterShareButton,
   WhatsappShareButton,
-  InstapaperShareButton,
   LinkedinShareButton,
   TelegramShareButton,
-  TwitterShareButton,
-  LinkedinIcon,
+  FacebookIcon,
   TwitterIcon,
+  WhatsappIcon,
+  LinkedinIcon,
   TelegramIcon,
 } from "react-share";
-import axios from "axios";
-import { Loader } from "lucide-react";
-import NewsletterForm from "./NewsletterForm";
+import EmailTemplate from "./newSubsriberEmail";
+
+
 
 const Footer = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const [NewsletterEmail, setNewsletterEmail] = useState("");
   const [isLoading, setLoading] = useState(false);
+
   const [createNewsletter] = useNewsletterPostMutation();
   const chakraToast = useToast();
-
   const shareUrl = "https://www.yookatale.com"; // URL to be shared
   const defaultMessage =
     "Hey, I am using YooKatale. Forget about going to the market. Enjoy low cost discounted products and never miss a meal with your friends and family!"; // Default message
 
+    const handleInstagramShare = () => {
+      const instagramUrl = `https://www.instagram.com/create/batch/?caption=${encodeURIComponent(
+        defaultMessage + ' ' + shareUrl
+      )}`;
+      window.open(instagramUrl, '_blank');
+    };
+  // submit email for newsletter
+  // const handleNewsletterSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   setLoading((prevState) => (prevState ? false : true));
+
+  //   try {
+  //     const res = await createNewsletter({ email: NewsletterEmail }).unwrap();
+
+  //     if (res.status == "Success") {
+  //       // set loading to be false
+  //       setLoading((prevState) => (prevState ? false : true));
+
+  //       // clear email value
+  //       setNewsletterEmail("");
+
+  //       chakraToast({
+  //         title: "Success",
+  //         description: "Successfully subscribed to newsletter",
+  //         status: "success",
+  //         duration: 5000,
+  //         isClosable: false,
+  //       });
+  //     }
+  //   } catch (err) {
+  //     // set loading to be false
+  //     setLoading((prevState) => (prevState ? false : true));
+
+  //     chakraToast({
+  //       title: "Error has occured",
+  //       description: err.data?.message
+  //         : err.data || err.error,
+  //       status: "error",
+  //       duration: 5000,
+  //       isClosable: false,
+  //     });
+  //   }
+  // };
+
+
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
-
-    setLoading(true); // Start loading
-
+  
+    setLoading(true);
+  
     try {
-      const res = await createNewsletter({ email: NewsletterEmail }).unwrap();
-
-      if (res.status === "Success") {
-        // Clear email value
+      const res = await fetch("/api/sendEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: NewsletterEmail }),
+      });
+  
+      const data = await res.json();
+  
+      if (res.status === 200 && data.success) {
         setNewsletterEmail("");
-
-        return chakraToast({
+  
+        chakraToast({
           title: "Success",
           description: "Successfully subscribed to the newsletter",
           status: "success",
           duration: 5000,
           isClosable: false,
         });
+      } else {
+        chakraToast({
+          title: "Error",
+          description: data.error || "An error occurred while sending the email",
+          status: "error",
+          duration: 5000,
+          isClosable: false,
+        });
       }
     } catch (err) {
-      // Display error message
+      console.error(err);
+  
       chakraToast({
         title: "Error",
-        description: err.data?.message
-          ? err.data.message
-          : err.data || err.error,
+        description: "An error occurred while sending the email",
         status: "error",
         duration: 5000,
         isClosable: false,
       });
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
   return (
     <>
-      {/* // modal newsletter form  */}
-      <NewsletterForm />
-
-      <Box borderTop={"1.7px solid " + ThemeColors.lightColor} id="refer">
+      <Box borderTop={"1.7px solid " + ThemeColors.lightColor} id="footer">
         <Box padding={"1rem 0 2rem 0"} background={"#0c0c0c"}>
           <Flex>
-            <Box width={"80%"} margin={"auto"}>
+            <Box width={"95%"} margin={"auto"}>
               <Grid
                 gridTemplateColumns={{
                   base: "repeat(1, 1fr)",
                   md: "repeat(2, 1fr)",
-                  xl: "repeat(3, 1fr)",
+                  xl: "repeat(4, 1fr)",
                 }}
                 gridGap={"1rem"}
               >
@@ -229,7 +284,7 @@ const Footer = () => {
                       </Box>
                       <Box padding={"1rem 0"}>
                         <Input
-                          type="text
+                          type="text"
                           name={"NewsletterEmail"}
                           placeholder="Enter your email"
                           value={NewsletterEmail}
@@ -264,6 +319,16 @@ const Footer = () => {
 
                 <Box padding={"1rem 0"}>
                   <Stack padding={"1rem"}>
+                    {/* <Box margin={"0.3rem 0"}>
+                      <Link href={"/products"}>
+                        <Text
+                          color={ThemeColors.lightColor}
+                          _hover={{ color: ThemeColors.darkColor }}
+                        >
+                          Products
+                        </Text>
+                      </Link>
+                    </Box> */}
                     {userInfo && (
                       <Box margin={"0.3rem 0"}>
                         <Link href={"/subscription"}>
@@ -271,7 +336,7 @@ const Footer = () => {
                             color={ThemeColors.lightColor}
                             _hover={{ color: ThemeColors.darkColor }}
                           >
-                            Go Premium
+                            YooCards
                           </Text>
                         </Link>
                       </Box>
@@ -296,6 +361,18 @@ const Footer = () => {
                         </Text>
                       </Link>
                     </Box>
+                    {/* <Box margin={"0.5rem 0"}>
+                          <Link href={"/schedule"} onClick={() =>
+                            setMobileNavOpen((prevState) => (prevState ? false : true))
+                            }>
+                            <Text
+                            color={ThemeColors.lightColor}}}
+                              _hover={{ color: ThemeColors.darkColor }}
+                            >
+                              Schedule Delivery
+                            </Text>
+                          </Link>
+                        </Box> */}
                     <Box margin={"0.3rem 0"}>
                       <Link href={"https://newsblog.yookatale.com"}>
                         <Text
@@ -316,6 +393,45 @@ const Footer = () => {
                         </Text>
                       </Link>
                     </Box>
+                    <Box margin={"0.3rem 0"}>
+                      <Link href={"https://wa.me/256754615840"}>
+                        <Button
+                          color={ThemeColors.lightColor}
+                          background={"whatsapp.600"}
+                          border={"1.7px solid " + "whatsapp.600"}
+                          borderRadius={"0.3rem"}
+                          padding={"0.3rem 0.5rem"}
+                          _hover={{
+                            border: "none",
+                          }}
+                        >
+                          <FaWhatsapp
+                            size={20}
+                            color={ThemeColors.lightColor}
+                            style={{ margin: "0 0.3rem" }}
+                          />{" "}
+                          Quick Order
+                        </Button>
+                      </Link>
+                    </Box>
+                  </Stack>
+                </Box>
+
+                <Box padding={"1rem 0"}>
+                  <Stack padding={"1rem"}>
+                    {CategoriesJson.map((category, index) => (
+                      <Box margin={"0.3rem 0"} key={index}>
+                        <Link href={`/search?q=${category}`}>
+                          <Text
+                            color={ThemeColors.lightColor}
+                            textTransform={"capitalize"}
+                            _hover={{ color: ThemeColors.darkColor }}
+                          >
+                            {category}
+                          </Text>
+                        </Link>
+                      </Box>
+                    ))}
                   </Stack>
                 </Box>
 
@@ -364,11 +480,11 @@ const Footer = () => {
                         </Text>
                       </Box>
                       <Box padding={"0.5rem 0"}>
-                        <ButtonComponent
-                          type={"submit"}
-                          text={"Subscribe"}
-                          icon={isLoading && <Loader size={20} />}
-                        />
+                        {isLoading ? (
+                          <Spinner />
+                        ) : (
+                          <ButtonComponent type={"submit"} text={"Subscribe"} />
+                        )}
                       </Box>
                     </Box>
                   </form>
@@ -377,7 +493,6 @@ const Footer = () => {
             </Box>
           </Flex>
         </Box>
-
         <Flex
           direction={{ base: "column", md: "column", xl: "row" }}
           justifyContent={{ base: "center", md: "center", xl: "none" }}
@@ -402,102 +517,61 @@ const Footer = () => {
               </span>
             </Text>
           </Box>
-
           <Spacer display={{ base: "none", md: "none", xl: "block" }} />
-
-          <Box padding={{ base: "0.5rem 0", md: "0.5rem 0", xl: "none" }}>
-            <Flex
-              justifyContent={"center"}
-              direction={{ base: "column", md: "column", xl: "row" }}
-            >
-              <Text
+          <Box padding={{base: "o.5rem 0", md:"0.5rem 0", xl: "none"}}>
+          <Flex
+          direction={{ base: "column", md: "column", xl: "row" }}
+          justifyContent={{ base: "center", md: "center", xl: "none" }}
+        >
+            <Text
                 color={ThemeColors.primaryColor}
-                margin={"0.5rem"}
+                margin={"0 0.3rem"}
                 fontSize="lg"
                 textTransform={"uppercase"}
-                textAlign={"center"}
               >
                 Invite A Friend
               </Text>
-
-              <Flex justifyContent={"center"} gap={"2"}>
                 <FacebookShareButton url={shareUrl} quote={defaultMessage}>
-                  <FacebookIcon size={25} round />
+                <FacebookIcon size={50} round />
                 </FacebookShareButton>
                 <TwitterShareButton url={shareUrl} title={defaultMessage}>
-                  <TwitterIcon size={25} round />
+                  <TwitterIcon size={50} round />
                 </TwitterShareButton>
                 <WhatsappShareButton url={shareUrl} title={defaultMessage}>
-                  <WhatsappIcon size={25} round />
+                  <WhatsappIcon size={50} round />
                 </WhatsappShareButton>
-                <InstapaperShareButton url={shareUrl} title={defaultMessage}>
-                  <InstapaperIcon size={25} round />
-                </InstapaperShareButton>
+                <button onClick={handleInstagramShare}>
+                  <FaInstagram size={50} round />
+                </button>
                 <LinkedinShareButton url={shareUrl} title={defaultMessage}>
-                  <LinkedinIcon size={25} round />
+                  <LinkedinIcon size={50} round />
                 </LinkedinShareButton>
                 <TelegramShareButton url={shareUrl} title={defaultMessage}>
-                  <TelegramIcon size={25} round />
+                  <TelegramIcon size={50} round />
                 </TelegramShareButton>
-              </Flex>
             </Flex>
           </Box>
           <Spacer display={{ base: "none", md: "none", xl: "block" }} />
           <Box padding={{ base: "0", md: "0", xl: "1rem 0" }}>
             <Flex justifyContent={{ base: "center", md: "center", xl: "none" }}>
-              <Link href={"/news"}>
-                <Box
-                  padding={{
-                    base: "1rem 0.5rem",
-                    md: "1rem 0.5rem",
-                    xl: "0 0.5rem",
-                  }}
-                >
-                  <p className="text-md">News</p>
-                </Box>
-              </Link>
-              <Link href={"/partner"}>
-                <Box
-                  padding={{
-                    base: "1rem 0.5rem",
-                    md: "1rem 0.5rem",
-                    xl: "0 0.5rem",
-                  }}
-                >
-                  <p className="text-md">Partner</p>
+            <Link href={"/partner"}>
+                <Box padding={{ base: "1rem", md: "1rem", xl: "0 1rem" }}>
+                  <Text fontSize={"md"}>Partner</Text>
                 </Box>
               </Link>
               <Link href={"/faqs"}>
-                <Box
-                  padding={{
-                    base: "1rem 0.5rem",
-                    md: "1rem 0.5rem",
-                    xl: "0 0.5rem",
-                  }}
-                >
-                  <p className="text-md">Faqs</p>
+                <Box padding={{ base: "1rem", md: "1rem", xl: "0 1rem" }}>
+                  <Text fontSize={"md"}>Faqs</Text>
                 </Box>
               </Link>
               <Link href={"/privacy"}>
-                <Box
-                  padding={{
-                    base: "1rem 0.5rem",
-                    md: "1rem 0.5rem",
-                    xl: "0 0.5rem",
-                  }}
-                >
-                  <p className="text-md">Privacy Policy</p>
+                <Box padding={{ base: "1rem", md: "1rem", xl: "0 1rem" }}>
+                  <Text fontSize={"md"}>Privacy Policy</Text>
                 </Box>
               </Link>
               <Link href={"/usage"}>
-                <Box
-                  padding={{
-                    base: "1rem 0.5rem",
-                    md: "1rem 0.5rem",
-                    xl: "0 0.5rem",
-                  }}
-                >
-                  <p className="text-md">Usage Policy</p>
+                <Box padding={{ base: "1rem", md: "1rem", xl: "0 1rem" }}>
+                  <Text fontSize={"md"}>Usage Policy</Text>
                 </Box>
               </Link>
             </Flex>
