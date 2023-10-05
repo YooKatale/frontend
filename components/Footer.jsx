@@ -19,6 +19,7 @@ import Link from "next/link";
 import { useState } from "react";
 import {
   FaEnvelope,
+  FaWhatsapp,
   FaFacebook,
   FaInstagram,
   FaLinkedin,
@@ -42,7 +43,7 @@ import {
   LinkedinIcon,
   TelegramIcon,
 } from "react-share";
-import EmailTemplate from "./newSubsriberEmail";
+// import EmailTemplate from "./newSubsriberEmail";
 
 
 

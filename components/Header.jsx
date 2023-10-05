@@ -193,7 +193,6 @@ const Header = () => {
       >
         {/* Logo */}
         <Link href="/">
-          <a>
             <Image
               src={Images.Logo}
               alt="Logo"
@@ -201,8 +200,7 @@ const Header = () => {
               height={40}
               loading="lazy"
             />
-          </a>
-        </Link>
+\        </Link>
 
         {/* Mobile navigation */}
         <Box display={{ base: "block", lg: "none" }}>
@@ -236,21 +234,21 @@ const Header = () => {
           {/* Home */}
           <Box as="li">
             <Link href="/">
-              <a>Home</a>
+              Home
             </Link>
           </Box>
 
           {/* Products */}
           <Box as="li">
             <Link href="/products">
-              <a>Products</a>
+              Products
             </Link>
           </Box>
 
           {/* Contact */}
           <Box as="li">
             <Link href="/contact">
-              <a>Contact</a>
+              Contact
             </Link>
           </Box>
 
