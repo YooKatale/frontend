@@ -199,8 +199,7 @@ const Header = () => {
               fill={true}
               className="object-contain h-full w-auto"
             />
-      </Link>
-          </div>
+            </div>
         </Link>
 
         {/* Mobile navigation */}
