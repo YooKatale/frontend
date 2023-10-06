@@ -1,6 +1,7 @@
 "use client"
 import { Box, FormControl, FormLabel, Input, Button, Select } from '@chakra-ui/react';
 import { useState } from 'react';
+import axios from 'axios';
 
 const VendorForm = ({ onSubmit }) => {
   const [name, setName] = useState('');
@@ -9,23 +10,36 @@ const VendorForm = ({ onSubmit }) => {
   const [businessName, setBusinessName] = useState('');
   const [businessAddress, setBusinessAddress] = useState('');
   const [businessHours, setBusinessHours] = useState('');
-  const [bike, setBike] = useState('');
-  const [vehicle, setVehicle] = useState('');
-  const [motorcycle, setMotorcycle] = useState('');
+  const [transport, setTransport] = useState("bike");
+  const [successMessage, setSucessMessage] = useState('');
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    onSubmit({
-      name,
-      phone,
-      email,
-      businessName,
-      businessAddress,
-      businessHours,
-      bike,
-      vehicle,
-      motorcycle,
-    });
+    try {
+      await axios.post('http://localhost:4400/api/partner/new', {
+        name,
+        phone,
+        email,
+        businessName,
+        businessAddress,
+        businessHours,
+        transport,
+      });
+      setName('');
+      setPhone('');
+      setBusinessName('');
+      setBusinessAddress('');
+      setBusinessHours('');
+      setTransport('bike');
+      setSucessMessage('Form submitted successfully!');
+      setTimeout(() => {
+        setSucessMessage('');
+      }, 5000);
+    
+
+    } catch (error) {
+      console.error('Error creating partner', error);
+    }
   };
 
   return (
@@ -95,11 +109,11 @@ const VendorForm = ({ onSubmit }) => {
               />
             </FormControl>
             <FormControl className="mb-4">
-              <FormLabel>Vehicle*</FormLabel>
+              <FormLabel>Transport*</FormLabel>
               <Select
                 className="border border-dark rounded hover:border-red focus:border-red px-2 py-1 italic"
-                value={motorcycle}
-                onChange={(event) => setMotorcycle(event.target.value)}
+                value={transport}
+                onChange={(event) => setTransport(event.target.value)}
                 required
               >
                 <option value="bike">Bike</option>
@@ -108,10 +122,13 @@ const VendorForm = ({ onSubmit }) => {
               </Select>
             </FormControl>
              <div className="text-center md:text-left">
-               <Button className="mt-4 bg-dark text-white rounded-full pl-10 pr-10 hover:bg-teal-600 mx-auto" type="submit">
+               <Button className="mt-4 bg-dark text-white rounded-full pl-10 pr-10 hover:bg-green mx-auto" type="submit">
                  Sign up
                </Button>
              </div>
+             {successMessage && (
+              <div className="text-dark text-center mt-4">{successMessage}</div>
+            )}
           </form>
         </div>
         <div className="p-4 w-full md:w-1/2 md:ml-5">
