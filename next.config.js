@@ -5,6 +5,16 @@
 
 // const bundleAnalyzer = withBundleAnalyzer({ enabled: true });
 
-const nextConfig = {};
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "yookatale.s3.eu-north-1.amazonaws.com",
+        port: "",
+      },
+    ],
+  },
+};
 
 module.exports = nextConfig;

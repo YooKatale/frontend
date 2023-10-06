@@ -317,10 +317,11 @@ const Blog = () => {
                     </Box>
                     <Flex padding={"0.5rem 0"} justifyContent={"center"}>
                       <Box margin={"0 0.5rem"} display={"none"}>
-                        <Link href={`{}`}>
+                        <Link href={`/`}>
                           <FaWhatsapp size={25} style={{ color: "#178b17" }} />
                         </Link>
                       </Box>
+
                       <Box
                         margin={"0 0.5rem"}
                         onClick={handleCopyClipboard}
@@ -332,7 +333,7 @@ const Blog = () => {
                         </Flex>
                       </Box>
                       <Box margin={"0 0.5rem"} display={"none"}>
-                        <Link href={`{}`}>
+                        <Link href={`/`}>
                           <FaFacebook size={25} style={{ color: "#1553a5" }} />
                         </Link>
                       </Box>

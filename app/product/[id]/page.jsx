@@ -38,6 +38,8 @@ const Product = ({ params }) => {
   const [isLoading, setLoading] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [SimilarProducts, setSimilarProducts] = useState([]);
+  const [editablePrice, setEditedPrice] = useState(ProductData.price);
+  const [isEditingPrice, setIsEditingPrice] = useState(false);
 
   const chakraToast = useToast();
 
@@ -86,6 +88,15 @@ const Product = ({ params }) => {
       console.log({ error });
     }
   };
+
+  // Function to start editing the price
+  const handleEditPrice = () => {
+    setIsEditingPrice(true);
+  }
+
+  const handleSavePrice = () => {
+    setIsEditingPrice(false);
+  }
 
   // fetch product categories
   useEffect(() => {
@@ -278,10 +289,29 @@ const Product = ({ params }) => {
                     fontSize={"2xl"}
                   >
                     UGX{" "}
-                    {FormatCurr(ProductData?.price ? ProductData?.price : 0)}
+                    {isEditingPrice ? (
+                      <input 
+                        type="number"
+                        value={editablePrice}
+                        onChange={(e) => setEditedPrice(e.target.value)}
+                        className="border"
+                       />
+                    ) : (
+                      FormatCurr(ProductData?.price ? ProductData?.price : 0)
+                    )}
                     <span className="mx-2 text-lg font-bold text-[#000]">
                       Per {ProductData?.unit}
                     </span>
+                    {
+                      isEditingPrice ? (
+                        <>
+                        <button onClick={handleSavePrice}>Save</button>
+                        <button onClick={() => setIsEditingPrice(false)}>Cancel</button>
+                        </>
+                      ) : (
+                        <button onClick={handleEditPrice}>Edit</button>
+                      )
+                    }
                   </Text>
 
                   <Text

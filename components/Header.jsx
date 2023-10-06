@@ -187,20 +187,21 @@ const Header = () => {
         align="center"
         justify="space-between"
         maxW={{ xl: "1920px" }}
-        py={4}
         px={4}
         mx="auto"
       >
         {/* Logo */}
         <Link href="/">
+          <div className="relative h-24 w-24 mr-4">
             <Image
-              src={Images.Logo}
+              src={"/assets/icons/logo2.png"}
               alt="Logo"
-              width={160}
-              height={40}
-              loading="lazy"
+              fill={true}
+              className="object-contain h-full w-auto"
             />
-\        </Link>
+      </Link>
+          </div>
+        </Link>
 
         {/* Mobile navigation */}
         <Box display={{ base: "block", lg: "none" }}>
@@ -236,6 +237,7 @@ const Header = () => {
             <Link href="/">
               Home
             </Link>
+            <Link href="/">Home</Link>
           </Box>
 
           {/* Products */}
@@ -243,6 +245,7 @@ const Header = () => {
             <Link href="/products">
               Products
             </Link>
+            <Link href="/products">Products</Link>
           </Box>
 
           {/* Contact */}
@@ -250,6 +253,7 @@ const Header = () => {
             <Link href="/contact">
               Contact
             </Link>
+            <Link href="/contact">Contact</Link>
           </Box>
 
           {/* Search */}
@@ -274,13 +278,22 @@ const Header = () => {
         {/* Right section */}
         <Flex align="center">
           {/* Cart */}
-          <Box display={{ base: "none", lg: "block" }}>
+          <Box display={{ base: "none", lg: "block" }}  _hover={{ bg: "white", borderColor: "green.500", color:"green.500"}}
+          className="p-2 rounded " color="white" bg="green.700"   borderWidth="2px"
+          >
+          <Link href="/cart">
+            <p>
+            <AiOutlineShoppingCart size="24px" />
+            </p>
+          </Link>
+          </Box>
+          {/* <Box display={{ base: "none", lg: "block" }}>
             <ButtonComponent
               variant="icon"
               icon={<AiOutlineShoppingCart size="24px" />}
               onClick={() => push("/cart")}
             />
-          </Box>
+          </Box> */}
 
           {/* User dropdown */}
           {userInfo ? (
@@ -305,12 +318,12 @@ const Header = () => {
                     {DropdownLinks.map((item, index) => (
                       <li key={index}>
                         <Link href={item.link}>
-                          <a
+                          <p
                             onClick={() => setDropdownMenu(false)}
                             className="dropdown-link"
                           >
                             {item.name}
-                          </a>
+                          </p>
                         </Link>
                       </li>
                     ))}
@@ -338,12 +351,11 @@ const Header = () => {
           )}
 
           {/* Cart mobile */}
-          <Box display={{ base: "block", lg: "none" }}>
-            <ButtonComponent
-              variant="icon"
-              icon={<AiOutlineShoppingCart size="24px" />}
-              onClick={() => push("/cart")}
-            />
+          <Box display={{ base: "block", lg: "none" }} hover={{ bg: "white", borderColor: "green.500", color:"green.500"}}
+          className="p-2 rounded " color="white" bg="green.700"   borderWidth="2px">
+          <Link href="/cart">
+             <AiOutlineShoppingCart size="24px" />
+          </Link>
           </Box>
         </Flex>
       </Flex>
@@ -352,4 +364,3 @@ const Header = () => {
 };
 
 export default Header;
-

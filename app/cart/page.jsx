@@ -23,6 +23,7 @@ import { useToast } from "@chakra-ui/react";
 import { redirect, useRouter } from "next/navigation";
 import TabOne from "@components/modals/tabs/TabOne";
 import TabTwo from "@components/modals/tabs/TabTwo";
+import Header from "@components/Header";
 
 import {
   useCartDeleteMutation,
@@ -199,7 +200,6 @@ const Cart = () => {
           <div className="lg:py-0 lg:px-8 px-0 py-0">
             <h2 className="text-2xl font-semibold">Your Cart</h2>
           </div>
-
           <div className="lg:py-4 lg:px-12 pt-4 pb-12 px-0 overflow-x-0">
             <div className="flex lg:flex-row flex-col">
               <div className="lg:w-[70%] w-full lg:pb-12 pb-4 pt-4">

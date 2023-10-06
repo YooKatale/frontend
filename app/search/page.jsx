@@ -28,6 +28,7 @@ const Search = () => {
   const handleDataFetch = async () => {
     try {
       const res = await fetchProducts(param).unwrap();
+      console.log(res);
 
       if (res?.status && res?.status == "Success") {
         setProducts(res?.Products);
@@ -51,7 +52,6 @@ const Search = () => {
             <h3 className="text-lg text-primary mx-2">{param}</h3>
           </h3>
         </div>
-
         <div className="flex">
           <div className="m-auto lg:w-[85%] w-full">
             {Products ? (

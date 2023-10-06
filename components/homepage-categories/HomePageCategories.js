@@ -1,8 +1,12 @@
-import { Box, Link, List, ListItem } from '@chakra-ui/react';
-import { useQuery } from 'react-query'; // Import react-query
+import { Box, List, ListItem } from "@chakra-ui/react";
+import Link from "next/link";
+import { useQuery } from "react-query"; // Import react-query
 
 function Homepage() {
-  const { data: categories } = useQuery('homepageCategories', fetchHomepageCategories);
+  const { data: categories } = useQuery(
+    "homepageCategories",
+    fetchHomepageCategories
+  );
 
   return (
     <Box>
@@ -20,10 +24,9 @@ function Homepage() {
 
 // Fetch homepage categories from an API endpoint
 async function fetchHomepageCategories() {
-  const response = await fetch('/api/homepage-categories'); // Replace with  API endpoint
+  const response = await fetch("/api/homepage-categories"); // Replace with  API endpoint
   const data = await response.json();
   return data;
 }
 
 export default Homepage;
-

@@ -1,12 +1,13 @@
 // Categories.js
-import React from 'react';
+import Link from "next/link";
+import React from "react";
 
 const Categories = ({ categories }) => {
   return (
     <ul>
       {categories.map((category) => (
         <li key={category.id}>
-          <a href={`/category/${category.slug}`}>{category.name}</a>
+          <Link href={`/category/${category.slug}`}>{category.name}</Link>
         </li>
       ))}
     </ul>
@@ -14,4 +15,3 @@ const Categories = ({ categories }) => {
 };
 
 export default Categories;
-

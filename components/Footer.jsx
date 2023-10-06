@@ -46,6 +46,10 @@ import {
 // import EmailTemplate from "./newSubsriberEmail";
 
 
+import axios from "axios";
+import { Loader } from "lucide-react";
+import NewsletterForm from "./NewsletterForm";
+import { FaWhatsapp } from "react-icons/fa";
 
 const Footer = () => {
   const { userInfo } = useSelector((state) => state.auth);

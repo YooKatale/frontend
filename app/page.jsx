@@ -15,6 +15,7 @@ import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import dynamic from "next/dynamic";
 import { useCommentsGetMutation } from "@slices/usersApiSlice";
 import { Salad } from "lucide-react";
+import RecommendedProducts from "@components/  RecommendedProducts";
 
 const DynamicButton = dynamic(() => import("@components/Button"), {
   loading: () => <p>Loading...</p>,
@@ -40,6 +41,7 @@ const Home = () => {
 
   const handleFetchProductsData = async () => {
     const res = await fetchProducts().unwrap();
+    console.log(res.data);
 
     if (res?.status && res?.status == "Success") {
       setProducts(res.data);
@@ -77,7 +79,7 @@ const Home = () => {
 
       {/* ------------- section 
       ------------------------------- */}
-      <div className="py-12 flex">
+      {/* <div className="py-12 flex">
         <div className="lg:w-[85%] sm:w-[90%] w-[95%] m-auto">
           <div className="py-4">
             <h3 className="text-2xl font-medium">Categories</h3>
@@ -105,13 +107,13 @@ const Home = () => {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* ------------- section 
       ------------------------------- */}
 
       {/* // product?.category == "popular" && */}
-      <Box
+      {/* <Box
         padding={"3rem 0"}
         borderBottom={"1.7px solid " + ThemeColors.lightColor}
       >
@@ -140,7 +142,36 @@ const Home = () => {
             )}
           </Box>
         </Flex>
-      </Box>
+      </Box> */}
+       <div className="py-12 flex">
+        <div className="lg:w-[85%] sm:w-[90%] w-[95%] m-auto">
+          <div className="py-4">
+            <h3 className="text-2xl font-medium">Popular Products</h3>
+            <div className="py-2">
+              <div className="h-[0.13rem] w-[170px] bg-primary"></div>
+            </div>
+          </div>
+
+          <div className="grid lg:grid-cols-5 sm:grid-cols-4 grid-cols-3 gap-4 py-6">
+            {CategoriesJson.map((category, index) => (
+              <div
+                className="lg:p-10 p-4 border-2 border-light rounded-md hover:border-primary"
+                key={index}
+              >
+                <Link href={`/search?q=${category}`}>
+                  <div className="flex justify-center flex-center">
+                    <img
+                      src={`/assets/images/categories/${category}.jpg`}
+                      className="lg:h-20 lg:w-20 w-12 h-12 rounded-full object-cover"
+                    />
+                  </div>
+                  <p className="lg:text-lg text-base text-center">{category}</p>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* <Box display={`${Products?.length > 0 && "none"}`} hidden>
         <Loader />

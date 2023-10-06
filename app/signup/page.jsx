@@ -35,6 +35,7 @@ const SignUp = () => {
   const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
   const [vegan, setVegan] = useState(false);
+  const [address, setAddress] = useState("");
   const [isLoading, setLoading] = useState(false);
 
   const { push } = useRouter();
@@ -78,6 +79,7 @@ const SignUp = () => {
         gender,
         vegan,
         dob,
+        address,
         password,
       }).unwrap();
 
@@ -238,6 +240,29 @@ const SignUp = () => {
                         name="dob"
                         value={dob}
                         onChange={(e) => setDob(e.target.value)}
+                      />
+                    </FormControl>
+                  </Box>
+                </Grid>
+
+                <Grid
+                  gridTemplateColumns={{
+                    base: "repeat(1, 1fr)",
+                    md: "repeat(1, 1fr)",
+                    xl: "repeat(2, 1fr)",
+                  }}
+                  gridGap={"1rem"}
+                >
+                  <Box padding={"0.5rem 0"}>
+                    <FormControl>
+                      <FormLabel htmlFor="email">Address</FormLabel>
+                      <Input
+                        type="text"
+                        id="address"
+                        placeholder=""
+                        name="address"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
                       />
                     </FormControl>
                   </Box>
