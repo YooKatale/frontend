@@ -26,10 +26,13 @@ const Home = () => {
   const [Comments, setComments] = useState([]);
   const [isLoading, setLoading] = useState(false);
 
-  const { userInfo } = useSelector((state) => state.auth);
 
   const [fetchProducts] = useProductsCategoriesGetMutation();
   const [fetchComments] = useCommentsGetMutation();
+
+  const { userInfo } = useSelector((state) => state.auth);
+
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const handleFetchCommentsData = async () => {
     const res = await fetchComments().unwrap();
@@ -52,7 +55,25 @@ const Home = () => {
   useEffect(() => {
     handleFetchProductsData();
     handleFetchCommentsData();
+    handleSubscriptionStatus();
   }, []);
+
+  const handleSubscriptionStatus = async () => {
+    try {
+      const response = await axios.get("http://localhost:4400/api/subscription/");
+      console.log(response.data);
+      if (response.data.status === "Success" && response.data.data.isSubscribed) {
+        setIsSubscribed(true);
+      } else {
+        setIsSubscribed(false);
+      }
+    } catch (error) {
+      console.error("Error checking subscription status", error);
+    };
+
+    fectchSubscriptionStatus();
+  }
+
 
   // comment section slider navigation
   const [currSliderIndex, setCurrSliderIndex] = useState(0);
@@ -264,33 +285,37 @@ const Home = () => {
 
       {/* ------------- section 
       ------------------------------- */}
-      <Box padding={"3rem 0"} background={"#000"}>
-        <Flex>
-          <Box margin={"auto"} width={{ base: "100%", md: "70%", xl: "50%" }}>
-            <Box padding={{ base: "2rem", md: "2rem 1rem", xl: "2rem 0" }}>
-              <Text
-                textAlign={"center"}
-                fontSize={{ base: "2xl", md: "2xl", xl: "3xl" }}
-                className="secondary-light-font"
-                color={ThemeColors.lightColor}
-              >
-                Forget about going to the Market get Premium access to your Home
-                digital mobile food market
-              </Text>
-
-              <Flex justifyContent={"center"} padding={"1rem 0"}>
-                <Link href={"/subscription"}>
-                  <DynamicButton
-                    type={"button"}
-                    text={"Go Premium"}
-                    size={"lg"}
-                  />
-                </Link>
-              </Flex>
+      {
+        isSubscribed && (
+          <Box padding={"3rem 0"} background={"#000"}>
+          <Flex>
+            <Box margin={"auto"} width={{ base: "100%", md: "70%", xl: "50%" }}>
+              <Box padding={{ base: "2rem", md: "2rem 1rem", xl: "2rem 0" }}>
+                <Text
+                  textAlign={"center"}
+                  fontSize={{ base: "2xl", md: "2xl", xl: "3xl" }}
+                  className="secondary-light-font"
+                  color={ThemeColors.lightColor}
+                >
+                  Forget about going to the Market get Premium access to your Home
+                  digital mobile food market
+                </Text>
+  
+                <Flex justifyContent={"center"} padding={"1rem 0"}>
+                  <Link href={"/subscription"}>
+                    <DynamicButton
+                      type={"button"}
+                      text={"Go Premium"}
+                      size={"lg"}
+                    />
+                  </Link>
+                </Flex>
+              </Box>
             </Box>
-          </Box>
-        </Flex>
-      </Box>
+          </Flex>
+        </Box>
+        )
+      }
 
       {/* ------------- section 
       ------------------------------- */}
@@ -317,6 +342,7 @@ const Home = () => {
                     />
                   </Box>
                 </Flex>
+
               </Box>
             )
         )

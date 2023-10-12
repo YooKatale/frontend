@@ -30,10 +30,13 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+// import { useRouter } from "next/router";
 
 const Subscription = () => {
   const [subscriptionPackages, setSubscriptionPackages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  
 
   const chakraToast = useToast();
   const router = useRouter();
@@ -94,9 +97,19 @@ const Subscription = () => {
     }
   };
 
+  const handlePayLater = () => {
+    if (isSubscribed) {
+      router.push("/payment");
+    }
+  };
+
   return (
     <>
-      <Box>
+      {
+        isSubscribed ? (
+          <button>Paylater</button>
+        ) : (
+          <Box>
         <Box padding={"3rem 0 5rem 0"}>
           <Box>
             <Flex>
@@ -161,7 +174,6 @@ const Subscription = () => {
                         subscription discount
                       </Text>
                     </Box>
-
                     <div className="py-8 lg:block hidden">
                       <div className="flex justify-center items-center relative">
                         <Image
@@ -179,6 +191,8 @@ const Subscription = () => {
           </Box>
         </Box>
       </Box>
+        )
+      }
     </>
   );
 };

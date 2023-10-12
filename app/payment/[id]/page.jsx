@@ -34,6 +34,8 @@ const Payment = ({ params }) => {
   const { userInfo } = useSelector((state) => state.auth);
   const router = useRouter();
 
+  const isSubscribed = true;
+
   // check if user logged in
   if (!userInfo || userInfo == {} || userInfo == "") {
     router.push("/signin");
@@ -157,12 +159,26 @@ const Payment = ({ params }) => {
     }
   };
 
+  const handlePaylater = () => {
+    if (isSubscribed) {
+      setPaymentMethod("payLater");
+      handlePayment();
+    }
+  }
+
   return (
     <div className="pt-[3rem] pb-[5rem]">
       <div className="flex">
         <div className="m-auto lg:w-3/5 sm:w-3/5 w-4/5 bg-white shadow-md px-6 py-10 min-h-[300px]">
           {Order?._id ? (
             <>
+              {isSubscribed && (
+                <div className="py-2 flex justify-center items-center">
+                  <span className="bg-green text-white px-2 py-1 rounded-md mr-2">
+                    Subscribed
+                  </span>
+                </div>
+              )}
               <div className="py-2">
                 <h3 className="text-center text-primary text-3xl">Checkout</h3>
               </div>
@@ -253,7 +269,7 @@ const Payment = ({ params }) => {
                   </select>
                 </div>
               </div>
-
+              
               <div className="py-2 flex justify-center items-center">
                 <div onClick={handlePayment}>
                   <ButtonComponent
@@ -263,7 +279,18 @@ const Payment = ({ params }) => {
                     icon={isLoading && <Loader2 size={20} />}
                   />
                 </div>
+                
               </div>
+              <div className="py-2 flex justify-center">
+                {isSubscribed && (
+                 <ButtonComponent
+                 text="Pay Later"
+                 size="lg"
+                 type="button"
+                 onClick={handlePaylater}
+              />
+      )}
+                </div>
             </>
           ) : (
             <div className="flex justify-center items-center relative h-[250px]">
@@ -272,7 +299,6 @@ const Payment = ({ params }) => {
           )}
         </div>
       </div>
-
       {/* // displaying payment component */}
       {paymentDisplay && (
         <FlutterwavePayment
