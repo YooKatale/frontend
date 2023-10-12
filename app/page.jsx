@@ -286,7 +286,7 @@ const Home = () => {
       {/* ------------- section 
       ------------------------------- */}
       {
-        isSubscribed && (
+        !isSubscribed && (
           <Box padding={"3rem 0"} background={"#000"}>
           <Flex>
             <Box margin={"auto"} width={{ base: "100%", md: "70%", xl: "50%" }}>
