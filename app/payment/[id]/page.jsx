@@ -117,7 +117,18 @@ const Payment = ({ params }) => {
           router.push("/");
         }   
       } catch (err) {
-        
+        console.error("Error", err);
+        setIsLoading((prev) => (prev ? false : true));
+
+        chakraToast({
+          title: "Error",
+          description: err.data?.message
+          ? err.data?.message
+          : err.data || err.error,
+          status: "error",
+          duration: 5000,
+          isClosable: false,
+        });
       }
     }  else {
       // Handle other payment methods here
