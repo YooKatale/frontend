@@ -94,7 +94,32 @@ const Payment = ({ params }) => {
           isClosable: false,
         });
       }
-    } else {
+    } else if (paymentMethod === "payLater") {
+      try {
+        const res = await updateOrder({
+          data: {
+            payment: {paymentMethod: paymentMethod},
+            order: params.id,
+            schema: "schedule",
+            user: userInfo
+          }
+        }).unwrap();
+  
+        setIsLoading((prev) => (prev ? false : true));
+  
+        if (res?.status === "success") {
+          chakraToast({
+            description: "Order successfully  placed for pay later",
+            status: "success",
+            duration: 5000,
+            isClosable: false
+          });
+          router.push("/");
+        }   
+      } catch (err) {
+        
+      }
+    }  else {
       // Handle other payment methods here
       setPaymentDisplay((prev) => true);
     }    
@@ -277,6 +302,9 @@ const Payment = ({ params }) => {
                     <option value="mobileMoney">Mobile Money</option>
                     <option value="card">Debit/Credit Card</option>
                     <option value="cash_on_delivery">Cash on Delivery</option>
+                    {isSubscribe ? (
+                      <option value="payLater">Pay Later</option>
+                    ) : null}
                     {/* {Order?.paymentFor !== "subscription" ? (
                       <option value="cash">Cash on delivery</option>
                     ) : (
