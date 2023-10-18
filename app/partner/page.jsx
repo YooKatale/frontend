@@ -1,21 +1,19 @@
 "use client";
-import React, { useState } from "react";
 import {
   Box,
+  Button,
   FormControl,
   FormLabel,
   Input,
   Stack,
   Select,
-  Link,
 } from "@chakra-ui/react";
+import { useState } from "react";
 import axios from "axios";
-import { Loader } from "lucide-react";
-import { useToast } from "@chakra-ui/react";
 import VendorForm from "@components/DeliveryForm";
 import ButtonComponent from "@components/Button";
 import { DB_URL } from "@config/config";
-import { ThemeColors } from "@constants/constants";
+import { Loader2 } from "lucide-react";
 
 const Partner = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -24,89 +22,40 @@ const Partner = ({ onSubmit }) => {
     phone: "",
     email: "",
     transport: "bike",
-    vegan: false,
-    terms: false, // Added a 'terms' field to track the checkbox state
   });
   const [isLoading, setLoading] = useState(false);
-  const chakraToast = useToast();
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      setLoading(true);
-
-      if (!formData.terms) {
-        chakraToast({
-          title: "Notice",
-          description: "Please agree to the terms and conditions to proceed",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-        setLoading(false);
-        return;
-      }
-
       await axios.post(`${DB_URL}/vendor/new`, formData);
-      chakraToast({
-        title: "Vendor form",
-        description: "Successfully Submitted vendor form",
-        status: "success",
-        duration: 5000,
-        isClosable: false,
-      });
-
-      // Clear the form data after successful submission
-      setFormData({
-        name: "",
-        address: "",
-        phone: "",
-        email: "",
-        transport: "bike",
-        vegan: false,
-        terms: false,
-      });
+      setSuccessMessage('Form submitted successfully!');
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 5000);
     } catch (error) {
-      setLoading(false);
-
-      chakraToast({
-        title: "Error",
-        description: error.data?.message
-          ? error.data?.message
-          : error.data || error.error,
-        status: "error",
-        duration: 5000,
-        isClosable: false,
-      });
+      console.error("An error occurred:", error);
+      onSubmit("An unexpected error occurred");
     }
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const newValue = type === "checkbox" ? checked : value;
-
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: newValue,
+      [name]: value,
     });
   };
 
   return (
-    <div className="mb-10">
-      <VendorForm />
-      <Box
-        p={4}
-        borderWidth={1}
-        borderRadius="lg"
-        w={{ base: "100%", md: "md" }}
-        mx="auto"
-      >
-        <form onSubmit={handleSubmit}>
-          <p className="text-3xl text-left mb-4 text-dark">
-            Fill out the vendor form
-          </p>
-          <Stack spacing={4}>
+  <div className="mb-10">
+    <VendorForm />
+    <Box p={4} borderWidth={1} borderRadius="lg" w={{ base: "100%", md: "md" }} mx="auto"> {/* Set the width to full on mobile and medium on larger screens */}
+      <form onSubmit={handleSubmit}>
+       <p className="text-3xl text-left mb-4 text-dark">Fill out the vendor form</p>
+       <Stack spacing={4}>
             <FormControl id="name">
               <FormLabel>Vendor's Name*</FormLabel>
               <Input
@@ -140,7 +89,7 @@ const Partner = ({ onSubmit }) => {
                 value={formData.phone}
                 onChange={handleChange}
                 required
-                className="border border-dark rounded hover:border-red focus-border-red px-2 py-1 italic"
+                className="border border-dark rounded hover:border-red focus:border-red px-2 py-1 italic"
               />
             </FormControl>
             <FormControl id="emailAddress">
@@ -152,7 +101,7 @@ const Partner = ({ onSubmit }) => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="border border-dark rounded hover-border-red focus-border-red px-2 py-1 italic"
+                className="border border-dark rounded hover:border-red focus:border-red px-2 py-1 italic"
               />
             </FormControl>
 
@@ -164,7 +113,7 @@ const Partner = ({ onSubmit }) => {
                 value={formData.transport}
                 onChange={handleChange}
                 required
-                className="border border-dark rounded hover-border-red focus-border-red px-2 py-1 italic"
+                className="border border-dark rounded hover:border-red focus:border-red px-2 py-1 italic"
               >
                 <option value="bike">Bike</option>
                 <option value="vehicle">Vehicle</option>
@@ -172,48 +121,23 @@ const Partner = ({ onSubmit }) => {
               </Select>
             </FormControl>
 
-            <Box padding={"0.5rem 0"}>
-              <div className="flex">
-                <input
-                  type="checkbox"
-                  name="vegan"
-                  checked={formData.vegan}
-                  onChange={handleChange}
-                  className="mr-4"
-                />
-                <p className="">Are you vegetarian?</p>
-              </div>
-            </Box>
-
-            <Box padding={"0.5rem 0"}>
-              <input
-                type="checkbox"
-                name="terms"
-                checked={formData.terms}
-                onChange={handleChange}
-                className="mr-4"
-              />
-              I agree to the{" "}
-              <Link href={"/privacy"}>
-                <span style={{ color: ThemeColors.darkColor }}>
-                  terms and conditions
-                </span>
-              </Link>
-            </Box>
-
             <div className="text-center md:text-left">
               <ButtonComponent
                 text={"Sign Up"}
                 size={"lg"}
                 type={"submit"}
-                icon={isLoading && <Loader size={20} />}
+                icon={isLoading && <Loader2 size={20} />}
               />
             </div>
           </Stack>
-        </form>
-      </Box>
-    </div>
+        {successMessage && (
+          <div className="text-dark text-center mt-4">{successMessage}</div>
+        )}
+      </form>
+    </Box>
+  </div>
   );
 };
 
 export default Partner;
+
