@@ -41,7 +41,7 @@ import { logout } from "@slices/authSlice";
 import { useLogoutMutation } from "@slices/usersApiSlice";
 import { redirect, useRouter } from "next/navigation";
 import { useToast } from "@chakra-ui/react";
-import { IsAccountValid } from "@middleware/middleware";
+// import { IsAccountValid } from "@middleware/middleware";
 import { HiChevronLeft } from "react-icons/hi";
 import ButtonComponent from "./Button";
 import { LogIn } from "lucide-react";
@@ -61,7 +61,7 @@ const Header = () => {
   const [fetchCart] = useCartMutation();
 
 
-  IsAccountValid();
+  // IsAccountValid();
 
   const { push } = useRouter();
 
