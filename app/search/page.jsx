@@ -38,7 +38,6 @@ const Search = () => {
     }
   };
 
-  // fetch product categories
   useEffect(() => {
     handleDataFetch();
   }, [param]);
