@@ -6,7 +6,7 @@ import OrdersTab from "@components/modals/tabs/settingsTabs/OrdersTab";
 import SettingsTab from "@components/modals/tabs/settingsTabs/SettingsTab";
 import SubscriptionsTab from "@components/modals/tabs/settingsTabs/SubscriptionsTab";
 import { ThemeColors } from "@constants/constants";
-import { IsLoggedIn } from "@middleware/middleware";
+// import { IsLoggedIn } from "@middleware/middleware";
 import { useState } from "react";
 import {
   FaCreditCard,
@@ -22,7 +22,7 @@ const Account = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const [activeTab, setActiveTab] = useState("general");
 
-  IsLoggedIn();
+  // IsLoggedIn();
 
   return (
     <>
