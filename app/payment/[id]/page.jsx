@@ -57,8 +57,6 @@ const Payment = ({ params }) => {
   
     if (paymentMethod === "cash_on_delivery") {
       try {
-        // Make sure you have server-side logic to support "Cash on Delivery"
-        // Update the order status to "Cash on Delivery"
         const res = await updateOrder({
           data: {
             payment: { paymentMethod: paymentMethod },
@@ -78,7 +76,7 @@ const Payment = ({ params }) => {
             isClosable: false,
           });
     
-          router.push("/");
+          router.push("/thank-you");
         }
       } catch (err) {
         console.error("Error:", err);
@@ -134,7 +132,7 @@ const Payment = ({ params }) => {
           isClosable: false,
         });
 
-        router.push("/");
+        router.push("/thank-you");
       }
     } catch (err) {
       setIsLoading((prev) => (prev ? false : true));

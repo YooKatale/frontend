@@ -14,6 +14,7 @@ import ButtonComponent from './Button';
 import { Loader } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeColors } from '@constants/constants';
+import { PlusOutlined } from '@ant-design/icons';
 
 const VendorForm = () => {
   const [fullname, setName] = useState('');
@@ -27,6 +28,7 @@ const VendorForm = () => {
   const [isLoading, setLoading] = useState(false);
   const [vegan, setVegan] = useState(false);
   const [terms, setTerms] = useState(false);
+  const [activeQuestion, setActiveQuestion] = useState(null);
 
   const chakraToast = useToast();
 
@@ -101,10 +103,38 @@ const VendorForm = () => {
     }
   };
 
+  const faqItems = [
+    {
+      question: 'How do I register to deliver with YooKatale?',
+      answer: 'Fill in the delivery form to sign up as a delivery person.',
+    },
+    {
+      question: 'How long does registration take?',
+      answer: 'Within 24 hours your account will be reviewed and approved to start.',
+    },
+    {
+      question: 'How do I get my earnings?',
+      answer: 'Delivery payments are made weekly via Bank.',
+    },
+    {
+      question: 'Why should I deliver for YooKatale?',
+      answer: 'Earn your way, get access to a van, motorcycle, bicycle, or tricycle.',
+    },
+  ];
+
+
+  const handleQuestionClick = (index) => {
+    if (index === activeQuestion) {
+      setActiveQuestion(null);
+    } else {
+      setActiveQuestion(index);
+    }
+  }
+
   return (
     <Box className="mx-auto p-4 bg-black mb-20 mt-20">
       <div className="flex flex-col lg:flex-row">
-        <div className="p-4 rounded-xl bg-white">
+        <div className="p-4 md:w-2/5 rounded-xl bg-white">
           <p className="text-3xl text-left mb-4 text-dark">
             Fill out the form to start delivering
           </p>
@@ -201,7 +231,7 @@ const VendorForm = () => {
                   onChange={handleChange}
                   className="mr-4"
                 />
-                <p className="">Are you vegetarian?</p>
+                <p className="">Do you want to apply for a new Courier from YooKatale?</p>
               </div>
             </Box>
 
@@ -238,6 +268,33 @@ const VendorForm = () => {
               Do you want to set your own schedule and connect when it suits you? Get paid for delivering orders with the yookatale Courier App.
             </p>
             <h4 className="text-white font-bold mt-5">Sign up today!</h4>
+            <div className="mt-10 text-white">
+            <h3 className="text-xl md:text-3xl text-left mb-4">Frequently Asked Questions</h3>
+               {faqItems.map((item, index) => (
+                  <div key={index} className="mb-4">
+                   <p
+                    className="text-white font-bold text-sm md:text-xl mb-2"
+                    onClick={() => handleQuestionClick(index)}
+                    style={{ cursor: 'pointer' }}
+                    >
+                    <span
+                       className="icon-circle mr-6"
+                       style={{
+                       backgroundColor: activeQuestion === index ? 'blue' : 'white',
+                     }}
+                    >
+                      <PlusOutlined style={{ color: activeQuestion === index ? 'white' : 'blue' }} />
+                    </span>
+                      {item.question}
+                    </p>
+                     <div className="ml-10">
+                      {activeQuestion === index && (
+                        <p className="text-gray-300">{item.answer}</p>
+                      )}
+                     </div>
+                  </div>
+                ))}
+               </div>
           </div>
         </div>
       </div>
