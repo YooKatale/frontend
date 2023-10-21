@@ -231,7 +231,7 @@ const VendorForm = () => {
                   onChange={handleChange}
                   className="mr-4"
                 />
-                <p className="">Are you vegetarian?</p>
+                <p className="">Do you want to apply for a new Courier from YooKatale?</p>
               </div>
             </Box>
 
@@ -269,11 +269,11 @@ const VendorForm = () => {
             </p>
             <h4 className="text-white font-bold mt-5">Sign up today!</h4>
             <div className="mt-10 text-white">
-            <h3 className="text-3xl text-left mb-4">Frequently Asked Questions</h3>
+            <h3 className="text-xl md:text-3xl text-left mb-4">Frequently Asked Questions</h3>
                {faqItems.map((item, index) => (
                   <div key={index} className="mb-4">
                    <p
-                    className="text-white font-bold text-xl mb-2"
+                    className="text-white font-bold text-sm md:text-xl mb-2"
                     onClick={() => handleQuestionClick(index)}
                     style={{ cursor: 'pointer' }}
                     >

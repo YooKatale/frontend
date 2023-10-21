@@ -239,11 +239,11 @@ const Partner = () => {
       <Box className="p-4 w-full md:w-1/2 md:ml-5">
         <div className="mt-10">
           <div className="mt-10 text-white">
-            <h3 className="text-3xl text-left mb-4">Frequently Asked Questions</h3>
+            <h3 className="text-xl md:text-3xl text-left mb-4">Frequently Asked Questions</h3>
             {faqItems.map((item, index) => (
                   <div key={index} className="mb-4">
                    <p
-                    className="text-white font-bold text-xl mb-2"
+                    className="text-white font-bold text-sm md:text-xl mb-2"
                     onClick={() => handleQuestionClick(index)}
                     style={{ cursor: 'pointer' }}
                     >
