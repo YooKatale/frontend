@@ -20,7 +20,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-toast": "^1.1.4",
     "@reduxjs/toolkit": "^1.9.5",
-    "antd": "^5.10.1",
+    "antd": "^5.10.2",
     "axios": "^1.5.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
@@ -45,8 +45,8 @@
     "react-share": "^4.4.1",
     "sharp": "^0.32.4",
     "tailwind-merge": "^1.14.0",
-    "tailwindcss-animate": "^1.0.6",
-    "tailwindcss": "^3.3.3"
+    "tailwindcss": "^3.3.3",
+    "tailwindcss-animate": "^1.0.6"
   },
   "engines": {
     "node": "18.x"
