@@ -45,7 +45,7 @@ const Invoice = () => {
           <strong>Tax 10%</strong>
         </p>
         <p className="text-right">
-          <strong>Total: $200</strong>
+          <strong>Total: $100</strong>
         </p>
       </div>
     </div>
