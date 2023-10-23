@@ -35,7 +35,7 @@ const SpecialProducts = ({ Products, userInfo, category, text }) => {
         <div className="py-4">
           <div className="flex justify-between">
             <div>
-              <h3 className="lg:text-2xl text-lg text-center">
+              <h3 className="lg:text-2xl text-lg text-center capitalize">
                 <span className="capitalize">{text}</span> Products
               </h3>
               <div className="flex">
