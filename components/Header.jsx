@@ -41,10 +41,13 @@ import { logout } from "@slices/authSlice";
 import { useLogoutMutation } from "@slices/usersApiSlice";
 import { redirect, useRouter } from "next/navigation";
 import { useToast } from "@chakra-ui/react";
-import { IsAccountValid } from "@middleware/middleware";
+// import { IsAccountValid } from "@middleware/middleware";
 import { HiChevronLeft } from "react-icons/hi";
 import ButtonComponent from "./Button";
 import { LogIn } from "lucide-react";
+import { useCartMutation } from "@slices/productsApiSlice";
+import { Badge } from "antd";
+
 
 const Header = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -54,8 +57,11 @@ const Header = () => {
   const [dropdownMenu, setDropdownMenu] = useState(false);
   const [scrollDownState, setScrollDownState] = useState(false);
   const [isLoginMode, setLoginMode] = useState(true);
+  const [cartCount, setCartCount] = useState(0);
+  const [fetchCart] = useCartMutation();
 
-  IsAccountValid();
+
+  // IsAccountValid();
 
   const { push } = useRouter();
 
@@ -98,6 +104,18 @@ const Header = () => {
       });
     }
   };
+
+  const updateCartCount = async () => {
+    try {
+      const res = await fetchCart(userInfo?._id).unwrap();
+      const cartData = res.data;
+      const itemCount = cartData.CartItems ? cartData.CartItems.length : 0;
+      setCartCount(itemCount);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
 
   const handleSearchFormSubmit = (e) => {
     e.preventDefault();
@@ -158,20 +176,22 @@ const Header = () => {
 
   useEffect(() => {
     stickyNavbarActivate();
+    updateCartCount()
 
     // get user IP
     handleUserIp();
   }, []);
 
   const DropdownLinks = [
-    { name: "Account", link: "/account" },
+    { name: "Profile", link: "/account" },
     { name: "Schedule a meal", link: "/schedule" },
     { name: "Loyalty Points", link: "/loyalty" },
     { name: "Subscription", link: "/subscription" },
     { name: "Support", link: "/" },
-    { name: "Invoices & Receipts", link: "/" },
-    { name: "Support", link: "/" },
-    { name: "Invoices & Receipts", link: "/" },
+    { name: "Invoices", link: "/" },
+    { name: "Receipts", link: "/" },
+    { name: "Help Center", link: "/" },
+    { name: "Invite a friend", link: "/" },
   ];
 
   if (userInfo) {
@@ -294,12 +314,17 @@ const Header = () => {
             </p>
           </Link>
           </Box> */}
+          <Box>
+
+          </Box>
           <Box display={{ base: "none", lg: "block" }}>
-            <ButtonComponent
-              variant="icon"
-              icon={<AiOutlineShoppingCart size="24px" />}
-              onClick={() => push("/cart")}
-            />
+          <Badge count={cartCount}>
+          <ButtonComponent
+            variant="icon"
+            icon={<AiOutlineShoppingCart size="24px" />}
+            onClick={() => push("/cart")}
+          />
+          </Badge>
           </Box>
 
           {/* User dropdown */}
@@ -315,12 +340,14 @@ const Header = () => {
                   bg="white"
                   boxShadow="0 4px 6px rgba(0, 0, 0, 0.1)"
                   borderRadius="md"
+                  
                   mt={2}
                   position="absolute"
                   right={0}
                   zIndex={3}
+                  width="200px"
                 >
-                  <ul>
+                  <ul className="md:ml-10 pb-5">
                     {DropdownLinks.map((item, index) => (
                       <li key={index}>
                         <Link href={item.link}>
@@ -357,11 +384,13 @@ const Header = () => {
             />
           </Box>
           <Box ml={4} display={{ base: "block", lg: "none" }}>
-              <ButtonComponent
-                variant="icon"
-                icon={<FaSignInAlt size="20px" />}
-                onClick={() => push("/signin")}
-              />
+               <Badge count={cartCount}>
+                 <ButtonComponent
+                  variant="icon"
+                  icon={<FaSignInAlt size="20px" />}
+                  onClick={() => push("/signin")}
+                 />
+               </Badge>
           </Box>
         </Flex>
       </Flex>

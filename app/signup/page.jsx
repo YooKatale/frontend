@@ -311,7 +311,7 @@ const SignUp = () => {
                 <Box padding={"0.5rem 0"}>
                   <input type="checkbox" name="terms" className="mr-4" />I agree
                   to the{" "}
-                  <Link href={"/policy"}>
+                  <Link href={"/usage"}>
                     <span style={{ color: ThemeColors.darkColor }}>
                       terms and conditions
                     </span>

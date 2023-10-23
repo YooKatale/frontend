@@ -291,34 +291,27 @@ const Home = () => {
 
       {/* ------------- section 
       ------------------------------- */}
-      <Box padding={"3rem 0"} background={"#000"}>
-        <Flex>
-          <Box margin={"auto"} width={{ base: "100%", md: "70%", xl: "50%" }}>
-            <Box padding={{ base: "2rem", md: "2rem 1rem", xl: "2rem 0" }}>
-              <Text
-                textAlign={"center"}
-                fontSize={{ base: "2xl", md: "2xl", xl: "3xl" }}
-                className="secondary-light-font"
-                color={ThemeColors.lightColor}
-              >
-                Forget about going to the Market get Premium access to your Home
-                digital mobile food market
-              </Text>
-
-              <Flex justifyContent={"center"} padding={"1rem 0"}>
-                <Link href={"/subscription"}>
-                  <DynamicButton
-                    type={"button"}
-                    text={"Subscribe Now "}
-                    size={"lg"}
-                  />
-                </Link>
-              </Flex>
-            </Box>
-          </Box>
+     <a href="/subscription" style={{ display: "block", textDecoration: "none" }}>
+      <Box
+        background={`url("/assets/images/subscribe.jpg") center center no-repeat`}
+        backgroundSize="cover"
+        h={{ base: "300px", md: "400px", lg: "750px" }}
+      >
+       <Flex>
+         <Box margin={"auto"} width={{ base: "100%", md: "70%", xl: "50%" }}>
+           <Box padding={{ base: "2rem", md: "2rem 1rem", xl: "2rem 0" }}>
+             <Flex justifyContent={"center"} padding={"1rem 0"}>
+                <DynamicButton
+                 type={"button"}
+                 text={"Subscribe Now "}
+                 size={"lg"}
+               />
+             </Flex>
+           </Box>
+         </Box>
         </Flex>
       </Box>
-
+    </a>
       {/* ------------- section 
       ------------------------------- */}
       {Products.length > 0 ? (

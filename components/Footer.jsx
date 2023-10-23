@@ -13,6 +13,7 @@ import {
   StackDivider,
   Text,
   useToast,
+  Heading
 } from "@chakra-ui/react";
 import { CategoriesJson, ThemeColors } from "@constants/constants";
 import Link from "next/link";
@@ -48,6 +49,7 @@ import axios from "axios";
 import { Loader } from "lucide-react";
 import NewsletterForm from "./NewsletterForm";
 import { FaWhatsapp } from "react-icons/fa";
+import Image from "next/image";
 
 const Footer = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -319,7 +321,6 @@ const Footer = () => {
                     </Box>
                   </Stack>
                 </Box>
-
                 <Box
                   padding={"1rem 0"}
                   display={{ base: "none", md: "none", xl: "block" }}
@@ -377,8 +378,34 @@ const Footer = () => {
               </Grid>
             </Box>
           </Flex>
-        </Box>
-
+          <Flex justifyContent="center">
+            <Box className="mt-3 text-center md:flex mx-auto">
+              <Link
+                href="/subscription"
+                className="md:mr-1 flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
+              >
+                <Image src="/assets/images/apple.svg" width={30} height={30} />
+                <div className="ml-1">
+                  <Text color="white" fontSize="sm">
+                    App Store
+                  </Text>
+                </div>
+              </Link>
+              <Link
+                 href="/subscription"
+                 className="mt-4 md:mt-0 md:ml-4 flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
+              >
+                 <Image src="/assets/images/google.svg" width={30} height={30} />
+                <div className="ml-1">
+                   <Text color="white" fontSize="sm">
+                    Google Play
+                    </Text>
+                </div>
+               </Link>
+              </Box>
+            </Flex> 
+          </Box>
+          
         <Flex
           direction={{ base: "column", md: "column", xl: "row" }}
           justifyContent={{ base: "center", md: "center", xl: "none" }}
@@ -498,7 +525,7 @@ const Footer = () => {
                     xl: "0 0.5rem",
                   }}
                 >
-                  <p className="text-md">Usage Policy</p>
+                   <p className="text-md">Usage Policy</p>
                 </Box>
               </Link>
             </Flex>
@@ -511,12 +538,3 @@ const Footer = () => {
 
 export default Footer;
 
-<Box as="footer" textAlign="center" padding="4rem">
-  <Text>Copyright © 2023 YooKatale</Text>
-  <Link href="https://play.google.com/store/apps/details?id=com.yookatale">
-    <FaGooglePlay size={32} color="green" />
-  </Link>
-  <Link href="https://apps.apple.com/app/yookatale/id1234567890">
-    <FaAppStore size={32} color="blue" />
-  </Link>
-</Box>

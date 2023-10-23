@@ -41,7 +41,6 @@ const Cart = () => {
 
   const { onOpen, onClose, isOpen } = useDisclosure();
 
-  // get user information stored in the localstorage
   const { userInfo } = useSelector((state) => state.auth);
 
   const [fetchCart] = useCartMutation();
@@ -50,14 +49,12 @@ const Cart = () => {
   const chakraToast = useToast();
   const router = useRouter();
 
-  // function handle fetching data
   const handleDataFetch = async () => {
     const res = await fetchCart(userInfo?._id).unwrap();
 
     try {
       if (res.status && res.status == "Success") {
-        // combine the data of each cart item with its products information into one single object
-        // variables to hold data for cart items and product items
+        
         let CartItems = res?.data.CartItems ? res?.data.CartItems : [];
         let CartProductsItems = res?.data.CartProductsItems
           ? res?.data.CartProductsItems

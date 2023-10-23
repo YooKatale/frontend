@@ -43,7 +43,6 @@ const Blog = () => {
   const [NewsletterEmail, setNewsletterEmail] = useState("");
   const [isLoading, setLoading] = useState(false);
 
-  // use the useSearchParam hooks from next/navigation to get url params
   const searchParam = useSearchParams();
   const pathname = usePathname();
 
