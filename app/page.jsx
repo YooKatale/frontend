@@ -291,27 +291,15 @@ const Home = () => {
 
       {/* ------------- section 
       ------------------------------- */}
-     <a href="/subscription" style={{ display: "block", textDecoration: "none" }}>
-      <Box
-        background={`url("/assets/images/subscribe.jpg") center center no-repeat`}
-        backgroundSize="cover"
-        h={{ base: "300px", md: "400px", lg: "750px" }}
-      >
-       <Flex>
-         <Box margin={"auto"} width={{ base: "100%", md: "70%", xl: "50%" }}>
-           <Box padding={{ base: "2rem", md: "2rem 1rem", xl: "2rem 0" }}>
-             <Flex justifyContent={"center"} padding={"1rem 0"}>
-                <DynamicButton
-                 type={"button"}
-                 text={"Subscribe Now "}
-                 size={"lg"}
-               />
-             </Flex>
-           </Box>
-         </Box>
-        </Flex>
-      </Box>
-    </a>
+      <a href="/subscription" style={{ display: "block", textDecoration: "none" }}>
+        <img
+         src="/assets/images/sub.jpg"
+         alt="Subscription Image"
+         width="100%"
+         height={200}
+        />
+      </a>
+      
       {/* ------------- section 
       ------------------------------- */}
       {Products.length > 0 ? (
