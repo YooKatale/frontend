@@ -17,6 +17,7 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import Image from "next/image";
 
 const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
   const [CartTotal, setCartTotal] = useState(0);
@@ -27,6 +28,7 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
   const chakraToast = useToast();
   const { userInfo } = useSelector((state) => state.auth);
   const [currentDateTime, setCurrentDateTime] = useState("");
+  const [receiptId, setReceiptId] = useState("");
 
   // function to calculate the cart total
   const calcCartTotal = () => {
@@ -44,9 +46,17 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
     return `${date}, ${time}`;
   }
 
+  const generateReceiptId = () => {
+    const timestamp = new Date().getTime();
+    const randomString = Math.random().toString(36).substring(2, 8); // Generates a random string of 6 characters
+
+    return `${timestamp}-${randomString}`;
+  };
+
   useEffect(() => {
     calcCartTotal();
     setCurrentDateTime(getCurrentDateTime());
+    setReceiptId(generateReceiptId());
   }, []);
 
   const handleSubmit = async () => {
@@ -63,6 +73,7 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
           specialRequests: tabOneData.specialRequests,
           payment: { paymentMethod: "", transactionId: "" },
           orderDate: currentDateTime,
+          receiptId: receiptId,
         },
       });
 
@@ -87,7 +98,10 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
   return (
     <>
       <div>
-        <h2>Yookatale</h2>
+        <div className="flex">
+         <Image src="/assets/icons/logo.jpg" width={50} height={50} />
+         <h2>Yookatale</h2>
+        </div>
         <div className="py-4">
           <h3 className="text-lg text-center">Checkout summary</h3>
         </div>
@@ -220,6 +234,13 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
           <Heading as={"h3"} size={"md"}>
             Cart Total: UGX {FormatCurr(CartTotal + 3500)}
           </Heading>
+        </Box>
+        <Box
+          padding={"1rem 0"}
+        >
+          <Text margin={"1rem 0"} fontSize={"lg"} className="text-semibold">
+            Receipt ID: {receiptId}          
+            </Text>
         </Box>
         <Box padding={"1rem 0"}>
           <Flex>
