@@ -46,17 +46,17 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
     return `${date}, ${time}`;
   }
 
-  const generateReceiptId = () => {
-    const timestamp = new Date().getTime();
-    const randomString = Math.random().toString(36).substring(2, 8); // Generates a random string of 6 characters
-
-    return `${timestamp}-${randomString}`;
-  };
-
+  function generateReceiptNumber() {
+    
+    const date = new Date();
+    const randomNum = Math.floor(Math.random() * 1000);
+    const receiptNum = `R${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}-${randomNum}`;
+    return receiptNum;
+  }
   useEffect(() => {
     calcCartTotal();
     setCurrentDateTime(getCurrentDateTime());
-    setReceiptId(generateReceiptId());
+    setReceiptId(generateReceiptNumber());
   }, []);
 
   const handleSubmit = async () => {
@@ -243,8 +243,8 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
           padding={"1rem 0"}
         >
           <Text margin={"1rem 0"} fontSize={"lg"} className="text-semibold">
-            Receipt ID: {receiptId}          
-            </Text>
+             Receipt Number:: {receiptId}          
+          </Text>
         </Box>
         <Box padding={"1rem 0"}>
           <Flex>
