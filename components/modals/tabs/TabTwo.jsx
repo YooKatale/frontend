@@ -102,6 +102,10 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
          <Image src="/assets/icons/logo.jpg" width={50} height={50} />
          <h2>Yookatale</h2>
         </div>
+        <p>
+          Authorized By: Seconds Tech Limited<br />
+          P.O. Box 74940, Clock Tower, Kampala, Naguru (U)
+        </p>
         <div className="py-4">
           <h3 className="text-lg text-center">Checkout summary</h3>
         </div>
