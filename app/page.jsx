@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import { useProductsCategoriesGetMutation } from "@slices/productsApiSlice";
 import Link from "next/link";
 import { useSelector } from "react-redux";
-import SpecialProducts from "@components/SpecialProducts";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import dynamic from "next/dynamic";
 import { useCommentsGetMutation } from "@slices/usersApiSlice";
@@ -18,6 +17,9 @@ import { Salad } from "lucide-react";
 import RecommendedProducts from "@components/  RecommendedProducts";
 
 const DynamicButton = dynamic(() => import("@components/Button"), {
+  loading: () => <p>Loading...</p>,
+});
+const DynamicSpecialProducts = dynamic(() => import('@components/SpecialProducts'), {
   loading: () => <p>Loading...</p>,
 });
 
@@ -147,7 +149,7 @@ const Home = () => {
               Products.map(
                 (product, index) =>
                   product.category === "topdeals" && (
-                    <SpecialProducts
+                    <DynamicSpecialProducts
                       key={index}
                       Products={product?.products}
                       userInfo={userInfo}
@@ -157,7 +159,7 @@ const Home = () => {
                   )
               )
             ) : (
-              <SpecialProducts
+              <DynamicSpecialProducts
                 Products={[]}
                 userInfo={{}}
                 category={""}
@@ -268,7 +270,7 @@ const Home = () => {
               Products.map(
                 (product, index) =>
                   product.category === "popular" && (
-                    <SpecialProducts
+                    <DynamicSpecialProducts
                       key={index}
                       Products={product?.products}
                       userInfo={userInfo}
@@ -278,7 +280,7 @@ const Home = () => {
                   )
               )
             ) : (
-              <SpecialProducts
+              <DynamicSpecialProducts
                 Products={[]}
                 userInfo={{}}
                 category={""}
@@ -318,7 +320,7 @@ const Home = () => {
                     margin={"auto"}
                     width={{ base: "95%", md: "90%", xl: "90%" }}
                   >
-                    <SpecialProducts
+                    <DynamicSpecialProducts
                       Products={product?.products}
                       userInfo={userInfo}
                       category={product?.category}
@@ -336,7 +338,7 @@ const Home = () => {
         >
           <Flex>
             <Box margin={"auto"} width={{ base: "95%", md: "90%", xl: "90%" }}>
-              <SpecialProducts
+              <DynamicSpecialProducts
                 Products={[]}
                 userInfo={{}}
                 category={""}
