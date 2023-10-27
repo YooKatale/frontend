@@ -81,7 +81,6 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
 
       router.push(`/payment/${res.data.data.Order}`);
     } catch (err) {
-      console.log({ err });
       setIsLoading((prevState) => (prevState ? false : true));
 
       chakraToast({
