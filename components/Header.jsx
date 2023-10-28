@@ -45,9 +45,8 @@ import { useToast } from "@chakra-ui/react";
 import { HiChevronLeft } from "react-icons/hi";
 import ButtonComponent from "./Button";
 import { LogIn } from "lucide-react";
-import { useCartMutation } from "@slices/productsApiSlice";
+import { DB_URL } from "@config/config";
 import { Badge } from "antd";
-
 
 const Header = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -57,9 +56,7 @@ const Header = () => {
   const [dropdownMenu, setDropdownMenu] = useState(false);
   const [scrollDownState, setScrollDownState] = useState(false);
   const [isLoginMode, setLoginMode] = useState(true);
-  const [cartCount, setCartCount] = useState(0);
-  const [fetchCart] = useCartMutation();
-
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   // IsAccountValid();
 
@@ -104,18 +101,6 @@ const Header = () => {
       });
     }
   };
-
-  const updateCartCount = async () => {
-    try {
-      const res = await fetchCart(userInfo?._id).unwrap();
-      const cartData = res.data;
-      const itemCount = cartData.CartItems ? cartData.CartItems.length : 0;
-      setCartCount(itemCount);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  
 
   const handleSearchFormSubmit = (e) => {
     e.preventDefault();
@@ -175,23 +160,45 @@ const Header = () => {
   };
 
   useEffect(() => {
+    const fetchSubscriptionStatus = async () => {
+      try {
+        const response = await fetch(`${DB_URL}/api/subscription`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${userInfo.token}`
+          }
+        });
+        const data = await response.json();
+        
+        if (data && data.isSubscribed) {
+          setIsSubscribed(true);
+        }
+      } catch (error) {
+        console.error("Error fetching subscription status:", error);
+      }
+    };
+
+    if (userInfo) {
+      fetchSubscriptionStatus();
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
     stickyNavbarActivate();
-    updateCartCount()
 
     // get user IP
     handleUserIp();
   }, []);
 
   const DropdownLinks = [
-    { name: "Profile", link: "/account" },
+    { name: "Account", link: "/account" },
     { name: "Schedule a meal", link: "/schedule" },
     { name: "Loyalty Points", link: "/loyalty" },
     { name: "Subscription", link: "/subscription" },
     { name: "Support", link: "/" },
-    { name: "Invoices", link: "/" },
-    { name: "Receipts", link: "/" },
-    { name: "Help Center", link: "/" },
-    { name: "Invite a friend", link: "/" },
+    { name: "Invoices & Receipts", link: "/" },
+    { name: "Support", link: "/" },
+    { name: "Invoices & Receipts", link: "/" },
   ];
 
   if (userInfo) {
@@ -243,7 +250,7 @@ const Header = () => {
             )}
           </Button>
         </Box>
-
+       
         {/* Desktop navigation */}
         <Stack
           as="ul"
@@ -282,6 +289,13 @@ const Header = () => {
               </a>
             )
           }
+          <Flex align="center">
+           {isSubscribed ? (
+              <Badge colorScheme="green" className="bg-green px-2 py-1 rounded-full text-white">Subscribed</Badge>
+             ) : (
+                <Badge colorScheme="red" className="bg-red px-2 py-1 rounded-full text-white">Not Subscribed</Badge>
+            )}
+            </Flex>
           {/* Search */}
           <Box as="li">
             <form onSubmit={handleSearchFormSubmit}>
@@ -314,17 +328,12 @@ const Header = () => {
             </p>
           </Link>
           </Box> */}
-          <Box>
-
-          </Box>
           <Box display={{ base: "none", lg: "block" }}>
-          <Badge count={cartCount}>
-          <ButtonComponent
-            variant="icon"
-            icon={<AiOutlineShoppingCart size="24px" />}
-            onClick={() => push("/cart")}
-          />
-          </Badge>
+            <ButtonComponent
+              variant="icon"
+              icon={<AiOutlineShoppingCart size="24px" />}
+              onClick={() => push("/cart")}
+            />
           </Box>
 
           {/* User dropdown */}
@@ -340,14 +349,12 @@ const Header = () => {
                   bg="white"
                   boxShadow="0 4px 6px rgba(0, 0, 0, 0.1)"
                   borderRadius="md"
-                  
                   mt={2}
                   position="absolute"
                   right={0}
                   zIndex={3}
-                  width="200px"
                 >
-                  <ul className="md:ml-10 pb-5">
+                  <ul>
                     {DropdownLinks.map((item, index) => (
                       <li key={index}>
                         <Link href={item.link}>
@@ -374,7 +381,7 @@ const Header = () => {
               />
             </Box>
           )}
-
+          
           {/* Cart mobile */}
           <Box display={{ base: "block", lg: "none" }}>
           <ButtonComponent
@@ -384,13 +391,11 @@ const Header = () => {
             />
           </Box>
           <Box ml={4} display={{ base: "block", lg: "none" }}>
-               <Badge count={cartCount}>
-                 <ButtonComponent
-                  variant="icon"
-                  icon={<FaSignInAlt size="20px" />}
-                  onClick={() => push("/signin")}
-                 />
-               </Badge>
+              <ButtonComponent
+                variant="icon"
+                icon={<FaSignInAlt size="20px" />}
+                onClick={() => push("/signin")}
+              />
           </Box>
         </Flex>
       </Flex>

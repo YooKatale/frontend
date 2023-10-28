@@ -15,11 +15,14 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { DB_URL } from "@config/config";
+import axios from "axios";
 
 const Payment = ({ params }) => {
   const [Order, setOrder] = useState({});
   const [paymentDisplay, setPaymentDisplay] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [CouponFormIsLoading, setCouponFormIsLoading] = useState(false);
@@ -47,9 +50,29 @@ const Payment = ({ params }) => {
     if (res.status == "Success") setOrder({ ...res.data });
   };
 
+  const fetchSubscriptionStatus = async () => {
+    try {
+      const response = await axios.get(
+        `${DB_URL}/subscription`,
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        }
+      );
+
+      if (response.data.isSubscribed) {
+        setIsSubscribed(true);
+      }
+    } catch (error) {
+      console.error("Error fetching subscrption status:", error);
+    }
+  };
+
   useEffect(() => {
+    fetchSubscriptionStatus();
     handleDataFetch();
-  }, []);
+  }, [userInfo]);
 
   // function to display payment component
   const handlePayment = async () => {
@@ -76,7 +99,7 @@ const Payment = ({ params }) => {
             isClosable: false,
           });
     
-          router.push("/thank-you");
+          router.push("/");
         }
       } catch (err) {
         console.error("Error:", err);
@@ -92,13 +115,48 @@ const Payment = ({ params }) => {
           isClosable: false,
         });
       }
-    } else {
+    } else if (paymentMethod === "payLater") {
+      try {
+        const res = await updateOrder({
+          data: {
+            payment: {paymentMethod: paymentMethod},
+            order: params.id,
+            schema: "schedule",
+            user: userInfo
+          }
+        }).unwrap();
+  
+        setIsLoading((prev) => (prev ? false : true));
+  
+        if (res?.status === "success") {
+          chakraToast({
+            description: "Order successfully  placed for pay later",
+            status: "success",
+            duration: 5000,
+            isClosable: false
+          });
+          router.push("/");
+        }   
+      } catch (err) {
+        console.error("Error", err);
+        setIsLoading((prev) => (prev ? false : true));
+
+        chakraToast({
+          title: "Error",
+          description: err.data?.message
+          ? err.data?.message
+          : err.data || err.error,
+          status: "error",
+          duration: 5000,
+          isClosable: false,
+        });
+      }
+    }  else {
       // Handle other payment methods here
       setPaymentDisplay((prev) => true);
     }    
   };  
   
-  // callback function that will be called when payment is successfully or failed and will update database
   const handleCallback = async (param) => {
     setPaymentDisplay((prev) => false);
 
@@ -132,7 +190,7 @@ const Payment = ({ params }) => {
           isClosable: false,
         });
 
-        router.push("/thank-you");
+        router.push("/");
       }
     } catch (err) {
       setIsLoading((prev) => (prev ? false : true));
@@ -275,11 +333,9 @@ const Payment = ({ params }) => {
                     <option value="mobileMoney">Mobile Money</option>
                     <option value="card">Debit/Credit Card</option>
                     <option value="cash_on_delivery">Cash on Delivery</option>
-                    {/* {Order?.paymentFor !== "subscription" ? (
-                      <option value="cash">Cash on delivery</option>
-                    ) : (
-                      ""
-                    )} */}
+                    {isSubscribed ? (
+                      <option value="payLater">Pay Later</option>
+                    ) : null}
                   </select>
                 </div>
               </div>
