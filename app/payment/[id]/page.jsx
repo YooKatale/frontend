@@ -15,11 +15,14 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { DB_URL } from "@config/config";
+import axios from "axios";
 
 const Payment = ({ params }) => {
   const [Order, setOrder] = useState({});
   const [paymentDisplay, setPaymentDisplay] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [CouponFormIsLoading, setCouponFormIsLoading] = useState(false);
@@ -47,9 +50,29 @@ const Payment = ({ params }) => {
     if (res.status == "Success") setOrder({ ...res.data });
   };
 
+  const fetchSubscriptionStatus = async () => {
+    try {
+      const response = await axios.get(
+        `${DB_URL}/subscription`,
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        }
+      );
+
+      if (response.data.isSubscribed) {
+        setIsSubscribed(true);
+      }
+    } catch (error) {
+      console.error("Error fetching subscrption status:", error);
+    }
+  };
+
   useEffect(() => {
+    fetchSubscriptionStatus();
     handleDataFetch();
-  }, []);
+  }, [userInfo]);
 
   // function to display payment component
   const handlePayment = async () => {
@@ -57,8 +80,6 @@ const Payment = ({ params }) => {
   
     if (paymentMethod === "cash_on_delivery") {
       try {
-        // Make sure you have server-side logic to support "Cash on Delivery"
-        // Update the order status to "Cash on Delivery"
         const res = await updateOrder({
           data: {
             payment: { paymentMethod: paymentMethod },
@@ -136,7 +157,6 @@ const Payment = ({ params }) => {
     }    
   };  
   
-  // callback function that will be called when payment is successfully or failed and will update database
   const handleCallback = async (param) => {
     setPaymentDisplay((prev) => false);
 
@@ -313,14 +333,9 @@ const Payment = ({ params }) => {
                     <option value="mobileMoney">Mobile Money</option>
                     <option value="card">Debit/Credit Card</option>
                     <option value="cash_on_delivery">Cash on Delivery</option>
-                    {isSubscribe ? (
+                    {isSubscribed ? (
                       <option value="payLater">Pay Later</option>
                     ) : null}
-                    {/* {Order?.paymentFor !== "subscription" ? (
-                      <option value="cash">Cash on delivery</option>
-                    ) : (
-                      ""
-                    )} */}
                   </select>
                 </div>
               </div>

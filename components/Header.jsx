@@ -45,6 +45,8 @@ import { IsAccountValid } from "@middleware/middleware";
 import { HiChevronLeft } from "react-icons/hi";
 import ButtonComponent from "./Button";
 import { LogIn } from "lucide-react";
+import { DB_URL } from "@config/config";
+import { Badge } from "antd";
 
 const Header = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -54,6 +56,7 @@ const Header = () => {
   const [dropdownMenu, setDropdownMenu] = useState(false);
   const [scrollDownState, setScrollDownState] = useState(false);
   const [isLoginMode, setLoginMode] = useState(true);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   IsAccountValid();
 
@@ -157,6 +160,30 @@ const Header = () => {
   };
 
   useEffect(() => {
+    const fetchSubscriptionStatus = async () => {
+      try {
+        const response = await fetch(`${DB_URL}/api/subscription`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${userInfo.token}`
+          }
+        });
+        const data = await response.json();
+        
+        if (data && data.isSubscribed) {
+          setIsSubscribed(true);
+        }
+      } catch (error) {
+        console.error("Error fetching subscription status:", error);
+      }
+    };
+
+    if (userInfo) {
+      fetchSubscriptionStatus();
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
     stickyNavbarActivate();
 
     // get user IP
@@ -223,7 +250,7 @@ const Header = () => {
             )}
           </Button>
         </Box>
-
+       
         {/* Desktop navigation */}
         <Stack
           as="ul"
@@ -262,6 +289,13 @@ const Header = () => {
               </a>
             )
           }
+          <Flex align="center">
+           {isSubscribed ? (
+              <Badge colorScheme="green" className="bg-green px-2 py-1 rounded-full text-white">Subscribed</Badge>
+             ) : (
+                <Badge colorScheme="red" className="bg-red px-2 py-1 rounded-full text-white">Not Subscribed</Badge>
+            )}
+            </Flex>
           {/* Search */}
           <Box as="li">
             <form onSubmit={handleSearchFormSubmit}>
@@ -347,7 +381,7 @@ const Header = () => {
               />
             </Box>
           )}
-
+          
           {/* Cart mobile */}
           <Box display={{ base: "block", lg: "none" }}>
           <ButtonComponent
