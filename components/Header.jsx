@@ -196,9 +196,8 @@ const Header = () => {
     { name: "Loyalty Points", link: "/loyalty" },
     { name: "Subscription", link: "/subscription" },
     { name: "Support", link: "/" },
-    { name: "Invoices & Receipts", link: "/" },
+    { name: "Invoices & Receipts", link: "/invoices" },
     { name: "Support", link: "/" },
-    { name: "Invoices & Receipts", link: "/" },
   ];
 
   if (userInfo) {
