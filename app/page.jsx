@@ -19,9 +19,12 @@ import RecommendedProducts from "@components/  RecommendedProducts";
 const DynamicButton = dynamic(() => import("@components/Button"), {
   loading: () => <p>Loading...</p>,
 });
-const DynamicSpecialProducts = dynamic(() => import('@components/SpecialProducts'), {
-  loading: () => <p>Loading...</p>,
-});
+const DynamicSpecialProducts = dynamic(
+  () => import("@components/SpecialProducts"),
+  {
+    loading: () => <p>Loading...</p>,
+  }
+);
 
 const Home = () => {
   const [Products, setProducts] = useState([]);
@@ -293,15 +296,18 @@ const Home = () => {
 
       {/* ------------- section 
       ------------------------------- */}
-      <a href="/subscription" style={{ display: "block", textDecoration: "none" }}>
+      <a
+        href="/subscription"
+        style={{ display: "block", textDecoration: "none" }}
+      >
         <img
-         src="/assets/images/sub.jpg"
-         alt="Subscription Image"
-         width="100%"
-         height={200}
+          src="/assets/images/sub.jpg"
+          alt="Subscription Image"
+          width="100%"
+          height={200}
         />
       </a>
-      
+
       {/* ------------- section 
       ------------------------------- */}
       {Products.length > 0 ? (
