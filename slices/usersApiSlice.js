@@ -33,7 +33,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     }),
     subscriptionPackageGet: builder.mutation({
       query: () => ({
-        url: `${DB_URL}/subscription/package`,
+        url: `${DB_URL}/subscription/package/get`,
         method: "GET",
       }),
     }),
