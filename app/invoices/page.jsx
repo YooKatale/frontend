@@ -85,9 +85,9 @@ const Invoice = () => {
                 <TableCell>
                   <ul>
                     {order.products.map((product, productIndex) => (
-                      <div>
-                        <li key={productIndex}>{product.name}</li>
-                        <li key={productIndex}>{product.price}</li>
+                      <div key={productIndex}>
+                        <li>{product.name}</li>
+                        <li>{product.price}</li>
                       </div>
                     ))}
                   </ul>
