@@ -7,21 +7,21 @@ export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (data) => ({
-        url: `${DB_URL}/users/auth`,
+        url: `${DB_URL}/auth/auth`,
         method: "POST",
         body: data,
       }),
     }),
     register: builder.mutation({
       query: (data) => ({
-        url: `${DB_URL}/users/register`,
+        url: `${DB_URL}/auth/register`,
         method: "POST",
         body: data,
       }),
     }),
     logout: builder.mutation({
       query: () => ({
-        url: `${DB_URL}/users/logout`,
+        url: `${DB_URL}/auth/logout`,
         method: "POST",
       }),
     }),
