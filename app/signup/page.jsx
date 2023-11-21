@@ -31,7 +31,7 @@ const SignUp = () => {
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [dob, setDob] = useState("");
-  const [phon, setPhone] = useState("");
+  const [phone, setPhone] = useState("");
   const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
   const [vegan, setVegan] = useState(false);
@@ -75,7 +75,7 @@ const SignUp = () => {
         firstname,
         lastname,
         email,
-        phon,
+        phone,
         gender,
         vegan,
         dob,
@@ -188,7 +188,7 @@ const SignUp = () => {
                         placeholder="Include country code [+256.....]"
                         name="phone"
                         id="phone"
-                        value={phon}
+                        value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                       />
                     </FormControl>
