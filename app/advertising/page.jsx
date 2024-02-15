@@ -29,7 +29,7 @@ const Advertising = () => {
   return (
     <>
       <Box>
-        <h1>Choose the plan in Property that works for you</h1>
+        <h1 className="ml-10 mt-10">Choose the plan that works for you</h1>
         <Box
           padding={{ base: "3rem 2rem", md: "3rem", xl: "3rem" }}
           className="flex items-center justify-center sm:overflow-x md:overflow-x-hidden"
