@@ -9,8 +9,11 @@ import {
   TabPanel,
 } from "@chakra-ui/react";
 import { SmallCloseIcon, CheckIcon } from "@chakra-ui/icons";
+import React, { useState } from "react";
 
 function MobileView() {
+    const [payment, setPayment] = useState('32,000 ugx');
+
   return (
     <Box className="md:hidden py-3 px-4">
       <Tabs variant="soft-rounded" colorScheme="yellow">
@@ -30,6 +33,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
+                    onClick={() => setPayment('32,000 ugx')}
                   >
                     Weekly
                     <span className="text-sm">32,000 ugx</span>
@@ -37,6 +41,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
+                    onClick={() => setPayment('92,000 ugx')}
                   >
                     Monthly
                     <span className="text-sm">92,000 ugx</span>
@@ -44,6 +49,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
+                    onClick={() => setPayment('300,000 ugx')}
                   >
                     3 Months
                     <span className="text-sm">300,000 ugx</span>
@@ -51,6 +57,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
+                    onClick={() => setPayment('530,000 ugx')}
                   >
                     6 Months
                     <span className="text-sm">530,000 ugx</span>
@@ -58,6 +65,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
+                    onClick={() => setPayment('1,600,000 ugx')}
                   >
                     1 year
                     <span className="text-sm">1,600,000 ugx</span>
@@ -405,6 +413,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
+                    onClick={() => setPayment('600,000 ugx')}
                   >
                     Monthly
                     <span className="text-sm">600,000 ugx</span>
@@ -412,6 +421,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
+                    onClick={() => setPayment('1,600,000 ugx')}
                   >
                     3 Months
                     <span className="text-sm">1,600,000 ugx</span>
@@ -419,6 +429,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
+                    onClick={() => setPayment('3,200,000 ugx')}
                   >
                     6 Months
                     <span className="text-sm">3,200,000 ugx</span>
@@ -629,6 +640,12 @@ function MobileView() {
           </TabPanel>
         </TabPanels>
       </Tabs>
+      <Box className="w-full z-50 -ml-3 flex justify-between backdrop-blur-md bg-light rounded-md">
+        <button className="bg-secondary rounded-lg w-full py-3 flex justify-between items-center">
+         <p className="ml-5">Buy</p>
+         <p className="mr-5">{payment}</p>
+        </button>
+      </Box>
     </Box>
   );
 }
