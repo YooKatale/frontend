@@ -1,30 +1,26 @@
 "use client";
 
-import {
-  Box,
-  Grid,
-  Text,
-  GridItem,
-  Card,
-  CardHeader,
-} from "@chakra-ui/react";
-import {
-  SmallCloseIcon,
-  CheckIcon,
-} from "@chakra-ui/icons";
+import { Box, Grid, Text, GridItem, Card, CardHeader } from "@chakra-ui/react";
+import { SmallCloseIcon, CheckIcon } from "@chakra-ui/icons";
 
 import React, { useState } from "react";
 import MobileView from "@components/advertising/mobile-view";
 
 const Advertising = () => {
-  const [activeCard, setActiveCard] = useState("card1");
+  const [activeCard, setActiveCard] = useState("basic");
+  const [activeButton, setActiveButton] = useState("weekly");
+  const [payment, setPayment] = useState('32,000 ugx');
   const handleCardClick = (cardId) => {
     setActiveCard(cardId);
+    // setPayment(null)
+  };
+  const handleButtonClick = (buttonId) => {
+    setActiveButton(buttonId);
   };
 
   return (
     <>
-        <MobileView />
+      <MobileView />
       <Box className="hidden md:block">
         <h1 className="ml-10 mt-10">Choose the plan that works for you</h1>
         <Box
@@ -144,11 +140,11 @@ const Advertising = () => {
               rowSpan={2}
               colSpan={1}
               className="cursor-pointer hidden md:block"
-              onClick={() => handleCardClick("card1")}
+              onClick={() => handleCardClick("basic")}
             >
               <Card
                 className={`${
-                  activeCard === "card1" ? "border-2 border-[#ffd900]" : ""
+                  activeCard === "basic" ? "border-2 border-[#ffd900]" : ""
                 }`}
               >
                 <CardHeader className="bg-light">Basic</CardHeader>
@@ -277,11 +273,11 @@ const Advertising = () => {
               rowSpan={2}
               colSpan={1}
               className="cursor-pointer hidden md:block"
-              onClick={() => handleCardClick("card2")}
+              onClick={() => handleCardClick("vip")}
             >
               <Card
                 className={`${
-                  activeCard === "card2" ? "border-2 border-[#ffd900]" : ""
+                  activeCard === "vip" ? "border-2 border-[#ffd900]" : ""
                 }`}
               >
                 <CardHeader className="bg-secondary">VIP</CardHeader>
@@ -408,6 +404,123 @@ const Advertising = () => {
             </GridItem>
           </Grid>
         </Box>
+        {activeCard === "basic" ? (
+          <Box className="w-full sticky flex justify-between h-60 backdrop-blur-md bg-light rounded-md">
+            <div className="flex items-center justify-center ml-10">
+              <button
+                onClick={() => {
+                  handleButtonClick("weekly")
+                  setPayment('32,000 ugx')
+                }}
+                className={`py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 ${
+                  activeButton === "weekly" ? "border-[#ffd900]" : ""
+                }`}
+              >
+                Weekly
+              </button>
+              <button
+                onClick={() => {
+                  handleButtonClick("monthly-basic")
+                  setPayment('92,000 ugx')
+                }}
+                className={`py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 ${
+                  activeButton === "monthly-basic" ? "border-[#ffd900]" : ""
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => {
+                  handleButtonClick("3months-basic")
+                  setPayment('300,000 ugx')
+                }}
+                className={`py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 ${
+                  activeButton === "3months-basic" ? "border-[#ffd900]" : ""
+                }`}
+              >
+                3 Months
+              </button>
+              <button
+                onClick={() => {
+                  handleButtonClick("6month-basic")
+                  setPayment('530,000 ugx')
+                }}
+                className={`py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 ${
+                  activeButton === "6month-basic" ? "border-[#ffd900]" : ""
+                }`}
+              >
+                6 Months
+              </button>
+              <button
+                onClick={() => {
+                  handleButtonClick("year")
+                  setPayment('1,600,000 ugx')
+                }}
+                className={`py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 ${
+                  activeButton === "year" ? "border-[#ffd900]" : ""
+                }`}
+              >
+                1 Year
+              </button>
+            </div>
+            <div className="flex items-center justify-center">
+              {
+                payment !== null && (
+                  <Text className="py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-green border border-gray-200 dark:border-gray-600">
+                {payment}
+              </Text>
+                )
+              }
+            </div>
+          </Box>
+        ) : (
+          <Box className="w-full sticky flex justify-between h-60 backdrop-blur-md bg-light rounded-md">
+            <div className="flex items-center justify-center ml-10">
+              <button
+                onClick={() => {
+                  handleButtonClick("monthly-vip");
+                  setPayment("600,000 ugx");
+                }}
+                className={`py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 ${
+                  activeButton === "monthly-vip" ? "border-[#ffd900]" : ""
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => {
+                  handleButtonClick("3months-vip");
+                  setPayment("1,600,000 ugx");
+                }}
+                className={`py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 ${
+                  activeButton === "3months-vip" ? "border-[#ffd900]" : ""
+                }`}
+              >
+                3 Months
+              </button>
+              <button
+                onClick={() => {
+                  handleButtonClick("6month-vip");
+                  setPayment("3,200,000 ugx");
+                }}
+                className={`py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 ${
+                  activeButton === "6month-vip" ? "border-[#ffd900]" : ""
+                }`}
+              >
+                6 Months
+              </button>
+            </div>
+            <div className="flex items-center justify-center">
+            {
+                payment !== null && (
+                  <Text className="py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-green border border-gray-200 dark:border-gray-600">
+                {payment}
+              </Text>
+                )
+              }
+            </div>
+          </Box>
+        )}
       </Box>
     </>
   );
