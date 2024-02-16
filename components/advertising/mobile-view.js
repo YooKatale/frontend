@@ -13,7 +13,7 @@ import { SmallCloseIcon, CheckIcon } from "@chakra-ui/icons";
 function MobileView() {
   return (
     <Box className="md:hidden py-3 px-4">
-      <Tabs variant="soft-rounded" colorScheme="green">
+      <Tabs variant="soft-rounded" colorScheme="yellow">
         <TabList>
           <Tab className="py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700  dark:border-gray-600">
             Basic
