@@ -23,7 +23,7 @@ function MobileView() {
           </Tab>
         </TabList>
         <TabPanels>
-          <TabPanel className="-ml-7">
+          <TabPanel className="-ml-7 -mr-7">
             <Card>
               <Tabs variant="unstyled">
                 <TabList className="overflow-x-auto">
@@ -66,7 +66,7 @@ function MobileView() {
                 <TabPanels>
                   <TabPanel>
                     <div>
-                      <ul className="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
+                      <ul className="max-w-md divide-y divide-dotted divide-gray-200 dark:divide-gray-700">
                         <li className="pb-3 sm:pb-4">
                           <div className="flex items-center space-x-4 rtl:space-x-reverse">
                             <div className="flex-1 min-w-0">
@@ -132,7 +132,7 @@ function MobileView() {
                   </TabPanel>
                   <TabPanel>
                     <div>
-                      <ul className="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
+                      <ul className="max-w-md divide-y divide-dotted divide-gray-200 dark:divide-gray-700">
                         <li className="pb-3 sm:pb-4">
                           <div className="flex items-center space-x-4 rtl:space-x-reverse">
                             <div className="flex-1 min-w-0">
@@ -198,7 +198,7 @@ function MobileView() {
                   </TabPanel>
                   <TabPanel>
                     <div>
-                      <ul className="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
+                      <ul className="max-w-md divide-y divide-dotted divide-gray-200 dark:divide-gray-700">
                         <li className="pb-3 sm:pb-4">
                           <div className="flex items-center space-x-4 rtl:space-x-reverse">
                             <div className="flex-1 min-w-0">
@@ -264,7 +264,7 @@ function MobileView() {
                   </TabPanel>
                   <TabPanel>
                     <div>
-                      <ul className="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
+                      <ul className="max-w-md divide-y divide-dotted divide-gray-200 dark:divide-gray-700">
                         <li className="pb-3 sm:pb-4">
                           <div className="flex items-center space-x-4 rtl:space-x-reverse">
                             <div className="flex-1 min-w-0">
@@ -330,7 +330,7 @@ function MobileView() {
                   </TabPanel>
                   <TabPanel>
                     <div>
-                      <ul className="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
+                      <ul className="max-w-md divide-y divide-dotted divide-gray-200 dark:divide-gray-700">
                         <li className="pb-3 sm:pb-4">
                           <div className="flex items-center space-x-4 rtl:space-x-reverse">
                             <div className="flex-1 min-w-0">
@@ -398,7 +398,7 @@ function MobileView() {
               </Tabs>
             </Card>
           </TabPanel>
-          <TabPanel className="-ml-7">
+          <TabPanel className="-ml-7 -mr-7">
             <Card>
               <Tabs variant="unstyled">
                 <TabList className="overflow-x-auto">
@@ -427,7 +427,7 @@ function MobileView() {
                 <TabPanels>
                   <TabPanel>
                     <div>
-                      <ul className="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
+                      <ul className="max-w-md divide-y divide-dotted divide-gray-200 dark:divide-gray-700">
                         <li className="pb-3 sm:pb-4">
                           <div className="flex items-center space-x-4 rtl:space-x-reverse">
                             <div className="flex-1 min-w-0">
@@ -493,7 +493,7 @@ function MobileView() {
                   </TabPanel>
                   <TabPanel>
                     <div>
-                      <ul className="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
+                      <ul className="max-w-md divide-y divide-dotted divide-gray-200 dark:divide-gray-700">
                         <li className="pb-3 sm:pb-4">
                           <div className="flex items-center space-x-4 rtl:space-x-reverse">
                             <div className="flex-1 min-w-0">
@@ -559,7 +559,7 @@ function MobileView() {
                   </TabPanel>
                   <TabPanel>
                     <div>
-                      <ul className="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
+                      <ul className="max-w-md divide-y divide-dotted divide-gray-200 dark:divide-gray-700">
                         <li className="pb-3 sm:pb-4">
                           <div className="flex items-center space-x-4 rtl:space-x-reverse">
                             <div className="flex-1 min-w-0">
