@@ -3,22 +3,18 @@
 import {
   Box,
   Grid,
-  Heading,
   Text,
   GridItem,
   Card,
   CardHeader,
-  SimpleGrid,
 } from "@chakra-ui/react";
-import { ThemeColors } from "@constants/constants";
 import {
   SmallCloseIcon,
   CheckIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
 } from "@chakra-ui/icons";
 
 import React, { useState } from "react";
+import MobileView from "@components/advertising/mobile-view";
 
 const Advertising = () => {
   const [activeCard, setActiveCard] = useState("card1");
@@ -28,13 +24,14 @@ const Advertising = () => {
 
   return (
     <>
-      <Box>
+        <MobileView />
+      <Box className="hidden md:block">
         <h1 className="ml-10 mt-10">Choose the plan that works for you</h1>
         <Box
           padding={{ base: "3rem 2rem", md: "3rem", xl: "3rem" }}
-          className="flex items-center justify-center sm:overflow-x md:overflow-x-hidden"
+          className="flex md:items-center md:justify-center sm:overflow-x md:overflow-x-hidden"
         >
-          <Grid templateColumns="repeat(3, 1fr)" gap={4}>
+          <Grid className="flex  md:grid-cols-3" gap={4}>
             <GridItem rowSpan={2} colSpan={1} className="mt-[68px]">
               <div className="w-full text-sm font-medium text-gray-900  rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 <Text
@@ -146,7 +143,7 @@ const Advertising = () => {
             <GridItem
               rowSpan={2}
               colSpan={1}
-              className="cursor-pointer"
+              className="cursor-pointer hidden md:block"
               onClick={() => handleCardClick("card1")}
             >
               <Card
@@ -279,7 +276,7 @@ const Advertising = () => {
             <GridItem
               rowSpan={2}
               colSpan={1}
-              className="cursor-pointer"
+              className="cursor-pointer hidden md:block"
               onClick={() => handleCardClick("card2")}
             >
               <Card
