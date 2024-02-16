@@ -35,13 +35,13 @@ const Advertising = () => {
           className="flex items-center justify-center sm:overflow-x md:overflow-x-hidden"
         >
           <Grid templateColumns="repeat(3, 1fr)" gap={4}>
-            <GridItem rowSpan={2} colSpan={1} className="mt-[63px]">
+            <GridItem rowSpan={2} colSpan={1} className="mt-[68px]">
               <div className="w-full text-sm font-medium text-gray-900  rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 <Text
                   aria-current="true"
                   className="block w-full py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
                 >
-                  Weekly
+                  <h1 className="font-bold">Weekly</h1>
                   <div className="">
                     <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
                       Adverts
@@ -61,7 +61,7 @@ const Advertising = () => {
                   </div>
                 </Text>
                 <Text className="block w-full py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                  Monthly
+                  <h1 className="font-bold">Monthly</h1>
                   <div className="">
                     <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
                       Adverts
@@ -82,7 +82,7 @@ const Advertising = () => {
                 </Text>
 
                 <Text className="block w-full py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                  3 Monthly
+                  <h1 className="font-bold">3 Monthly</h1>
                   <div className="">
                     <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
                       Adverts
@@ -102,7 +102,7 @@ const Advertising = () => {
                   </div>
                 </Text>
                 <Text className="block w-full py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                  6 Months
+                  <h1 className="font-bold">6 Months</h1>
                   <div className="">
                     <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
                       Adverts
@@ -122,7 +122,7 @@ const Advertising = () => {
                   </div>
                 </Text>
                 <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                  1 year
+                  <h1 className="font-bold">1 year</h1>
                   <div className="">
                     <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
                       Adverts
@@ -254,10 +254,7 @@ const Advertising = () => {
                     aria-current="true"
                     className="block w-full px-4 py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
                   >
-                    <div className="flex justify-between">
-                      1,600,000 ugx{" "}
-                      <ChevronDownIcon className="bg-light rounded-full w-5 h-5" />
-                    </div>
+                    <div className="flex justify-between">1,600,000 ugx</div>
                     <div className="">
                       <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
                         9 Adverts
@@ -370,7 +367,7 @@ const Advertising = () => {
                     3,200,000 ugx
                     <div className="">
                       <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                       6 Adverts
+                        6 Adverts
                       </Text>
                       <Text className="block w-full ml-10 py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
                         <CheckIcon />
