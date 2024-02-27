@@ -39,7 +39,6 @@ const Advertising = () => {
 
   const handleCardClick = (cardId) => {
     setActiveCard(cardId);
-    // setPayment(null)
   };
 
   const fetchAdvertisementPackages = async (req, res) => {
