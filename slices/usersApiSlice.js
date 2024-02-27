@@ -89,6 +89,19 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    advertisementPackageGet: builder.mutation({
+      query: () => ({
+        url: `${DB_URL}/advertisement/packages`,
+        method: "GET",
+      }),
+    }),
+    advertisementPost: builder.mutation({
+      query: (data) => ({
+        url: `${DB_URL}/advertisement`,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -106,4 +119,6 @@ export const {
   usePartnerPostMutation,
   useNewsArticlesFetchMutation,
   useNewsArticleFetchMutation,
+  useAdvertisementPackageGetMutation,
+  useAdvertisementPostMutation,
 } = usersApiSlice;

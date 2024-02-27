@@ -11,17 +11,50 @@ import {
 import { SmallCloseIcon, CheckIcon } from "@chakra-ui/icons";
 import React, { useState } from "react";
 
-function MobileView() {
-    const [payment, setPayment] = useState('32,000 ugx');
+function MobileView(props) {
+  const {
+    handlePayment,
+    advertisementPackages,
+    setAdvertId,
+    payment,
+    setPayment,
+  } = props;
+  const [active, setActive] = useState("Basic");
+  const basicPacks = advertisementPackages.filter(
+    (pack) => pack.type === "Basic"
+  );
+  const vipPacks = advertisementPackages.filter((pack) => pack.type === "Vip");
 
+  const handleBasicFilter = (period) => {
+    basicPacks
+      .filter((pack) => pack.period === period)
+      .map((pack) => {
+        setPayment(pack.price);
+        setAdvertId(pack._id);
+      });
+  };
+  const handleVipFilter = (period) => {
+    vipPacks
+      .filter((pack) => pack.period === period)
+      .map((pack) => {
+        setPayment(pack.price);
+        setAdvertId(pack._id);
+      });
+  };
   return (
     <Box className="md:hidden py-3 px-4">
       <Tabs variant="soft-rounded" colorScheme="yellow">
         <TabList>
-          <Tab className="py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700  dark:border-gray-600">
+          <Tab
+            onClick={() => setActive("Basic")}
+            className="py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700  dark:border-gray-600"
+          >
             Basic
           </Tab>
-          <Tab className="py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700  dark:border-gray-600">
+          <Tab
+            onClick={() => setActive("Vip")}
+            className="py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700  dark:border-gray-600"
+          >
             VIP
           </Tab>
         </TabList>
@@ -33,7 +66,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
-                    onClick={() => setPayment('32,000 ugx')}
+                    onClick={() => handleBasicFilter("weekly")}
                   >
                     Weekly
                     <span className="text-sm">32,000 ugx</span>
@@ -41,7 +74,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
-                    onClick={() => setPayment('92,000 ugx')}
+                    onClick={() => handleBasicFilter("monthly")}
                   >
                     Monthly
                     <span className="text-sm">92,000 ugx</span>
@@ -49,7 +82,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
-                    onClick={() => setPayment('300,000 ugx')}
+                    onClick={() => handleBasicFilter("3 months")}
                   >
                     3 Months
                     <span className="text-sm">300,000 ugx</span>
@@ -57,7 +90,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
-                    onClick={() => setPayment('530,000 ugx')}
+                    onClick={() => handleBasicFilter("6 months")}
                   >
                     6 Months
                     <span className="text-sm">530,000 ugx</span>
@@ -65,7 +98,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
-                    onClick={() => setPayment('1,600,000 ugx')}
+                    onClick={() => handleBasicFilter("1 year")}
                   >
                     1 year
                     <span className="text-sm">1,600,000 ugx</span>
@@ -413,7 +446,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
-                    onClick={() => setPayment('600,000 ugx')}
+                    onClick={() => handleVipFilter("monthly")}
                   >
                     Monthly
                     <span className="text-sm">600,000 ugx</span>
@@ -421,7 +454,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
-                    onClick={() => setPayment('1,600,000 ugx')}
+                    onClick={() => handleVipFilter("3 months")}
                   >
                     3 Months
                     <span className="text-sm">1,600,000 ugx</span>
@@ -429,7 +462,7 @@ function MobileView() {
                   <Tab
                     _selected={{ border: "1px", borderColor: "green" }}
                     className="flex flex-col"
-                    onClick={() => setPayment('3,200,000 ugx')}
+                    onClick={() => handleVipFilter("6 months")}
                   >
                     6 Months
                     <span className="text-sm">3,200,000 ugx</span>
@@ -641,10 +674,27 @@ function MobileView() {
         </TabPanels>
       </Tabs>
       <Box className="w-full z-50 -ml-3 flex justify-between backdrop-blur-md bg-light rounded-md">
-        <button className="bg-secondary rounded-lg w-full py-3 flex justify-between items-center">
-         <p className="ml-5">Buy</p>
-         <p className="mr-5">{payment}</p>
-        </button>
+        {active === "Basic" && basicPacks.length > 0 ? (
+          <button
+            onClick={handlePayment}
+            className="bg-secondary rounded-lg w-full py-3 flex justify-between items-center"
+          >
+            <p className="ml-5">Buy</p>
+            <p className="mr-5">{payment} ugx</p>
+          </button>
+        ) : (
+          active === "Vip" &&
+          vipPacks.length >
+            0 ? (
+              <button
+                onClick={handlePayment}
+                className="bg-secondary rounded-lg w-full py-3 flex justify-between items-center"
+              >
+                <p className="ml-5">Buy</p>
+                <p className="mr-5">{payment} ugx</p>
+              </button>
+            ) : null
+        )}
       </Box>
     </Box>
   );
