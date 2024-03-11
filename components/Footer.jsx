@@ -48,7 +48,7 @@ import {
 import axios from "axios";
 import { Loader } from "lucide-react";
 import NewsletterForm from "./NewsletterForm";
-import PopupAd from "./PopupAd";
+// import PopupAd from "./PopupAd";
 import { FaWhatsapp } from "react-icons/fa";
 import Image from "next/image";
 
@@ -103,7 +103,7 @@ const Footer = () => {
     <>
       {/* // modal newsletter form  */}
       <NewsletterForm />
-      <PopupAd />
+      {/* <PopupAd /> */}
 
       <Box borderTop={"1.7px solid " + ThemeColors.lightColor} id="refer">
         <Box padding={"1rem 0 2rem 0"} background={"#0c0c0c"}>
