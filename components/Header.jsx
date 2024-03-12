@@ -301,21 +301,24 @@ const Header = () => {
           }
           {/* Search */}
           <Box as="li">
-            <form onSubmit={handleSearchFormSubmit}>
-              <InputGroup size="sm">
-                <InputLeftElement pointerEvents="none">
-                  <FaSearch color="gray.300" />
-                </InputLeftElement>
-                <Input
-                  type="text"
-                  placeholder="Search..."
-                  variant="filled"
-                  value={searchParam}
-                  onChange={(e) => setSearchParam(e.target.value)}
-                />
-              </InputGroup>
-            </form>
-          </Box>
+  <form onSubmit={handleSearchFormSubmit}>
+    <InputGroup size="sm">
+      <InputLeftElement pointerEvents="none">
+        <FaSearch color="gray.300" />
+      </InputLeftElement>
+      <Input
+        type="text"
+        placeholder="Search..."
+        variant="filled"
+        value={searchParam}
+        onChange={(e) => setSearchParam(e.target.value)}
+      />
+      <Button type="submit" ml={2}>
+        Search
+      </Button>
+    </InputGroup>
+  </form>
+</Box>
         </Stack>
 
         {/* Right section */}

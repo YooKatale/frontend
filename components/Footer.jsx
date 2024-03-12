@@ -48,7 +48,7 @@ import {
 import axios from "axios";
 import { Loader } from "lucide-react";
 import NewsletterForm from "./NewsletterForm";
-// import PopupAd from "./PopupAd";
+//import PopupAd from "./PopupAd";
 import { FaWhatsapp } from "react-icons/fa";
 import Image from "next/image";
 
@@ -302,7 +302,7 @@ const Footer = () => {
                       </Link>
                     </Box>
                     <Box margin={"0.3rem 0"}>
-                      <Link href={"https://newsblog.yookatale.com"}>
+                      <Link href={"http://yookatale.com/news"}>
                         <Text
                           color={ThemeColors.lightColor}
                           _hover={{ color: ThemeColors.darkColor }}
