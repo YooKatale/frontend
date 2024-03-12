@@ -15,11 +15,20 @@ const nextConfig = {
       },
       {
         protocol: "http",
-        // hostname: "bwanamatayo.s3.ap-south-1.amazonaws.com",
         hostname: "localhost",
         port: "",
       },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: "/careers",
+        destination: "http://yookatale.com/careers",
+        permanent: true,
+      },
+      
+    ];
   },
 };
 
