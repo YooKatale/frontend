@@ -4,7 +4,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import Button from "@components/Button";
 
-import { MdOutlineLocationOn } from "react-icons/md";
 
 
 function Careers({ jobs }) {
