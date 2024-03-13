@@ -1,12 +1,11 @@
-
+"use client";
 
 import React from "react";
 import PropTypes from "prop-types";
 import Button from "@components/Button";
 
-
-
 function Careers({ jobs }) {
+  const { jobs } = props;
   return (
     <div className="w-full py-10 bg-secondary">
       
@@ -35,17 +34,18 @@ function Careers({ jobs }) {
 }
 
 
-const JobCard = ({
-  category,
-  title,
-  reportsTo,
-  employment,
-  terms,
-  location,
-  details,
-  salary,
-  closingDate,
-}) => {
+const JobCard = (props) => {
+  const {
+    category,
+    title,
+    reportsTo,
+    employment,
+    terms,
+    location,
+    details,
+    salary,
+    closingDate,
+  } = props;
   const [openDetails, setOpenDetails] = React.useState(false);
 
   return (
