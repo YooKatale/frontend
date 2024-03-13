@@ -20,16 +20,7 @@ const nextConfig = {
       },
     ],
   },
-  async redirects() {
-    return [
-      {
-        source: "/careers",
-        destination: "http://yookatale.com/careers",
-        permanent: true,
-      },
-      
-    ];
-  },
+
 };
 
 module.exports = nextConfig;
