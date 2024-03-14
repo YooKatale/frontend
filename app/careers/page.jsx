@@ -2,6 +2,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Button from "@components/Button";
+import MdOutlineLocationOn from '@mui/icons-material/OutlineLocationOn';
+
 
 function Careers({ jobs }) {
 
