@@ -321,13 +321,13 @@ const Footer = () => {
                         </Text>
                       </Link>
                     </Box>
-                    <Box margin={"0.3rem 0"}>
-                      <Link href={"/careers"}>
-                        <Text color={ThemeColors.lightColor} _hover={{ color: ThemeColors.darkColor }}>
-                          Careers
-                        </Text>
-                      </Link>
-                    </Box>
+                      <Box margin={"0.3rem 0"}>
+                        <Link href={"/careers"}>
+                          <Text color={ThemeColors.lightColor} _hover={{ color: ThemeColors.darkColor }}>
+                            Careers
+                          </Text>
+                        </Link>
+                      </Box>
                   </Stack>
                 </Box>
                 <Box
