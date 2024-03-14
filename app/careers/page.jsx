@@ -2,7 +2,7 @@
 import React from "react";
 import Button from "@components/Button";
 import { MdOutlineLocationOn } from "react-icons/md";
-import { jobs } from "@lib/constants/index"; // Importing the jobs array
+import { jobs } from "@lib/constants/index"; 
 
 function Careers() {
 
