@@ -1,15 +1,13 @@
 "use client";
 import React from "react";
-import PropTypes from "prop-types";
 import Button from "@components/Button";
 import { MdOutlineLocationOn } from "react-icons/md";
+import { jobs } from "@lib/constants/index"; // Importing the jobs array
 
-
-function Careers({ jobs }) {
+function Careers() {
 
   return (
     <div className="w-full py-10 bg-secondary">
-      
       <div className="lg:w-7/12 w-11/12 space-y-10 mx-auto">
         <div className="space-y-2 lg:space-y-3">
           <p className="text-2xl lg:w-10/12 mx-auto lg:text-5xl text-gray-800 font-semibold">
@@ -21,32 +19,28 @@ function Careers({ jobs }) {
         </div>
 
         <div className="lg:w-10/12 mx-auto space-y-10">
-          {jobs && Array.isArray(jobs) ? (
-            jobs.map((job, i) => <JobCard key={i} {...job} />)
+          {jobs && Array.isArray(jobs) && jobs.length > 0 ? (
+            jobs.map((job) => <JobCard key={job._id} {...job} />)
           ) : (
             <p>No jobs available</p>
           )}
         </div>
       </div>
-
-      
     </div>
   );
 }
 
-
-const JobCard = (props) => {
-  const {
-    category,
-    title,
-    reportsTo,
-    employment,
-    terms,
-    location,
-    details,
-    salary,
-    closingDate,
-  } = props;
+const JobCard = ({
+  category,
+  title,
+  reportsTo,
+  employment,
+  terms,
+  location,
+  details,
+  salary,
+  closingDate,
+}) => {
   const [openDetails, setOpenDetails] = React.useState(false);
 
   return (
@@ -116,21 +110,6 @@ const JobCard = (props) => {
       </div>
     </div>
   );
-};
-
-JobCard.propTypes = {
-  category: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  reportsTo: PropTypes.string.isRequired,
-  employment: PropTypes.string.isRequired,
-  terms: PropTypes.string.isRequired,
-  location: PropTypes.string.isRequired,
-  details: PropTypes.shape({
-    responsibilities: PropTypes.arrayOf(PropTypes.string.isRequired),
-    requirements: PropTypes.arrayOf(PropTypes.string.isRequired),
-  }).isRequired,
-  salary: PropTypes.string.isRequired,
-  closingDate: PropTypes.string.isRequired,
 };
 
 export default Careers;
