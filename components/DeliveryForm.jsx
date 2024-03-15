@@ -132,7 +132,17 @@ const VendorForm = () => {
   }
 
   return (
+ 
     <Box className="mx-auto p-4 bg-black mb-20 mt-20">
+
+        <Box
+      className="mx-auto p-4 bg-black mb-20 mt-20"
+      style={{ textAlign: 'center' }}
+    >
+      <p style={{color:'white', fontSize:'30px'}}>
+        Become a Deliverer!
+      </p>
+    </Box>
       <div className="flex flex-col lg:flex-row">
         <div className="p-4 md:w-2/5 rounded-xl bg-white">
           <p className="text-3xl text-left mb-4 text-dark">
@@ -145,7 +155,7 @@ const VendorForm = () => {
                 className="border-b border-dark italic hover:border-red focus:border-red px-2 py-1"
                 value={fullname}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="Name Lastname"
+                placeholder="Enter Full Name"
                 required
               />
             </FormControl>
@@ -280,10 +290,10 @@ const VendorForm = () => {
                     <span
                        className="icon-circle mr-6"
                        style={{
-                       backgroundColor: activeQuestion === index ? 'blue' : 'white',
+                       backgroundColor: activeQuestion === index ? 'black' : 'white',
                      }}
                     >
-                      <PlusOutlined style={{ color: activeQuestion === index ? 'white' : 'blue' }} />
+                      <PlusOutlined style={{ color: activeQuestion === index ? 'white' : 'black' }} />
                     </span>
                       {item.question}
                     </p>
