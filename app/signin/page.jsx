@@ -137,7 +137,7 @@ const SignIn = ({ redirect, callback }) => {
                 </FormControl>
                 <Box padding="1rem 0">
                   <Text display="flex">
-                    Create new account{" "}
+                    Create new account:{" "}
                     <Link
                       href={"/signup"}
                       style={{
@@ -149,6 +149,7 @@ const SignIn = ({ redirect, callback }) => {
                     </Link>
                   </Text>
                 </Box>
+               
                 <Box padding={"0"}>
                   <ButtonComponent
                     size={"regular"}
@@ -157,6 +158,21 @@ const SignIn = ({ redirect, callback }) => {
                     icon={isLoading && <Loader size={20} />}
                   />
                 </Box>
+
+
+                <Box
+                display="flex"
+                justifyContent="flex-end" 
+                marginTop="1rem">
+                <Text>
+                  <Link
+                    href={"/forgotpassword"}
+                    style={{ color: ThemeColors.darkColor }}
+                  >
+                    Forgot Password?
+                  </Link>
+                </Text>
+              </Box>
               </form>
             </Box>
           </Flex>
@@ -167,3 +183,4 @@ const SignIn = ({ redirect, callback }) => {
 };
 
 export default SignIn;
+
