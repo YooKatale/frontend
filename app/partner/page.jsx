@@ -1,4 +1,5 @@
 "use client";
+import React, { useState } from 'react';
 import {
   Box,
   FormControl,
@@ -7,15 +8,13 @@ import {
   Select,
   useToast
 } from '@chakra-ui/react';
-import { useState } from 'react';
-import { DB_URL } from '@config/config';
 import axios from 'axios';
 import ButtonComponent from '@components/Button';
 import { Loader } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeColors } from '@constants/constants';
-import VendorForm from '@components/DeliveryForm';
 import { PlusOutlined } from '@ant-design/icons';
+import VendorForm from '@components/DeliveryForm'; // Importing VendorForm
 
 const Partner = () => {
   const [formData, setFormData] = useState({
@@ -121,12 +120,27 @@ const Partner = () => {
 
   return (
     <div>
-      <VendorForm />
+     
+
+    
+
+<p style={{textAlign:'center', marginTop:'20px', fontSize:'50px'}}>
+  Partner With Us
+</p>
+      {/* Actual Vendor Form */}
       <Box
       className="mx-auto p-4 bg-black mb-20 mt-20"
       display="flex"
       flexDirection={{ base: 'column', lg: 'row' }}
     >
+      <Box
+      className="mx-auto p-4 bg-white mb-20 mt-20"
+      style={{ textAlign: 'center' }}
+    >
+      <p className="text-3xl text-left mb-4 text-dark">
+        Become Our Vendor Today!
+      </p>
+    </Box>
       <Box className="p-4 md:w-2/5 rounded-xl bg-white">
         <p className="text-3xl text-left mb-4 text-dark">
           Fill out the vendor form
@@ -236,6 +250,7 @@ const Partner = () => {
           </div>
         </form>
       </Box>
+      
       <Box className="p-4 w-full md:w-1/2 md:ml-5">
         <div className="mt-10">
           <div className="mt-10 text-white">
@@ -245,15 +260,15 @@ const Partner = () => {
                    <p
                     className="text-white font-bold text-sm md:text-xl mb-2"
                     onClick={() => handleQuestionClick(index)}
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: 'pointer', borderRadius: '2px' }}
                     >
                     <span
                        className="icon-circle mr-6"
                        style={{
-                       backgroundColor: activeQuestion === index ? 'blue' : 'white',
+                       backgroundColor: activeQuestion === index ? 'black' : 'white',
                      }}
                     >
-                      <PlusOutlined style={{ color: activeQuestion === index ? 'white' : 'blue' }} />
+                      <PlusOutlined style={{ color: activeQuestion === index ? 'white' : 'black' }} />
                     </span>
                       {item.question}
                     </p>
@@ -267,7 +282,15 @@ const Partner = () => {
           </div>
         </div>
       </Box>
-    </Box>
+      </Box>
+
+      {/* Vendor Form from components */}
+      <VendorForm />
+
+      {/* Frequently Asked Questions */}
+      <Box className="p-4 w-full md:w-1/2 md:ml-5">
+        {/* FAQ Items */}
+      </Box>
     </div>
   );
 };
