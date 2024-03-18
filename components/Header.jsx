@@ -302,8 +302,8 @@ const Header = () => {
           {/* Search */}
           <Box as="li">
           <form onSubmit={handleSearchFormSubmit} className="flex items-center">
-  <InputGroup size="sm">
-    <InputLeftElement pointerEvents="none">
+  <InputGroup size="sm" style={{ height: '2.5rem' }}>
+    <InputLeftElement pointerEvents="none" style={{ height: '100%' }}>
       <FaSearch color="gray.300" />
     </InputLeftElement>
     <Input
@@ -313,19 +313,21 @@ const Header = () => {
       value={searchParam}
       onChange={(e) => setSearchParam(e.target.value)}
       _focus={{
-        borderColor: 'teal.500',
-        boxShadow: '0 0 0 1px teal.500',
+        borderColor: 'green', 
+        boxShadow: '0 0 0 1px green',
       }}
-      rounded="md" 
+      rounded="md"
+      style={{ height: '100%', borderTopRightRadius: 0, borderBottomRightRadius: 0 }} 
     />
   </InputGroup>
   <Button
     type="submit"
-    style={{ color: 'white', backgroundColor: 'green', cursor: 'pointer', transition: 'none' }}
+    style={{ color: 'white', backgroundColor: 'green', cursor: 'pointer', transition: 'none', height: '2.5rem', borderRadius: 0 }} 
   >
     Search 
   </Button>
 </form>
+
 
 </Box>
         </Stack>
