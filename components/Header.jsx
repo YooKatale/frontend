@@ -321,7 +321,7 @@ const Header = () => {
   </InputGroup>
   <Button
     type="submit"
-    ml={2}
+    
    style={{color:'white', bg:'green', cursor:'pointer'}}
   >
     Search 
