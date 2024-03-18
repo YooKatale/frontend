@@ -322,12 +322,7 @@ const Header = () => {
   <Button
     type="submit"
     ml={2}
-    bg="green" 
-    variant="solid"
-  
-    _active={{ 
-      bg: 'teal.600',
-    }}
+   style={{color:'white', bg:'green', cursor:'pointer'}}
   >
     Search 
   </Button>
