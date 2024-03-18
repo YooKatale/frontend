@@ -13,9 +13,10 @@ import axios from 'axios';
 import ButtonComponent from '@components/Button';
 import { Loader } from 'lucide-react';
 import Link from 'next/link';
+import VendorForm from '@components/DeliveryForm'; 
 import { ThemeColors } from '@constants/constants';
 import { PlusOutlined } from '@ant-design/icons';
-import VendorForm from '@components/DeliveryForm'; 
+
 
 const Partner = () => {
   const [formData, setFormData] = useState({
@@ -121,23 +122,14 @@ const Partner = () => {
 
   return (
     <div>
-      <p style={{textAlign:'center', marginTop:'20px', fontSize:'50px'}}>
-        Partner With Us
-      </p>
+       <VendorForm />
      
       <Box
         className="mx-auto p-4 bg-black mb-20 mt-20"
         display="flex"
         flexDirection={{ base: 'column', lg: 'row' }}
       >
-        <Box
-          className="mx-auto p-4 bg-white mb-20 mt-20"
-          style={{ textAlign: 'center' }}
-        >
-          <p className="text-3xl text-left mb-4 text-dark">
-            Become Our Vendor Today!
-          </p>
-        </Box>
+        
         <Box className="p-4 md:w-2/5 rounded-xl bg-white">
           <p className="text-3xl text-left mb-4 text-dark">
             Fill out the vendor form
@@ -288,7 +280,7 @@ const Partner = () => {
       </Box>
 
  
-      <VendorForm />
+     
 
       {/* Frequently Asked Questions */}
       <Box className="p-4 w-full md:w-1/2 md:ml-5">

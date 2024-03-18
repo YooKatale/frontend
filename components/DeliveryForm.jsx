@@ -134,15 +134,6 @@ const VendorForm = () => {
   return (
  
     <Box className="mx-auto p-4 bg-black mb-20 mt-20">
-
-        <Box
-      className="mx-auto p-4 bg-black mb-20 mt-20"
-      style={{ textAlign: 'center' }}
-    >
-      <p style={{color:'white', fontSize:'30px'}}>
-        Become a Deliverer!
-      </p>
-    </Box>
       <div className="flex flex-col lg:flex-row">
         <div className="p-4 md:w-2/5 rounded-xl bg-white">
           <p className="text-3xl text-left mb-4 text-dark">
