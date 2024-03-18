@@ -321,12 +321,12 @@ const Header = () => {
   </InputGroup>
   <Button
     type="submit"
-    
-   style={{color:'white', bg:'green', cursor:'pointer'}}
+    style={{ color: 'white', backgroundColor: 'green', cursor: 'pointer', transition: 'none' }}
   >
     Search 
   </Button>
 </form>
+
 </Box>
         </Stack>
 
