@@ -316,7 +316,7 @@ const Header = () => {
         borderColor: 'teal.500',
         boxShadow: '0 0 0 1px teal.500',
       }}
-      rounded="full" 
+      rounded="md" 
     />
   </InputGroup>
   <Button
