@@ -29,7 +29,7 @@ const VendorForm = () => {
   const [vegan, setVegan] = useState(false);
   const [terms, setTerms] = useState(false);
   const [activeQuestion, setActiveQuestion] = useState(null);
-
+  const [numberPlate, setNumber] = useState('');
   const chakraToast = useToast();
 
 
@@ -132,6 +132,7 @@ const VendorForm = () => {
   }
 
   return (
+ 
     <Box className="mx-auto p-4 bg-black mb-20 mt-20">
       <div className="flex flex-col lg:flex-row">
         <div className="p-4 md:w-2/5 rounded-xl bg-white">
@@ -145,7 +146,7 @@ const VendorForm = () => {
                 className="border-b border-dark italic hover:border-red focus:border-red px-2 py-1"
                 value={fullname}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="Name Lastname"
+                placeholder="Enter Full Name"
                 required
               />
             </FormControl>
@@ -222,6 +223,21 @@ const VendorForm = () => {
                 <option value="motorcycle">Motorcycle</option>
               </Select>
             </FormControl>
+            <FormControl className="mb-4">
+              {transport !== 'bike' && ( // Conditionally render based on selected transport
+                <>
+                  <FormLabel>Number Plate</FormLabel>
+                  <Input
+                    className="border border-dark italic hover:border-red focus:border-red rounded px-2 py-1"
+                    value={numberPlate}
+                    onChange={(event) => setNumberPlate(event.target.value)}
+                    placeholder="Enter Number Plate"
+                    required
+                  />
+                </>
+              )}
+            </FormControl>
+
             <Box padding="0.5rem 0">
               <div className="flex">
                 <input
@@ -280,10 +296,10 @@ const VendorForm = () => {
                     <span
                        className="icon-circle mr-6"
                        style={{
-                       backgroundColor: activeQuestion === index ? 'blue' : 'white',
+                       backgroundColor: activeQuestion === index ? 'black' : 'white',
                      }}
                     >
-                      <PlusOutlined style={{ color: activeQuestion === index ? 'white' : 'blue' }} />
+                      <PlusOutlined style={{ color: activeQuestion === index ? 'white' : 'black' }} />
                     </span>
                       {item.question}
                     </p>

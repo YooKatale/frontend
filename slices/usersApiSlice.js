@@ -1,5 +1,3 @@
-// "use client";
-
 import { apiSlice } from "./apiSlice";
 import { DB_URL } from "@config/config";
 
@@ -102,6 +100,20 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    forgotPassword: builder.mutation({ // Move forgotPassword mutation outside advertisementPost
+      query: (data) => ({
+        url: `${DB_URL}/auth/forgot-password`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    resetPassword: builder.mutation({
+      query: (data) => ({
+        url: `${DB_URL}/auth/reset-password`, // Adjust the URL as per your server API
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -121,4 +133,6 @@ export const {
   useNewsArticleFetchMutation,
   useAdvertisementPackageGetMutation,
   useAdvertisementPostMutation,
+  useForgotPasswordMutation, 
+  useResetPasswordMutation,
 } = usersApiSlice;
