@@ -322,11 +322,9 @@ const Header = () => {
   <Button
     type="submit"
     ml={2}
-    colorScheme="green" 
+    bg="green" 
     variant="solid"
-    _hover={{
-      bg: 'teal.600',
-    }}
+  
     _active={{ 
       bg: 'teal.600',
     }}
