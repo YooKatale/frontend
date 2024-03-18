@@ -322,7 +322,7 @@ const Header = () => {
   </InputGroup>
   <Button
     type="submit"
-    style={{ color: 'white', backgroundColor: 'green', cursor: 'pointer', transition: 'none', height: '2.5rem', borderRadius: 0 }} 
+    style={{ color: 'white', backgroundColor: 'green', cursor: 'pointer', transition: 'none', height: '2.5rem', borderRadius: '1px' }} 
   >
     Search 
   </Button>
