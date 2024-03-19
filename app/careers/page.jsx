@@ -1,8 +1,8 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Button from "@components/Button";
 import { MdOutlineLocationOn } from "react-icons/md";
-import { jobs } from "@lib/constants/index"; // Importing the jobs array
+import { jobs } from "@lib/constants/index"; 
 
 function Careers() {
 
@@ -41,84 +41,214 @@ const JobCard = ({
   salary,
   closingDate,
 }) => {
-  const [openDetails, setOpenDetails] = React.useState(false);
+  const [openDetails, setOpenDetails] = useState(false);
+  const [showApplyForm, setShowApplyForm] = useState(false);
+
+  const toggleApplyForm = () => {
+    setShowApplyForm(!showApplyForm);
+  };
 
   return (
     <div className="w-full border-2 lg:border-4 bg-white drop-shadow-secondary lg:drop-shadow-main transition-all duration-300 ease-in-out space-y-2 lg:space-y-5 border-gray-800 p-5">
-  <p className="lg:text-xs text-lg font-semibold">{category}</p>
-  <p className="text-3xl font-semibold">{title}</p>
-  <div className="ml-1 lg:ml-5">
-    <p className="lg:text-lg text-sm text-gray-800">
-      <span className="font-semibold">Reports to:</span> {reportsTo}
-    </p>
-    <p className="lg:text-lg text-sm text-gray-800">
-      <span className="font-semibold">Employment : </span>
-      {employment}
-    </p>
-    <p className="text-sm lg:text-lg text-gray-800">
-      <span className="font-semibold">Employment terms :</span> {terms}
-    </p>
-    <p className="text-sm lg:text-lg text-gray-800">
-      <span className="font-semibold">Salary :</span> {salary}
-    </p>
-    <p className="text-sm lg:text-lg text-gray-800">
-      <span className="font-semibold">To Apply: </span>Send resume
-      <span className="text-blue-700"> info@yookatale.com</span>
-    </p>
-    <p className="text-sm lg:text-lg text-gray-800">
-      <span className="font-semibold">Closing Date</span> {closingDate}
-    </p>
-  </div>
+      <p className="lg:text-xs text-lg font-semibold">{category}</p>
+      <p className="text-3xl font-semibold">{title}</p>
+      <div className="ml-1 lg:ml-5">
+        <p className="lg:text-lg text-sm text-gray-800">
+          <span className="font-semibold">Reports to:</span> {reportsTo}
+        </p>
+        <p className="lg:text-lg text-sm text-gray-800">
+          <span className="font-semibold">Employment : </span>
+          {employment}
+        </p>
+        <p className="text-sm lg:text-lg text-gray-800">
+          <span className="font-semibold">Employment terms :</span> {terms}
+        </p>
+        <p className="text-sm lg:text-lg text-gray-800">
+          <span className="font-semibold">Salary :</span> {salary}
+        </p>
+        <p className="text-sm lg:text-lg text-gray-800">
+          <span className="font-semibold">To Apply: </span>Send resume
+          <span className="text-blue-700"> info@yookatale.com</span>
+        </p>
+        <p className="text-sm lg:text-lg text-gray-800">
+          <span className="font-semibold">Closing Date</span> {closingDate}
+        </p>
+      </div>
 
-<br/>
- 
-  <button disabled={true} style={{ margin: '5px', padding: '5px', background: 'lightgray', border: '2px solid black', display: 'flex', alignItems: 'center' }}>
-  <MdOutlineLocationOn className="lg:text-xl text-sm" />
-  <div style={{ marginLeft: '5px' }}>{location}</div>
-</button>
+      <br/>
+      
+      
+      <button disabled={true} style={{ margin: '5px', padding: '5px', background: 'lightgray', border: '2px solid black', display: 'flex', alignItems: 'center' }}>
+        <MdOutlineLocationOn className="lg:text-xl text-sm" />
+        <div style={{ marginLeft: '5px' }}>{location}</div>
+      </button>
 
-  <br/>
-  <button
-  onClick={() => setOpenDetails(!openDetails)}
-  style={{
-    margin: '5px',
-    padding: '5px',
-    background: 'lightgray',
-    border: '2px solid black',
-    boxShadow: openDetails ? 'none' : '1px 0 2px rgba(0, 0, 0, 0.1)', 
-  }}
->
-  {openDetails ? "Close Details" : "View Details"}
-</button>
+      <br/>
+      <button
+        onClick={() => setOpenDetails(!openDetails)}
+        style={{
+          margin: '5px',
+          padding: '5px',
+          background: 'lightgray',
+          border: '2px solid black',
+          boxShadow: openDetails ? 'none' : '1px 0 2px rgba(0, 0, 0, 0.1)', 
+        }}
+      >
+        {openDetails ? "Close Details" : "View Details"}
+      </button>
+      <button
+        style={{
+          margin: "5px",
+          padding: "5px",
+          background: "lightgray",
+          border: "2px solid black",
+          alignItems: "center",
+          boxShadow: '1px 0 2px rgba(0, 0, 0, 0.1)',
+          width: "80px"
+        }}
+        onClick={toggleApplyForm}
+      >
+        Apply
+      </button>
 
+      <div
+        className={`transition-all lg:border-l lg:ml-10 border-gray-800 duration-500 ease-in-out lg:w-10/12 lg:p-2 py-2 lg:pl-5 rounded ${
+          openDetails ? "block" : "hidden"
+        }`}
+      >
+        <p className="font-semibold mb-4">Key Responsibilities</p>
+        <ul className="list-disc list-inside">
+          {details.responsibilities.map((item, i) => (
+            <li className="lg:ml-5 text-xs lg:text-sm" key={i}>
+              {item}
+            </li>
+          ))}
+        </ul>
 
-              
+        <p className="font-semibold mb-4 mt-10">Key Requirements</p>
+        <ul className="list-disc list-inside">
+          {details.requirements.map((item, i) => (
+            <li className="lg:ml-5 text-xs lg:text-sm" key={i}>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
 
+      {showApplyForm && <ApplyForm />}
+    </div>
+  );
+};
 
-  <div
-    className={`transition-all lg:border-l lg:ml-10 border-gray-800 duration-500 ease-in-out lg:w-10/12 lg:p-2 py-2 lg:pl-5 rounded ${
-      openDetails ? "block" : "hidden"
-    }`}
-  >
-    <p className="font-semibold mb-4">Key Responsibilities</p>
-    <ul className="list-disc list-inside">
-      {details.responsibilities.map((item, i) => (
-        <li className="lg:ml-5 text-xs lg:text-sm" key={i}>
-          {item}
-        </li>
-      ))}
-    </ul>
+const ApplyForm = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    coverLetter: "",
+    cv: null
+  });
 
-    <p className="font-semibold mb-4 mt-10">Key Requirements</p>
-    <ul className="list-disc list-inside">
-      {details.requirements.map((item, i) => (
-        <li className="lg:ml-5 text-xs lg:text-sm" key={i}>
-          {item}
-        </li>
-      ))}
-    </ul>
-  </div>
-</div>
+  const handleChange = (e) => {
+    if (e.target.name === "cv") {
+      setFormData({ ...formData, [e.target.name]: e.target.files[0] });
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form submitted with data:", formData);
+    s
+    setFormData({ name: "", email: "", phone: "", coverLetter: "", cv: null });
+  };
+
+  return (
+    <div className="mt-4">
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label className="block text-sm font-semibold mb-1" htmlFor="name">
+            Name:
+          </label>
+          <input
+            className="border rounded px-2 py-1 w-full"
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-semibold mb-1" htmlFor="email">
+            Email:
+          </label>
+          <input
+            className="border rounded px-2 py-1 w-full"
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-semibold mb-1" htmlFor="phone">
+            Phone:
+          </label>
+          <input
+            className="border rounded px-2 py-1 w-full"
+            type="tel"
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label
+            className="block text-sm font-semibold mb-1"
+            htmlFor="coverLetter"
+          >
+            Cover Letter: (2500 Characters)
+          </label>
+          <textarea
+            className="border rounded px-2 py-1 w-full"
+            id="coverLetter"
+            name="coverLetter"
+            value={formData.coverLetter}
+            onChange={handleChange}
+            required
+          ></textarea>
+        </div>
+        <div className="mb-4">
+          <label
+            className="block text-sm font-semibold mb-1"
+            htmlFor="cv"
+          >
+            Attach CV (Resume):
+          </label>
+          <input
+            className="border rounded px-2 py-1 w-full"
+            type="file"
+            id="cv"
+            name="cv"
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          className="text-white font-bold py-2 px-4 rounded"
+          style={{backgroundColor:'black', color:'white'}}
+        >
+          Apply
+        </button>
+      </form>
+    </div>
   );
 };
 
