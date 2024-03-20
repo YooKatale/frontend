@@ -45,7 +45,13 @@ const JobCard = ({
   const [showApplyForm, setShowApplyForm] = useState(false);
 
   const toggleApplyForm = () => {
-    setShowApplyForm(!showApplyForm);
+    setOpenDetails(false);
+    setShowApplyForm(prevState => !prevState);
+  };
+
+  const toggleDetails = () => {
+    setShowApplyForm(false); 
+    setOpenDetails(prevState => !prevState);
   };
 
   return (
@@ -114,8 +120,7 @@ const JobCard = ({
       <div
         className={`transition-all lg:border-l lg:ml-10 border-gray-800 duration-500 ease-in-out lg:w-10/12 lg:p-2 py-2 lg:pl-5 rounded ${
           openDetails ? "block" : "hidden"
-        }`}
-      >
+        }`}>
         <p className="font-semibold mb-4">Key Responsibilities</p>
         <ul className="list-disc list-inside">
           {details.responsibilities.map((item, i) => (
