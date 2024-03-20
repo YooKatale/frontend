@@ -43,6 +43,13 @@ const JobCard = ({
 }) => {
   const [openDetails, setOpenDetails] = useState(false);
   const [showApplyForm, setShowApplyForm] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    coverLetter: "",
+    cv: null
+  });
 
   const toggleApplyForm = () => {
     setOpenDetails(false);
@@ -161,12 +168,23 @@ const ApplyForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted with data:", formData);
-    s
-    setFormData({ name: "", email: "", phone: "", coverLetter: "", cv: null });
-  };
+    try {
+        const formDataToSend = new FormData();
+        formDataToSend.append("name", formData.name);
+        formDataToSend.append("email", formData.email);
+        formDataToSend.append("phone", formData.phone);
+        formDataToSend.append("coverLetter", formData.coverLetter);
+        formDataToSend.append("resume", formData.cv);
+
+        const response = await axios.post("https://yookatale-server.onrender.com/api/applications", formDataToSend);
+        console.log("Application submitted successfully:", response.data);
+    } catch (error) {
+        console.error("Error submitting application:", error);
+    }
+};
+
 
   return (
     <div className="mt-4">
