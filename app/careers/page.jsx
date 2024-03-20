@@ -91,7 +91,7 @@ const JobCard = ({
 
       <br/>
       <button
-        onClick={() => setOpenDetails(!openDetails)}
+        onClick={toggleDetails}
         style={{
           margin: '5px',
           padding: '5px',
