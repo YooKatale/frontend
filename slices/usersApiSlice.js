@@ -100,16 +100,16 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    forgotPassword: builder.mutation({ // Move forgotPassword mutation outside advertisementPost
+    forgotPassword: builder.mutation({
       query: (data) => ({
-        url: `${DB_URL}/auth/forgot-password`,
-        method: "POST",
+        url: `${DB_URL}/auth/forgot-password/`,
+        method: "PUT",
         body: data,
       }),
     }),
     resetPassword: builder.mutation({
       query: (data) => ({
-        url: `${DB_URL}/auth/reset-password`, // Adjust the URL as per your server API
+        url: `${DB_URL}/auth/reset-password`,
         method: "POST",
         body: data,
       }),

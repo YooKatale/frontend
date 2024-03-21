@@ -1,46 +1,51 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Button, FormControl, FormLabel, Input, Text, useToast } from "@chakra-ui/react";
-import { useForgotPasswordMutation } from "@slices/usersApiSlice"; 
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
+import { useResetPasswordMutation } from "@slices/usersApiSlice";
 import Link from "next/link";
+import { useRouter } from 'next/navigation'
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setLoading] = useState(false);
-  const [isLinkSent, setLinkSent] = useState(false); 
+  const [isLinkSent, setLinkSent] = useState(false);
   const toast = useToast();
+  const router = useRouter()
 
-  const [forgotPassword] = useForgotPasswordMutation(); 
-
+  const [resetPassword] = useResetPasswordMutation();
+  // const resetLink = `${window.location.origin}/resetpassword/page.jsx`;
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await forgotPassword({ email });
+      const response = await resetPassword({ email });
+      if(response.data.status === 200){
+        toast({
+          title: "Password Reset Request Sent",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        router.push(`/resetpassword/${response.data.token}`)
+        setLoading(false);
+        setLinkSent(true);
+      }
       setLoading(false);
-      setLinkSent(true);
-  
-      const resetLink = `${window.location.origin}/resetpassword/page.jsx`;
-      toast({
-        title: "Password Reset Link Sent",
-        description: (
-          <>
-            A password reset link has been sent to {email}.{" "}
-            <Link href={resetLink} style={{ textDecoration: "underline" }}>
-              Click here to reset your password.
-            </Link>
-          </>
-        ),
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
+      setLinkSent(false);
     } catch (error) {
       setLoading(false);
       toast({
         title: "Error",
-        description: "Failed to send password reset link. Please try again later.",
+        description: "Email address not found.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -50,10 +55,12 @@ const ForgotPasswordPage = () => {
 
   return (
     <Box maxW="md" mx="auto" mt="8" style={{ height: "400px" }}>
-      <p style={{ textAlign: "center", fontSize: "30px" }}>Recover Your Account</p>
+      <p style={{ textAlign: "center", fontSize: "30px" }}>
+        Recover Your Account
+      </p>
       <br />
       <br />
-      {!isLinkSent ? ( 
+      {!isLinkSent ? (
         <form onSubmit={handleSubmit}>
           <FormControl id="email" isRequired>
             <FormLabel>Email address</FormLabel>
@@ -82,7 +89,9 @@ const ForgotPasswordPage = () => {
         </form>
       ) : (
         <Text textAlign="center" fontSize="lg">
-          Password reset link has been sent to your email. Please check your inbox (and spam folder) for further instructions.
+          {/* Password reset link has been sent to your email. Please check your
+          inbox (and spam folder) for further instructions. */}
+          Password reset request has been sent. Please wait to be redirected.
         </Text>
       )}
       <br />
