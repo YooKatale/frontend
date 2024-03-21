@@ -1,8 +1,16 @@
 "use client";
+
 import React, { useState } from "react";
 import Button from "@components/Button";
 import { MdOutlineLocationOn } from "react-icons/md";
 import { jobs } from "@lib/constants/index"; 
+import axios from "axios";
+import 'firebase/database';
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
+import { sendDatabaseLink } from '@slices/applicationSlice';
+
+
 
 function Careers() {
 
@@ -43,13 +51,6 @@ const JobCard = ({
 }) => {
   const [openDetails, setOpenDetails] = useState(false);
   const [showApplyForm, setShowApplyForm] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    coverLetter: "",
-    cv: null
-  });
 
   const toggleApplyForm = () => {
     setOpenDetails(false);
@@ -60,6 +61,7 @@ const JobCard = ({
     setShowApplyForm(false); 
     setOpenDetails(prevState => !prevState);
   };
+
 
   return (
     <div className="w-full border-2 lg:border-4 bg-white drop-shadow-secondary lg:drop-shadow-main transition-all duration-300 ease-in-out space-y-2 lg:space-y-5 border-gray-800 p-5">
@@ -157,7 +159,7 @@ const ApplyForm = () => {
     name: "",
     email: "",
     coverLetter: "",
-    cv: null
+    cv: null,
   });
 
   const handleChange = (e) => {
@@ -171,19 +173,60 @@ const ApplyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const formDataToSend = new FormData();
-        formDataToSend.append("name", formData.name);
-        formDataToSend.append("email", formData.email);
-        formDataToSend.append("phone", formData.phone);
-        formDataToSend.append("coverLetter", formData.coverLetter);
-        formDataToSend.append("resume", formData.cv);
 
-        const response = await axios.post("https://yookatale-server.onrender.com/api/applications", formDataToSend);
-        console.log("Application submitted successfully:", response.data);
-    } catch (error) {
-        console.error("Error submitting application:", error);
-    }
-};
+      const firebaseConfig = {
+        apiKey: "AIzaSyDzELH4X4U7ysiyn7CpNUuR3xbv8vNj1dw",
+        authDomain: "yookatale-298c7.firebaseapp.com",
+        projectId: "yookatale-298c7",
+        storageBucket: "yookatale-298c7.appspot.com",
+        messagingSenderId: "184298082840",
+        appId: "1:184298082840:web:dc701afb9cf97ccc27696d",
+        measurementId: "G-1LENC2YK54"
+      };
+      
+       
+       const app = initializeApp(firebaseConfig);
+       const analytics = getAnalytics(app);
+ 
+       
+       if (!firebase.apps.length) {
+         firebase.initializeApp(firebaseConfig);
+       }
+ 
+      
+       const db = firebase.database();
+ 
+      
+       const applicationsRef = db.ref("applications");
+ 
+       const newApplicationRef = applicationsRef.push();
+       await newApplicationRef.set(formData);
+ 
+ 
+       const databaseLink = `https://yookatale-298c7.firebaseio.com/applications/${newApplicationRef.key}`;
+  
+     
+       await sendDatabaseLink(databaseLink);
+
+       setFormData({
+         name: "",
+         email: "",
+         coverLetter: "",
+         cv: null,
+       });
+   
+      
+       alert("Application submitted successfully!");
+     } catch (error) {
+    
+       console.error("Error submitting application:", error);
+ 
+
+       alert("Error submitting application. Please try again later.");
+     }
+   };
+ 
+
 
 
   return (
