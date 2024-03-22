@@ -10,8 +10,6 @@ import { sendDatabaseLink } from '@slices/applicationSlice';
 import firebaseConfig from '@config/firebaseConfig';
 import { getDatabase, ref, push, set } from 'firebase/database';
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
 function Careers() {
 
@@ -172,6 +170,9 @@ const ApplyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+
       const db = getDatabase();
       const applicationsRef = ref(db, 'applications');
       const newApplicationRef = push(applicationsRef);
