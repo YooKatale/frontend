@@ -4,13 +4,10 @@ import React, { useState } from "react";
 import Button from "@components/Button";
 import { MdOutlineLocationOn } from "react-icons/md";
 import { jobs } from "@lib/constants/index"; 
-import axios from "axios";
-import 'firebase/database';
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { sendDatabaseLink } from '@slices/applicationSlice';
-
-
+import firebaseConfig from '@config/firebaseConfig';
 
 function Careers() {
 
@@ -62,7 +59,6 @@ const JobCard = ({
     setOpenDetails(prevState => !prevState);
   };
 
-
   return (
     <div className="w-full border-2 lg:border-4 bg-white drop-shadow-secondary lg:drop-shadow-main transition-all duration-300 ease-in-out space-y-2 lg:space-y-5 border-gray-800 p-5">
       <p className="lg:text-xs text-lg font-semibold">{category}</p>
@@ -91,7 +87,6 @@ const JobCard = ({
       </div>
 
       <br/>
-      
       
       <button disabled={true} style={{ margin: '5px', padding: '5px', background: 'lightgray', border: '2px solid black', display: 'flex', alignItems: 'center' }}>
         <MdOutlineLocationOn className="lg:text-xl text-sm" />
@@ -173,61 +168,31 @@ const ApplyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+ 
+      const db = getDatabase();
+      const applicationsRef = ref(db, 'applications');
+      const newApplicationRef = push(applicationsRef);
+      await set(newApplicationRef, formData);
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyDzELH4X4U7ysiyn7CpNUuR3xbv8vNj1dw",
-        authDomain: "yookatale-298c7.firebaseapp.com",
-        projectId: "yookatale-298c7",
-        storageBucket: "yookatale-298c7.appspot.com",
-        messagingSenderId: "184298082840",
-        appId: "1:184298082840:web:dc701afb9cf97ccc27696d",
-        measurementId: "G-1LENC2YK54"
-      };
-      
-       
-       const app = initializeApp(firebaseConfig);
-       const analytics = getAnalytics(app);
- 
-       
-       if (!firebase.apps.length) {
-         firebase.initializeApp(firebaseConfig);
-       }
- 
-      
-       const db = firebase.database();
- 
-      
-       const applicationsRef = db.ref("applications");
- 
-       const newApplicationRef = applicationsRef.push();
-       await newApplicationRef.set(formData);
- 
- 
-       const databaseLink = `https://yookatale-298c7.firebaseio.com/applications/${newApplicationRef.key}`;
+      const databaseLink = `https://yookatale-298c7.firebaseio.com/applications/${newApplicationRef.key}`;
   
-     
-       await sendDatabaseLink(databaseLink);
+      await sendDatabaseLink(databaseLink);
 
-       setFormData({
-         name: "",
-         email: "",
-         coverLetter: "",
-         cv: null,
-       });
-   
-      
-       alert("Application submitted successfully!");
-     } catch (error) {
-    
-       console.error("Error submitting application:", error);
- 
+      setFormData({
+        name: "",
+        email: "",
+        coverLetter: "",
+        cv: null,
+      });
 
-       alert("Error submitting application. Please try again later.");
-     }
-   };
- 
-
-
+      alert("Application submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      alert("Error submitting application. Please try again later.");
+    }
+  };
 
   return (
     <div className="mt-4">
@@ -261,24 +226,7 @@ const ApplyForm = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-semibold mb-1" htmlFor="phone">
-            Phone:
-          </label>
-          <input
-            className="border rounded px-2 py-1 w-full"
-            type="tel"
-            id="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            className="block text-sm font-semibold mb-1"
-            htmlFor="coverLetter"
-          >
+          <label className="block text-sm font-semibold mb-1" htmlFor="coverLetter">
             Cover Letter: (2500 Characters)
           </label>
           <textarea
@@ -291,10 +239,7 @@ const ApplyForm = () => {
           ></textarea>
         </div>
         <div className="mb-4">
-          <label
-            className="block text-sm font-semibold mb-1"
-            htmlFor="cv"
-          >
+          <label className="block text-sm font-semibold mb-1" htmlFor="cv">
             Attach CV (Resume):
           </label>
           <input
@@ -309,7 +254,7 @@ const ApplyForm = () => {
         <button
           type="submit"
           className="text-white font-bold py-2 px-4 rounded"
-          style={{backgroundColor:'black', color:'white'}}
+          style={{ backgroundColor: 'black', color: 'white' }}
         >
           Apply
         </button>

@@ -1,15 +1,24 @@
 "use client";
 
-import axios from 'axios';
-import { DB_URL } from '@config/config';
+import { getDatabase, ref, set } from 'firebase/database';
+import { initializeApp } from 'firebase/app';
+import  firebaseConfig  from '@config/firebaseConfig';
 
-const API_BASE_URL = DB_URL;
+const app = initializeApp(firebaseConfig, "yookatale");
+
+
+const db = getDatabase(app);
+
+const databaseRef = ref(db, 'databaseLinks');
 
 export const sendDatabaseLink = async (databaseLink) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/sendDatabaseLink`, { databaseLink });
-    return response.data;
+   
+    await set(databaseRef, { databaseLink });
+    return { success: true };
   } catch (error) {
     throw new Error('Error sending database link: ' + error.message);
   }
 };
+
+
