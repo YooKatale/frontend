@@ -8,6 +8,10 @@ import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { sendDatabaseLink } from '@slices/applicationSlice';
 import firebaseConfig from '@config/firebaseConfig';
+import { getDatabase, ref, push, set } from 'firebase/database';
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 function Careers() {
 
@@ -168,25 +172,21 @@ const ApplyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
- 
       const db = getDatabase();
       const applicationsRef = ref(db, 'applications');
       const newApplicationRef = push(applicationsRef);
       await set(newApplicationRef, formData);
-
-      const databaseLink = `https://yookatale-298c7.firebaseio.com/applications/${newApplicationRef.key}`;
   
+      const databaseLink = `https://yookatale-298c7-default-rtdb.firebaseio.com/applications/${newApplicationRef.key}`;
       await sendDatabaseLink(databaseLink);
-
+  
       setFormData({
         name: "",
         email: "",
         coverLetter: "",
         cv: null,
       });
-
+  
       alert("Application submitted successfully!");
     } catch (error) {
       console.error("Error submitting application:", error);
