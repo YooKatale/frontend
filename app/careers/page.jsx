@@ -178,7 +178,7 @@ const ApplyForm = () => {
       const newApplicationRef = push(applicationsRef);
       await set(newApplicationRef, formData);
   
-      const databaseLink = `https://yookatale-298c7-default-rtdb.firebaseio.com/applications/${newApplicationRef.key}`;
+      const databaseLink = `https://yookatale-298c7-default-rtdb.firebaseio.com/${newApplicationRef.key}`;
       await sendDatabaseLink(databaseLink);
   
       setFormData({
