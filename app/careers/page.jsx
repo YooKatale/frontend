@@ -7,9 +7,11 @@ import { jobs } from "@lib/constants/index";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { sendDatabaseLink } from "@slices/applicationSlice";
-import firebaseConfig from "@config/firebaseConfig";
+import { firebaseConfig } from "config/config";
 import { getDatabase, ref, push, set } from "firebase/database";
 import { useGetCareersMutation } from "@slices/careersListSlice";
+import { useSubmitApplicationMutation } from "@slices/applicationSlice";
+
 
 function Careers() {
   const [careers, setCareers] = useState([]);
@@ -190,6 +192,9 @@ const ApplyForm = () => {
     cv: null,
   });
 
+
+const [submitApplication, { isLoading }] = useSubmitApplicationMutation();
+
   const handleChange = (e) => {
     if (e.target.name === "cv") {
       setFormData({ ...formData, [e.target.name]: e.target.files[0] });
@@ -201,26 +206,20 @@ const ApplyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
+      const { data } = await submitApplication(formData);
 
-      const db = getDatabase();
-      const applicationsRef = ref(db, "applications");
-      const newApplicationRef = push(applicationsRef);
-      await set(newApplicationRef, formData);
+      if (data?.success) {
+        setFormData({
+          name: "",
+          email: "",
+          coverLetter: "",
+          cv: null,
+        });
 
-      const databaseLink = `${process.env.REACT_APP_DATABASE_LINK}${newApplicationRef.key}`;
-      await sendDatabaseLink(databaseLink);
-      console.log('dbLink', databaseLink);
-
-      setFormData({
-        name: "",
-        email: "",
-        coverLetter: "",
-        cv: null,
-      });
-
-      alert("Application submitted successfully!");
+        alert("Application submitted successfully!");
+      } else {
+        throw new Error("Failed to submit application");
+      }
     } catch (error) {
       console.error("Error submitting application:", error);
       alert("Error submitting application. Please try again later.");
