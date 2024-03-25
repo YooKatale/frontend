@@ -3,31 +3,32 @@
 import React, { useState, useEffect } from "react";
 import Button from "@components/Button";
 import { MdOutlineLocationOn } from "react-icons/md";
-import { jobs } from "@lib/constants/index"; 
-import { initializeApp } from 'firebase/app';
-import { getAnalytics } from 'firebase/analytics';
-import { sendDatabaseLink } from '@slices/applicationSlice';
-import firebaseConfig from '@config/firebaseConfig';
-import { getDatabase, ref, push, set } from 'firebase/database';
-import { fetchCareers } from "@slices/careersListSlice";
-
-
+import { jobs } from "@lib/constants/index";
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { sendDatabaseLink } from "@slices/applicationSlice";
+import firebaseConfig from "@config/firebaseConfig";
+import { getDatabase, ref, push, set } from "firebase/database";
+import { useGetCareersMutation } from "@slices/careersListSlice";
 
 function Careers() {
+  const [careers, setCareers] = useState([]);
+  const [fetchCareers] = useGetCareersMutation();
 
-  const [jobs, setJobs] = useState([]);
+  const getCareers = async (req, res) => {
+    try {
+      const res = await fetchCareers().unwrap();
+      console.log("res", res);
+      if (res?.success === true) {
+        setCareers(res?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchCareers();
-        setJobs(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
+    getCareers();
   }, []);
 
   return (
@@ -43,8 +44,8 @@ function Careers() {
         </div>
 
         <div className="lg:w-10/12 mx-auto space-y-10">
-          {jobs && Array.isArray(jobs) && jobs.length > 0 ? (
-            jobs.map((job) => <JobCard key={job._id} {...job} />)
+          {careers && Array.isArray(careers) && careers.length > 0 ? (
+            careers.map((job) => <JobCard key={job._id} job={job} />)
           ) : (
             <p>No jobs available</p>
           )}
@@ -54,73 +55,74 @@ function Careers() {
   );
 }
 
-const JobCard = ({
-  category,
-  title,
-  reportsTo,
-  employment,
-  terms,
-  location,
-  details,
-  salary,
-  closingDate,
-}) => {
+const JobCard = (props) => {
+  const { job } = props;
   const [openDetails, setOpenDetails] = useState(false);
   const [showApplyForm, setShowApplyForm] = useState(false);
 
   const toggleApplyForm = () => {
     setOpenDetails(false);
-    setShowApplyForm(prevState => !prevState);
+    setShowApplyForm((prevState) => !prevState);
   };
 
   const toggleDetails = () => {
-    setShowApplyForm(false); 
-    setOpenDetails(prevState => !prevState);
+    setShowApplyForm(false);
+    setOpenDetails((prevState) => !prevState);
   };
 
   return (
     <div className="w-full border-2 lg:border-4 bg-white drop-shadow-secondary lg:drop-shadow-main transition-all duration-300 ease-in-out space-y-2 lg:space-y-5 border-gray-800 p-5">
-      <p className="lg:text-xs text-lg font-semibold">{category}</p>
-      <p className="text-3xl font-semibold">{title}</p>
+      <p className="lg:text-xs text-lg font-semibold">{job?.category}</p>
+      <p className="text-3xl font-semibold">{job?.title}</p>
       <div className="ml-1 lg:ml-5">
         <p className="lg:text-lg text-sm text-gray-800">
-          <span className="font-semibold">Reports to:</span> {reportsTo}
+          <span className="font-semibold">Reports to:</span> {job?.reportsTo}
         </p>
         <p className="lg:text-lg text-sm text-gray-800">
           <span className="font-semibold">Employment : </span>
-          {employment}
+          {job?.employment}
         </p>
         <p className="text-sm lg:text-lg text-gray-800">
-          <span className="font-semibold">Employment terms :</span> {terms}
+          <span className="font-semibold">Employment terms :</span> {job?.terms}
         </p>
         <p className="text-sm lg:text-lg text-gray-800">
-          <span className="font-semibold">Salary :</span> {salary}
+          <span className="font-semibold">Salary :</span> {job?.salary}
         </p>
         <p className="text-sm lg:text-lg text-gray-800">
           <span className="font-semibold">To Apply: </span>Send resume
           <span className="text-blue-700"> info@yookatale.com</span>
         </p>
         <p className="text-sm lg:text-lg text-gray-800">
-          <span className="font-semibold">Closing Date</span> {closingDate}
+          <span className="font-semibold">Closing Date</span> {job?.closingDate}
         </p>
       </div>
 
-      <br/>
-      
-      <button disabled={true} style={{ margin: '5px', padding: '5px', background: 'lightgray', border: '2px solid black', display: 'flex', alignItems: 'center' }}>
+      <br />
+
+      <button
+        disabled={true}
+        style={{
+          margin: "5px",
+          padding: "5px",
+          background: "lightgray",
+          border: "2px solid black",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
         <MdOutlineLocationOn className="lg:text-xl text-sm" />
-        <div style={{ marginLeft: '5px' }}>{location}</div>
+        <div style={{ marginLeft: "5px" }}>{job?.location}</div>
       </button>
 
-      <br/>
+      <br />
       <button
         onClick={toggleDetails}
         style={{
-          margin: '5px',
-          padding: '5px',
-          background: 'lightgray',
-          border: '2px solid black',
-          boxShadow: openDetails ? 'none' : '1px 0 2px rgba(0, 0, 0, 0.1)', 
+          margin: "5px",
+          padding: "5px",
+          background: "lightgray",
+          border: "2px solid black",
+          boxShadow: openDetails ? "none" : "1px 0 2px rgba(0, 0, 0, 0.1)",
         }}
       >
         {openDetails ? "Close Details" : "View Details"}
@@ -132,8 +134,8 @@ const JobCard = ({
           background: "lightgray",
           border: "2px solid black",
           alignItems: "center",
-          boxShadow: '1px 0 2px rgba(0, 0, 0, 0.1)',
-          width: "80px"
+          boxShadow: "1px 0 2px rgba(0, 0, 0, 0.1)",
+          width: "80px",
         }}
         onClick={toggleApplyForm}
       >
@@ -143,10 +145,11 @@ const JobCard = ({
       <div
         className={`transition-all lg:border-l lg:ml-10 border-gray-800 duration-500 ease-in-out lg:w-10/12 lg:p-2 py-2 lg:pl-5 rounded ${
           openDetails ? "block" : "hidden"
-        }`}>
+        }`}
+      >
         <p className="font-semibold mb-4">Key Responsibilities</p>
         <ul className="list-disc list-inside">
-          {details.responsibilities.map((item, i) => (
+          {job?.responsibilities.map((item, i) => (
             <li className="lg:ml-5 text-xs lg:text-sm" key={i}>
               {item}
             </li>
@@ -155,7 +158,7 @@ const JobCard = ({
 
         <p className="font-semibold mb-4 mt-10">Key Requirements</p>
         <ul className="list-disc list-inside">
-          {details.requirements.map((item, i) => (
+          {job?.requirements.map((item, i) => (
             <li className="lg:ml-5 text-xs lg:text-sm" key={i}>
               {item}
             </li>
@@ -191,20 +194,21 @@ const ApplyForm = () => {
       const analytics = getAnalytics(app);
 
       const db = getDatabase();
-      const applicationsRef = ref(db, 'applications');
+      const applicationsRef = ref(db, "applications");
       const newApplicationRef = push(applicationsRef);
       await set(newApplicationRef, formData);
-  
+
       const databaseLink = `${process.env.REACT_APP_DATABASE_LINK}${newApplicationRef.key}`;
       await sendDatabaseLink(databaseLink);
-  
+      console.log('dbLink', databaseLink);
+
       setFormData({
         name: "",
         email: "",
         coverLetter: "",
         cv: null,
       });
-  
+
       alert("Application submitted successfully!");
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -244,7 +248,10 @@ const ApplyForm = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-semibold mb-1" htmlFor="coverLetter">
+          <label
+            className="block text-sm font-semibold mb-1"
+            htmlFor="coverLetter"
+          >
             Cover Letter: (2500 Characters)
           </label>
           <textarea
@@ -272,7 +279,7 @@ const ApplyForm = () => {
         <button
           type="submit"
           className="text-white font-bold py-2 px-4 rounded"
-          style={{ backgroundColor: 'black', color: 'white' }}
+          style={{ backgroundColor: "black", color: "white" }}
         >
           Apply
         </button>

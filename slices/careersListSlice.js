@@ -1,14 +1,15 @@
-"use client";
+import { apiSlice } from "./apiSlice";
+import { DB_URL } from "@config/config";
 
-export const fetchCareers = async () => {
-    try {
-      const response = await fetch("http://localhost:4400/api/careers");
-      if (!response.ok) {
-        throw new Error("Failed to fetch careers");
-      }
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching careers:", error);
-      throw error;
-    }
-  };
+export const CareersApliSlice = apiSlice.injectEndpoints({
+  endpoints: (builder) => ({
+    getCareers: builder.mutation({
+      query: () => ({
+        url: `${DB_URL}/careers`,
+        method: "GET",
+      }),
+    }),
+  }),
+});
+
+export const { useGetCareersMutation } = CareersApliSlice;
