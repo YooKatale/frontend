@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "@components/Button";
 import { MdOutlineLocationOn } from "react-icons/md";
 import { jobs } from "@lib/constants/index"; 
@@ -9,9 +9,26 @@ import { getAnalytics } from 'firebase/analytics';
 import { sendDatabaseLink } from '@slices/applicationSlice';
 import firebaseConfig from '@config/firebaseConfig';
 import { getDatabase, ref, push, set } from 'firebase/database';
+import { fetchCareers } from "@slices/careersListSlice";
+
 
 
 function Careers() {
+
+  const [jobs, setJobs] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchCareers();
+        setJobs(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="w-full py-10 bg-white">
