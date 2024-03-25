@@ -60,6 +60,16 @@ const JobCard = (props) => {
   const [openDetails, setOpenDetails] = useState(false);
   const [showApplyForm, setShowApplyForm] = useState(false);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { 
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric' 
+    };
+    return date.toLocaleDateString('en-US', options);
+  };
+
   const toggleApplyForm = () => {
     setOpenDetails(false);
     setShowApplyForm((prevState) => !prevState);
@@ -93,7 +103,8 @@ const JobCard = (props) => {
           <span className="text-blue-700"> info@yookatale.com</span>
         </p>
         <p className="text-sm lg:text-lg text-gray-800">
-          <span className="font-semibold">Closing Date</span> {job?.closingDate}
+          <span className="font-semibold">Closing Date</span>{" "}
+          {formatDate(job?.closingDate)}
         </p>
       </div>
 
