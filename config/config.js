@@ -1,8 +1,6 @@
 const PROD_DB_URL = "https://yookatale-server.onrender.com/api";
 const DEV_DB_URL = "http://localhost:8000/api";
 
-export const DB_URL = PROD_DB_URL;
-
 const firebaseConfig = {
     apiKey: "AIzaSyDzELH4X4U7ysiyn7CpNUuR3xbv8vNj1dw",
     authDomain: "yookatale-298c7.firebaseapp.com",
@@ -13,6 +11,8 @@ const firebaseConfig = {
     measurementId: "G-1LENC2YK54",
     databaseURL: "https://yookatale-298c7-default-rtdb.firebaseio.com/"
   };
+
+export const DB_URL = PROD_DB_URL;  
 
 export { firebaseConfig, PROD_DB_URL, DEV_DB_URL };
 
