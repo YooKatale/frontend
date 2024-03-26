@@ -16,6 +16,7 @@ import Link from 'next/link';
 import VendorForm from '@components/DeliveryForm'; 
 import { ThemeColors } from '@constants/constants';
 import { PlusOutlined } from '@ant-design/icons';
+import { useRegisterVendorMutation } from "@slices/vendorSlice";
 
 
 const Partner = () => {
@@ -31,6 +32,8 @@ const Partner = () => {
   const [isLoading, setLoading] = useState(false);
   const [activeQuestion, setActiveQuestion] = useState(null);
   const chakraToast = useToast();
+
+  const registerVendorMutation = useRegisterVendorMutation();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -49,7 +52,7 @@ const Partner = () => {
     }
 
     try {
-      await axios.post(`${DB_URL}/vendor/new`, formData);
+      await registerVendorMutation.mutateAsync(formData);
       chakraToast({
         title: 'Vendor form',
         description: 'Successfully Submitted vendor form',
