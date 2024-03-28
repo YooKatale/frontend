@@ -1,18 +1,28 @@
-"use client"; 
+"use client";
 
-import { useState } from "react";
-import { Box, Button, FormControl, FormLabel, Input, Text, useToast } from "@chakra-ui/react";
-import { useResetPasswordMutation } from "@slices/usersApiSlice"; 
-
-const ResetPasswordPage = () => {
-  const [email, setEmail] = useState("");
+import { useState, useEffect } from "react";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
+import { useForgotPasswordMutation } from "@slices/usersApiSlice";
+import { useRouter } from "next/navigation";
+const ResetPasswordPage = ({ params }) => {
+  // const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); 
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [isPasswordReset, setPasswordReset] = useState(false);
   const toast = useToast();
+  const { token } = params;
+  const router = useRouter();
 
-  const [resetPassword] = useResetPasswordMutation();
+  const [resetPassword] = useForgotPasswordMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,20 +36,28 @@ const ResetPasswordPage = () => {
       });
       return;
     }
-    setLoading(true); 
+    setLoading(true);
     try {
-      const response = await resetPassword({ email, password });
-      setLoading(false); 
-      setPasswordReset(true); 
-      toast({
-        title: "Password Reset Successful",
-        description: "Your password has been reset successfully.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
+      const data = {
+        token,
+        newPassword: password,
+        confirmPassword: confirmPassword,
+      };
+      const response = await resetPassword(data);
+      if (response.data.status === 201) {
+        setLoading(false);
+        setPasswordReset(true);
+        toast({
+          title: "Password Reset Successful",
+          description: "Your password has been reset successfully.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        router.push('/signin');
+      }
     } catch (error) {
-      setLoading(false); 
+      setLoading(false);
       toast({
         title: "Error",
         description: "Failed to reset password. Please try again later.",
@@ -51,13 +69,13 @@ const ResetPasswordPage = () => {
   };
 
   return (
-    <Box maxW="md" mx="auto" mt="8" style={{height:'500px'}}>
+    <Box maxW="md" mx="auto" mt="8" style={{ height: "500px" }}>
       <Text textAlign="center" fontSize="3xl" fontWeight="bold" mb="4">
         Reset Your Password
       </Text>
       {!isPasswordReset ? (
         <form onSubmit={handleSubmit}>
-          <FormControl id="email" isRequired mb="4">
+          {/* <FormControl id="email" isRequired mb="4">
             <FormLabel>Email address</FormLabel>
             <Input
               type="email"
@@ -65,7 +83,7 @@ const ResetPasswordPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-          </FormControl>
+          </FormControl> */}
           <FormControl id="password" isRequired mb="4">
             <FormLabel>New Password</FormLabel>
             <Input
@@ -86,7 +104,12 @@ const ResetPasswordPage = () => {
           </FormControl>
           <br />
           <br />
-          <Button type="submit" isLoading={isLoading} loadingText="Resetting..." style={{color:'white', backgroundColor:'green'}}>
+          <Button
+            type="submit"
+            isLoading={isLoading}
+            loadingText="Resetting..."
+            style={{ color: "white", backgroundColor: "green" }}
+          >
             Reset Password
           </Button>
         </form>
