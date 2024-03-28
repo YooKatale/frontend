@@ -1,17 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Button from "@components/Button";
 import { MdOutlineLocationOn } from "react-icons/md";
-import { jobs } from "@lib/constants/index";
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { sendDatabaseLink } from "@slices/applicationSlice";
-import { firebaseConfig } from "config/config";
-import { getDatabase, ref, push, set } from "firebase/database";
 import { useGetCareersMutation } from "@slices/careersListSlice";
-import { useSubmitApplicationMutation } from "@slices/applicationSlice";
-
+import { useJobApplicationMutation } from "@slices/applicationSlice";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { storage } from "@lib/firebase";
+import { v4 } from "uuid";
 
 function Careers() {
   const [careers, setCareers] = useState([]);
@@ -20,7 +15,6 @@ function Careers() {
   const getCareers = async (req, res) => {
     try {
       const res = await fetchCareers().unwrap();
-      console.log("res", res);
       if (res?.success === true) {
         setCareers(res?.data);
       }
@@ -64,12 +58,12 @@ const JobCard = (props) => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const options = { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
+    const options = {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
     };
-    return date.toLocaleDateString('en-US', options);
+    return date.toLocaleDateString("en-US", options);
   };
 
   const toggleApplyForm = () => {
@@ -189,41 +183,52 @@ const ApplyForm = () => {
     name: "",
     email: "",
     coverLetter: "",
-    cv: null,
+    phone: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState(null);
 
+  const handleUpload = (files) => {
+    setFile(files[0]);
+  };
 
-const [submitApplication, { isLoading }] = useSubmitApplicationMutation();
+  const [submitApplication] = useJobApplicationMutation();
 
   const handleChange = (e) => {
-    if (e.target.name === "cv") {
-      setFormData({ ...formData, [e.target.name]: e.target.files[0] });
-    } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      const { data } = await submitApplication(formData);
+      if (file === null) return;
+      const imageURL = ref(storage, `/Applications/${file.name + v4()}`);
+      const uploadFile = await uploadBytes(imageURL, file);
+      if (uploadFile) {
+        const downloadURL = await getDownloadURL(imageURL);
+        const reqBody = {
+          ...formData,
+          resume: downloadURL,
+        };
 
-      if (data?.success) {
-        setFormData({
-          name: "",
-          email: "",
-          coverLetter: "",
-          cv: null,
-        });
-
-        alert("Application submitted successfully!");
-      } else {
-        throw new Error("Failed to submit application");
+        const response = await submitApplication(reqBody);
+        if (response.data.status === "Success") {
+          alert("Your application has been submitted");
+          setFormData({
+            name: "",
+            email: "",
+            coverLetter: "",
+            phone: "",
+          });
+          setFile(null);
+        }
       }
     } catch (error) {
       console.error("Error submitting application:", error);
       alert("Error submitting application. Please try again later.");
     }
+    setLoading(false);
   };
 
   return (
@@ -258,6 +263,20 @@ const [submitApplication, { isLoading }] = useSubmitApplicationMutation();
           />
         </div>
         <div className="mb-4">
+          <label className="block text-sm font-semibold mb-1" htmlFor="email">
+            Phone:
+          </label>
+          <input
+            className="border rounded px-2 py-1 w-full"
+            type="tel"
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="mb-4">
           <label
             className="block text-sm font-semibold mb-1"
             htmlFor="coverLetter"
@@ -281,18 +300,25 @@ const [submitApplication, { isLoading }] = useSubmitApplicationMutation();
             className="border rounded px-2 py-1 w-full"
             type="file"
             id="cv"
-            name="cv"
-            onChange={handleChange}
+            onChange={(e) => handleUpload(e.target.files)}
             required
           />
         </div>
-        <button
-          type="submit"
-          className="text-white font-bold py-2 px-4 rounded"
-          style={{ backgroundColor: "black", color: "white" }}
-        >
-          Apply
-        </button>
+        {loading === false ? (
+          <button
+            type="submit"
+            className="text-white font-bold py-2 px-4 rounded bg-black"
+          >
+            Apply
+          </button>
+        ) : (
+          <button
+            disabled
+            className="text-white font-bold py-2 px-4 rounded bg-black"
+          >
+            Sending...
+          </button>
+        )}
       </form>
     </div>
   );
