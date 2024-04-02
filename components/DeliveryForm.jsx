@@ -15,6 +15,7 @@ import { Loader } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeColors } from '@constants/constants';
 import { PlusOutlined } from '@ant-design/icons';
+import { useSubmitDeliveryFormMutation } from '@slices/deliveryFormSlice'
 
 const VendorForm = () => {
   const [fullname, setName] = useState('');
@@ -29,9 +30,9 @@ const VendorForm = () => {
   const [vegan, setVegan] = useState(false);
   const [terms, setTerms] = useState(false);
   const [activeQuestion, setActiveQuestion] = useState(null);
-  const [numberPlate, setNumber] = useState('');
+  const [numberPlate, setNumberPlate] = useState('');
   const chakraToast = useToast();
-
+  const [submitDeliveryForm] = useSubmitDeliveryFormMutation();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -50,7 +51,7 @@ const VendorForm = () => {
     }
 
     try {
-      await axios.post(`${DB_URL}/partner/new`, {
+      const payload = {
         fullname,
         phone,
         email,
@@ -60,7 +61,11 @@ const VendorForm = () => {
         businessHours,
         transport,
         vegan,
-      });
+      };
+      if (transport !== 'bike') {
+        payload.numberPlate = numberPlate; 
+      }
+      await submitDeliveryForm(payload); 
       chakraToast({
         title: 'Vendor form',
         description: 'Successfully Submitted driver form',
@@ -77,8 +82,8 @@ const VendorForm = () => {
       setLocation('');
       setTransport('bike');
       setVegan(false);
-
       setLoading(false);
+      
     } catch (error) {
       setLoading(false);
 
@@ -93,6 +98,7 @@ const VendorForm = () => {
       });
     }
   };
+      
 
   const handleChange = (event) => {
     const { name, checked } = event.target;
