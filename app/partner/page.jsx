@@ -9,15 +9,14 @@ import {
   Select,
   useToast
 } from '@chakra-ui/react';
-import axios from 'axios';
 import ButtonComponent from '@components/Button';
 import { Loader } from 'lucide-react';
 import Link from 'next/link';
 import VendorForm from '@components/DeliveryForm'; 
 import { ThemeColors } from '@constants/constants';
 import { PlusOutlined } from '@ant-design/icons';
-import { useRegisterVendorMutation } from "@slices/vendorSlice";
-
+import axios from 'axios';
+import { DB_URL } from '@config/config';
 
 const Partner = () => {
   const [formData, setFormData] = useState({
@@ -32,8 +31,6 @@ const Partner = () => {
   const [isLoading, setLoading] = useState(false);
   const [activeQuestion, setActiveQuestion] = useState(null);
   const chakraToast = useToast();
-
-  const registerVendorMutation = useRegisterVendorMutation();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -52,7 +49,17 @@ const Partner = () => {
     }
 
     try {
-      await registerVendorMutation.mutateAsync(formData);
+      const data = {
+        name: formData.name,
+        address: formData.address,
+        email: formData.email,
+        phone: formData.phone,
+        category: formData.category,
+        vegan: formData.vegan
+      };
+     
+      await axios.post(`${DB_URL}/vendor/new`, data);
+      
       chakraToast({
         title: 'Vendor form',
         description: 'Successfully Submitted vendor form',
@@ -61,13 +68,12 @@ const Partner = () => {
         isClosable: false,
       });
 
-      
       setFormData({
         name: '',
         address: '',
         phone: '',
         email: '',
-        category: '', 
+        category: '',
         vegan: false,
         terms: false,
       });
@@ -76,11 +82,11 @@ const Partner = () => {
     } catch (error) {
       setLoading(false);
 
+      console.error("An error occurred:", error); 
+
       chakraToast({
         title: 'Error',
-        description: error.data?.message
-          ? error.data?.message
-          : error.data || error.error,
+        description: error.response?.data?.message || 'An unexpected error occurred',
         status: 'error',
         duration: 5000,
         isClosable: false,
@@ -101,13 +107,11 @@ const Partner = () => {
   const faqItems = [
     {
       question: 'How do I register my business on YooKatale?',
-      answer:
-        'Visit Partner page and fill in the vendor registration form yookatale.com/partner',
+      answer: 'Visit Partner page and fill in the vendor registration form yookatale.com/partner',
     },
     {
       question: 'How long does registration process take?',
-      answer:
-        'After filling in the form, your account will be reviewed and approved within 24 hours.',
+      answer: 'After filling in the form, your account will be reviewed and approved within 24 hours.',
     },
     {
       question: 'How do I collect my money on YooKatale?',
@@ -116,11 +120,7 @@ const Partner = () => {
   ];
 
   const handleQuestionClick = (index) => {
-    if (index === activeQuestion) {
-      setActiveQuestion(null);
-    } else {
-      setActiveQuestion(index);
-    }
+    setActiveQuestion(activeQuestion === index ? null : index);
   }
 
   return (
