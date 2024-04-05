@@ -34,17 +34,13 @@ export const Images = {
 };
 
 export const CategoriesJson = [
-  "roughages",
-  "fruits",
-  "root tubers",
-  "vegetables",
-  "grains and flour",
-  "meats",
-  "fats and oils",
-  "herbs and spices",
-  "juice",
-  "meals",
+  "Carbohydrates",
+  "Protein",
+  "Fats and oils",
+  "Vitamins",
+  "Minerals",
 ];
+
 
 export const DisplayImages = [img, img1, img2, img3, img4];
 
