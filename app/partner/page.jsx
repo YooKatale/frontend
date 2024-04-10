@@ -13,6 +13,7 @@ import ButtonComponent from '@components/Button';
 import { Loader } from 'lucide-react';
 import Link from 'next/link';
 import VendorForm from '@components/DeliveryForm'; 
+import { useRegisterVendorMutation } from '@slices/vendorSlice';
 import { ThemeColors } from '@constants/constants';
 import { PlusOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -31,6 +32,7 @@ const Partner = () => {
   const [isLoading, setLoading] = useState(false);
   const [activeQuestion, setActiveQuestion] = useState(null);
   const chakraToast = useToast();
+  const [registerVendor] = useRegisterVendorMutation()
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -58,16 +60,15 @@ const Partner = () => {
         vegan: formData.vegan
       };
      
-      await axios.post(`${DB_URL}/vendor/new`, data);
-      
-      chakraToast({
-        title: 'Vendor form',
-        description: 'Successfully Submitted vendor form',
-        status: 'success',
-        duration: 5000,
-        isClosable: false,
-      });
-
+      const response = await registerVendor(data);
+      if (response.data.status === "Success") {
+        chakraToast({
+          title: 'Vendor form',
+          description: 'Successfully Submitted vendor form',
+          status: 'success',
+          duration: 5000,
+          isClosable: false,
+        });
       setFormData({
         name: '',
         address: '',
@@ -77,7 +78,7 @@ const Partner = () => {
         vegan: false,
         terms: false,
       });
-
+      }
       setLoading(false);
     } catch (error) {
       setLoading(false);
