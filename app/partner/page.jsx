@@ -57,7 +57,8 @@ const Partner = () => {
         email: formData.email,
         phone: formData.phone,
         category: formData.category,
-        vegan: formData.vegan
+        vegan: formData.vegan,
+        status: 'Unverified'
       };
      
       const response = await registerVendor(data);
