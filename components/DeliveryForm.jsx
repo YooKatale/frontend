@@ -1,36 +1,34 @@
-"use client"
+"use client";
 import {
   Box,
   FormControl,
   FormLabel,
   Input,
   Select,
-  useToast
-} from '@chakra-ui/react';
-import { useState } from 'react';
-import { DB_URL } from '@config/config';
-import axios from 'axios';
-import ButtonComponent from './Button';
-import { Loader } from 'lucide-react';
-import Link from 'next/link';
-import { ThemeColors } from '@constants/constants';
-import { PlusOutlined } from '@ant-design/icons';
-import { useSubmitDeliveryFormMutation } from '@slices/deliveryFormSlice'
+  useToast,
+} from "@chakra-ui/react";
+import { useState } from "react";
+import ButtonComponent from "./Button";
+import { Loader } from "lucide-react";
+import Link from "next/link";
+import { ThemeColors } from "@constants/constants";
+import { PlusOutlined } from "@ant-design/icons";
+import { useSubmitDeliveryFormMutation } from "@slices/deliveryFormSlice";
 
 const VendorForm = () => {
-  const [fullname, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [location, setLocation] = useState('');
-  const [businessName, setBusinessName] = useState('');
-  const [businessAddress, setBusinessAddress] = useState('');
-  const [businessHours, setBusinessHours] = useState('');
-  const [transport, setTransport] = useState('bike');
+  const [fullname, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [location, setLocation] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [businessAddress, setBusinessAddress] = useState("");
+  const [businessHours, setBusinessHours] = useState("");
+  const [transport, setTransport] = useState("bike");
   const [isLoading, setLoading] = useState(false);
   const [vegan, setVegan] = useState(false);
   const [terms, setTerms] = useState(false);
   const [activeQuestion, setActiveQuestion] = useState(null);
-  const [numberPlate, setNumberPlate] = useState('');
+  const [numberPlate, setNumberPlate] = useState("");
   const chakraToast = useToast();
   const [submitDeliveryForm] = useSubmitDeliveryFormMutation();
 
@@ -40,9 +38,9 @@ const VendorForm = () => {
 
     if (!terms) {
       chakraToast({
-        title: 'Notice',
-        description: 'Please agree to the terms and conditions to proceed',
-        status: 'error',
+        title: "Notice",
+        description: "Please agree to the terms and conditions to proceed",
+        status: "error",
         duration: 5000,
         isClosable: true,
       });
@@ -61,73 +59,73 @@ const VendorForm = () => {
         businessHours,
         transport,
         vegan,
+        status: "Unverified",
       };
-      if (transport !== 'bike') {
-        payload.numberPlate = numberPlate; 
+      if (transport !== "bike") {
+        payload.numberPlate = numberPlate;
       }
-      await submitDeliveryForm(payload); 
+      await submitDeliveryForm(payload);
       chakraToast({
-        title: 'Vendor form',
-        description: 'Successfully Submitted driver form',
-        status: 'success',
+        title: "Vendor form",
+        description: "Successfully Submitted driver form",
+        status: "success",
         duration: 5000,
         isClosable: false,
       });
 
-      setName('');
-      setPhone('');
-      setBusinessName('');
-      setBusinessAddress('');
-      setBusinessHours('');
-      setLocation('');
-      setTransport('bike');
+      setName("");
+      setPhone("");
+      setBusinessName("");
+      setBusinessAddress("");
+      setBusinessHours("");
+      setLocation("");
+      setTransport("bike");
       setVegan(false);
       setLoading(false);
-      
     } catch (error) {
       setLoading(false);
 
       chakraToast({
-        title: 'Error',
+        title: "Error",
         description: error.data?.message
           ? error.data?.message
           : error.data || error.error,
-        status: 'error',
+        status: "error",
         duration: 5000,
         isClosable: false,
       });
     }
   };
-      
 
   const handleChange = (event) => {
     const { name, checked } = event.target;
-    if (name === 'vegan') {
+    if (name === "vegan") {
       setVegan(checked);
-    } else if (name === 'terms') {
+    } else if (name === "terms") {
       setTerms(checked);
     }
   };
 
   const faqItems = [
     {
-      question: 'How do I register to deliver with YooKatale?',
-      answer: 'Fill in the delivery form to sign up as a delivery person.',
+      question: "How do I register to deliver with YooKatale?",
+      answer: "Fill in the delivery form to sign up as a delivery person.",
     },
     {
-      question: 'How long does registration take?',
-      answer: 'Within 24 hours your account will be reviewed and approved to start.',
+      question: "How long does registration take?",
+      answer:
+        "Within 24 hours your account will be reviewed and approved to start.",
     },
     {
-      question: 'How do I get my earnings?',
-      answer: 'Delivery payments are made weekly via Bank.',
+      question: "How do I get my earnings?",
+      answer: "Delivery payments are made weekly via Bank.",
     },
     {
-      question: 'Why should I deliver for YooKatale?',
-      answer: 'Earn your way, get access to a van, motorcycle, bicycle, or tricycle.',
+      question: "Why should I deliver for YooKatale?",
+      answer:
+        "Earn your way, get access to a van, motorcycle, bicycle, or tricycle.",
     },
   ];
-
 
   const handleQuestionClick = (index) => {
     if (index === activeQuestion) {
@@ -135,10 +133,9 @@ const VendorForm = () => {
     } else {
       setActiveQuestion(index);
     }
-  }
+  };
 
   return (
- 
     <Box className="mx-auto p-4 bg-black mb-20 mt-20">
       <div className="flex flex-col lg:flex-row">
         <div className="p-4 md:w-2/5 rounded-xl bg-white">
@@ -230,7 +227,7 @@ const VendorForm = () => {
               </Select>
             </FormControl>
             <FormControl className="mb-4">
-              {transport !== 'bike' && ( // Conditionally render based on selected transport
+              {transport !== "bike" && ( // Conditionally render based on selected transport
                 <>
                   <FormLabel>Number Plate</FormLabel>
                   <Input
@@ -253,7 +250,9 @@ const VendorForm = () => {
                   onChange={handleChange}
                   className="mr-4"
                 />
-                <p className="">Do you want to apply for a new Courier from YooKatale?</p>
+                <p className="">
+                  Do you want to apply for a new Courier from YooKatale?
+                </p>
               </div>
             </Box>
 
@@ -265,7 +264,7 @@ const VendorForm = () => {
                 onChange={handleChange}
                 className="mr-4"
               />
-              I agree to the{' '}
+              I agree to the{" "}
               <Link href="/vendor-terms">
                 <span style={{ color: ThemeColors.darkColor }}>
                   terms and conditions
@@ -287,36 +286,45 @@ const VendorForm = () => {
           <div className="mt-10">
             <h2 className="text-3xl text-white">Hello</h2>
             <p className="text-white mt-5">
-              Do you want to set your own schedule and connect when it suits you? Get paid for delivering orders with the yookatale Courier App.
+              Do you want to set your own schedule and connect when it suits
+              you? Get paid for delivering orders with the yookatale Courier
+              App.
             </p>
             <h4 className="text-white font-bold mt-5">Sign up today!</h4>
             <div className="mt-10 text-white">
-            <h3 className="text-xl md:text-3xl text-left mb-4">Frequently Asked Questions</h3>
-               {faqItems.map((item, index) => (
-                  <div key={index} className="mb-4">
-                   <p
+              <h3 className="text-xl md:text-3xl text-left mb-4">
+                Frequently Asked Questions
+              </h3>
+              {faqItems.map((item, index) => (
+                <div key={index} className="mb-4">
+                  <p
                     className="text-white font-bold text-sm md:text-xl mb-2"
                     onClick={() => handleQuestionClick(index)}
-                    style={{ cursor: 'pointer' }}
-                    >
+                    style={{ cursor: "pointer" }}
+                  >
                     <span
-                       className="icon-circle mr-6"
-                       style={{
-                       backgroundColor: activeQuestion === index ? 'black' : 'white',
-                     }}
+                      className="icon-circle mr-6"
+                      style={{
+                        backgroundColor:
+                          activeQuestion === index ? "black" : "white",
+                      }}
                     >
-                      <PlusOutlined style={{ color: activeQuestion === index ? 'white' : 'black' }} />
+                      <PlusOutlined
+                        style={{
+                          color: activeQuestion === index ? "white" : "black",
+                        }}
+                      />
                     </span>
-                      {item.question}
-                    </p>
-                     <div className="ml-10">
-                      {activeQuestion === index && (
-                        <p className="text-gray-300">{item.answer}</p>
-                      )}
-                     </div>
+                    {item.question}
+                  </p>
+                  <div className="ml-10">
+                    {activeQuestion === index && (
+                      <p className="text-gray-300">{item.answer}</p>
+                    )}
                   </div>
-                ))}
-               </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -1,38 +1,36 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   FormControl,
   FormLabel,
   Input,
   Select,
-  useToast
-} from '@chakra-ui/react';
-import ButtonComponent from '@components/Button';
-import { Loader } from 'lucide-react';
-import Link from 'next/link';
-import VendorForm from '@components/DeliveryForm'; 
-import { useRegisterVendorMutation } from '@slices/vendorSlice';
-import { ThemeColors } from '@constants/constants';
-import { PlusOutlined } from '@ant-design/icons';
-import axios from 'axios';
-import { DB_URL } from '@config/config';
+  useToast,
+} from "@chakra-ui/react";
+import ButtonComponent from "@components/Button";
+import { Loader } from "lucide-react";
+import Link from "next/link";
+import VendorForm from "@components/DeliveryForm";
+import { useRegisterVendorMutation } from "@slices/vendorSlice";
+import { ThemeColors } from "@constants/constants";
+import { PlusOutlined } from "@ant-design/icons";
 
 const Partner = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    phone: '',
-    email: '',
-    category: '', 
+    name: "",
+    address: "",
+    phone: "",
+    email: "",
+    category: "",
     vegan: false,
     terms: false,
   });
   const [isLoading, setLoading] = useState(false);
   const [activeQuestion, setActiveQuestion] = useState(null);
   const chakraToast = useToast();
-  const [registerVendor] = useRegisterVendorMutation()
+  const [registerVendor] = useRegisterVendorMutation();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -40,9 +38,9 @@ const Partner = () => {
 
     if (!formData.terms) {
       chakraToast({
-        title: 'Notice',
-        description: 'Please agree to the terms and conditions to proceed',
-        status: 'error',
+        title: "Notice",
+        description: "Please agree to the terms and conditions to proceed",
+        status: "error",
         duration: 5000,
         isClosable: true,
       });
@@ -58,38 +56,39 @@ const Partner = () => {
         phone: formData.phone,
         category: formData.category,
         vegan: formData.vegan,
-        status: 'Unverified'
+        status: "Unverified",
       };
-     
+
       const response = await registerVendor(data);
       if (response.data.status === "Success") {
         chakraToast({
-          title: 'Vendor form',
-          description: 'Successfully Submitted vendor form',
-          status: 'success',
+          title: "Vendor form",
+          description: "Successfully Submitted vendor form",
+          status: "success",
           duration: 5000,
           isClosable: false,
         });
-      setFormData({
-        name: '',
-        address: '',
-        phone: '',
-        email: '',
-        category: '',
-        vegan: false,
-        terms: false,
-      });
+        setFormData({
+          name: "",
+          address: "",
+          phone: "",
+          email: "",
+          category: "",
+          vegan: false,
+          terms: false,
+        });
       }
       setLoading(false);
     } catch (error) {
       setLoading(false);
 
-      console.error("An error occurred:", error); 
+      console.error("An error occurred:", error);
 
       chakraToast({
-        title: 'Error',
-        description: error.response?.data?.message || 'An unexpected error occurred',
-        status: 'error',
+        title: "Error",
+        description:
+          error.response?.data?.message || "An unexpected error occurred",
+        status: "error",
         duration: 5000,
         isClosable: false,
       });
@@ -98,7 +97,7 @@ const Partner = () => {
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
-    const newValue = type === 'checkbox' ? checked : value;
+    const newValue = type === "checkbox" ? checked : value;
 
     setFormData({
       ...formData,
@@ -108,33 +107,35 @@ const Partner = () => {
 
   const faqItems = [
     {
-      question: 'How do I register my business on YooKatale?',
-      answer: 'Visit Partner page and fill in the vendor registration form yookatale.com/partner',
+      question: "How do I register my business on YooKatale?",
+      answer:
+        "Visit Partner page and fill in the vendor registration form yookatale.com/partner",
     },
     {
-      question: 'How long does registration process take?',
-      answer: 'After filling in the form, your account will be reviewed and approved within 24 hours.',
+      question: "How long does registration process take?",
+      answer:
+        "After filling in the form, your account will be reviewed and approved within 24 hours.",
     },
     {
-      question: 'How do I collect my money on YooKatale?',
-      answer: 'YooKatale vendor payments are processed weekly through a Bank account.',
+      question: "How do I collect my money on YooKatale?",
+      answer:
+        "YooKatale vendor payments are processed weekly through a Bank account.",
     },
   ];
 
   const handleQuestionClick = (index) => {
     setActiveQuestion(activeQuestion === index ? null : index);
-  }
+  };
 
   return (
     <div>
-       <VendorForm />
-     
+      <VendorForm />
+
       <Box
         className="mx-auto p-4 bg-black mb-20 mt-20"
         display="flex"
-        flexDirection={{ base: 'column', lg: 'row' }}
+        flexDirection={{ base: "column", lg: "row" }}
       >
-        
         <Box className="p-4 md:w-2/5 rounded-xl bg-white">
           <p className="text-3xl text-left mb-4 text-dark">
             Fill out the vendor form
@@ -189,7 +190,6 @@ const Partner = () => {
               />
             </FormControl>
 
-       
             <FormControl className="mb-4">
               <FormLabel>Category*</FormLabel>
               <Select
@@ -232,7 +232,7 @@ const Partner = () => {
                 onChange={handleChange}
                 className="mr-4"
               />
-              I agree to the{' '}
+              I agree to the{" "}
               <Link href="/vendor-terms">
                 <span style={{ color: ThemeColors.darkColor }}>
                   terms and conditions
@@ -254,21 +254,28 @@ const Partner = () => {
         <Box className="p-4 w-full md:w-1/2 md:ml-5">
           <div className="mt-10">
             <div className="mt-10 text-white">
-              <h3 className="text-xl md:text-3xl text-left mb-4">Frequently Asked Questions</h3>
+              <h3 className="text-xl md:text-3xl text-left mb-4">
+                Frequently Asked Questions
+              </h3>
               {faqItems.map((item, index) => (
                 <div key={index} className="mb-4">
                   <p
                     className="text-white font-bold text-sm md:text-xl mb-2"
                     onClick={() => handleQuestionClick(index)}
-                    style={{ cursor: 'pointer', borderRadius: '2px' }}
+                    style={{ cursor: "pointer", borderRadius: "2px" }}
                   >
                     <span
                       className="icon-circle mr-6"
                       style={{
-                        backgroundColor: activeQuestion === index ? 'black' : 'white',
+                        backgroundColor:
+                          activeQuestion === index ? "black" : "white",
                       }}
                     >
-                      <PlusOutlined style={{ color: activeQuestion === index ? 'white' : 'black' }} />
+                      <PlusOutlined
+                        style={{
+                          color: activeQuestion === index ? "white" : "black",
+                        }}
+                      />
                     </span>
                     {item.question}
                   </p>
@@ -284,13 +291,8 @@ const Partner = () => {
         </Box>
       </Box>
 
- 
-     
-
       {/* Frequently Asked Questions */}
-      <Box className="p-4 w-full md:w-1/2 md:ml-5">
-        {/* FAQ Items */}
-      </Box>
+      <Box className="p-4 w-full md:w-1/2 md:ml-5">{/* FAQ Items */}</Box>
     </div>
   );
 };
