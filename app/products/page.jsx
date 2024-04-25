@@ -225,7 +225,6 @@ const Products = () => {
                       product={product}
                       key={index}
                       userInfo={userInfo}
-                      UGX={UGX}
                     />
                   ))}
                 </Grid>
