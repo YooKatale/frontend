@@ -162,7 +162,7 @@ const Header = () => {
   useEffect(() => {
     const fetchSubscriptionStatus = async () => {
       try {
-        const response = await fetch(`${DB_URL}/api/subscription`, {
+        const response = await fetch(`${DB_URL}/subscription`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${userInfo.token}`
