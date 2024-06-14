@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:yookatale/views/login/getLocation.dart';
 import 'package:yookatale/views/login/login.dart';
 import 'package:yookatale/views/login/register.dart';
@@ -21,13 +22,20 @@ void main() async {
 
   ByteData data = await PlatformAssetBundle().load('assets/ca/lets-encrypt-r3.pem');
   SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
-  runApp(const MyApp());
+
+  final channel = WebSocketChannel.connect(
+    Uri.parse('ws://localhost:4400'), 
+  );
+
+  runApp(MyApp(channel: channel));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final WebSocketChannel channel;
 
-  // This widget is the root of your application.
+  const MyApp({super.key, required this.channel});
+
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,34 +44,26 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home:StreamBuilder<User?>(
+      home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context,snapshot){
-
-          if(snapshot.hasData){
-
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
             return const Dashboard();
-
-          }else{
-
+          } else {
             return const SplashScreen();
           }
         },
       ),
       // initialRoute: ,// first route
       routes: {
-        SplashScreen.id:(context)=>const SplashScreen(),
-        Register.id:(context)=>const Register(),
-        Login.id:(context)=>const Login(),
-        Dashboard.id:(context)=>const Dashboard(),
-        GetStartedScreen.id:(context) =>const GetStartedScreen(),
-        GetStartedSignIn.id:(context) =>  GetStartedSignIn(),
-        GetLocationScreen.id:(context) => GetLocationScreen()
+        SplashScreen.id: (context) => const SplashScreen(),
+        Register.id: (context) => const Register(),
+        Login.id: (context) => const Login(),
+        Dashboard.id: (context) => const Dashboard(),
+        GetStartedScreen.id: (context) => const GetStartedScreen(),
+        GetStartedSignIn.id: (context) => GetStartedSignIn(),
+        GetLocationScreen.id: (context) => GetLocationScreen(),
       },
     );
   }
 }
-
-
-
-
