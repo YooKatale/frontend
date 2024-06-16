@@ -128,11 +128,7 @@ const ProductCard = ({ product, userInfo }) => {
             <div className="flex justify-center items-center h-full relative">
               {/* Display the discount information as a badge */}
               <img
-                src={
-                  process.env.NODE_ENV == "development"
-                    ? `/images/img1.png`
-                    : product.images[0]
-                }
+                src={product.images[0]}
                 className="w-auto object-contain h-full"
                 alt={product.images}
               />

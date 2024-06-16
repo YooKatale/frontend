@@ -47,8 +47,6 @@ const Home = () => {
   const handleFetchProductsData = async () => {
     const res = await fetchProducts().unwrap();
 
-    console.log({ res });
-
     if (res?.status && res?.status == "Success") {
       setProducts(res.data);
     }
@@ -157,7 +155,7 @@ const Home = () => {
                       Products={product?.products}
                       userInfo={userInfo}
                       category={product?.category}
-                      text={product?.category}
+                      text={"bulk"}
                     />
                   )
               )
@@ -263,36 +261,141 @@ const Home = () => {
       </Box>
 
       {/* // product?.category == "popular" && */}
-      <Box
-        padding={"3rem 0"}
-        borderBottom={"1.7px solid " + ThemeColors.lightColor}
-      >
-        <Flex>
-          <Box margin={"auto"} width={{ base: "95%", md: "90%", xl: "90%" }}>
-            {Products?.length > 0 ? (
-              Products.map(
-                (product, index) =>
-                  product.category === "popular" && (
+      {Products?.length > 0 ? (
+        Products.map(
+          (product, index) =>
+            product.category === "popular" && (
+              <Box
+                padding={"3rem 0"}
+                borderBottom={"1.7px solid " + ThemeColors.lightColor}
+                key={index}
+              >
+                <Flex>
+                  <Box
+                    margin={"auto"}
+                    width={{ base: "95%", md: "90%", xl: "90%" }}
+                  >
                     <DynamicSpecialProducts
-                      key={index}
                       Products={product?.products}
                       userInfo={userInfo}
                       category={product?.category}
                       text={product?.category}
                     />
-                  )
-              )
-            ) : (
-              <DynamicSpecialProducts
-                Products={[]}
-                userInfo={{}}
-                category={""}
-                text={""}
-              />
-            )}
-          </Box>
-        </Flex>
-      </Box>
+                  </Box>
+                </Flex>
+              </Box>
+            )
+        )
+      ) : (
+        <DynamicSpecialProducts
+          Products={[]}
+          userInfo={{}}
+          category={""}
+          text={""}
+        />
+      )}
+
+      {Products?.length > 0 ? (
+        Products.map(
+          (product, index) =>
+            product.category === "discover" && (
+              <Box
+                padding={"3rem 0"}
+                borderBottom={"1.7px solid " + ThemeColors.lightColor}
+                key={index}
+              >
+                <Flex>
+                  <Box
+                    margin={"auto"}
+                    width={{ base: "95%", md: "90%", xl: "90%" }}
+                  >
+                    <DynamicSpecialProducts
+                      Products={product?.products}
+                      userInfo={userInfo}
+                      category={product?.category}
+                      text={product?.category}
+                    />
+                  </Box>
+                </Flex>
+              </Box>
+            )
+        )
+      ) : (
+        <DynamicSpecialProducts
+          Products={[]}
+          userInfo={{}}
+          category={""}
+          text={""}
+        />
+      )}
+
+      {Products?.length > 0 ? (
+        Products.map(
+          (product, index) =>
+            product.category === "promotional" && (
+              <Box
+                padding={"3rem 0"}
+                borderBottom={"1.7px solid " + ThemeColors.lightColor}
+                key={index}
+              >
+                <Flex>
+                  <Box
+                    margin={"auto"}
+                    width={{ base: "95%", md: "90%", xl: "90%" }}
+                  >
+                    <DynamicSpecialProducts
+                      Products={product?.products}
+                      userInfo={userInfo}
+                      category={product?.category}
+                      text={product?.category}
+                    />
+                  </Box>
+                </Flex>
+              </Box>
+            )
+        )
+      ) : (
+        <DynamicSpecialProducts
+          Products={[]}
+          userInfo={{}}
+          category={""}
+          text={""}
+        />
+      )}
+
+      {Products?.length > 0 ? (
+        Products.map(
+          (product, index) =>
+            product.category === "recommended" && (
+              <Box
+                padding={"3rem 0"}
+                borderBottom={"1.7px solid " + ThemeColors.lightColor}
+                key={index}
+              >
+                <Flex>
+                  <Box
+                    margin={"auto"}
+                    width={{ base: "95%", md: "90%", xl: "90%" }}
+                  >
+                    <DynamicSpecialProducts
+                      Products={product?.products}
+                      userInfo={userInfo}
+                      category={product?.category}
+                      text={product?.category}
+                    />
+                  </Box>
+                </Flex>
+              </Box>
+            )
+        )
+      ) : (
+        <DynamicSpecialProducts
+          Products={[]}
+          userInfo={{}}
+          category={""}
+          text={""}
+        />
+      )}
 
       {/* ------------- section 
       ------------------------------- */}
