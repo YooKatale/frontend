@@ -39,6 +39,8 @@ export const CategoriesJson = [
   "Fats and oils",
   "Vitamins",
   "Minerals",
+  "Knife Shapening",
+  "Cake Ordering"
 ];
 
 
