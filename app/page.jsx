@@ -26,6 +26,21 @@ const DynamicSpecialProducts = dynamic(
   }
 );
 
+const CategoryCard = ({ category }) => (
+  <div className="lg:p-10 p-4 border-2 border-light rounded-md hover:border-primary">
+    <Link href={`/search?q=${category}`}>
+      <div className="flex justify-center flex-center">
+        <img
+          src={`/assets/images/categories/${category}.jpg`}
+          className="lg:h-20 lg:w-20 w-12 h-12 rounded-full object-cover"
+        />
+      </div>
+      <p className="lg:text-lg text-base text-center">{category}</p>
+    </Link>
+  </div>
+);
+
+
 const Home = () => {
   const [Products, setProducts] = useState([]);
   const [Comments, setComments] = useState([]);
@@ -87,20 +102,7 @@ const Home = () => {
         <div className="lg:w-[85%] sm:w-[90%] w-[95%] m-auto">
           <div className="grid lg:grid-cols-5 sm:grid-cols-4 grid-cols-3 gap-4 py-6">
             {CategoriesJson.map((category, index) => (
-              <div
-                className="lg:p-10 p-4 border-2 border-light rounded-md hover:border-primary"
-                key={index}
-              >
-                <Link href={`/search?q=${category}`}>
-                  <div className="flex justify-center flex-center">
-                    <img
-                      src={`/assets/images/categories/${category}.jpg`}
-                      className="lg:h-20 lg:w-20 w-12 h-12 rounded-full object-cover"
-                    />
-                  </div>
-                  <p className="lg:text-lg text-base text-center">{category}</p>
-                </Link>
-              </div>
+              <CategoryCard key={index} category={category} />
             ))}
           </div>
         </div>
