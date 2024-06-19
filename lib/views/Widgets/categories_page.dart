@@ -15,6 +15,31 @@ class CategoriesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var categories = ref.watch(categoriesProvider);
+
+     List<Map<String, dynamic>> staticProducts = [
+      {
+        'title': 'Knife sharpening',
+        'image': 'knife_sharpening.png',
+        'category': 'Services',
+        'minPrice': 6000,
+        'maxPrice': 6000,
+      },
+      {
+        'title': 'Cake Order',
+        'image': 'cake_order.png',
+        'category': 'Bakery',
+        'minPrice': 38000,
+        'maxPrice': 120000,
+      },
+      {
+        'title': 'Gas Refill',
+        'image': 'gas_refill.png',
+        'category': 'Home Services',
+        'minPrice': 30000,
+        'maxPrice': 100000,
+      }
+    ];
+
     return Column(
       children: [
         const Row(

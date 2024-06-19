@@ -16,6 +16,36 @@ class _CategoryProductState extends State<CategoryProduct> {
   List itemsTemp = [];
   int itemLength = 0;
 
+  List<Map<String, dynamic>> staticProducts = [
+    {
+      'name': 'Knife sharpening',
+      'imageUrl': 'assets/images/knife_sharpening.jpg',
+      'price': 6000,
+      'crossedPrice': null,
+      'unit': 'service',
+      'weight': '',
+      'category': 'Services'
+    },
+    {
+      'name': 'Cake Order',
+      'imageUrl': 'assets/images/cake_order.jpg',
+      'price': 38000,
+      'crossedPrice': 120000,
+      'unit': 'order',
+      'weight': '',
+      'category': 'Bakery'
+    },
+    {
+      'name': 'Gas Refill',
+      'price': 30000,
+      'crossedPrice': 100000,
+      'unit': 'refill',
+      'weight': '',
+      'category': 'Home Services'
+    }
+  ];
+
+
   @override
   void initState() {
     // TODO: implement initState

@@ -112,6 +112,8 @@ flutter:
   - assets/fruits/
   - assets/categories/
   - assets/popular_products1/
+     - assets/images/knife_sharpening.jpg
+    - assets/images/cake_order.jpg
   #   - images/a_dot_burr.jpeg
 
 #   - images/a_dot_ham.jpeg
