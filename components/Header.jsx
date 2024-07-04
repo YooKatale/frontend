@@ -301,23 +301,34 @@ const Header = () => {
           }
           {/* Search */}
           <Box as="li">
-  <form onSubmit={handleSearchFormSubmit}>
-    <InputGroup size="sm">
-      <InputLeftElement pointerEvents="none">
-        <FaSearch color="gray.300" />
-      </InputLeftElement>
-      <Input
-        type="text"
-        placeholder="Search..."
-        variant="filled"
-        value={searchParam}
-        onChange={(e) => setSearchParam(e.target.value)}
-      />
-      <Button type="submit" ml={2}>
-        Search
-      </Button>
-    </InputGroup>
-  </form>
+          <form onSubmit={handleSearchFormSubmit} className="flex items-center">
+  <InputGroup size="sm" style={{ height: '2.5rem' }}>
+    <InputLeftElement pointerEvents="none" style={{ height: '100%' }}>
+      <FaSearch color="gray.300" />
+    </InputLeftElement>
+    <Input
+      type="text"
+      placeholder="Search..."
+      variant="filled"
+      value={searchParam}
+      onChange={(e) => setSearchParam(e.target.value)}
+      _focus={{
+        borderColor: 'green', 
+        boxShadow: '0 0 0 1px green',
+      }}
+      rounded="md"
+      style={{ height: '100%', borderTopRightRadius: 0, borderBottomRightRadius: 0 }} 
+    />
+  </InputGroup>
+  <Button
+    type="submit"
+    style={{ color: 'white', backgroundColor: 'green', cursor: 'pointer', transition: 'none', height: '2.5rem', borderRadius: '1px' }} 
+  >
+    Search 
+  </Button>
+</form>
+
+
 </Box>
         </Stack>
 
