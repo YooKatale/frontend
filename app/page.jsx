@@ -419,25 +419,47 @@ const Home = () => {
             product?.category !== "popular" &&
             product?.category !== "topdeals" &&
             product.products?.length > 0 && (
-              <Box
-                padding={"3rem 0"}
-                borderBottom={"1.7px solid " + ThemeColors.lightColor}
-                key={index}
-              >
-                <Flex>
-                  <Box
-                    margin={"auto"}
-                    width={{ base: "95%", md: "90%", xl: "90%" }}
-                  >
-                    <DynamicSpecialProducts
-                      Products={product?.products}
-                      userInfo={userInfo}
-                      category={product?.category}
-                      text={product?.category}
+              <>
+                <Box
+                  padding={"3rem 0"}
+                  borderBottom={"1.7px solid " + ThemeColors.lightColor}
+                  key={index}
+                >
+                  <Flex>
+                    <Box
+                      margin={"auto"}
+                      width={{ base: "95%", md: "90%", xl: "90%" }}
+                    >
+                      <DynamicSpecialProducts
+                        Products={product?.products}
+                        userInfo={userInfo}
+                        category={product?.category}
+                        text={product?.category}
+                      />
+                    </Box>
+                  </Flex>
+                </Box>
+
+                {index === 2 && (
+                  <Box>
+                    <img
+                      src="/assets/images/banner3.jpeg"
+                      className="w-full h-auto objsct-cover"
+                      alt="banner2"
                     />
                   </Box>
-                </Flex>
-              </Box>
+                )}
+
+                {index === Products.length - 7 && (
+                  <Box>
+                    <img
+                      src="/assets/images/banner2.jpeg"
+                      className="w-full h-auto objsct-cover"
+                      alt="banner3"
+                    />
+                  </Box>
+                )}
+              </>
             )
         )
       ) : (
