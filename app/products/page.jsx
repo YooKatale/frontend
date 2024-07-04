@@ -184,7 +184,7 @@ const Products = () => {
                         display={"flex"}
                         htmlFor="category"
                         className="secondary-light-font"
-                      >
+                      > 
                         {category}
                       </FormLabel>
                     </Flex>
