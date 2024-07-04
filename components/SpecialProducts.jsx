@@ -36,7 +36,10 @@ const SpecialProducts = ({ Products, userInfo, category, text }) => {
           <div className="flex justify-between">
             <div>
               <h3 className="lg:text-2xl text-lg text-center capitalize">
-                <span className="capitalize">{text}</span> Products
+                <span className="capitalize">
+                  {text.toLowerCase() === "roughages" ? "supplements" : text}
+                </span>{" "}
+                Products
               </h3>
               <div className="flex">
                 <div className="h-[0.15rem] lg:w-[10rem] w-[6rem] my-2 bg-primary"></div>
