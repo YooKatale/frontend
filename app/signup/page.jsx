@@ -13,6 +13,9 @@ import {
   Select,
   Checkbox,
   Spinner,
+  RadioGroup,
+  Radio,
+  Stack,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import Link from "next/link";
@@ -39,6 +42,7 @@ const SignUp = () => {
   const [vegan, setVegan] = useState(false);
   const [address, setAddress] = useState("");
   const [isLoading, setLoading] = useState(false);
+  const [notifyBy, setNotifyBy] = useState("");
 
   const { push } = useRouter();
 
@@ -190,7 +194,7 @@ const SignUp = () => {
                         country={'ug'}
                         value={phone}
                         onChange={(tel) => setPhone(tel)}
-                        onlyCountries={['ug','gh', 'ng', 'tz', 'ke', 'rw', 'za']}
+                        onlyCountries={['ug', 'gh', 'ng', 'tz', 'ke', 'rw', 'za']}
                         placeholder="Enter phone number"
                       />
                     </FormControl>
@@ -280,6 +284,18 @@ const SignUp = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
+                  </FormControl>
+                </Box>
+                <Box padding={"0.5rem 0"}>
+                  <FormControl>
+                    <FormLabel htmlFor="notifyBy">Get Notification by</FormLabel>
+                    <RadioGroup defaultValue='sms' onChange={(notify) => console.log(notify)} value={notifyBy}>
+                      <Stack direction='row'>
+                        <Radio value='sms' colorScheme='red'>SMS</Radio>
+                        <Radio value='whatsapp'>WhatsApp</Radio>
+                        <Radio value='call'>Call</Radio>
+                      </Stack>
+                    </RadioGroup>
                   </FormControl>
                 </Box>
                 <Box padding="1rem 0">
