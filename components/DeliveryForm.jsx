@@ -32,6 +32,7 @@ const VendorForm = () => {
   const [activeQuestion, setActiveQuestion] = useState(null);
   const [numberPlate, setNumberPlate] = useState('');
   const chakraToast = useToast();
+  const [notifyBy, setNotifyBy] = useState('sms');
   const [submitDeliveryForm] = useSubmitDeliveryFormMutation();
 
   const handleSubmit = async (event) => {
@@ -60,6 +61,7 @@ const VendorForm = () => {
         businessAddress,
         businessHours,
         transport,
+        notifyBy,
         vegan,
       };
       if (transport !== 'bike') {
@@ -81,6 +83,7 @@ const VendorForm = () => {
       setBusinessHours('');
       setLocation('');
       setTransport('bike');
+      setNotifyBy('sms');
       setVegan(false);
       setLoading(false);
       
@@ -135,6 +138,10 @@ const VendorForm = () => {
     } else {
       setActiveQuestion(index);
     }
+  }
+// handling the notification by state
+  function handleNotify(e) {
+    setNotifyBy(e);
   }
 
   return (
@@ -243,7 +250,18 @@ const VendorForm = () => {
                 </>
               )}
             </FormControl>
-
+            <Box padding={"0.5rem 0"}>
+              <FormControl>
+                <FormLabel htmlFor="notifyBy">Get Notification by</FormLabel>
+                <RadioGroup defaultValue='sms' onChange={handleNotify}>
+                  <Stack direction='row'>
+                    <Radio value='sms' colorScheme='red'>SMS</Radio>
+                    <Radio value='whatsapp'>WhatsApp</Radio>
+                    <Radio value='call' colorScheme='green'>Call</Radio>
+                  </Stack>
+                </RadioGroup>
+              </FormControl>
+            </Box>
             <Box padding="0.5rem 0">
               <div className="flex">
                 <input

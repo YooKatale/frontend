@@ -6,13 +6,16 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Radio,
+  RadioGroup,
   Select,
+  Stack,
   useToast
 } from '@chakra-ui/react';
 import ButtonComponent from '@components/Button';
 import { Loader } from 'lucide-react';
 import Link from 'next/link';
-import VendorForm from '@components/DeliveryForm'; 
+import VendorForm from '@components/DeliveryForm';
 import { useRegisterVendorMutation } from '@slices/vendorSlice';
 import { ThemeColors } from '@constants/constants';
 import { PlusOutlined } from '@ant-design/icons';
@@ -25,7 +28,8 @@ const Partner = () => {
     address: '',
     phone: '',
     email: '',
-    category: '', 
+    notifyBy: '',
+    category: '',
     vegan: false,
     terms: false,
   });
@@ -60,7 +64,7 @@ const Partner = () => {
         vegan: formData.vegan,
         status: 'Unverified'
       };
-     
+
       const response = await registerVendor(data);
       if (response.data.status === "Success") {
         chakraToast({
@@ -70,21 +74,21 @@ const Partner = () => {
           duration: 5000,
           isClosable: false,
         });
-      setFormData({
-        name: '',
-        address: '',
-        phone: '',
-        email: '',
-        category: '',
-        vegan: false,
-        terms: false,
-      });
+        setFormData({
+          name: '',
+          address: '',
+          phone: '',
+          email: '',
+          category: '',
+          vegan: false,
+          terms: false,
+        });
       }
       setLoading(false);
     } catch (error) {
       setLoading(false);
 
-      console.error("An error occurred:", error); 
+      console.error("An error occurred:", error);
 
       chakraToast({
         title: 'Error',
@@ -125,16 +129,21 @@ const Partner = () => {
     setActiveQuestion(activeQuestion === index ? null : index);
   }
 
+  function handleNotify(e) {
+    setNotifyBy(e);
+  }
+
+
   return (
     <div>
-       <VendorForm />
-     
+      <VendorForm />
+
       <Box
         className="mx-auto p-4 bg-black mb-20 mt-20"
         display="flex"
         flexDirection={{ base: 'column', lg: 'row' }}
       >
-        
+
         <Box className="p-4 md:w-2/5 rounded-xl bg-white">
           <p className="text-3xl text-left mb-4 text-dark">
             Fill out the vendor form
@@ -189,7 +198,7 @@ const Partner = () => {
               />
             </FormControl>
 
-       
+
             <FormControl className="mb-4">
               <FormLabel>Category*</FormLabel>
               <Select
@@ -210,7 +219,18 @@ const Partner = () => {
                 <option value="Fisherman">Fisherman</option>
               </Select>
             </FormControl>
-
+            <Box padding={"0.5rem 0"}>
+              <FormControl>
+                <FormLabel htmlFor="notifyBy">Get Notification by</FormLabel>
+                <RadioGroup defaultValue='sms' onChange={handleNotify}>
+                  <Stack direction='row'>
+                    <Radio value='sms' colorScheme='red'>SMS</Radio>
+                    <Radio value='whatsapp'>WhatsApp</Radio>
+                    <Radio value='call' colorScheme='green'>Call</Radio>
+                  </Stack>
+                </RadioGroup>
+              </FormControl>
+            </Box>
             <Box padding="0.5rem 0">
               <div className="flex">
                 <input
@@ -284,8 +304,8 @@ const Partner = () => {
         </Box>
       </Box>
 
- 
-     
+
+
 
       {/* Frequently Asked Questions */}
       <Box className="p-4 w-full md:w-1/2 md:ml-5">

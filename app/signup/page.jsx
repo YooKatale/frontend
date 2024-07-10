@@ -42,7 +42,7 @@ const SignUp = () => {
   const [vegan, setVegan] = useState(false);
   const [address, setAddress] = useState("");
   const [isLoading, setLoading] = useState(false);
-  const [notifyBy, setNotifyBy] = useState("");
+  const [notifyBy, setNotifyBy] = useState("sms");
 
   const { push } = useRouter();
 
@@ -86,6 +86,7 @@ const SignUp = () => {
         vegan,
         dob,
         address,
+        notifyBy,
         password,
       }).unwrap();
 
@@ -115,6 +116,10 @@ const SignUp = () => {
       });
     }
   };
+  function handleNotify(e) {
+    console.log(e);
+    setNotifyBy(e);
+  }
 
   return (
     <>
@@ -289,11 +294,11 @@ const SignUp = () => {
                 <Box padding={"0.5rem 0"}>
                   <FormControl>
                     <FormLabel htmlFor="notifyBy">Get Notification by</FormLabel>
-                    <RadioGroup defaultValue='sms' onChange={(notify) => console.log(notify)} value={notifyBy}>
+                    <RadioGroup defaultValue='sms' onChange={handleNotify}>
                       <Stack direction='row'>
                         <Radio value='sms' colorScheme='red'>SMS</Radio>
                         <Radio value='whatsapp'>WhatsApp</Radio>
-                        <Radio value='call'>Call</Radio>
+                        <Radio value='call' colorScheme='green'>Call</Radio>
                       </Stack>
                     </RadioGroup>
                   </FormControl>
