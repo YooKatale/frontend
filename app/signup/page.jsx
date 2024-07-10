@@ -186,9 +186,10 @@ const SignUp = () => {
                     <FormControl>
                       <FormLabel htmlFor="phone">Phone Number</FormLabel>
                       <PhoneInput
+                        style={{ width: '100%', border: '1px solid #ccc' }}
                         country={'ug'}
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(tel) => setPhone(tel)}
                         onlyCountries={['ug','gh', 'ng', 'tz', 'ke', 'rw', 'za']}
                         placeholder="Enter phone number"
                       />
