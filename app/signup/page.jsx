@@ -24,6 +24,8 @@ import { setCredentials } from "@slices/authSlice";
 import { redirect, useRouter } from "next/navigation";
 import ButtonComponent from "@components/Button";
 import { Loader } from "lucide-react";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 const SignUp = () => {
   // states
@@ -183,13 +185,12 @@ const SignUp = () => {
                   <Box padding={"0.5rem 0"}>
                     <FormControl>
                       <FormLabel htmlFor="phone">Phone Number</FormLabel>
-                      <Input
-                        type="text"
-                        placeholder="Include country code [+256.....]"
-                        name="phone"
-                        id="phone"
+                      <PhoneInput
+                        country={'ug'}
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
+                        onlyCountries={['ug','gh', 'ng', 'tz', 'ke', 'rw', 'za']}
+                        placeholder="Enter phone number"
                       />
                     </FormControl>
                   </Box>
