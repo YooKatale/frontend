@@ -78,7 +78,6 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
       });
 
       setIsLoading((prevState) => (prevState ? false : true));
-
       router.push(`/payment/${res.data.data.Order}`);
     } catch (err) {
       setIsLoading((prevState) => (prevState ? false : true));
