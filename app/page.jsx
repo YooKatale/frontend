@@ -27,18 +27,19 @@ const DynamicSpecialProducts = dynamic(
 );
 
 const CategoryCard = ({ category }) => (
-  <div className="lg:p-10 p-4 border-2 border-light rounded-md hover:border-primary">
+  <div className="lg:p-1 p-1 border-2 border-light rounded-md hover:border-primary">
     <Link href={`/search?q=${category}`}>
-      <div className="flex justify-center flex-center">
+      <div className="flex justify-center items-center">
         <img
           src={`/assets/images/categories/${category}.jpg`}
-          className="lg:h-20 lg:w-20 w-12 h-12 rounded-full object-cover"
+          className="lg:h-32 lg:w-32 w-20 h-20 object-contain"
         />
       </div>
-      <p className="lg:text-lg text-base text-center">{category}</p>
+      {/* <p className="lg:text-lg text-base text-center">{category}</p> */}
     </Link>
   </div>
 );
+
 
 
 const Home = () => {

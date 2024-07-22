@@ -115,6 +115,7 @@ const SignUp = () => {
       <Box>
         <Box paddingBottom={"3rem"}>
           <Box padding={"1rem 0"}>
+
             <Heading as={"h2"} fontSize={"lg"} textAlign={"center"}>
               Are you new
             </Heading>
@@ -327,6 +328,17 @@ const SignUp = () => {
                   />
                 </Box>
               </form>
+
+              <Text fontSize="3xl" textAlign="center">
+                <Link href="/subscription">
+                   <ButtonComponent
+                    size="regular"
+                    type="button"
+                    text="View Our Subscription Packages"
+                    icon={false} 
+                     />
+                </Link>
+             </Text>
             </Box>
           </Flex>
         </Box>

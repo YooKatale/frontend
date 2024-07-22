@@ -38,9 +38,15 @@ export const CategoriesJson = [
   "Protein",
   "Fats and oils",
   "Vitamins",
-  "Minerals",
+  "gas",
+  "herbs and spices",
   "Knife Shapening",
-  "Cake Ordering"
+  "breakfast",
+  "Dairy",
+  "vegetables",
+  "juice&meals",
+  "root tubers",
+
 ];
 
 

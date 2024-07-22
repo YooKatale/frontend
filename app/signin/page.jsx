@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import ButtonComponent from "@components/Button";
 import { Loader } from "lucide-react";
 
+
 const SignIn = ({ redirect, callback }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -172,8 +173,21 @@ const SignIn = ({ redirect, callback }) => {
                     Forgot Password?
                   </Link>
                 </Text>
+  
               </Box>
               </form>
+
+              <Text fontSize="3xl" textAlign="center">
+                <Link href="/subscription">
+                   <ButtonComponent
+                    size="regular"
+                    type="button"
+                    text="View Our Subscription Packages"
+                    icon={false} 
+                     />
+                </Link>
+             </Text>
+                    
             </Box>
           </Flex>
         </Box>
