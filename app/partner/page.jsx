@@ -200,14 +200,28 @@ const Partner = () => {
                 className="border border-dark italic hover-border-red focus-border-red rounded px-2 py-1"
               >
                 <option value="Livestock farmer">Livestock farmer</option>
-                <option value="Dairy farmer">Dairy farmer</option>
+                {/* <option value="Dairy farmer">Dairy farmer</option>
                 <option value="Poultry farmer">Poultry farmer</option>
                 <option value="Egg supplier">Egg supplier</option>
                 <option value="Honey supplier">Honey supplier</option>
                 <option value="Fruit grower">Fruit grower</option>
                 <option value="Vegetable grower">Vegetable grower</option>
-                <option value="Grain farmer">Grain farmer</option>
-                <option value="Fisherman">Fisherman</option>
+                <option value="Grain farmer">Grain farmer</option>*/}
+                <option value="Fisherman">Fisherman</option> 
+                <option value="Carbohydrates">Carbohydrates</option>
+                <option value="Protein">Protein</option>
+                <option value="Fats and oils">Fats and oils</option>
+                <option value="Vitamins">Vitamins</option>
+                <option value="Gas">Gas</option>
+                <option value="Herbs and spices">Herbs and spices</option>
+                <option value="Knife Sharpening">Knife Sharpening</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Vegetables">Vegetables</option>
+                <option value="Juice & meals">Juice & meals</option>
+                <option value="Root tubers">Root tubers</option>
+                {/* <option value="Markets & Shops Nearby">Markets & Shops Nearby</option> */}
+
               </Select>
             </FormControl>
 
