@@ -1,9 +1,7 @@
 "use client";
 
-import { Box, Flex, Grid, Heading, Text } from "@chakra-ui/react";
+import { Box, Flex, Grid, Heading, Text, Divider } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
-
-// import React from 'react'
 
 const About = () => {
   return (
@@ -12,7 +10,7 @@ const About = () => {
         <Box padding={{ base: "3rem 2rem", md: "3rem", xl: "3rem" }}>
           <Box>
             <Heading as={"h3"} size="md" textAlign={"center"}>
-              About
+              About Us
             </Heading>
             <Text
               className="secondary-light-font"
@@ -32,18 +30,16 @@ const About = () => {
           </Box>
 
           <Box padding={"2rem 0"}>
-            <Flex>
-              <Box
-                margin={"auto"}
-                width={{ base: "100%", md: "100%", xl: "80%" }}
-              >
+            <Flex justifyContent="center">
+              <Box width={{ base: "100%", md: "100%", xl: "80%" }}>
                 <Flex direction={{ base: "column", md: "column", xl: "row" }}>
                   <Box width={{ base: "100%", md: "100%", xl: "60%" }}>
                     <Text fontSize={"lg"} textAlign={"center"}>
-                      YooKatale is a mobile retail and wholesale market for
-                      natural and organic foods in Uganda, Africa. We are a
-                      customer-centric business that aims to set an industry
-                      standard
+                      YooKatale is a mobile food market that sells and
+                       buys food, promotes and advertises various food
+                        products across Uganda to other countries with
+                         a variety of foods from different cultures,
+                          in affordable quantities & quality.
                     </Text>
                   </Box>
                   <Box
@@ -63,7 +59,18 @@ const About = () => {
                         size={"2xl"}
                         margin={"0.3rem 0"}
                       >
-                        To permeate vitality among people and communities
+                        To make food accessible everywhere.
+                      </Text>
+                      <Divider my={4} />
+                      <Heading as={"h3"} size="md">
+                        Vision
+                      </Heading>
+                      <Text
+                        className="secondary-light-font"
+                        size={"2xl"}
+                        margin={"0.3rem 0"}
+                      >
+                        To connect people & communities to healthy food anywhere.
                       </Text>
                     </Box>
                   </Box>
@@ -71,40 +78,78 @@ const About = () => {
               </Box>
             </Flex>
 
-            <div className={"py-4"}>
-              <div className="flex">
-                <div className="m-auto lg:w-4/5 w-full">
-                  <div className="py-2">
-                    <h3 className="text-lg font-bold">Core Principles</h3>
-                  </div>
+            <Box className={"py-4"}>
+              <Box textAlign="center">
+                <Heading as={"h3"} size="lg" marginBottom={4}>
+                  Manifesto
+                </Heading>
+                <Text>
+                  To enable People, Yookatale is about giving
+                   and lifting others with love and trust as
+                    the fabric and structure of building happy
+                     & healthy communities everywhere.
+                </Text>
+              </Box>
 
-                  <div className="grid lg:grid-cols-3 lg:py-0 gap-4 py-2">
-                    <div className="p-4 border-2 border-light rounded-md">
-                      <p className="text-center">
-                        You have power & opportunity to make someone smile, do
-                        it. we live in an ever changing world, the only fuel
-                        that can drive us to a better & peaceful tomorrow for
-                        generations is deep compassion for one another.
-                      </p>
-                    </div>
-                    <div className="p-4 border-2 border-light rounded-md">
-                      <p className="text-center">
-                        Ultimately, we come into existence through love. Spread
-                        this feeling throughout the world in your own way,
-                        Celebrate life.
-                      </p>
-                    </div>
-                    <div className="p-4 border-2 border-light rounded-md">
-                      <p className="text-center">
-                        Yookatale is about giving and lifting others with love
-                        and trust as the fabric and structure of building happy
-                        & healthy communities everywhere.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+              <Box my={8}>
+                <Heading as="h3" size="lg" textAlign={"center"} marginBottom={4}>
+                  Core Values
+                </Heading>
+                <Grid templateColumns={{ base: "1fr", md: "1fr 1fr", xl: "repeat(3, 1fr)" }} gap={6}>
+                  {[
+                    "Focus on the customer.",
+                    "Respect everyone.",
+                    "Simplify everything.",
+                    "Be authentic & curious.",
+                    "Respect opportunities.",
+                    "Never give up."
+                  ].map((value, index) => (
+                    <Box
+                      key={index}
+                      padding={4}
+                      border="2px solid"
+                      borderColor={ThemeColors.lightColor}
+                      borderRadius="md"
+                    >
+                      <Text textAlign="center">{value}</Text>
+                    </Box>
+                  ))}
+                </Grid>
+              </Box>
+
+              <Box my={8}>
+                <Heading as="h3" size="lg" textAlign={"center"} marginBottom={4}>
+                  Culture
+                </Heading>
+                <Text textAlign={"center"} fontSize={"lg"}>
+                  We are a hybrid company that integrates
+                   both physical and digital technology
+                    solutions to uplift & solve everyday
+                     problems in society.
+                </Text>
+              </Box>
+
+              <Box my={8}>
+                <Heading as="h3" size="lg" textAlign={"center"} marginBottom={4}>
+                  Hybrid Organizational Structure
+                </Heading>
+                <Text textAlign={"center"} fontSize={"lg"}>
+                  Yookatale's culture can be described as
+                   having a hierarchical structure, where
+                    the focus is on being customer-centric
+                     first, placing employees second, and
+                      considering stakeholders as the 
+                      final priority. This approach 
+                      emphasizes the importance of 
+                      prioritizing customer needs and
+                       satisfaction, followed by ensuring
+                        the well-being and engagement of 
+                        employees, and finally, considering
+                         the interests of stakeholders in
+                          the decision-making process.
+                </Text>
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Box>
