@@ -292,9 +292,9 @@ const Header = () => {
             userInfo && (
               <Flex align="center">
               {isSubscribed ? (
-               <Badge colorScheme="green" className="bg-green px-2 py-1 rounded-full text-white text-sm md:text-base">Subscribed</Badge>
+               <Badge className="bg-green px-2 py-1 rounded-full text-white text-sm md:text-base">Subscribed</Badge>
              ) : (
-                <Badge colorScheme="red" className="bg-red px-2 py-1 rounded-full text-white text-sm">Not Subscribed</Badge>
+                <Badge  className="bg-red px-2 py-1 rounded-full text-white text-sm">Not Subscribed</Badge>
             )}
             </Flex>
             )

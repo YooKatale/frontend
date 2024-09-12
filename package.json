@@ -1,7 +1,7 @@
 {
   "name": "tatli_app",
   "version": "0.1.0",
-  "proxy": "http://localhost:8000/",
+  "proxy": "http://localhost:4400/",
   "proxy_temp": "https://yookatale-server-app.onrender.com/",
   "private": true,
   "scripts": {
