@@ -46,6 +46,7 @@ export const CategoriesJson = [
   "vegetables",
   "juice&meals",
   "root tubers",
+  "Markets & Shops Nearby",
 
 ];
 
