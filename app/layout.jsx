@@ -1,4 +1,4 @@
-'use client'
+//'use client'
 import Header from "@components/Header";
 import Footer from "@components/Footer";
 import { Providers } from "./providers";
@@ -9,6 +9,7 @@ import { Work_Sans } from "next/font/google";
 import ServiceWorker from "@components/ServiceWorker";
 import { CacheProvider } from "@chakra-ui/next-js";
 import { ChakraProvider } from "@chakra-ui/react";
+import { Suspense } from "react";
 
 const WorkSans = Work_Sans({ subsets: ["latin"] });
 
@@ -25,9 +26,11 @@ const RootLayout = ({ children }) => {
       <body className={WorkSans.className} suppressHydrationWarning>
           {/* <ServiceWorker /> */}
           <Providers>
+            <Suspense>
             <Header />
             {children}
             <Footer />
+            </Suspense>
             <CookiePolicy />
           </Providers>
           {/* <ScriptTag /> */} 
