@@ -77,7 +77,7 @@ const Home = () => {
   const [currSliderIndex, setCurrSliderIndex] = useState(0);
 
   const increaseSliderIndex = () => {
-    if (currSliderIndex === Comments.length - 1) {
+    if (currSliderIndex === Comments?.length - 1) {
       setCurrSliderIndex((prev) => 0);
     } else {
       setCurrSliderIndex((prev) => prev + 1);
@@ -88,7 +88,7 @@ const Home = () => {
     if (currSliderIndex > 0) {
       setCurrSliderIndex((prev) => prev - 1);
     } else {
-      setCurrSliderIndex((prev) => Comments.length - 1);
+      setCurrSliderIndex((prev) => Comments?.length - 1);
     }
   };
 
@@ -430,7 +430,7 @@ const Home = () => {
 
       {/* ------------- section 
       ------------------------------- */}
-      {Products.length > 0 ? (
+      {Products?.length > 0 ? (
         Products.map(
           (product, index) =>
             product?.category !== "popular" &&
@@ -467,7 +467,7 @@ const Home = () => {
                   </Box>
                 )}
 
-                {index === Products.length - 7 && (
+                {index === Products?.length - 7 && (
                   <Box>
                     <img
                       src="/assets/images/banner2.jpeg"
@@ -500,7 +500,7 @@ const Home = () => {
       {/* ------------- section 
       ------------------------------- */}
       <Box>
-        {Comments.length > 0 ? (
+        {Comments?.length > 0 ? (
           <Box
             padding={"2rem 0 3rem 0"}
             borderBottom={"1.7px solid " + ThemeColors.lightColor}
