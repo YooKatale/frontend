@@ -151,9 +151,7 @@ const Home = () => {
         />
       </Box>
 
-      {/* <Box display={`${Products?.length > 0 && "none"}`} hidden>
-        <Loader />
-      </Box> */}
+      
 
       {/* ------------- section 
       ------------------------------- */}
@@ -239,160 +237,149 @@ const Home = () => {
           </Box>
         </Flex>
       </Box>
+      
 
       {/* // product?.category == "popular" && */}
       <Box
         padding={"3rem 0"}
         borderBottom={"1.7px solid " + ThemeColors.lightColor}
       >
-      {Products?.length > 0 ? (
-        Products.map(
-          (product, index) =>
-            product?.category === "popular" && (
-              
-                <Flex key={index}>
-                  <Box
-                    margin={"auto"}
-                    width={{ base: "95%", md: "90%", xl: "90%" }}
-                  >
+        <Flex>
+          <Box margin={"auto"} width={{ base: "95%", md: "90%", xl: "90%" }}>
+            {Products?.length > 0 ? (
+              Products.map(
+                (product, index) =>
+                  product?.category === "popular" && (
                     <DynamicSpecialProducts
                       Products={product?.products}
                       userInfo={userInfo}
                       category={product?.category}
                       text={product?.category}
+                      key={index}
                     />
-                  </Box>
-                </Flex>
-            )
-        )
-      ) : (
-        <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
-      )}
-      <Box
-      ml={'6.3%'}
-         
-          bgImage="url('/assets/images/banner2.jpeg')"
+                  )
+              )
+            ) : (
+              <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
+            )}
+          </Box>
+        </Flex>
+        <Box
+          style={{ marginLeft: '6.3%' }}
+          bgImage="url('/assets/images/banner3.jpeg')"
           bgSize="cover"
           bgPosition="center"
           h={{ base: '200px', sm: '200px', lg: '150px' }}
           w="80%"
         />
-</Box>
+      </Box>
 
 
-
-<Box
+      <Box
         padding={"3rem 0"}
         borderBottom={"1.7px solid " + ThemeColors.lightColor}
       >
-      {Products?.length > 0 ? (
-        Products.map(
-          (product, index) =>
-            product?.category === "discover" && (
-              
-                <Flex key={index}>
-                  <Box
-                    margin={"auto"}
-                    width={{ base: "95%", md: "90%", xl: "90%" }}
-                  >
+        <Flex>
+          <Box margin={"auto"} width={{ base: "95%", md: "90%", xl: "90%" }}>
+            {Products?.length > 0 ? (
+              Products.map(
+                (product, index) =>
+                  product?.category === "discover" && (
                     <DynamicSpecialProducts
                       Products={product?.products}
                       userInfo={userInfo}
                       category={product?.category}
                       text={product?.category}
+                      key={index}
                     />
-                  </Box>
-                </Flex>
-            )
-        )
-      ) : (
-        <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
-      )}
-      <Box
-           ml={'6.3%'}
+                  )
+              )
+            ) : (
+              <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
+            )}
+          </Box>
+        </Flex>
+        <Box
+          style={{ marginLeft: '6.3%' }}
           bgImage="url('/assets/images/banner4.jpeg')"
           bgSize="cover"
           bgPosition="center"
           h={{ base: '200px', sm: '200px', lg: '150px' }}
           w="80%"
         />
-</Box>
-      
+      </Box>
 
-<Box
+      <Box
         padding={"3rem 0"}
         borderBottom={"1.7px solid " + ThemeColors.lightColor}
       >
-      {Products?.length > 0 ? (
-        Products.map(
-          (product, index) =>
-            product?.category === "promotional" && (
-              
-                <Flex key={index}>
-                  <Box
-                    margin={"auto"}
-                    width={{ base: "95%", md: "90%", xl: "90%" }}
-                  >
+        <Flex>
+          <Box margin={"auto"} width={{ base: "95%", md: "90%", xl: "90%" }}>
+            {Products?.length > 0 ? (
+              Products.map(
+                (product, index) =>
+                  product?.category === "promotional" && (
                     <DynamicSpecialProducts
                       Products={product?.products}
                       userInfo={userInfo}
                       category={product?.category}
                       text={product?.category}
+                      key={index}
                     />
-                  </Box>
-                </Flex>
-            )
-        )
-      ) : (
-        <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
-      )}
-      <Box
-           ml={'6.3%'}
+                  )
+              )
+            ) : (
+              <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
+            )}
+          </Box>
+        </Flex>
+        <Box
+          style={{ marginLeft: '6.3%' }}
           bgImage="url('/assets/images/banner5.jpeg')"
           bgSize="cover"
           bgPosition="center"
           h={{ base: '200px', sm: '200px', lg: '150px' }}
           w="80%"
         />
-</Box>
+      </Box>
 
-<Box
+
+      <Box
         padding={"3rem 0"}
         borderBottom={"1.7px solid " + ThemeColors.lightColor}
       >
-      {Products?.length > 0 ? (
-        Products.map(
-          (product, index) =>
-            product?.category === "recommended" && (
-              
-                <Flex key={index}>
-                  <Box
-                    margin={"auto"}
-                    width={{ base: "95%", md: "90%", xl: "90%" }}
-                  >
+        <Flex>
+          <Box margin={"auto"} width={{ base: "95%", md: "90%", xl: "90%" }}>
+            {Products?.length > 0 ? (
+              Products.map(
+                (product, index) =>
+                  product?.category === "recommended" && (
                     <DynamicSpecialProducts
                       Products={product?.products}
                       userInfo={userInfo}
                       category={product?.category}
                       text={product?.category}
+                      key={index}
                     />
-                  </Box>
-                </Flex>
-            )
-        )
-      ) : (
-        <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
-      )}
-      <Box
-           ml={'6.3%'}
+                  )
+              )
+            ) : (
+              <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
+            )}
+          </Box>
+        </Flex>
+        <Box
+          style={{ marginLeft: '6.3%' }}
           bgImage="url('/assets/images/banner6.jpeg')"
           bgSize="cover"
           bgPosition="center"
           h={{ base: '200px', sm: '200px', lg: '150px' }}
           w="80%"
         />
-</Box>
+      </Box>
 
+
+     
 
 
       {/* ------------- section 
@@ -433,6 +420,7 @@ const Home = () => {
                         userInfo={userInfo}
                         category={product?.category}
                         text={product?.category}
+                        key={index}
                       />
                     </Box>
                   </Flex>
