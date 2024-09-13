@@ -491,7 +491,7 @@ const Footer = () => {
                 Invite A Friend
               </Text>
 
-              <Flex justifyContent={"center"} gap={"2"}>
+              {/* <Flex justifyContent={"center"} gap={"2"}>
                 <FacebookShareButton url={shareUrl} quote={defaultMessage}>
                   <FacebookIcon size={25} round />
                 </FacebookShareButton>
@@ -510,7 +510,7 @@ const Footer = () => {
                 <TelegramShareButton url={shareUrl} title={defaultMessage}>
                   <TelegramIcon size={25} round />
                 </TelegramShareButton>
-              </Flex>
+              </Flex> */}
             </Flex>
           </Box>
           <Spacer display={{ base: "none", md: "none", xl: "block" }} />
