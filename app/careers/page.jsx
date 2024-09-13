@@ -241,7 +241,6 @@ const ApplyForm = () => {
           <input
             className="border rounded px-2 py-1 w-full"
             type="text"
-            id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
@@ -255,7 +254,6 @@ const ApplyForm = () => {
           <input
             className="border rounded px-2 py-1 w-full"
             type="email"
-            id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
@@ -269,7 +267,6 @@ const ApplyForm = () => {
           <input
             className="border rounded px-2 py-1 w-full"
             type="tel"
-            id="phone"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
@@ -285,7 +282,7 @@ const ApplyForm = () => {
           </label>
           <textarea
             className="border rounded px-2 py-1 w-full"
-            id="coverLetter"
+           
             name="coverLetter"
             value={formData.coverLetter}
             onChange={handleChange}

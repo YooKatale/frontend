@@ -28,7 +28,7 @@ const RootLayout = ({ children }) => {
             <Footer />
             <CookiePolicy />
           </Providers>
-          <ScriptTag />
+          {/* <ScriptTag /> */}
         </main>
       </body>
     </html>

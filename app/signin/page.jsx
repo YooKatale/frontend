@@ -117,8 +117,8 @@ const SignIn = ({ redirect, callback }) => {
                 <FormControl>
                   <FormLabel htmlFor="email">Email</FormLabel>
                   <Input
-                    type="text"
-                    id="email"
+                    type="email"
+                    id={`email${Math.random(0,10000)}`}
                     placeholder="Email is required"
                     value={email}
                     name="email"
@@ -132,7 +132,7 @@ const SignIn = ({ redirect, callback }) => {
                     placeholder="password is required"
                     name="password"
                     value={password}
-                    id="password"
+                    id={`password${Math.random(0,10000)}`}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </FormControl>

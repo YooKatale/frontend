@@ -119,7 +119,7 @@ const Contact = () => {
                           <FormLabel htmlFor="name">Name</FormLabel>
                           <Input
                             type="text"
-                            id="name"
+                          
                             placeholder="name is required"
                             name="name"
                             value={name}
@@ -132,7 +132,7 @@ const Contact = () => {
                           <FormLabel htmlFor="email">Email</FormLabel>
                           <Input
                             type="text"
-                            id="email"
+                          
                             placeholder="email is required"
                             name="email"
                             value={email}

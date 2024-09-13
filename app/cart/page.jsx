@@ -240,7 +240,6 @@ const Cart = () => {
                                 <Input
                                   name="coupon"
                                   type="text"
-                                  id="coupon"
                                   placeholder="Coupon"
                                 />
                                 <div className="py-2">

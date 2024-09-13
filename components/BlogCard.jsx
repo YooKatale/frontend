@@ -21,6 +21,7 @@ const BlogCard = ({ blog }) => {
               objectFit={"cover"}
               borderTopRightRadius={"md"}
               borderTopRLeftRadius={"md"}
+              alt="blogimage"
             />
           </Box>
           <Box padding={"0.5rem"}>

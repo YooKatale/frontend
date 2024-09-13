@@ -223,7 +223,7 @@ const SignUp = () => {
                       <FormLabel htmlFor="email">Email *</FormLabel>
                       <Input
                         type="text"
-                        id="email"
+                        id={`email${Math.random(0,10000)}`}
                         placeholder="email is required"
                         name="email"
                         value={email}
@@ -275,7 +275,7 @@ const SignUp = () => {
                       type="password"
                       placeholder="password is required"
                       name="password"
-                      id="password"
+                      id={`password${Math.random(0,10000)}`}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />

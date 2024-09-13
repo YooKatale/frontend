@@ -300,6 +300,7 @@ const Product = ({ params }) => {
                     {isEditingPrice ? (
                       <input
                         type="number"
+                        name="price"
                         value={editablePrice}
                         onChange={(e) => setEditedPrice(e.target.value)}
                         className="border"

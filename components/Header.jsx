@@ -229,7 +229,9 @@ const Header = () => {
             <Image
               src={"/assets/icons/logo2.png"}
               alt="Logo"
-              fill={true}
+              //fill={true}
+              height= {100}
+  width= {100}
               className="object-contain h-full w-auto"
             />
           </div>

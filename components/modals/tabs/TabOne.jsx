@@ -156,7 +156,7 @@ const TabOne = ({ updateTabIndex, fetchData }) => {
                       <FormLabel htmlFor="email">Email</FormLabel>
                       <Input
                         type="text"
-                        id="email"
+                        id={`email${Math.random(0,10000)}`}
                         placeholder="email is required"
                         name="email"
                         value={personalInfo.email}

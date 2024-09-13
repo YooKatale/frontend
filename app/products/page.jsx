@@ -211,7 +211,7 @@ const Products = () => {
                   {ProductsTitle}
                 </Heading>
               </Box>
-              {Products.length > 0 ? (
+              {Products?.length > 0 ? (
                 <Grid
                   gridTemplateColumns={{
                     base: "repeat(2, 1fr)",

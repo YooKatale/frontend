@@ -62,7 +62,7 @@ const SpecialProducts = ({ Products, userInfo, category, text }) => {
             id={`${category}__container__scrollbar`}
             className="container__hide__scrollbar gap-4"
           >
-            {Products.length > 0
+            {Products?.length > 0
               ? Products.map((product, index) => (
                   <ProductCard
                     key={index}
@@ -73,7 +73,7 @@ const SpecialProducts = ({ Products, userInfo, category, text }) => {
               : [1, 2, 3, 4].map((item) => <LoaderSkeleton key={item} />)}
           </Flex>
 
-          {Products.length > 4 && (
+          {Products?.length > 4 && (
             <Box display={{ base: "none", md: "none", xl: "block" }}>
               <Box
                 onClick={handleLeftScroll}

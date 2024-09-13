@@ -674,7 +674,7 @@ function MobileView(props) {
         </TabPanels>
       </Tabs>
       <Box className="w-full z-50 -ml-3 flex justify-between backdrop-blur-md bg-light rounded-md">
-        {active === "Basic" && basicPacks.length > 0 ? (
+        {active === "Basic" && basicPacks?.length > 0 ? (
           <button
             onClick={handlePayment}
             className="bg-secondary rounded-lg w-full py-3 flex justify-between items-center"
@@ -684,7 +684,7 @@ function MobileView(props) {
           </button>
         ) : (
           active === "Vip" &&
-          vipPacks.length >
+          vipPacks?.length >
             0 ? (
               <button
                 onClick={handlePayment}
