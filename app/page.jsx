@@ -15,7 +15,6 @@ import dynamic from "next/dynamic";
 import { useCommentsGetMutation } from "@slices/usersApiSlice";
 import { Salad } from "lucide-react";
 import RecommendedProducts from "@components/  RecommendedProducts";
-
 const DynamicButton = dynamic(() => import("@components/Button"), {
   loading: () => <p>Loading...</p>,
 });
@@ -109,39 +108,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* <div className="py-12 flex">
-        <div className="lg:w-[85%] sm:w-[90%] w-[95%] m-auto">
-          <div className="py-4">
-            <h3 className="text-2xl font-medium">Categories</h3>
-            <div className="py-2">
-              <div className="h-[0.13rem] w-[170px] bg-primary"></div>
-            </div>
-          </div>
-
-          <div className="grid lg:grid-cols-5 sm:grid-cols-4 grid-cols-3 gap-4 py-6">
-            {CategoriesJson.map((category, index) => (
-              <div
-                className="lg:p-10 p-4 border-2 border-light rounded-md hover:border-primary"
-                key={index}
-              >
-                <Link href={`/search?q=${category}`}>
-                  <div className="flex justify-center flex-center">
-                    <img
-                      src={`/assets/images/categories/${category}.jpg`}
-                      className="lg:h-20 lg:w-20 w-12 h-12 rounded-full object-cover"
-                    />
-                  </div>
-                  <p className="lg:text-lg text-base text-center">{category}</p>
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div> */}
-
-      {/* ------------- section 
-      ------------------------------- */}
-
       {/* // product?.category == "popular" && */}
       <Box
         padding={"3rem 0"}
@@ -170,8 +136,19 @@ const Home = () => {
                 text={""}
               />
             )}
+
+
           </Box>
         </Flex>
+        
+        <Box
+          style={{ marginLeft: '6.3%' }}
+          bgImage="url('/assets/images/banner3.jpeg')"
+          bgSize="cover"
+          bgPosition="center"
+          h={{ base: '200px', sm: '200px', lg: '150px' }}
+          w="80%"
+        />
       </Box>
 
       {/* <Box display={`${Products?.length > 0 && "none"}`} hidden>
@@ -264,16 +241,16 @@ const Home = () => {
       </Box>
 
       {/* // product?.category == "popular" && */}
+      <Box
+        padding={"3rem 0"}
+        borderBottom={"1.7px solid " + ThemeColors.lightColor}
+      >
       {Products?.length > 0 ? (
         Products.map(
           (product, index) =>
             product.category === "popular" && (
-              <Box
-                padding={"3rem 0"}
-                borderBottom={"1.7px solid " + ThemeColors.lightColor}
-                key={index}
-              >
-                <Flex>
+              
+                <Flex key={index}>
                   <Box
                     margin={"auto"}
                     width={{ base: "95%", md: "90%", xl: "90%" }}
@@ -286,7 +263,6 @@ const Home = () => {
                     />
                   </Box>
                 </Flex>
-              </Box>
             )
         )
       ) : (
@@ -297,17 +273,28 @@ const Home = () => {
           text={""}
         />
       )}
+      <Box
+          style={{ marginLeft: '6.3%' }}
+          bgImage="url('/assets/images/banner2.jpeg')"
+          bgSize="cover"
+          bgPosition="center"
+          h={{ base: '200px', sm: '200px', lg: '150px' }}
+          w="80%"
+        />
+</Box>
 
+
+
+<Box
+        padding={"3rem 0"}
+        borderBottom={"1.7px solid " + ThemeColors.lightColor}
+      >
       {Products?.length > 0 ? (
         Products.map(
           (product, index) =>
             product.category === "discover" && (
-              <Box
-                padding={"3rem 0"}
-                borderBottom={"1.7px solid " + ThemeColors.lightColor}
-                key={index}
-              >
-                <Flex>
+              
+                <Flex key={index}>
                   <Box
                     margin={"auto"}
                     width={{ base: "95%", md: "90%", xl: "90%" }}
@@ -320,7 +307,6 @@ const Home = () => {
                     />
                   </Box>
                 </Flex>
-              </Box>
             )
         )
       ) : (
@@ -331,17 +317,27 @@ const Home = () => {
           text={""}
         />
       )}
+      <Box
+          style={{ marginLeft: '6.3%' }}
+          bgImage="url('/assets/images/banner4.jpeg')"
+          bgSize="cover"
+          bgPosition="center"
+          h={{ base: '200px', sm: '200px', lg: '150px' }}
+          w="80%"
+        />
+</Box>
+      
 
+<Box
+        padding={"3rem 0"}
+        borderBottom={"1.7px solid " + ThemeColors.lightColor}
+      >
       {Products?.length > 0 ? (
         Products.map(
           (product, index) =>
             product.category === "promotional" && (
-              <Box
-                padding={"3rem 0"}
-                borderBottom={"1.7px solid " + ThemeColors.lightColor}
-                key={index}
-              >
-                <Flex>
+              
+                <Flex key={index}>
                   <Box
                     margin={"auto"}
                     width={{ base: "95%", md: "90%", xl: "90%" }}
@@ -354,7 +350,6 @@ const Home = () => {
                     />
                   </Box>
                 </Flex>
-              </Box>
             )
         )
       ) : (
@@ -365,17 +360,26 @@ const Home = () => {
           text={""}
         />
       )}
+      <Box
+          style={{ marginLeft: '6.3%' }}
+          bgImage="url('/assets/images/banner5.jpeg')"
+          bgSize="cover"
+          bgPosition="center"
+          h={{ base: '200px', sm: '200px', lg: '150px' }}
+          w="80%"
+        />
+</Box>
 
+<Box
+        padding={"3rem 0"}
+        borderBottom={"1.7px solid " + ThemeColors.lightColor}
+      >
       {Products?.length > 0 ? (
         Products.map(
           (product, index) =>
             product.category === "recommended" && (
-              <Box
-                padding={"3rem 0"}
-                borderBottom={"1.7px solid " + ThemeColors.lightColor}
-                key={index}
-              >
-                <Flex>
+              
+                <Flex key={index}>
                   <Box
                     margin={"auto"}
                     width={{ base: "95%", md: "90%", xl: "90%" }}
@@ -388,7 +392,6 @@ const Home = () => {
                     />
                   </Box>
                 </Flex>
-              </Box>
             )
         )
       ) : (
@@ -399,6 +402,17 @@ const Home = () => {
           text={""}
         />
       )}
+      <Box
+          style={{ marginLeft: '6.3%' }}
+          bgImage="url('/assets/images/banner6.jpeg')"
+          bgSize="cover"
+          bgPosition="center"
+          h={{ base: '200px', sm: '200px', lg: '150px' }}
+          w="80%"
+        />
+</Box>
+
+
 
       {/* ------------- section 
       ------------------------------- */}

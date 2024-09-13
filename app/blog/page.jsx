@@ -339,7 +339,7 @@ const Blog = () => {
                       <Box margin={"0 0.5rem"} display={"none"}>
                         <a
                           href="https://twitter.com/share?ref_src=twsrc%5Etfw"
-                          class="twitter-share-button"
+                          className="twitter-share-button"
                           data-text={`${BlogPost?.title}`}
                           data-url={`${pathname}`}
                           data-via="YooKatale"

@@ -33,7 +33,7 @@ export const Images = {
   cardSecureIcon,
 };
 
-export const CategoriesJson = [
+export const CategoriesJsond= [
   "Carbohydrates",
   "Protein",
   "Fats and oils",
@@ -47,9 +47,25 @@ export const CategoriesJson = [
   "juice&meals",
   "root tubers",
   "Markets & Shops Nearby",
-
 ];
 
+export const CategoriesJson = [
+  "Vitamins",
+  "Protein",
+  "Dairy",
+  "vegetables",
+  "Fats and oils",
+  "root tubers",
+  "Carbohydrates",
+  "herbs and spices",
+  "juice",
+  "meals",
+  "Cuisines",
+  "Kitchen",
+  "breakfast",
+  "Supplements",
+  "Markets & Shops Nearby",
+];
 
 export const DisplayImages = [img, img1, img2, img3, img4];
 
