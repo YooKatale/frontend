@@ -119,13 +119,12 @@ const Footer = () => {
   function generateReferralCode(userId) {
     const hash = crypto.createHash('sha256').update(userId).digest('hex');
     return hash.substring(0, 8);  // Return first 8 characters
-  }
-  const [referralCode, setreferralCode] = useState("")
+  } 
   const [referralUrl, setreferralUrl] = useState("")
   useEffect(() => {
     const referralCodew = generateReferralCode(userInfo?._id);
-    if (userInfo?._id != null) {
-      setreferralCode(referralCodew)
+    if (userInfo) {
+      
       setreferralUrl(`https://yookatale.com?ref=${referralCodew}`)
     }
   }, [])
