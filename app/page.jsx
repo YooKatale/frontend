@@ -14,7 +14,7 @@ import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import dynamic from "next/dynamic";
 import { useCommentsGetMutation } from "@slices/usersApiSlice";
 import { Salad } from "lucide-react";
-import RecommendedProducts from "@components/  RecommendedProducts";
+import RecommendedProducts from "@components/RecommendedProducts";
 const DynamicButton = dynamic(() => import("@components/Button"), {
   loading: () => <p>Loading...</p>,
 });
@@ -60,10 +60,14 @@ const Home = () => {
   };
 
   const handleFetchProductsData = async () => {
-    const res = await fetchProducts().unwrap();
-
-    if (res?.status && res?.status == "Success") {
-      setProducts(res.data);
+    try {
+      const res = await fetchProducts().unwrap();
+      if (res?.status && res?.status === "Success") {
+        setProducts(res.data || []); 
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setProducts([]);
     }
   };
 
