@@ -118,7 +118,7 @@ const Home = () => {
             {Products?.length > 0 ? (
               Products.map(
                 (product, index) =>
-                  product.category === "topdeals" && (
+                  product?.category === "topdeals" && (
                     <DynamicSpecialProducts
                       key={index}
                       Products={product?.products}
@@ -248,7 +248,7 @@ const Home = () => {
       {Products?.length > 0 ? (
         Products.map(
           (product, index) =>
-            product.category === "popular" && (
+            product?.category === "popular" && (
               
                 <Flex key={index}>
                   <Box
@@ -266,15 +266,11 @@ const Home = () => {
             )
         )
       ) : (
-        <DynamicSpecialProducts
-          Products={[]}
-          userInfo={{}}
-          category={""}
-          text={""}
-        />
+        <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
       )}
       <Box
-          style={{ marginLeft: '6.3%' }}
+      ml={'6.3%'}
+         
           bgImage="url('/assets/images/banner2.jpeg')"
           bgSize="cover"
           bgPosition="center"
@@ -292,7 +288,7 @@ const Home = () => {
       {Products?.length > 0 ? (
         Products.map(
           (product, index) =>
-            product.category === "discover" && (
+            product?.category === "discover" && (
               
                 <Flex key={index}>
                   <Box
@@ -310,15 +306,10 @@ const Home = () => {
             )
         )
       ) : (
-        <DynamicSpecialProducts
-          Products={[]}
-          userInfo={{}}
-          category={""}
-          text={""}
-        />
+        <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
       )}
       <Box
-          style={{ marginLeft: '6.3%' }}
+           ml={'6.3%'}
           bgImage="url('/assets/images/banner4.jpeg')"
           bgSize="cover"
           bgPosition="center"
@@ -335,7 +326,7 @@ const Home = () => {
       {Products?.length > 0 ? (
         Products.map(
           (product, index) =>
-            product.category === "promotional" && (
+            product?.category === "promotional" && (
               
                 <Flex key={index}>
                   <Box
@@ -353,15 +344,10 @@ const Home = () => {
             )
         )
       ) : (
-        <DynamicSpecialProducts
-          Products={[]}
-          userInfo={{}}
-          category={""}
-          text={""}
-        />
+        <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
       )}
       <Box
-          style={{ marginLeft: '6.3%' }}
+           ml={'6.3%'}
           bgImage="url('/assets/images/banner5.jpeg')"
           bgSize="cover"
           bgPosition="center"
@@ -377,7 +363,7 @@ const Home = () => {
       {Products?.length > 0 ? (
         Products.map(
           (product, index) =>
-            product.category === "recommended" && (
+            product?.category === "recommended" && (
               
                 <Flex key={index}>
                   <Box
@@ -395,15 +381,10 @@ const Home = () => {
             )
         )
       ) : (
-        <DynamicSpecialProducts
-          Products={[]}
-          userInfo={{}}
-          category={""}
-          text={""}
-        />
+        <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
       )}
       <Box
-          style={{ marginLeft: '6.3%' }}
+           ml={'6.3%'}
           bgImage="url('/assets/images/banner6.jpeg')"
           bgSize="cover"
           bgPosition="center"
@@ -435,7 +416,7 @@ const Home = () => {
           (product, index) =>
             product?.category !== "popular" &&
             product?.category !== "topdeals" &&
-            product.products?.length > 0 && (
+            product?.products?.length > 0 && (
               <>
                 <Box
                   padding={"3rem 0"}
