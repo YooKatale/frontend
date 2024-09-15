@@ -81,12 +81,12 @@ const Home = () => {
   };
 
   return (
-    <Box width="100%" maxWidth="1400px" margin="0 auto">  {/* Increased maxWidth to 1400px */}
+    <Box width="100%" maxWidth="87.5rem" margin="0 auto">  {/* 1400px converted to rem (1400px / 16 = 87.5rem) */}
       <Hero />
 
       {/* ------------- Categories Section ------------------------------- */}
-      <Box py={12} mx="auto">
-        <Box w="100%" maxW="1400px" mx="auto">  {/* Match maxWidth to 1400px */}
+      <Box py="3rem" mx="auto"> {/* Use 3rem for padding */}
+        <Box width="100%" maxWidth="87.5rem" mx="auto"> {/* Match maxWidth to 87.5rem */}
           <Box 
             display="grid" 
             gridTemplateColumns={{
@@ -95,8 +95,8 @@ const Home = () => {
               md: "repeat(4, 1fr)",     // 4 columns on larger screens
               lg: "repeat(5, 1fr)"      // 5 columns on extra large screens
             }} 
-            gap={6}  // Adds spacing between grid items
-            py={6}
+            gap="1.5rem"  {/* Adds 1.5rem spacing between grid items */}
+            py="1.5rem"   {/* Adds 1.5rem padding to the top and bottom */}
           >
             {CategoriesJson.map((category, index) => (
               <CategoryCard key={index} category={category} />
