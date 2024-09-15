@@ -69,8 +69,8 @@ const Header = () => {
             <Image
               src="/assets/icons/logo2.png"
               alt="Logo"
-              height={40} // Adjust logo size using relative units
-              width={120}
+              height={35} // Adjust logo size using relative units
+              width={115}
               priority
             />
           </Link>
@@ -129,7 +129,7 @@ const Header = () => {
             <Link href="/">Home</Link>
           </Box>
           <Box as="li" fontSize="0.875rem">
-            <Link href="/about">About Us</Link>
+            <Link href="/about">About</Link>
           </Box>
           <Box as="li" fontSize="0.875rem">
             <Link href="/news">Blog</Link>
