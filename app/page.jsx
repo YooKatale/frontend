@@ -88,8 +88,8 @@ const Home = () => {
       <Hero />
 
       {/* ------------- Categories Section ------------------------------- */}
-      <Box py="3rem" mx="auto"> {/* Use 3rem for padding */}
-        <Box width="100%" maxWidth="87.5rem" mx="auto"> {/* Match maxWidth to 87.5rem */}
+      <Box py="3rem" mx="auto"> 
+        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
           <Box 
             display="grid" 
             gridTemplateColumns={{
@@ -98,8 +98,8 @@ const Home = () => {
               md: "repeat(4, 1fr)",     // 4 columns on larger screens
               lg: "repeat(5, 1fr)"      // 5 columns on extra large screens
             }} 
-            gap={6}  // Adds spacing between grid items
-            py={6}   // Adds padding to the top and bottom
+            gap={6}  
+            py={6}   
           >
             {CategoriesJson.map((category, index) => (
               <CategoryCard key={index} category={category} />
@@ -110,12 +110,9 @@ const Home = () => {
 
 
       {/* // product?.category == "popular" && */}
-      <Box
-        padding={"3rem 0"}
-        borderBottom={"1.7px solid " + ThemeColors.lightColor}
-      >
+      <Box py="3rem" mx="auto"> 
         <Flex>
-          <Box margin={"auto"} width={{ base: "95%", md: "90%", xl: "90%" }}>
+        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
             {Products?.length > 0 ? (
               Products.map(
                 (product, index) =>
