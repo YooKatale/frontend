@@ -1,16 +1,20 @@
 "use client";
 
-import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
-import { Images, ThemeColors } from "@constants/constants";
-import Image from "next/image";
-import Link from "next/link";
-import ButtonComponent from "./Button";
+import { Box } from "@chakra-ui/react";
 
 const Hero = () => {
   return (
-   
-      <div className="lg:bg-[url('/assets/images/banner.jpg')] sm:bg-[url('/assets/images/banner.jpg')] bg-[url('/assets/images/banner1.png')] bg-cover bg-center lg:h-[450px] sm:h-[300px] h-[200px]"></div>
-  
+    <Box
+      as="section"
+      width="100%"
+      maxWidth="1400px"
+      margin="0 auto"
+      height={{ base: "12.5rem", sm: "18.75rem", lg: "25rem" }}
+      backgroundImage="url('/assets/images/banner.jpg')"
+      backgroundPosition="center"
+      backgroundSize="cover"
+      backgroundRepeat="no-repeat"
+    />
   );
 };
 

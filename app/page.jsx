@@ -1,20 +1,18 @@
 "use client";
-import React from "react";
 import { Box, Flex, Grid, Heading, Text } from "@chakra-ui/react";
 import Hero from "@components/Hero";
 import { CategoriesJson, Images, ThemeColors } from "@constants/constants";
 import Image from "next/image";
-import { FaTruckLoading, FaCreditCard, FaHeadset } from "react-icons/fa";
+import React from "react";
+import { FaCreditCard, FaHeadset, FaTruckLoading } from "react-icons/fa";
 
-import { useEffect, useState } from "react";
+import CategoryCard from "@components/cards/CategoryCard";
 import { useProductsCategoriesGetMutation } from "@slices/productsApiSlice";
-import Link from "next/link";
-import { useSelector } from "react-redux";
-import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
-import dynamic from "next/dynamic";
 import { useCommentsGetMutation } from "@slices/usersApiSlice";
-import { Salad } from "lucide-react";
-import RecommendedProducts from "@components/RecommendedProducts";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
+import { useSelector } from "react-redux";
 const DynamicButton = dynamic(() => import("@components/Button"), {
   loading: () => <p>Loading...</p>,
 });
@@ -23,20 +21,6 @@ const DynamicSpecialProducts = dynamic(
   {
     loading: () => <p>Loading...</p>,
   }
-);
-
-const CategoryCard = ({ category }) => (
-  <div className="lg:p-1 p-1 border-2 border-light rounded-md hover:border-primary">
-    <Link href={`/search?q=${category}`}>
-      <div className="flex justify-center items-center">
-        <img
-          src={`/assets/images/categories/${category}.jpg`}
-          className="lg:h-32 lg:w-32 w-20 h-20 object-contain"
-        />
-      </div>
-      {/* <p className="lg:text-lg text-base text-center">{category}</p> */}
-    </Link>
-  </div>
 );
 
 
@@ -97,20 +81,29 @@ const Home = () => {
   };
 
   return (
-    <Box>
+    <Box width="100%" maxWidth="1400px" margin="0 auto">  {/* Increased maxWidth to 1400px */}
       <Hero />
 
-      {/* ------------- section 
-      ------------------------------- */}
-      <div className="py-12 flex">
-        <div className="lg:w-[85%] sm:w-[90%] w-[95%] m-auto">
-          <div className="grid lg:grid-cols-5 sm:grid-cols-4 grid-cols-3 gap-4 py-6">
+      {/* ------------- Categories Section ------------------------------- */}
+      <Box py={12} mx="auto">
+        <Box w="100%" maxW="1400px" mx="auto">  {/* Match maxWidth to 1400px */}
+          <Box 
+            display="grid" 
+            gridTemplateColumns={{
+              base: "repeat(2, 1fr)",   // 2 columns on small screens
+              sm: "repeat(3, 1fr)",     // 3 columns on medium screens
+              md: "repeat(4, 1fr)",     // 4 columns on larger screens
+              lg: "repeat(5, 1fr)"      // 5 columns on extra large screens
+            }} 
+            gap={6}  // Adds spacing between grid items
+            py={6}
+          >
             {CategoriesJson.map((category, index) => (
               <CategoryCard key={index} category={category} />
             ))}
-          </div>
-        </div>
-      </div>
+          </Box>
+        </Box>
+      </Box>
 
       {/* // product?.category == "popular" && */}
       <Box

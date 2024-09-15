@@ -100,13 +100,13 @@ const Header = () => {
                 placeholder="Search for products"
                 value={searchParam}
                 onChange={(e) => setSearchParam(e.target.value)}
-                fontSize="0.875rem" // Smaller font size for inputs
-                padding="0.75rem" // Adjust padding for input field
+                fontSize="0.875rem"  // Smaller font size for inputs
+                padding="0.75rem"  // Adjust padding for input field
+                paddingLeft="2.5rem"  // Increase left padding to avoid overlap with icon
               />
             </InputGroup>
           </form>
         </Box>
-
         {/* Mobile Menu Icon */}
         <Box display={{ base: "block", md: "none" }}>
           <Button variant="outline" onClick={toggleMobileNav}>

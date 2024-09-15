@@ -1,3 +1,5 @@
+import cardSecureIcon from "@public/assets/icons/card-secure.png";
+import customerServiceIcon from "@public/assets/icons/customer-service.png";
 import logo from "@public/assets/icons/logo.jpg";
 import logo1 from "@public/assets/icons/logo1.png";
 import logo2 from "@public/assets/icons/logo2.png";
@@ -8,8 +10,6 @@ import img2 from "@public/assets/images/img2.png";
 import img3 from "@public/assets/images/img3.png";
 import img4 from "@public/assets/images/img4.png";
 import img5 from "@public/assets/images/img5.png";
-import customerServiceIcon from "@public/assets/icons/customer-service.png";
-import cardSecureIcon from "@public/assets/icons/card-secure.png";
 
 export const ThemeColors = {
   primaryColor: "#185f2d",
@@ -58,13 +58,13 @@ export const CategoriesJson = [
   "root tubers",
   "Carbohydrates",
   "herbs and spices",
+  "breakfast",
+  "Markets & Shops Nearby",
   "juice",
   "meals",
   "Cuisines",
   "Kitchen",
-  "breakfast",
   "Supplements",
-  "Markets & Shops Nearby",
 ];
 
 export const DisplayImages = [img, img1, img2, img3, img4];
