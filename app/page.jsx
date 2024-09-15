@@ -1,18 +1,21 @@
 "use client";
-import { Box, Flex, Grid, Heading, Text } from "@chakra-ui/react";
-import Hero from "@components/Hero";
+import { Flex, Grid, Heading, Text } from "@chakra-ui/react";
 import { CategoriesJson, Images, ThemeColors } from "@constants/constants";
 import Image from "next/image";
 import React from "react";
 import { FaCreditCard, FaHeadset, FaTruckLoading } from "react-icons/fa";
 
-import CategoryCard from "@components/cards/CategoryCard";
 import { useProductsCategoriesGetMutation } from "@slices/productsApiSlice";
 import { useCommentsGetMutation } from "@slices/usersApiSlice";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import { useSelector } from "react-redux";
+
+import { Box } from "@chakra-ui/react";
+import Hero from "@components/Hero";
+import CategoryCard from "@components/cards/CategoryCard";
+
 const DynamicButton = dynamic(() => import("@components/Button"), {
   loading: () => <p>Loading...</p>,
 });
@@ -81,7 +84,7 @@ const Home = () => {
   };
 
   return (
-    <Box width="100%" maxWidth="87.5rem" margin="0 auto">  {/* 1400px converted to rem (87.5rem) */}
+    <Box width="100%" maxWidth="87.5rem" margin="0 auto">  {/* Main container */}
       <Hero />
 
       {/* ------------- Categories Section ------------------------------- */}
@@ -95,8 +98,8 @@ const Home = () => {
               md: "repeat(4, 1fr)",     // 4 columns on larger screens
               lg: "repeat(5, 1fr)"      // 5 columns on extra large screens
             }} 
-            gap={6}  {/* Adds spacing between grid items */}
-            py={6}   {/* Adds padding to the top and bottom */}
+            gap={6}  // Adds spacing between grid items
+            py={6}   // Adds padding to the top and bottom
           >
             {CategoriesJson.map((category, index) => (
               <CategoryCard key={index} category={category} />
@@ -104,6 +107,7 @@ const Home = () => {
           </Box>
         </Box>
       </Box>
+
 
       {/* // product?.category == "popular" && */}
       <Box
