@@ -81,7 +81,7 @@ const Home = () => {
   };
 
   return (
-    <Box width="100%" maxWidth="87.5rem" margin="0 auto">  {/* 1400px converted to rem (1400px / 16 = 87.5rem) */}
+    <Box width="100%" maxWidth="87.5rem" margin="0 auto">  {/* 1400px converted to rem (87.5rem) */}
       <Hero />
 
       {/* ------------- Categories Section ------------------------------- */}
@@ -95,8 +95,8 @@ const Home = () => {
               md: "repeat(4, 1fr)",     // 4 columns on larger screens
               lg: "repeat(5, 1fr)"      // 5 columns on extra large screens
             }} 
-            gap="1.5rem"  {/* Adds 1.5rem spacing between grid items */}
-            py="1.5rem"   {/* Adds 1.5rem padding to the top and bottom */}
+            gap={6}  {/* Adds spacing between grid items */}
+            py={6}   {/* Adds padding to the top and bottom */}
           >
             {CategoriesJson.map((category, index) => (
               <CategoryCard key={index} category={category} />
