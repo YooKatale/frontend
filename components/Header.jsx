@@ -8,18 +8,14 @@ import {
   InputGroup,
   InputLeftElement,
   Stack,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
-import {
-  FaSearch,
-  FaShoppingCart,
-  FaUser,
-} from "react-icons/fa";
+import { FaSearch, FaShoppingCart, FaUser } from "react-icons/fa";
 import { useSelector } from "react-redux";
 
 const Header = () => {
@@ -56,6 +52,7 @@ const Header = () => {
       top={0}
       zIndex="sticky"
       transition="background-color 0.2s"
+      fontSize="1rem" // Set a base font size to maintain consistency
     >
       <Flex
         as="nav"
@@ -64,7 +61,7 @@ const Header = () => {
         maxW="1920px"
         px={4}
         mx="auto"
-        height="80px"
+        height="4rem" // Height of 4rem for the nav bar
       >
         {/* Left Section - Logo and Categories Dropdown */}
         <Flex align="center">
@@ -72,14 +69,19 @@ const Header = () => {
             <Image
               src="/assets/icons/logo2.png"
               alt="Logo"
-              height={100}
-              width={100}
-              className="object-contain"
+              height={40} // Adjust logo size using relative units
+              width={120}
+              priority
             />
           </Link>
           <Box ml={4} display={{ base: "none", md: "block" }}>
             <Link href="/products" passHref>
-              <Button variant="outline" leftIcon={<AiOutlineMenu />}>
+              <Button
+                variant="outline"
+                fontSize="0.875rem" // Smaller font size for buttons
+                padding="0.5rem 1rem" // Padding inside buttons
+                leftIcon={<AiOutlineMenu />}
+              >
                 All Categories
               </Button>
             </Link>
@@ -98,6 +100,8 @@ const Header = () => {
                 placeholder="Search for products"
                 value={searchParam}
                 onChange={(e) => setSearchParam(e.target.value)}
+                fontSize="0.875rem" // Smaller font size for inputs
+                padding="0.75rem" // Adjust padding for input field
               />
             </InputGroup>
           </form>
@@ -121,19 +125,19 @@ const Header = () => {
           flexGrow={1}
           pl={0}
         >
-          <Box as="li">
+          <Box as="li" fontSize="0.875rem"> {/* Smaller font for navigation */}
             <Link href="/">Home</Link>
           </Box>
-          <Box as="li">
+          <Box as="li" fontSize="0.875rem">
             <Link href="/about">About Us</Link>
           </Box>
-          <Box as="li">
+          <Box as="li" fontSize="0.875rem">
             <Link href="/news">Blog</Link>
           </Box>
-          <Box as="li">
+          <Box as="li" fontSize="0.875rem">
             <Link href="/careers">Careers</Link>
           </Box>
-          <Box as="li">
+          <Box as="li" fontSize="0.875rem">
             <Link href="/contact">Contact</Link>
           </Box>
         </Stack>
@@ -150,9 +154,10 @@ const Header = () => {
                   mr: 2,
                   background: "green",
                   color: "white",
+                  fontSize: "0.875rem", // Ensure smaller font size
                   _hover: {
-                    backgroundColor: "gray.100", // Light gray background on hover
-                    color: "green",              // Green text on hover
+                    backgroundColor: "gray.100",
+                    color: "green",
                   },
                 }}
                 leftIcon={<FaShoppingCart />}
@@ -174,9 +179,10 @@ const Header = () => {
                     mr: 2,
                     background: "green",
                     color: "white",
+                    fontSize: "0.875rem", // Keep font size consistent
                     _hover: {
-                      backgroundColor: "gray.100", // Light gray background on hover
-                      color: "green",              // Green text on hover
+                      backgroundColor: "gray.100",
+                      color: "green",
                     },
                   }}
                   leftIcon={<FaUser />}
@@ -193,6 +199,8 @@ const Header = () => {
               bg="orange.400"
               color="white"
               size="lg"
+              fontSize="0.875rem" // Make sure the CTA button has a smaller font
+              padding="0.75rem 1.5rem" // Consistent padding
               _hover={{ bg: "orange.500" }}
             >
               Call: +256 754 615840
@@ -214,6 +222,8 @@ const Header = () => {
                 placeholder="Search for products"
                 value={searchParam}
                 onChange={(e) => setSearchParam(e.target.value)}
+                fontSize="0.875rem" // Small font size for mobile input
+                padding="0.75rem" // Consistent padding
               />
             </InputGroup>
           </form>
