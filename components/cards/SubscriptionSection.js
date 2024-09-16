@@ -1,31 +1,28 @@
-import { Box, Link } from '@mui/material';
+import { Box } from '@mui/material';
+import Image from 'next/image'; // or use MUI img if needed
 
-const SubscriptionSection = () => {
+export default function Subscription() {
   return (
-    <Box 
-      component="section" 
+    <Box
+      component="a"
+      href="/subscription"
       sx={{
-        display: 'flex', 
-        justifyContent: 'center', 
-        marginTop: '2rem'
+        display: 'block',
+        textDecoration: 'none',
+        width: '100%', // Full width for mobile responsiveness
+        margin: '0 auto', // Center the box on larger screens
       }}
     >
-      {/* Link Component */}
-      <Link href="/subscription" underline="none">
-        {/* Image within Box */}
-        <Box
-          component="img"
-          src="/assets/images/sub.jpg"
-          alt="Subscription Image"
-          sx={{
-            width: { xs: '100%', sm: '80%', md: '60%' },  // Responsive width
-            height: 'auto',  // Maintain aspect ratio
-            maxHeight: '200px', // Limit max height
-          }}
-        />
-      </Link>
+      <Image
+        src="/assets/images/sub.jpg"
+        alt="Subscription Image"
+        layout="responsive" // Ensures responsiveness
+        width={600} // Set appropriate width
+        height={400} // Set appropriate height
+        style={{
+          objectFit: 'contain', // Ensures the image fits well within the container
+        }}
+      />
     </Box>
   );
-};
-
-export default SubscriptionSection;
+}

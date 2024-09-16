@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import { Box } from "@chakra-ui/react";
 import Hero from "@components/Hero";
 import CategoryCard from "@components/cards/CategoryCard";
+import Subscription from "@components/cards/SubscriptionSection";
 
 const DynamicButton = dynamic(() => import("@components/Button"), {
   loading: () => <p>Loading...</p>,
@@ -241,62 +242,33 @@ const Home = () => {
 
 
       
-      <Box py="3rem" mx="auto"> 
-        <Flex>
-        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
-            {Products?.length > 0 ? (
-              Products.map(
-                (product, index) =>
-                  product?.category === "recommended" && (
-                    <DynamicSpecialProducts
-                      Products={product?.products}
-                      userInfo={userInfo}
-                      category={product?.category}
-                      text={product?.category}
-                      key={index}
-                    />
-                  )
-              )
-            ) : (
-              <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
-            )}
-          </Box>
-        </Flex>
-      </Box>
-{/* <Box
-  bgImage="url('/assets/images/banner6.jpeg')" // Placeholder image
-  bgSize="cover"
-  bgPosition="center"
-  h="350px"
-  w="100%"
-/> */}
+<Box py="3rem" mx="auto">
+  <Flex>
+    <Box width="100%" maxWidth="87.5rem" mx="auto">
+      {Products?.length > 0 ? (
+        Products.map(
+          (product, index) =>
+            product?.category === "recommended" && (
+              <DynamicSpecialProducts
+                Products={product?.products}
+                userInfo={userInfo}
+                category={product?.category}
+                text={product?.category}
+                key={index}
+              />
+            )
+        )
+      ) : (
+        <DynamicSpecialProducts Products={[]} userInfo={{}} category={""} text={""} />
+      )}
+    </Box>
+  </Flex>
 
-
-     
-
-
-      {/* ------------- section 
-      ------------------------------- */}
-      <a
-  href="/subscription"
-  style={{ 
-    display: "block", 
-    textDecoration: "none", 
-  }}
->
-  <img
-    src="/assets/images/sub.jpg"
-    alt="Subscription Image"
-    style={{
-      width: "100%",      // Ensure the image fills the container
-      objectFit: "contain", // Adjust how the image is resized
-    }}
-  />
-</a>
-
-
-      {/* ------------- section 
-      ------------------------------- */}
+  {/* Subscription component should have the same width and margins as the section above */}
+  <Box width="100%" maxWidth="87.5rem" mx="auto" mt="2rem">
+    <Subscription />
+  </Box>
+</Box>
 
       
       {Products?.length > 0 ? (
@@ -306,15 +278,9 @@ const Home = () => {
             product?.category !== "topdeals" &&
             product?.products?.length > 0 && (
               <React.Fragment key={product?.category}>  {/* Add a key here */}
-                <Box
-                  padding={"3rem 0"}
-                  borderBottom={"1.7px solid " + ThemeColors.lightColor}
-                >
-                  <Flex>
-                    <Box
-                      margin={"auto"}
-                      width={{ base: "95%", md: "90%", xl: "90%" }}
-                    >
+              <Box pt="3rem" mx="auto"> 
+        <Flex>
+        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
                       <DynamicSpecialProducts
                         Products={product?.products}
                         userInfo={userInfo}
