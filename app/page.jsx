@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import { Box } from "@chakra-ui/react";
 import Hero from "@components/Hero";
 import CategoryCard from "@components/cards/CategoryCard";
+import ResponsiveBackground from "@components/cards/ResponsiveBackground";
 import Subscription from "@components/cards/SubscriptionSection";
 
 const DynamicButton = dynamic(() => import("@components/Button"), {
@@ -136,13 +137,8 @@ const Home = () => {
     </Box>
   </Flex>
 </Box>
-<Box
-  bgImage="url('/assets/images/b3.jpeg')" // Placeholder image
-  bgSize="cover"
-  bgPosition="center"
-  h="350px"
-  w="100%"
-/>
+<ResponsiveBackground url="/assets/images/b3.jpeg" />
+
       
 
       {/* // product?.category == "popular" && */}
