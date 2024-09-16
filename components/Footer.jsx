@@ -537,7 +537,7 @@ try {
               justifyContent={"center"}
               direction={{ base: "column", md: "column", xl: "row" }}
             >
-              <Text
+              <Button
                 color={ThemeColors.primaryColor}
                 margin={"0.5rem"}
                 fontSize="lg"
@@ -546,7 +546,7 @@ try {
                 onClick={()=>openRefferal()}
               >
                 Invite A Friend
-              </Text>
+              </Button>
 
               {/* <Flex justifyContent={"center"} gap={"2"}>
                 <FacebookShareButton url={shareUrl} quote={defaultMessage}>
