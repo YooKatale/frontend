@@ -1,9 +1,7 @@
 "use client";
-import { Flex, Grid, Heading, Text } from "@chakra-ui/react";
-import { CategoriesJson, Images, ThemeColors } from "@constants/constants";
-import Image from "next/image";
+import { Flex, Heading, Text } from "@chakra-ui/react";
+import { CategoriesJson, ThemeColors } from "@constants/constants";
 import React from "react";
-import { FaCreditCard, FaHeadset, FaTruckLoading } from "react-icons/fa";
 
 import { useProductsCategoriesGetMutation } from "@slices/productsApiSlice";
 import { useCommentsGetMutation } from "@slices/usersApiSlice";
@@ -89,7 +87,7 @@ const Home = () => {
       <Hero />
 
       {/* ------------- Categories Section ------------------------------- */}
-      <Box py="3rem" mx="auto"> 
+      <Box pt="3rem" mx="auto"> 
         <Box width="100%" maxWidth="87.5rem" mx="auto"> 
           <Box 
             display="grid" 
@@ -144,87 +142,6 @@ const Home = () => {
   h="350px"
   w="100%"
 />
-      {/* ------------- section 
-      ------------------------------- */}
-      
-      <Box py="3rem" mx="auto"> 
-        <Flex>
-        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
-            <Grid
-              gridTemplateColumns={{
-                base: "repeat(2, 1fr)",
-                md: "repeat(2, 1fr)",
-                xl: "repeat(4, 1fr)",
-              }}
-              gridGap={"1rem"}
-            >
-              <Box>
-                <Flex
-                  padding={{ base: "0 0.5rem", md: "0 0.5rem", xl: "0 1rem" }}
-                  flexDirection={"column"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                >
-                  <FaCreditCard size={60} color={ThemeColors.darkColor} />
-                  <Box padding={"0.5rem 0"}>
-                    <Text textAlign={"center"} fontSize={"lg"}>
-                      Register for 25% YooCard premium & Gold discount
-                    </Text>
-                  </Box>
-                </Flex>
-              </Box>
-              <Box>
-                <Flex
-                  padding={{ base: "0 0.5rem", md: "0 0.5rem", xl: "0 1rem" }}
-                  flexDirection={"column"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                >
-                  <FaHeadset size={60} color={ThemeColors.darkColor} />
-                  {/* <Image src={Images.customerServiceIcon} width={60} /> */}
-                  <Box padding={"0.5rem 0"}>
-                    <Text textAlign={"center"} fontSize={"lg"}>
-                      24/7 service support
-                    </Text>
-                  </Box>
-                </Flex>
-              </Box>
-              <Box>
-                <Flex
-                  padding={{ base: "0 0.5rem", md: "0 0.5rem", xl: "0 1rem" }}
-                  flexDirection={"column"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                >
-                  <FaTruckLoading size={60} color={ThemeColors.darkColor} />
-                  <Box padding={"0.5rem 0"}>
-                    <Text textAlign={"center"} fontSize={"lg"}>
-                      Delivery offer [21 - 30] <br />
-                      (Register for 9 days free delivery)
-                    </Text>
-                  </Box>
-                </Flex>
-              </Box>
-              <Box>
-                <Flex
-                  padding={{ base: "0 0.5rem", md: "0 0.5rem", xl: "0 1rem" }}
-                  flexDirection={"column"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                >
-                  {/* <CgShield size={60} color={ThemeColors.darkColor} /> */}
-                  <Image src={Images.cardSecureIcon} width={60} alt="icon"/>
-                  <Box padding={"0.5rem 0"}>
-                    <Text textAlign={"center"} fontSize={"lg"}>
-                      Safe, instant & secured
-                    </Text>
-                  </Box>
-                </Flex>
-              </Box>
-            </Grid>
-          </Box>
-        </Flex>
-      </Box>
       
 
       {/* // product?.category == "popular" && */}
@@ -346,13 +263,13 @@ const Home = () => {
           </Box>
         </Flex>
       </Box>
-<Box
+{/* <Box
   bgImage="url('/assets/images/banner6.jpeg')" // Placeholder image
   bgSize="cover"
   bgPosition="center"
   h="350px"
   w="100%"
-/>
+/> */}
 
 
      
@@ -361,16 +278,22 @@ const Home = () => {
       {/* ------------- section 
       ------------------------------- */}
       <a
-        href="/subscription"
-        style={{ display: "block", textDecoration: "none" }}
-      >
-        <img
-          src="/assets/images/sub.jpg"
-          alt="Subscription Image"
-          width="100%"
-          height={200}
-        />
-      </a>
+  href="/subscription"
+  style={{ 
+    display: "block", 
+    textDecoration: "none", 
+  }}
+>
+  <img
+    src="/assets/images/sub.jpg"
+    alt="Subscription Image"
+    style={{
+      width: "100%",      // Ensure the image fills the container
+      objectFit: "contain", // Adjust how the image is resized
+    }}
+  />
+</a>
+
 
       {/* ------------- section 
       ------------------------------- */}
