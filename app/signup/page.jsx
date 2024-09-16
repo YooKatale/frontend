@@ -37,7 +37,7 @@ const SignUp = () => {
   const [vegan, setVegan] = useState(false);
   const [address, setAddress] = useState("");
   const [isLoading, setLoading] = useState(false);
-
+const [referralCode, setReferralCode]= useState(null);
   const { push } = useRouter();
 
   const chakraToast = useToast();
@@ -50,6 +50,10 @@ const SignUp = () => {
 
   useEffect(() => {
     if (userInfo) return push("/");
+    if (typeof window !== 'undefined') {
+      const urlpath = new URLSearchParams(window.location.search);
+      urlpath.get('ref') !==undefined && setReferralCode(urlpath.get('ref'))
+    }
   }, []);
 
   const handleSubmit = async (e) => {
@@ -70,6 +74,7 @@ const SignUp = () => {
 
         return setLoading((prevState) => (prevState ? false : true));
       }
+      const referenceCode = referralCode !== null && referralCode !== undefined && referralCode.toString().trim() !== ""? referralCode:undefined;
 
       const res = await register({
         firstname,
@@ -81,6 +86,7 @@ const SignUp = () => {
         dob,
         address,
         password,
+        referenceCode
       }).unwrap();
 
       dispatch(setCredentials({ ...res }));
@@ -256,7 +262,7 @@ const SignUp = () => {
                 >
                   <Box padding={"0.5rem 0"}>
                     <FormControl>
-                      <FormLabel htmlFor="email">Address</FormLabel>
+                      <FormLabel htmlFor="address">Address</FormLabel>
                       <Input
                         type="text"
                         id="address"
@@ -267,7 +273,25 @@ const SignUp = () => {
                       />
                     </FormControl>
                   </Box>
+                  {referralCode!==null && referralCode.toString()!==""?
+                  <Box padding={"0.5rem 0"}>
+                  <FormControl>
+                      <FormLabel htmlFor="email">Referral Code</FormLabel>
+                      <Input
+                      disabled
+                      _hover={{}}
+                        type="text"
+                        id="referralCode"
+                        placeholder=""
+                        name="referralCode"
+                        value={referralCode}
+                        onChange={(e) => setReferralCode(e.target.value)}
+                      />
+                    </FormControl>
+                  </Box>:null}
                 </Grid>
+
+               
                 <Box padding={"0.5rem 0"}>
                   <FormControl>
                     <FormLabel htmlFor="password">Password</FormLabel>

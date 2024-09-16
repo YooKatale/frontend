@@ -29,7 +29,7 @@ import {
   useToast
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
-import { useNewsletterPostMutation } from "@slices/usersApiSlice";
+import { useCreateReferralCodeMutation, useNewsletterPostMutation, useSendReferralEmailMutation } from "@slices/usersApiSlice";
 import { Loader } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -47,14 +47,30 @@ import NewsletterForm from "./NewsletterForm";
 //import PopupAd from "./PopupAd";
 import Image from "next/image";
 import { FaWhatsapp } from "react-icons/fa";
+import {
+  FacebookShareButton,
+  FacebookIcon,
+  WhatsappShareButton,
+  WhatsappIcon,
+  TwitterShareButton,
+  TwitterIcon,
+  LinkedinIcon,
+  TelegramShareButton,
+  TelegramIcon,
+} from 'next-share'
+import { LinkedinShareButton } from "react-share";
 const crypto = require('crypto');
 const Footer = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const [NewsletterEmail, setNewsletterEmail] = useState("");
+  const [referralCode, setreferralCode] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [isReferralLoading, setIsReferralLoading] = useState(false);
   const [createNewsletter] = useNewsletterPostMutation();
+  const [createReferralCode]=useCreateReferralCodeMutation();
+  const [sendMailInvitation]=useSendReferralEmailMutation()
   const chakraToast = useToast();
+  const[invitee, setInvitee]=useState("")
   const { isOpen: isReferralOpen, onOpen: openRefferal, onClose: closeReferral } = useDisclosure();
   const shareUrl = "https://www.yookatale.com"; // URL to be shared
   const defaultMessage =
@@ -95,6 +111,7 @@ const Footer = () => {
       setLoading(false); // Stop loading
     }
   };
+  
   function generateReferralCode(userId) {
     const hash = crypto.createHash('sha256').update(userId).digest('hex');
     return hash.substring(0, 8);  // Return first 8 characters
@@ -103,13 +120,75 @@ const Footer = () => {
   
   useEffect(() => {
     if (userInfo?._id) {  // Ensure that userInfo and _id are defined
-      const referralCode = generateReferralCode(userInfo._id);
-      setreferralUrl(`https://yookatale.com?ref=${referralCode}`);
+      const referralCodetemp = generateReferralCode(userInfo._id);
+      setreferralCode(referralCodetemp)
+      setreferralUrl(`https://yookatale.com/signup?ref=${referralCodetemp}`);
     }
   }, [userInfo]);  // Dependency array to run this when userInfo changes  
 
   const { hasCopied, onCopy } = useClipboard(referralUrl); 
   
+ const handleOncopy=async()=>{
+  onCopy()
+  const toPayload={
+    referralCode: referralCode,
+    userId: userInfo?._id
+  }
+  try {
+    const res = await createReferralCode(toPayload).unwrap()
+  if (res.status === "Success") {
+    chakraToast({
+      title: "Success",
+      description: "Your Referral link has been saved",
+      status: "success",
+      duration: 6000,
+      isClosable: false,
+      position:'top'
+    });
+  }
+  } catch (error) {
+    //alert(JSON.stringify(error))
+    chakraToast({
+      title: "Error",
+      description: error.data.message,
+      status: "error",
+      duration: 6000,
+      isClosable: false,
+      position:'top'
+    });
+  }
+  
+}
+
+const handleMailInvitation = async () => {
+  setIsReferralLoading(true)
+  const toPayload={
+    email: invitee,
+    referralCode: referralCode
+  }
+try {
+  const res = await sendMailInvitation(toPayload)
+  if (res?.data?.status === "Success") {
+    setIsReferralLoading(false)
+  return chakraToast({
+    title: "Success",
+    description: "Successfully sent Invitation",
+    status: "success",
+    duration: 5000,
+    isClosable: false,
+  });
+}
+} catch (error) {
+  setIsReferralLoading(false)
+  return chakraToast({
+    title: "Error",
+    description: "Sending Invitation failed",
+    status: "error",
+    duration: 5000,
+    isClosable: false,
+  });
+}
+}
   return (
     <>
       {/* // modal newsletter form  */}
@@ -458,7 +537,7 @@ const Footer = () => {
               justifyContent={"center"}
               direction={{ base: "column", md: "column", xl: "row" }}
             >
-              <Text
+              <Button
                 color={ThemeColors.primaryColor}
                 margin={"0.5rem"}
                 fontSize="lg"
@@ -467,7 +546,7 @@ const Footer = () => {
                 onClick={()=>openRefferal()}
               >
                 Invite A Friend
-              </Text>
+              </Button>
 
               {/* <Flex justifyContent={"center"} gap={"2"}>
                 <FacebookShareButton url={shareUrl} quote={defaultMessage}>
@@ -554,29 +633,34 @@ const Footer = () => {
         </Flex>
       </Box>
 
-      <Modal isOpen={isReferralOpen} onClose={closeReferral}>
+      <Modal isOpen={isReferralOpen} onClose={closeReferral} closeOnOverlayClick={false}>
       <ModalOverlay />
       <ModalContent pt={3} pb={2}>
-        <ModalHeader>Share Your Referral Link</ModalHeader>
+        <ModalHeader textAlign={'center'} textDecoration={'underline'}>Share Your Referral Link</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Box mt={-4} mb={2}>
+          <Box mt={-4} mb={2} fontWeight={'400'}>
             <Text fontSize={15} mt={0}>Refer others and earn some extra cash. Simply share your referral link with your associates or businesses</Text>
               <List fontSize={14} styleType="disc" pl={8}>
                 <ListItem>Make sure they signup using your referral link</ListItem>
                 <ListItem>Confirm and claim your payout</ListItem>
               </List>
           </Box>
+          <Box mb={6} fontWeight={'400'}>
           <FormControl>
             <FormLabel>Invite By Mail</FormLabel>
             <InputGroup>
             <Input 
               placeholder="Input email to invite" 
               type="email"
+              disabled={isReferralLoading}
+              value={invitee}
+              onChange={(e)=>setInvitee(e.target.value)}
+              _hover={{}}
             />
                 <InputRightElement width={isReferralLoading?"6rem":"4.5rem"} mr={isReferralLoading &&1}>
                   <Button h="2rem" size="sm" style={{backgroundColor:'orange', color:'white', fontWeight:'500'}}
-                  onClick={()=>{setIsReferralLoading(!isReferralLoading)}}  isLoading={isReferralLoading} loadingText="Sending"
+                  onClick={()=>{ handleMailInvitation()}}  isLoading={isReferralLoading} loadingText="Sending"
                   >
                     Invite
                   </Button>
@@ -584,37 +668,57 @@ const Footer = () => {
                 </InputRightElement>
               </InputGroup>
           </FormControl>
-        <FormControl mb={4}>
+          </Box>
+          <Box mb={6}>
+        <FormControl>
             <FormLabel>Referral URL</FormLabel>
             <InputGroup>
-              <Input value={referralUrl} isDisabled />
+              <Input value={referralUrl} isDisabled _hover={{}}/>
               <InputRightElement width="4.5rem">
                 <Button h="2rem" size="sm" style={{backgroundColor:'black', color:'white', fontWeight:'500'}}
-                onClick={onCopy} mr={hasCopied && 1} >
+                //onClick={onCopy}
+                onClick={handleOncopy} 
+                mr={hasCopied && 1} >
                   {hasCopied ? "Copied" : "Copy"}
                 </Button>
               </InputRightElement>
             </InputGroup>
           </FormControl>
-          <FormControl>
-            <FormLabel>Message to Friend</FormLabel>
-            <Textarea 
-            defaultValue={defaultMessage}
-            
-              placeholder="Write a personal message..." 
-              rows={4}
-            />
-          </FormControl>
+          </Box>
+          <Box justifyContent={'center'} textAlign={'center'}>
+            <FacebookShareButton
+              url={shareUrl}
+              quote={defaultMessage}
+              hashtag={'#yookatale'}
+              style={{ padding: 3 }}
+            >
+              <FacebookIcon size={40} round />
+            </FacebookShareButton>
+            <WhatsappShareButton url={shareUrl} title={defaultMessage} style={{ padding: 3 }} separator=":: ">
+              <WhatsappIcon size={40} round />
+            </WhatsappShareButton>
+            <TwitterShareButton url={shareUrl} title={defaultMessage} style={{ padding: 3 }}>
+              <TwitterIcon size={40} round />
+            </TwitterShareButton>
+            <LinkedinShareButton url={shareUrl} style={{ padding: 3 }} >
+              <LinkedinIcon size={40} round />
+            </LinkedinShareButton>
+            <TelegramShareButton url={shareUrl} title={defaultMessage} style={{ padding: 3 }}>
+              <TelegramIcon size={40} round />
+            </TelegramShareButton>
+            </Box>
         </ModalBody>
-        <ModalFooter>
-          <Flex w="100%" justify="space-between">
-            <Button colorScheme="blue" onClick={closeReferral}>
-              Cancel
+        <ModalFooter justifyContent={'center'} textAlign={'center'}>
+         
+            <Button colorScheme="gray" 
+            onClick={()=>
+              {closeReferral(); 
+            setIsReferralLoading(false)
+          }}>
+              Close
             </Button>
-            <Button colorScheme="green" onClick={() => alert("Referral sent!")}>
-              Send Referral
-            </Button>
-          </Flex>
+            
+          
         </ModalFooter>
       </ModalContent>
     </Modal>
