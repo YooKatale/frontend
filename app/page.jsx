@@ -51,12 +51,13 @@ const Home = () => {
       const res = await fetchProducts().unwrap();
       if (res?.status && res?.status === "Success") {
         setProducts(res.data || []); 
+        console.log("Fetched Products:", res.data);  // Log the fetched product data
       }
     } catch (error) {
       console.error("Error fetching products:", error);
       setProducts([]);
     }
-  };
+  };  
 
   // fetch product categories
   useEffect(() => {
@@ -109,57 +110,46 @@ const Home = () => {
       </Box>
 
 
-      {/* // product?.category == "popular" && */}
+      <Box pt="3rem" mx="auto"> 
+  <Flex direction="column" alignItems="center">
+    <Box width="100%" maxWidth="87.5rem" mx="auto">
+      {Products?.length > 0 ? (
+        Products.map(
+          (product, index) =>
+            product?.category === "topdeals" && (
+              <DynamicSpecialProducts
+                key={index}
+                Products={product?.products}
+                userInfo={userInfo}
+                category={product?.category}
+                text={"bulk"}
+              />
+            )
+        )
+      ) : (
+        <DynamicSpecialProducts
+          Products={[]}
+          userInfo={{}}
+          category={""}
+          text={""}
+        />
+      )}
+    </Box>
+  </Flex>
+</Box>
+<Box
+  bgImage="url('/assets/images/b3.jpeg')" // Placeholder image
+  bgSize="cover"
+  bgPosition="center"
+  h="350px"
+  w="100%"
+/>
+      {/* ------------- section 
+      ------------------------------- */}
+      
       <Box py="3rem" mx="auto"> 
         <Flex>
         <Box width="100%" maxWidth="87.5rem" mx="auto"> 
-            {Products?.length > 0 ? (
-              Products.map(
-                (product, index) =>
-                  product?.category === "topdeals" && (
-                    <DynamicSpecialProducts
-                      key={index}
-                      Products={product?.products}
-                      userInfo={userInfo}
-                      category={product?.category}
-                      text={"bulk"}
-                    />
-                  )
-              )
-            ) : (
-              <DynamicSpecialProducts
-                Products={[]}
-                userInfo={{}}
-                category={""}
-                text={""}
-              />
-            )}
-
-
-          </Box>
-        </Flex>
-        
-        <Box
-          style={{ marginLeft: '6.3%' }}
-          bgImage="url('/assets/images/banner3.jpeg')"
-          bgSize="cover"
-          bgPosition="center"
-          h={{ base: '90px', sm: '90px', lg: '90px' }}
-          w="80%"
-        />
-      </Box>
-
-      
-
-      {/* ------------- section 
-      ------------------------------- */}
-      <Box
-        padding={"3rem 0"}
-        borderBottom={"1.7px solid " + ThemeColors.lightColor}
-        display={"none"}
-      >
-        <Flex>
-          <Box margin={"auto"} width={{ base: "100%", md: "75%", xl: "70%" }}>
             <Grid
               gridTemplateColumns={{
                 base: "repeat(2, 1fr)",
@@ -238,12 +228,10 @@ const Home = () => {
       
 
       {/* // product?.category == "popular" && */}
-      <Box
-        padding={"3rem 0"}
-        borderBottom={"1.7px solid " + ThemeColors.lightColor}
-      >
+      
+      <Box pt="3rem" mx="auto"> 
         <Flex>
-          <Box margin={"auto"} width={{ base: "95%", md: "90%", xl: "90%" }}>
+        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
             {Products?.length > 0 ? (
               Products.map(
                 (product, index) =>
@@ -262,23 +250,20 @@ const Home = () => {
             )}
           </Box>
         </Flex>
-        <Box
-          style={{ marginLeft: '6.3%' }}
-          bgImage="url('/assets/images/banner3.jpeg')"
-          bgSize="cover"
-          bgPosition="center"
-          h={{ base: '90px', sm: '90px', lg: '90px' }}
-          w="80%"
-        />
+<Box
+  bgImage="url('/assets/images/b1.jpeg')" // Placeholder image
+  bgSize="cover"
+  bgPosition="center"
+  h="350px"
+  w="100%"
+/>
       </Box>
 
 
-      <Box
-        padding={"3rem 0"}
-        borderBottom={"1.7px solid " + ThemeColors.lightColor}
-      >
+      
+      <Box pt="3rem" mx="auto"> 
         <Flex>
-          <Box margin={"auto"} width={{ base: "95%", md: "90%", xl: "90%" }}>
+        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
             {Products?.length > 0 ? (
               Products.map(
                 (product, index) =>
@@ -297,22 +282,19 @@ const Home = () => {
             )}
           </Box>
         </Flex>
-        <Box
-          style={{ marginLeft: '6.3%' }}
-          bgImage="url('/assets/images/banner4.jpeg')"
-          bgSize="cover"
-          bgPosition="center"
-          h={{ base: '90px', sm: '90px', lg: '90px' }}
-          w="80%"
-        />
       </Box>
+<Box
+  bgImage="url('/assets/images/b2.jpeg')" // Placeholder image
+  bgSize="cover"
+  bgPosition="center"
+  h="350px"
+  w="100%"
+/>
 
-      <Box
-        padding={"3rem 0"}
-        borderBottom={"1.7px solid " + ThemeColors.lightColor}
-      >
+      
+      <Box pt="3rem" mx="auto"> 
         <Flex>
-          <Box margin={"auto"} width={{ base: "95%", md: "90%", xl: "90%" }}>
+        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
             {Products?.length > 0 ? (
               Products.map(
                 (product, index) =>
@@ -331,23 +313,20 @@ const Home = () => {
             )}
           </Box>
         </Flex>
-        <Box
-          style={{ marginLeft: '6.3%' }}
-          bgImage="url('/assets/images/banner5.jpeg')"
-          bgSize="cover"
-          bgPosition="center"
-          h={{ base: '90px', sm: '90px', lg: '90px' }}
-          w="80%"
-        />
       </Box>
+<Box
+  bgImage="url('/assets/images/banner2.jpeg')" // Placeholder image
+  bgSize="cover"
+  bgPosition="center"
+  h="350px"
+  w="100%"
+/>
 
 
-      <Box
-        padding={"3rem 0"}
-        borderBottom={"1.7px solid " + ThemeColors.lightColor}
-      >
+      
+      <Box py="3rem" mx="auto"> 
         <Flex>
-          <Box margin={"auto"} width={{ base: "95%", md: "90%", xl: "90%" }}>
+        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
             {Products?.length > 0 ? (
               Products.map(
                 (product, index) =>
@@ -366,15 +345,14 @@ const Home = () => {
             )}
           </Box>
         </Flex>
-        <Box
-          style={{ marginLeft: '6.3%' }}
-          bgImage="url('/assets/images/banner6.jpeg')"
-          bgSize="cover"
-          bgPosition="center"
-          h={{ base: '90px', sm: '90px', lg: '90px' }}
-          w="80%"
-        />
       </Box>
+<Box
+  bgImage="url('/assets/images/banner6.jpeg')" // Placeholder image
+  bgSize="cover"
+  bgPosition="center"
+  h="350px"
+  w="100%"
+/>
 
 
      
