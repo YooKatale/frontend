@@ -114,6 +114,20 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    createReferralCode: builder.mutation({
+      query: (data) => ({
+        url: `${DB_URL}/referralCode`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    sendReferralEmail: builder.mutation({
+      query: (data) => ({
+        url: `${DB_URL}/sendReferralEmail`,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -135,4 +149,6 @@ export const {
   useAdvertisementPostMutation,
   useForgotPasswordMutation, 
   useResetPasswordMutation,
+  useCreateReferralCodeMutation,
+  useSendReferralEmailMutation
 } = usersApiSlice;
