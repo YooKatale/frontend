@@ -638,6 +638,7 @@ try {
       <ModalContent pt={3} pb={2}>
         <ModalHeader textAlign={'center'} textDecoration={'underline'}>Share Your Referral Link</ModalHeader>
         <ModalCloseButton />
+        {userInfo?._id !==undefined ?
         <ModalBody>
           <Box mt={-4} mb={2} fontWeight={'400'}>
             <Text fontSize={15} mt={0}>Refer others and earn some extra cash. Simply share your referral link with your associates or businesses</Text>
@@ -708,6 +709,13 @@ try {
             </TelegramShareButton>
             </Box>
         </ModalBody>
+        :<ModalBody>
+          <Box mt={-4} mb={2} fontWeight={'400'} textAlign={'center'} marginTop={3}>
+            <Text fontSize={17} mt={0}>You need to Signin to be able to refer</Text>
+          </Box>
+        </ModalBody>
+
+}
         <ModalFooter justifyContent={'center'} textAlign={'center'}>
          
             <Button colorScheme="gray" 
