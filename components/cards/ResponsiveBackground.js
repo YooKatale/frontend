@@ -1,26 +1,22 @@
-import { Box } from '@mui/material';
-
+import { Box } from "@chakra-ui/react";
 const ResponsiveBackground = ({ url }) => {
   return (
     <Box
-      sx={{
-        backgroundImage: `url(${url})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        width: '100%', // Full width
-        height: '350px', // Default height for larger screens
-        '@media (max-width: 600px)': {
-          height: '200px', // Adjust height for small screens like phones
-          backgroundSize: 'contain', // Ensure proper scaling on smaller screens
-        },
-        '@media (min-width: 600px) and (max-width: 960px)': {
-          height: '250px', // Adjust height for tablets
-        },
-        '@media (min-width: 960px)': {
-          height: '350px', // Default height for larger screens
-        },
-      }}
-    />
+    sx={{
+      height: { base: '50px', sm: '70px', md: '100px' },
+      bgSize: "contain", // Make the entire image is visible
+      bgRepeat: "no-repeat",
+    }}
+    >
+    <img 
+    src={url} 
+    alt="Banner" 
+    style={{
+      width: '100%',
+      height: '100%',
+    }} 
+  />
+</Box>
   );
 };
 

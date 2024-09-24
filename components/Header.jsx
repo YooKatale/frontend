@@ -10,6 +10,7 @@ import {
   Stack,
   useToast,
 } from "@chakra-ui/react";
+import { BellIcon, Loader2, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -41,195 +42,192 @@ const Header = () => {
   const toggleMobileNav = () => {
     setMobileNavOpen(!mobileNavOpen);
   };
-
   return (
-    <Box
-      as="header"
-      bg="white"
-      borderBottomWidth="1px"
-      borderColor="gray.200"
-      position="sticky"
-      top={0}
-      zIndex="sticky"
-      transition="background-color 0.2s"
-      fontSize="1rem" // Set a base font size to maintain consistency
-    >
-      <Flex
-        as="nav"
-        align="center"
-        justify="space-between"
-        maxW="1920px"
-        px={4}
-        mx="auto"
-        height="4rem" // Height of 4rem for the nav bar
+    <> 
+      <Box
+        as="header"
+        bg="white"
+        borderBottomWidth="1px"
+        borderColor="gray.200"
+        position="sticky"
+        top={0}
+        zIndex="sticky"
+        transition="background-color 0.2s"
+        fontSize="1rem" // Set a base font size to maintain consistency
+        py={1}
       >
-        {/* Left Section - Logo and Categories Dropdown */}
-        <Flex align="center">
-          <Link href="/">
-            <Image
-              src="/assets/icons/logo2.png"
-              alt="Logo"
-              height={35} // Adjust logo size using relative units
-              width={115}
-              priority
-            />
-          </Link>
-          <Box ml={4} display={{ base: "none", md: "block" }}>
-            <Link href="/products" passHref>
-              <Button
-                variant="outline"
-                fontSize="0.875rem" // Smaller font size for buttons
-                padding="0.5rem 1rem" // Padding inside buttons
-                leftIcon={<AiOutlineMenu />}
-              >
-                All Categories
-              </Button>
-            </Link>
-          </Box>
-        </Flex>
-
-        {/* Search Bar */}
-        <Box flexGrow={1} mx={8} display={{ base: "none", md: "block" }}>
-          <form onSubmit={handleSearchFormSubmit}>
-            <InputGroup size="lg">
-              <InputLeftElement pointerEvents="none">
-                <FaSearch color="gray.300" />
-              </InputLeftElement>
-              <Input
-                type="text"
-                placeholder="Search for products"
-                value={searchParam}
-                onChange={(e) => setSearchParam(e.target.value)}
-                fontSize="0.875rem"  // Smaller font size for inputs
-                padding="0.75rem"  // Adjust padding for input field
-                paddingLeft="2.5rem"  // Increase left padding to avoid overlap with icon
-              />
-            </InputGroup>
-          </form>
-        </Box>
-        {/* Mobile Menu Icon */}
-        <Box display={{ base: "block", md: "none" }}>
-          <Button variant="outline" onClick={toggleMobileNav}>
-            {mobileNavOpen ? <AiOutlineClose size="24px" /> : <AiOutlineMenu size="24px" />}
-          </Button>
-        </Box>
-
-        {/* Navigation Links */}
-        <Stack
-          as="ul"
-          direction={{ base: "column", md: "row" }}
-          spacing={8}
-          display={{ base: mobileNavOpen ? "block" : "none", md: "flex" }}
-          alignItems="center"
-          listStyleType="none"
-          flexGrow={1}
-          pl={0}
+        <Flex
+          as="nav"
+          align="center"
+          justify="space-between"
+          //maxW="1920px"
+          px={4}
+          mx="auto"
+          height="4rem" // Height of 4rem for the nav bar
+          justifyContent={'center'}
         >
-          <Box as="li" fontSize="0.875rem"> {/* Smaller font for navigation */}
-            <Link href="/">Home</Link>
-          </Box>
-          <Box as="li" fontSize="0.875rem">
-            <Link href="/about">About</Link>
-          </Box>
-          <Box as="li" fontSize="0.875rem">
-            <Link href="/news">Blog</Link>
-          </Box>
-          <Box as="li" fontSize="0.875rem">
-            <Link href="/careers">Careers</Link>
-          </Box>
-          <Box as="li" fontSize="0.875rem">
-            <Link href="/contact">Contact</Link>
-          </Box>
-        </Stack>
-
-        {/* Right Section */}
-        <Flex align="center" display={{ base: "none", md: "flex" }}>
-          {/* Account and Cart */}
+          {/* Left Section - Logo and Categories Dropdown */}
           <Flex align="center">
-            {/* Cart Button */}
-            <Link href="/cart">
-              <Button
-                variant="outline"
-                sx={{
-                  mr: 2,
-                  background: "green",
-                  color: "white",
-                  fontSize: "0.875rem", // Ensure smaller font size
-                  _hover: {
-                    backgroundColor: "gray.100",
-                    color: "green",
-                  },
-                }}
-                leftIcon={<FaShoppingCart />}
-              >
-                Cart
-              </Button>
-            </Link>
+            <Link href="/">
+              <Image
+                src="/assets/icons/logo2.png"
+                alt="Logo"
+                height={100} // Adjust logo size using relative units
+                width={100}
 
-            {/* Sign In or Account Button */}
-            {userInfo ? (
-              <Link href="/account" ml={4}>
-                <FaUser size="20px" />
+              />
+            </Link>
+            <Box display={{ base: "none", md: "block" }}>
+              <Link href="/products" passHref>
+                <Button
+                  variant="outline"
+                  fontSize="0.875rem" // Smaller font size for buttons
+                  //padding="0.5rem 1rem" // Padding inside buttons
+                  leftIcon={<AiOutlineMenu />}
+                >
+                  All Categories
+                </Button>
               </Link>
-            ) : (
-              <Link href="/signin" ml={4}>
+            </Box>
+          </Flex>
+
+          {/* Search Bar */}
+          <Box mx={4} display={{ base: "none", md: "block" }} w={"12rem"} >
+            <form onSubmit={handleSearchFormSubmit}>
+              <InputGroup size="md" w={'12rem'} px={1} py={1}>
+                <InputLeftElement pointerEvents="none">
+                  <FaSearch color="gray.300" />
+                </InputLeftElement>
+                <Input
+                  type="text"
+                  placeholder="Search for products"
+                  value={searchParam}
+                  onChange={(e) => setSearchParam(e.target.value)}
+                  fontSize="0.875rem"  // Smaller font size for inputs
+                  paddingLeft="1.78rem"  // Increase left padding to avoid overlap with icon
+                />
+              </InputGroup>
+            </form>
+          </Box>
+        {/* Navigation Links */}
+          <Stack
+            direction={{ base: "row", md: "row" }} // Stack items in a column on mobile and row on larger screens
+            spacing={4} 
+            display={{ base: mobileNavOpen ? "flex" : "none", md: "flex" }} // Toggle display based on mobile nav state
+            listStyleType="none" 
+            pl={0} 
+            pr={6} 
+            alignItems={{ base: "flex-start", md: "center" }} // Align items vertically on mobile and horizontally on larger screens
+          >
+            <Box as="li" fontSize={{ base: "sm", md: "md" }}> 
+              <Link href="/">Home</Link>
+            </Box>
+            <Box as="li" fontSize={{ base: "sm", md: "md" }}>
+              <Link href="/about">About</Link>
+            </Box>
+            <Box as="li" fontSize={{ base: "sm", md: "md" }}>
+              <Link href="/news">Blog</Link>
+            </Box>
+            <Box as="li" fontSize={{ base: "sm", md: "md" }}>
+              <Link href="/careers">Careers</Link>
+            </Box>
+            <Box as="li" fontSize={{ base: "sm", md: "md" }}>
+              <Link href="/contact">Contact</Link>
+            </Box>
+          </Stack>
+          {/* Mobile Menu Icon */}
+            <Button variant="outline" onClick={toggleMobileNav} display={{ base: "block", md: "none" }} style={{marginLeft:'auto'}} >
+              {mobileNavOpen ? <AiOutlineClose size="20px"/> : <AiOutlineMenu size="24px" />}
+            </Button>
+        
+          {/* Right Section */}
+          <Flex align="center" display={{ base: "none", md: "flex" }}>
+            {/* Account and Cart */}
+            <Flex align="center">
+              {/* Cart Button */}
+              <Link href="/cart">
                 <Button
                   variant="outline"
                   sx={{
                     mr: 2,
                     background: "green",
                     color: "white",
-                    fontSize: "0.875rem", // Keep font size consistent
+                    fontSize: "0.875rem", // Ensure smaller font size
                     _hover: {
                       backgroundColor: "gray.100",
                       color: "green",
                     },
                   }}
-                  leftIcon={<FaUser />}
+                  leftIcon={<FaShoppingCart />}
                 >
-                  Sign In
+                  Cart
                 </Button>
               </Link>
-            )}
+              {/* Sign In or Account Button */}
+              {userInfo ? (
+                <Link href="/account" ml={4}>
+                  <FaUser size="20px" />
+                </Link>
+              ) : (
+                <Link href="/signin" ml={4}>
+                  <Button
+                    variant="outline"
+                    sx={{
+                      mr: 2,
+                      background: "green",
+                      color: "white",
+                      fontSize: "0.875rem", // Keep font size consistent
+                      _hover: {
+                        backgroundColor: "gray.100",
+                        color: "green",
+                      },
+                    }}
+                    leftIcon={<FaUser />}
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+              )}
+            </Flex>
+            {/* Call to Action Button */}
+            <Box mx={4}>
+              <Button
+                bg="orange.400"
+                color="white"
+                size="lg"
+                fontSize="0.875rem" // Make sure the CTA button has a smaller font
+                padding="0.75rem 1.5rem" // Consistent padding
+                _hover={{ bg: "orange.500" }}
+              >
+                Call: +256 754 615840
+              </Button>
+            </Box>
           </Flex>
-
-          {/* Call to Action Button */}
-          <Box ml={4}>
-            <Button
-              bg="orange.400"
-              color="white"
-              size="lg"
-              fontSize="0.875rem" // Make sure the CTA button has a smaller font
-              padding="0.75rem 1.5rem" // Consistent padding
-              _hover={{ bg: "orange.500" }}
-            >
-              Call: +256 754 615840
-            </Button>
-          </Box>
         </Flex>
-      </Flex>
 
       {/* Mobile Search Bar */}
-      {mobileNavOpen && (
-        <Box px={4} pb={4} display={{ base: "block", md: "none" }}>
-          <form onSubmit={handleSearchFormSubmit}>
-            <InputGroup size="md">
-              <InputLeftElement pointerEvents="none">
-                <FaSearch color="gray.300" />
-              </InputLeftElement>
-              <Input
-                type="text"
-                placeholder="Search for products"
-                value={searchParam}
-                onChange={(e) => setSearchParam(e.target.value)}
-                fontSize="0.875rem" // Small font size for mobile input
-                padding="0.75rem" // Consistent padding
-              />
-            </InputGroup>
-          </form>
-        </Box>
-      )}
-    </Box>
+        {mobileNavOpen && (
+          <Box px={4} pb={4} display={{ base: "block", md: "none" }}>
+            <form onSubmit={handleSearchFormSubmit}>
+              <InputGroup size="md">
+                <InputLeftElement pointerEvents="none">
+                  <FaSearch color="gray.300" />
+                </InputLeftElement>
+                <Input
+                  type="text"
+                  placeholder="Search for products"
+                  _placeholder={{ px: 7 }}
+                  value={searchParam}
+                  onChange={(e) => setSearchParam(e.target.value)}
+                  fontSize="0.875rem" // Small font size for mobile input
+                  padding="0.75rem" // Consistent padding
+                />
+              </InputGroup>
+            </form>
+          </Box>
+        )}
+      </Box>
+    </>
   );
 };
 
