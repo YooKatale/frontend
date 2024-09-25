@@ -287,7 +287,7 @@ const Home = () => {
         
                 {index === Products?.length - 7 && (
                   <Box key={`banner3-${index}`}>
-                    <ResponsiveBackground url="/assets/images/banner2.jpeg" />
+                    <ResponsiveBackground url="/assets/images/banner2.jpeg"/>
                   </Box>
                 )}
               </React.Fragment>
