@@ -23,7 +23,7 @@ import ButtonComponent from "@components/Button";
 import { Loader } from "lucide-react";
 
 
-const SignIn = ({ redirect, callback }) => {
+const SignIn = ({ redirect, callback, ismodal }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setLoading] = useState(false);
@@ -86,12 +86,12 @@ const SignIn = ({ redirect, callback }) => {
   return (
     <>
       <Box>
-        <Box paddingBottom={"5rem"}>
+        <Box >
           <Box padding={"1rem 0"}>
             <Heading as={"h2"} fontSize={"lg"} textAlign={"center"}>
               Access your account
             </Heading>
-            <Text fontSize={"3xl"} textAlign={"center"}>
+            <Text fontSize={25} textAlign={"center"}>
               Sign In to continue
             </Text>
             <Flex>
@@ -114,7 +114,7 @@ const SignIn = ({ redirect, callback }) => {
               }}
             >
               <form onSubmit={submitHandler}>
-                <FormControl>
+                <FormControl mt={-6}>
                   <FormLabel htmlFor="email">Email</FormLabel>
                   <Input
                     type="email"
@@ -125,7 +125,7 @@ const SignIn = ({ redirect, callback }) => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl mt={4}>
                   <FormLabel htmlFor="password">Password</FormLabel>
                   <Input
                     type="password"
@@ -151,43 +151,43 @@ const SignIn = ({ redirect, callback }) => {
                   </Text>
                 </Box>
                
-                <Box padding={"0"}>
-                  <ButtonComponent
-                    size={"regular"}
-                    type={"submit"}
-                    text={"Sign In"}
-                    icon={isLoading && <Loader size={20} />}
-                  />
+               
+                <Box display="flex" justifyContent="space-between" alignItems="center" >
+                  {/* Sign In Button on the Left */}
+                  <Box>
+                    <ButtonComponent
+                      size={"regular"}
+                      type={"submit"}
+                      text={"Sign In"}
+                      icon={isLoading && <Loader size={20} />}
+                    />
+                  </Box>
+                  {/* Forgot Password on the Right */}
+                  <Box>
+                    <Text>
+                      <Link href={"/forgotpassword"} style={{ color: ThemeColors.darkColor }}>
+                        Forgot Password?
+                      </Link>
+                    </Text>
+                  </Box>
                 </Box>
 
-
-                <Box
-                display="flex"
-                justifyContent="flex-end" 
-                marginTop="1rem">
-                <Text>
-                  <Link
-                    href={"/forgotpassword"}
-                    style={{ color: ThemeColors.darkColor }}
-                  >
-                    Forgot Password?
+              </form>
+              {!ismodal &&
+                <Text fontSize="3xl" textAlign="center">
+                  <Link href="/subscription">
+                    <Button variant={'outline'}
+                      style={{ border: "1px solid #4CAF50", marginTop: 12 }}
+                      _hover={{
+                        //bg:'#C8E6C9',
+                        color: '#388E3C'
+                      }}
+                    >
+                      View Our Subscription Packages
+                    </Button>
                   </Link>
                 </Text>
-  
-              </Box>
-              </form>
-
-              <Text fontSize="3xl" textAlign="center">
-                <Link href="/subscription">
-                   <ButtonComponent
-                    size="regular"
-                    type="button"
-                    text="View Our Subscription Packages"
-                    icon={false} 
-                     />
-                </Link>
-             </Text>
-                    
+              }  
             </Box>
           </Flex>
         </Box>

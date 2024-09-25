@@ -74,12 +74,8 @@ const NewsletterForm = () => {
   };
   return (
    (display && <div
-      // className={`fixed lg:w-[500px] sm:w-[400px] w-[350px] p-6 bottom-4 left-4 backdrop-blur-md bg-[#ffffffd7] rounded-md ${
-      //   display ? "translate-y-0" : "translate-y-[150%]"
-      // }`}
-
       className={`fixed lg:w-[500px] sm:w-[400px] w-[350px] p-6 bottom-4 left-4 backdrop-blur-md bg-[#ffffffd7] rounded-md 
-        transition-transform duration-300 ease-in-out z-50`} // High z-index value
+        transition-transform duration-300 ease-in-out z-50`} // Z-index to keep on top of other 
     >
       <div
         className="absolute top-4 right-4 cursor-pointer"
