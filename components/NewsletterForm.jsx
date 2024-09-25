@@ -12,7 +12,7 @@ const NewsletterForm = () => {
   const [NewsletterEmail, setNewsletterEmail] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [display, setDisplay] = useState(false);
-
+  const [userClosed, setUserClosed] = useState(false);
   const [createNewsletter] = useNewsletterPostMutation();
   const chakraToast = useToast();
 
@@ -58,21 +58,32 @@ const NewsletterForm = () => {
     }
   };
 
+  
   useEffect(() => {
-    setTimeout(() => {
-      setDisplay((prev) => (prev ? false : true));
-    }, 2500);
-  }, []);
-
+    if (!userClosed) {
+      const timeoutId = setTimeout(() => {
+        setDisplay(true);
+      }, 2500);
+      // Cleanup timeout -(In case of unexpected unmounting)
+      return () => clearTimeout(timeoutId);
+    }
+  }, [userClosed]);
+  const handleClose = () => {
+    setDisplay(false);
+    setUserClosed(true);
+  };
   return (
-    <div
-      className={`fixed lg:w-[500px] sm:w-[400px] w-[350px] p-6 bottom-4 left-4 backdrop-blur-md bg-[#ffffffd7] rounded-md ${
-        display ? "translate-y-0" : "translate-y-[150%]"
-      }`}
+   (display && <div
+      // className={`fixed lg:w-[500px] sm:w-[400px] w-[350px] p-6 bottom-4 left-4 backdrop-blur-md bg-[#ffffffd7] rounded-md ${
+      //   display ? "translate-y-0" : "translate-y-[150%]"
+      // }`}
+
+      className={`fixed lg:w-[500px] sm:w-[400px] w-[350px] p-6 bottom-4 left-4 backdrop-blur-md bg-[#ffffffd7] rounded-md 
+        transition-transform duration-300 ease-in-out z-50`} // High z-index value
     >
       <div
         className="absolute top-4 right-4 cursor-pointer"
-        onClick={() => setDisplay((prev) => (prev ? false : true))}
+        onClick={() => handleClose()}
       >
         <ChevronDown size={25} />
       </div>
@@ -112,7 +123,7 @@ const NewsletterForm = () => {
           </div>
         </form>
       </div>
-    </div>
+    </div>)
   );
 };
 

@@ -6,7 +6,8 @@ const LoaderSkeleton = () => {
    width:'100%',
     padding: '0.5rem', // Default padding for smaller screens
     animation: 'pulse 1s infinite',
-    borderRadius: '0.375rem'
+    borderRadius: '0.375rem',
+    margin: "20px 0px"
   };
 
   // Apply additional styles for medium and larger screens
