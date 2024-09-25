@@ -15,6 +15,7 @@ import Hero from "@components/Hero";
 import CategoryCard from "@components/cards/CategoryCard";
 import ResponsiveBackground from "@components/cards/ResponsiveBackground";
 import Subscription from "@components/cards/SubscriptionSection";
+import SwipperComponent from "@components/Swiper";
 
 const DynamicButton = dynamic(() => import("@components/Button"), {
   loading: () => <p>Loading...</p>,
@@ -85,12 +86,18 @@ const Home = () => {
   };
 
   return (
-    <Box width="100%" maxWidth="87.5rem" margin="0 auto">  {/* Main container */}
+    <Box width="100%" maxWidth={{ 
+      base: "22rem",  // For small screens 
+      sm: "40rem",    // For medium screens 
+      md: "60rem",    // For larger screens 
+      lg: "80rem",    // For extra-large screens 
+      //xl: "87.5rem"   // For extra-extra-large screens 
+    }}  margin="0 auto">  {/* Main container */}
       <Hero />
-
+      
       {/* ------------- Categories Section ------------------------------- */}
       <Box pt="3rem" mx="auto"> 
-        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
+        <Box /*maxWidth="87.5rem"*/ mx={3}> 
           <Box 
             display="grid" 
             gridTemplateColumns={{
@@ -101,6 +108,13 @@ const Home = () => {
             }} 
             gap={6}  
             py={6}   
+            maxWidth={{ 
+              base: "20rem",  // For small screens 
+              sm: "40rem",    // For medium screens 
+              md: "60rem",    // For larger screens 
+              lg: "80rem",    // For extra-large screens 
+              //xl: "87.5rem"   // For extra-extra-large screens 
+            }}
           >
             {CategoriesJson.map((category, index) => (
               <CategoryCard key={index} category={category} />
@@ -110,42 +124,37 @@ const Home = () => {
       </Box>
 
 
-      <Box pt="3rem" mx="auto"> 
-  <Flex direction="column" alignItems="center">
-    <Box width="100%" maxWidth="87.5rem" mx="auto">
-      {Products?.length > 0 ? (
-        Products.map(
-          (product, index) =>
-            product?.category === "topdeals" && (
+      <Box pt="3rem" mx={2}>
+        <Flex direction="column" alignItems="center">
+          <Box mx="auto" width="100%">
+            {Products?.length > 0 ? (
+              Products.map(
+                (product, index) =>
+                  product?.category === "topdeals" && (
+                    <DynamicSpecialProducts
+                      key={index}
+                      Products={product?.products}
+                      userInfo={userInfo}
+                      category={product?.category}
+                      text={"bulk"}
+                    />
+                  )
+              )
+            ) : (
               <DynamicSpecialProducts
-                key={index}
-                Products={product?.products}
-                userInfo={userInfo}
-                category={product?.category}
-                text={"bulk"}
+                Products={[]}
+                userInfo={{}}
+                category={""}
+                text={""}
               />
-            )
-        )
-      ) : (
-        <DynamicSpecialProducts
-          Products={[]}
-          userInfo={{}}
-          category={""}
-          text={""}
-        />
-      )}
-    </Box>
-  </Flex>
-</Box>
-<ResponsiveBackground url="/assets/images/b3.jpeg" />
-
-      
-
-      {/* // product?.category == "popular" && */}
-      
-      <Box pt="3rem" mx="auto"> 
-        <Flex>
-        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
+            )}
+          </Box>
+        </Flex>
+      </Box>
+<ResponsiveBackground url="/assets/images/new.jpeg" />
+      <Box pt="3rem" mx={2}> 
+        <Flex direction="column" alignItems="center">
+        <Box width="100%"  > 
             {Products?.length > 0 ? (
               Products.map(
                 (product, index) =>
@@ -164,20 +173,20 @@ const Home = () => {
             )}
           </Box>
         </Flex>
-<Box
-  bgImage="url('/assets/images/b1.jpeg')" // Placeholder image
-  bgSize="cover"
-  bgPosition="center"
-  h="350px"
-  w="100%"
-/>
+        {/* <Box
+          bgImage="url('/assets/images/b1.jpeg')" // Placeholder image
+          bgSize="cover"
+          bgPosition="center"
+          h="350px"
+          w="100%"
+        /> */}
       </Box>
 
-
+      <ResponsiveBackground url="/assets/images/b1.jpeg" />
       
-      <Box pt="3rem" mx="auto"> 
+      <Box pt="3rem"  width="100%" > 
         <Flex>
-        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
+        <Box width="100%"  mx={2} > 
             {Products?.length > 0 ? (
               Products.map(
                 (product, index) =>
@@ -197,18 +206,18 @@ const Home = () => {
           </Box>
         </Flex>
       </Box>
-<Box
+{/* <Box
   bgImage="url('/assets/images/b2.jpeg')" // Placeholder image
   bgSize="cover"
   bgPosition="center"
   h="350px"
   w="100%"
-/>
+/> */}
 
-      
-      <Box pt="3rem" mx="auto"> 
+<ResponsiveBackground url="/assets/images/b2.jpeg" />
+      <Box pt="3rem" width="100%" > 
         <Flex>
-        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
+        <Box width="100%" mx={2}  > 
             {Products?.length > 0 ? (
               Products.map(
                 (product, index) =>
@@ -228,19 +237,19 @@ const Home = () => {
           </Box>
         </Flex>
       </Box>
-<Box
+{/* <Box
   bgImage="url('/assets/images/banner2.jpeg')" // Placeholder image
   bgSize="cover"
   bgPosition="center"
   h="350px"
   w="100%"
-/>
-
+/> */}
+<ResponsiveBackground url="/assets/images/banner2.jpeg" />
 
       
-<Box py="3rem" mx="auto">
+<Box py="3rem" width="100%" >
   <Flex>
-    <Box width="100%" maxWidth="87.5rem" mx="auto">
+    <Box mx={2}  width="100%">
       {Products?.length > 0 ? (
         Products.map(
           (product, index) =>
@@ -260,12 +269,12 @@ const Home = () => {
     </Box>
   </Flex>
 
-  {/* Subscription component should have the same width and margins as the section above */}
-  <Box width="100%" maxWidth="87.5rem" mx="auto" mt="2rem">
+  
+</Box>
+{/* Subscription component should have the same width and margins as the section above */}
+<Box width="100%"  mx="auto" mt="2rem">
     <Subscription />
   </Box>
-</Box>
-
       
       {Products?.length > 0 ? (
         Products.map(
@@ -274,9 +283,9 @@ const Home = () => {
             product?.category !== "topdeals" &&
             product?.products?.length > 0 && (
               <React.Fragment key={product?.category}>  {/* Add a key here */}
-              <Box pt="3rem" mx="auto"> 
-        <Flex>
-        <Box width="100%" maxWidth="87.5rem" mx="auto"> 
+              <Box pt="3rem" mx={2}> 
+                  <Flex>
+                    <Box width="100%" mx="auto">
                       <DynamicSpecialProducts
                         Products={product?.products}
                         userInfo={userInfo}

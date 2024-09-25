@@ -14,13 +14,13 @@ export default function Subscription() {
       }}
     >
       <Image
-        src="/assets/images/sub.jpg"
+        src="/assets/images/subnew.jpeg"
         alt="Subscription Image"
         layout="responsive" // Ensures responsiveness
-        width={600} // Set appropriate width
-        height={400} // Set appropriate height
+        width={600} 
+        height={400} 
         style={{
-          objectFit: 'contain', // Ensures the image fits well within the container
+          objectFit: 'contain',
         }}
       />
     </Box>

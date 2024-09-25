@@ -1,10 +1,30 @@
 import React from "react";
 
 const LoaderSkeleton = () => {
+  const containerStyle = {
+    maxWidth: '100%',
+   width:'100%',
+    padding: '0.5rem', // Default padding for smaller screens
+    animation: 'pulse 1s infinite',
+    borderRadius: '0.375rem'
+  };
+
+  // Apply additional styles for medium and larger screens
+  const mediaQueryStyle = {
+    '@media (minWidth: 250px)': {
+      padding: '1rem', // Adjust padding for medium screens and up
+    },
+  };
   return (
-    <div
+    // <div
+    //   role="status"
+    //   //className="max-w-sm p-4  shadow animate-pulse md:p-6 dark:border-gray-700 rounded-md bg-light"
+    //   className="max-w-[100%] p-2 shadow animate-pulse md:p-2 dark:border-gray-700 rounded-md bg-light"
+    // >
+      <div
+      className="shadow animate-pulse dark:border-gray-700 rounded-md bg-light"
       role="status"
-      className="max-w-sm p-4  shadow animate-pulse md:p-6 dark:border-gray-700 rounded-md bg-light"
+      style={{ ...containerStyle, ...mediaQueryStyle }}
     >
       <div className="flex items-center justify-center h-[9rem] mb-4 bg-gray-300 rounded dark:bg-gray-700">
         <svg
@@ -18,7 +38,7 @@ const LoaderSkeleton = () => {
           <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
         </svg>
       </div>
-      <div className="h-2.5 bg-white rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+      <div className="h-2.5 bg-white rounded-full dark:bg-gray-700 mb-4"></div>
       <div className="h-2 bg-white rounded-full dark:bg-gray-700 mb-2.5"></div>
       <div className="h-2 bg-white rounded-full dark:bg-gray-700 mb-2.5"></div>
       <div className="h-2 bg-white rounded-full dark:bg-gray-700"></div>
