@@ -1,6 +1,6 @@
 "use client";
 
-import { useToast, Badge, Box, Heading, Text } from "@chakra-ui/react";
+import { useToast, Badge, Box, Heading, Text, useDisclosure } from "@chakra-ui/react";
 import React, { useState } from "react";
 import Link from "next/link";
 import { useCartCreateMutation } from "@slices/productsApiSlice";
@@ -15,13 +15,22 @@ import { useSelector } from "react-redux";
 import { Card } from 'antd';
 import Paragraph from "antd/es/skeleton/Paragraph";
 import { ShoppingCartOutlined } from "@ant-design/icons";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from '@chakra-ui/react'
 import "antd/dist/reset.css";
 const { Meta } = Card;
 const ProductCard = ({ product, userInfo }) => {
   const [addCartApi] = useCartCreateMutation();
   const [SignInStateModal, setSignInStateModal] = useState(false);
   const [isLoading, setLoading] = useState(false);
-
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const chakraToast = useToast();
 
   // Function to calculate the discounted price
@@ -81,10 +90,11 @@ const ProductCard = ({ product, userInfo }) => {
         status: "error",
         duration: 5000,
         isClosable: false,
+        position:'top'
       });
 
       setSignInStateModal((prev) => !prev);
-
+      onOpen()
       // Set loading to false
       setLoading(false);
 
@@ -202,85 +212,17 @@ const ProductCard = ({ product, userInfo }) => {
             </Button>
           </Box>
         </Box>
-
-         
-        
-   
-   
-      {/* <div className="lg:p-4 py-2 px-4 bg-white hover:shadow-md w-[200px] rounded-md shrink-0 relative">
-        <div className="h-[120px] p-[0.3rem]">
-          <Link href={`/product/${product._id}`}>
-            {product.discountPercentage && (
-              <Badge
-                colorScheme="red"
-                position="absolute"
-                size="sm"
-                zIndex="1"
-                paddingX={"0.5rem"}
-                style={{
-                  width: "2rem",
-                  height: "2rem",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {product?.type == "bulk" && product?.type}
-                {product.discountPercentage != "0" &&
-                  product.discountPercentage}
-              </Badge>
-            )}
-
-            <div className="flex justify-center items-center h-full relative">
-              <img
-                src={product.images[0]}
-                className="w-auto object-contain h-full"
-                alt={product.images}
-              />
-            </div>
-          </Link>
-        </div>
-
-         <div className="p-[0.3rem 0]">
-          <div className="py-2">
-            <p className="secondary-light-font text-center text-lg">
-              {product.name}
-            </p>
-            <h3 className={`font-bold text-center text-base text-dark`}>
-              {`UGX ${FormatCurr(product.price)}`}
-            </h3>
-
-            {product.category == "grains and flour" && (
-              <p className="secondary-light-font text-center text-base">
-                per {product.unit}
-              </p>
-            )}
-
-            {product?.type == "bulk" && (
-              <p className="secondary-light-font text-center text-base">
-                {product?.description}
-              </p>
-            )}
-          </div>
-
-          <div className="py-[0.3rem] flex justify-center">
-            <Button
-              className="text-white bg-dark hover:bg-transparent hover:text-dark text-base gap-2 rounded-md border-[1.7px] border-dark"
-              onClick={() => handleAddToCartBtnClick(product._id)}
-            >
-              {isLoading ? (
-                <LoaderIcon size={20} />
-              ) : (
-                <ShoppingCart size={20} />
-              )}{" "}
-              Add To Cart
-            </Button>
-          </div>
-        </div> 
-      </div> */}
-
       {/* Sign-in / Sign-up form */}
-      
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+  <ModalOverlay />
+  <ModalContent className="bg-light" maxW="800px">
+    <ModalCloseButton />
+    <ModalBody>
+      <SignIn redirect={null} callback={handleListeningToSignIn} ismodal={true}/>
+    </ModalBody>
+  </ModalContent>
+</Modal>
     </>
   );
 };
