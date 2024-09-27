@@ -137,15 +137,15 @@ const Partner = () => {
         
         <Box className="p-4 md:w-2/5 rounded-xl bg-white">
           <p className="text-3xl text-left mb-4 text-dark">
-            Fill out the vendor form
+            Fill out the Store form
           </p>
           <form onSubmit={handleSubmit}>
             <FormControl className="mb-4">
-              <FormLabel>Vendor's Name*</FormLabel>
+              <FormLabel>Store's Name*</FormLabel>
               <Input
                 type="text"
                 name="name"
-                placeholder="Vendor's Name"
+                placeholder="Store's Name"
                 value={formData.name}
                 onChange={handleChange}
                 required
@@ -200,27 +200,37 @@ const Partner = () => {
                 className="border border-dark italic hover-border-red focus-border-red rounded px-2 py-1"
               >
                 <option value="Livestock farmer">Livestock farmer</option>
-                {/* <option value="Dairy farmer">Dairy farmer</option>
-                <option value="Poultry farmer">Poultry farmer</option>
-                <option value="Egg supplier">Egg supplier</option>
-                <option value="Honey supplier">Honey supplier</option>
-                <option value="Fruit grower">Fruit grower</option>
-                <option value="Vegetable grower">Vegetable grower</option>
-                <option value="Grain farmer">Grain farmer</option>*/}
-                <option value="Fisherman">Fisherman</option> 
+                <option value="Fisherman">Fisherman</option>
                 <option value="Carbohydrates">Carbohydrates</option>
                 <option value="Protein">Protein</option>
-                <option value="Fats and oils">Fats and oils</option>
+                <option value="Fats & Oils">Fats & Oils</option>
                 <option value="Vitamins">Vitamins</option>
                 <option value="Gas">Gas</option>
-                <option value="Herbs and spices">Herbs and spices</option>
+                <option value="Spices & Herbs">Spices & Herbs</option>
                 <option value="Knife Sharpening">Knife Sharpening</option>
                 <option value="Breakfast">Breakfast</option>
                 <option value="Dairy">Dairy</option>
                 <option value="Vegetables">Vegetables</option>
-                <option value="Juice & meals">Juice & meals</option>
+                <option value="Juice">Juice</option>
+                <option value="Meals">Meals</option>
                 <option value="Root tubers">Root tubers</option>
-                {/* <option value="Markets & Shops Nearby">Markets & Shops Nearby</option> */}
+                <option value="Market">Market</option>
+                <option value="Shop">Shop</option>
+                <option value="Dairy farmer">Dairy farmer</option>
+                <option value="Poultry farmer">Poultry farmer</option>
+                <option value="Egg supplier">Egg supplier</option>
+                <option value="Honey supplier">Honey supplier</option>
+                <option value="Cuisines">Cuisines</option>
+                <option value="Kitchen">Kitchen</option>
+                <option value="Supplements">Supplements</option>
+                <option value="Restaurant">Restaurant</option>
+                <option value="Gym">Gym</option>
+                <option value="Sunna & steam">Sunna & steam</option>
+                <option value="Hotel">Hotel</option>
+                <option value="Chef">Chef</option>
+                <option value="Culinary">Culinary</option>
+                <option value="Supermarket">Supermarket</option>
+
 
               </Select>
             </FormControl>
