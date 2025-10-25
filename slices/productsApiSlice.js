@@ -6,7 +6,7 @@ export const productsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     productsGet: builder.mutation({
       query: () => ({
-        url: `${DB_URL}/productss`,
+        url: `${DB_URL}/products`,
         method: "GET",
       }),
     }),
