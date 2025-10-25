@@ -3,7 +3,7 @@ import { Flex, Heading, Text } from "@chakra-ui/react";
 import { CategoriesJson, ThemeColors } from "@constants/constants";
 import React from "react";
 
-import { useProductsCategoriesGetMutation } from "@slices/productsApiSlice";
+import { useProductsGetMutation } from "@slices/productsApiSlice";
 import { useCommentsGetMutation } from "@slices/usersApiSlice";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
@@ -36,7 +36,7 @@ const Home = () => {
 
   const { userInfo } = useSelector((state) => state.auth);
 
-  const [fetchProducts] = useProductsCategoriesGetMutation();
+  const [fetchProducts] = useProductsGetMutation();
   const [fetchComments] = useCommentsGetMutation();
 
   const handleFetchCommentsData = async () => {
