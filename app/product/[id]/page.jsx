@@ -7,12 +7,11 @@ import {
   Grid,
   Heading,
   Text,
-  Image,
   useToast,
 } from "@chakra-ui/react";
 import { DisplayImages, Images, ThemeColors } from "@constants/constants";
 import React, { useEffect, useState } from "react";
-// import Image from "next/image";
+import Image from "next/image";
 
 import { AiOutlineClose, AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import {
@@ -218,56 +217,83 @@ const Product = ({ params }) => {
             >
               <Box width={{ base: "100%", md: "90%", xl: "45%" }}>
                 <Box id="main-product-image" position={"relative"}>
-                  <Flex
-                    alignContent={"center"}
-                    justifyContent={"center"}
-                    height={"100%"}
+                  <Box
+                    position="relative"
+                    width="100%"
+                    height={{ base: "300px", md: "400px", lg: "500px" }}
+                    borderRadius="xl"
+                    overflow="hidden"
+                    bg="gray.50"
+                    boxShadow="md"
+                    border="1px solid"
+                    borderColor="gray.200"
                   >
-                    <Image
-                      src={
-                        ProductData?.images ? `${ProductData?.images[0]}` : ""
-                      }
-                      style={{
-                        width: "auto",
-                        height: "100%",
-                        margin: "auto",
-                      }}
-                      alt="product image"
-                    />
-                  </Flex>
+                    {ProductData?.images && ProductData?.images[0] ? (
+                      <Image
+                        src={ProductData.images[0]}
+                        alt={ProductData?.name || "product image"}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 45vw"
+                        style={{
+                          objectFit: "cover",
+                          padding: "1rem",
+                        }}
+                        priority
+                      />
+                    ) : (
+                      <Flex
+                        alignItems="center"
+                        justifyContent="center"
+                        height="100%"
+                        bg="gray.100"
+                      >
+                        <Text fontSize="4xl" color="gray.400">
+                          📦
+                        </Text>
+                      </Flex>
+                    )}
+                  </Box>
                   <Box padding={"1rem 0"}>
                     <Grid
-                      gridTemplateColumns={`repeat(${
-                        parseInt(DisplayImages.length)
-                          ? parseInt(DisplayImages.length) > 5
-                            ? 5
-                            : parseInt(DisplayImages.length)
-                          : 5
-                      }, 1fr)`}
-                      gridGap={"1rem"}
+                      gridTemplateColumns={{
+                        base: "repeat(3, 1fr)",
+                        md: "repeat(4, 1fr)",
+                        lg: "repeat(5, 1fr)",
+                      }}
+                      gap={3}
                     >
-                      {ProductData?.images
-                        ? ProductData?.images.map((image, index) => (
-                            <Flex
-                              alignContent={"center"}
-                              justifyContent={"center"}
-                              height={"100%"}
+                      {ProductData?.images && ProductData?.images.length > 0
+                        ? ProductData.images.map((image, index) => (
+                            <Box
                               key={index}
-                              borderRadius={"0.3rem"}
-                              border={"1.7px solid " + ThemeColors.lightColor}
+                              position="relative"
+                              height={{ base: "80px", md: "100px" }}
+                              borderRadius="lg"
+                              overflow="hidden"
+                              bg="gray.50"
+                              border="2px solid"
+                              borderColor={index === 0 ? "green.400" : "gray.200"}
+                              cursor="pointer"
+                              transition="all 0.3s ease"
+                              _hover={{
+                                borderColor: "green.400",
+                                transform: "scale(1.05)",
+                                boxShadow: "md",
+                              }}
                             >
                               <Image
                                 src={image}
+                                alt={`${ProductData?.name || "product"} - image ${index + 1}`}
+                                fill
+                                sizes="(max-width: 768px) 25vw, (max-width: 1200px) 20vw, 15vw"
                                 style={{
-                                  height: "auto",
-                                  width: "100%",
-                                  margin: "auto",
+                                  objectFit: "contain",
+                                  padding: "0.5rem",
                                 }}
-                                alt="product image"
                               />
-                            </Flex>
+                            </Box>
                           ))
-                        : ""}
+                        : null}
                     </Grid>
                   </Box>
                 </Box>

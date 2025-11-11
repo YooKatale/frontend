@@ -9,9 +9,15 @@ import {
   Heading,
   Text,
   useToast,
+  Button,
+  HStack,
+  VStack,
+  Divider,
+  Badge,
+  Icon,
 } from "@chakra-ui/react";
 import { CategoriesJson, ThemeColors } from "@constants/constants";
-import { FaArrowDown, FaArrowUp } from "react-icons/fa";
+import { FaArrowDown, FaArrowUp, FaFilter, FaTimes } from "react-icons/fa";
 
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -22,11 +28,15 @@ import {
 } from "@slices/productsApiSlice";
 
 import ProductCard from "@components/ProductCard";
+import LoaderSkeleton from "@components/LoaderSkeleton";
 
 const Products = () => {
   const [ProductsTitle, setProductsTitle] = useState("All Products");
   const [Products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -37,19 +47,27 @@ const Products = () => {
   const chakraToast = useToast();
 
   const handleDataFetch = async () => {
-    const res = await fetchProducts().unwrap();
+    try {
+      setIsLoading(true);
+      const res = await fetchProducts().unwrap();
 
-    if (res?.status && res?.status == "Success") {
-      setProducts(res?.data);
-      setProductsTitle("All Products");
+      if (res?.status && res?.status == "Success") {
+        setProducts(res?.data);
+        setProductsTitle("All Products");
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      chakraToast({
+        title: "Error",
+        description: "Failed to load products",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  // fetch product categories
-  useEffect(() => {
-    handleDataFetch();
-    handleCategoriesFetch();
-  }, []);
 
   const handleCategoriesFetch = async () => {
     try {
@@ -62,9 +80,16 @@ const Products = () => {
     }
   };
 
+  // fetch product categories
+  useEffect(() => {
+    handleDataFetch();
+    handleCategoriesFetch();
+  }, []);
+
   // filter functions
   const handleFilterFetch = async (param) => {
     try {
+      setIsLoading(true);
       const res = await fetchProductsFilter(param).unwrap();
 
       if (res?.status && res?.status == "Success") {
@@ -81,7 +106,16 @@ const Products = () => {
         duration: 5000,
         isClosable: false,
       });
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const clearFilters = () => {
+    setSelectedFilters([]);
+    const checkboxes = [...document.querySelectorAll("input.chakra-checkbox__input")];
+    checkboxes.forEach(checkbox => checkbox.checked = false);
+    handleDataFetch();
   };
 
   const handleFilterApply = () => {
@@ -103,158 +137,241 @@ const Products = () => {
 
   return (
     <>
-      <Box>
-        <Box padding={{ base: "2rem 1rem", md: "2rem", xl: "2rem" }}>
-          <Flex direction={{ base: "column", md: "column", xl: "row" }}>
-            <Box
-              width={{ base: "100%", md: "100%", xl: "25%" }}
-              borderRight={"1.7px solid " + ThemeColors.lightColor}
-              padding={"0 1rem"}
+      <Box bg="gray.50" minH="100vh">
+        <Box 
+          maxWidth="1400px" 
+          margin="0 auto" 
+          padding={{ base: "1rem", md: "2rem" }}
+        >
+          {/* Page Header */}
+          <Box mb={6} bg="white" p={6} borderRadius="lg" boxShadow="sm">
+            <Heading 
+              as="h1" 
+              size="xl" 
+              mb={2}
+              bgGradient="linear(to-r, green.400, green.600)"
+              bgClip="text"
             >
-              <Box padding={"0 1rem 0.5rem 1rem"}>
-                <Heading as={"h2"} size={"md"} className="secondary-extra-bold">
-                  Apply Filters
-                </Heading>
-              </Box>
+              All Categories
+            </Heading>
+            <Text color="gray.600" fontSize="md">
+              Browse our wide selection of products across all categories
+            </Text>
+          </Box>
+
+          {/* Mobile Filter Toggle */}
+          <Box display={{ base: "block", xl: "none" }} mb={4}>
+            <Button
+              leftIcon={<FaFilter />}
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              colorScheme="green"
+              width="100%"
+              size="lg"
+            >
+              {showMobileFilters ? "Hide Filters" : "Show Filters"}
+            </Button>
+          </Box>
+
+          <Flex direction={{ base: "column", md: "column", xl: "row" }} gap={6}>
+            {/* Filters Sidebar */}
+            <Box
+              width={{ base: "100%", md: "100%", xl: "280px" }}
+              display={{ base: showMobileFilters ? "block" : "none", xl: "block" }}
+            >
               <Box
-                padding={"1rem 0 0.5rem 0"}
-                borderBottom={"1.7px solid " + ThemeColors.lightColor}
+                bg="white"
+                borderRadius="lg"
+                boxShadow="sm"
+                p={5}
+                position="sticky"
+                top="20px"
               >
-                <Text fontSize={"md"}>By price:</Text>
-                <Box padding={"0.5rem 0 0 0"}>
-                  <Flex margin="0.3rem 0">
-                    <Box>
-                      <Checkbox
-                        name="filterByLowPrice"
-                        id="filterByLowPrice"
-                        width={"100%"}
-                        value={"lowest"}
-                        onChange={(e) => handleFilterApply(e.target.value)}
-                        className="filter-input"
-                      />
-                    </Box>
-                    <FormLabel
-                      margin={"0 0.3rem 0 1rem"}
-                      display={"flex"}
-                      htmlFor="filterByLowPrice"
+                <Flex justify="space-between" align="center" mb={4}>
+                  <HStack>
+                    <Icon as={FaFilter} color="green.500" />
+                    <Heading as="h2" size="md" fontWeight="700">
+                      Filters
+                    </Heading>
+                  </HStack>
+                  {selectedFilters.length > 0 && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      colorScheme="red"
+                      onClick={clearFilters}
+                      leftIcon={<FaTimes />}
                     >
-                      <FaArrowDown style={{ margin: "0 0.3rem" }} />{" "}
-                      <Text
-                        fontSize={"md"}
-                        marginBottom={"0.5rem"}
-                        className="secondary-light-font"
-                      >
-                        Lowest
-                      </Text>
-                    </FormLabel>
-                  </Flex>
-                  <Flex margin="0.3rem 0">
-                    <Box>
-                      <Checkbox
-                        name="filterByHighPrice"
-                        id="filterByHighPrice"
-                        width={"100%"}
-                        value="highest"
-                        onChange={(e) => handleFilterApply(e.target.value)}
-                      />
-                    </Box>
-                    <FormLabel
-                      margin={"0 0.3rem 0 1rem"}
-                      display={"flex"}
-                      htmlFor="filterByHighPrice"
-                    >
-                      <FaArrowUp style={{ margin: "0 0.3rem" }} />{" "}
-                      <Text
-                        fontSize={"md"}
-                        marginBottom={"0.5rem"}
-                        className="secondary-light-font"
-                      >
-                        Highest
-                      </Text>
-                    </FormLabel>
-                  </Flex>
-                </Box>
-              </Box>
-              {/* category */}
-              <Box
-                padding={"1rem 0 0.5rem 0"}
-                borderBottom={"1.7px solid " + ThemeColors.lightColor}
-              >
-                <Text fontSize={"md"}>By category:</Text>
-                <Box padding={"0.5rem 0 0 0"}>
-                  {categories.length > 0 ? (
-                    categories.map((category, index) => (
-                      <Flex margin="0.3rem 0" key={index}>
-                        <Box>
-                          <Checkbox
-                            name="category"
-                            id={`category-${category._id}`}
-                            width={"100%"}
-                            value={category.name.toLowerCase().replace(/\s+/g, '-')}
-                            onChange={(e) => handleFilterApply(e.target.value)}
-                          />
-                        </Box>
-                        <FormLabel
-                          margin={"0 0.3rem 0 1rem"}
-                          display={"flex"}
-                          htmlFor={`category-${category._id}`}
-                          className="secondary-light-font"
-                        > 
-                          {category.name}
-                        </FormLabel>
-                      </Flex>
-                    ))
-                  ) : (
-                    <Text fontSize="sm" color="gray.500">
-                      No categories available
-                    </Text>
+                      Clear
+                    </Button>
                   )}
-                </Box>
+                </Flex>
+                
+                <Divider mb={4} />
+
+                {/* Price Filter */}
+                <VStack align="stretch" spacing={4}>
+                  <Box>
+                    <Text fontSize="md" fontWeight="600" mb={3}>
+                      Sort by Price
+                    </Text>
+                    <VStack align="stretch" spacing={2}>
+                      <Box
+                        p={3}
+                        borderRadius="md"
+                        border="1px solid"
+                        borderColor="gray.200"
+                        _hover={{ bg: "gray.50", borderColor: "green.300" }}
+                        transition="all 0.2s"
+                      >
+                        <Checkbox
+                          name="filterByLowPrice"
+                          id="filterByLowPrice"
+                          value="lowest"
+                          onChange={(e) => handleFilterApply(e.target.value)}
+                          colorScheme="green"
+                          size="lg"
+                        >
+                          <HStack spacing={2}>
+                            <Icon as={FaArrowDown} color="green.500" />
+                            <Text fontSize="sm" fontWeight="500">
+                              Price: Low to High
+                            </Text>
+                          </HStack>
+                        </Checkbox>
+                      </Box>
+                      
+                      <Box
+                        p={3}
+                        borderRadius="md"
+                        border="1px solid"
+                        borderColor="gray.200"
+                        _hover={{ bg: "gray.50", borderColor: "green.300" }}
+                        transition="all 0.2s"
+                      >
+                        <Checkbox
+                          name="filterByHighPrice"
+                          id="filterByHighPrice"
+                          value="highest"
+                          onChange={(e) => handleFilterApply(e.target.value)}
+                          colorScheme="green"
+                          size="lg"
+                        >
+                          <HStack spacing={2}>
+                            <Icon as={FaArrowUp} color="red.500" />
+                            <Text fontSize="sm" fontWeight="500">
+                              Price: High to Low
+                            </Text>
+                          </HStack>
+                        </Checkbox>
+                      </Box>
+                    </VStack>
+                  </Box>
+
+                  <Divider />
+
+                  {/* Category Filter */}
+                  <Box>
+                    <Text fontSize="md" fontWeight="600" mb={3}>
+                      Categories
+                    </Text>
+                    <VStack align="stretch" spacing={2} maxH="400px" overflowY="auto">
+                      {categories.length > 0 ? (
+                        categories.map((category, index) => (
+                          <Box
+                            key={index}
+                            p={2}
+                            borderRadius="md"
+                            _hover={{ bg: "gray.50" }}
+                            transition="all 0.2s"
+                          >
+                            <Checkbox
+                              name="category"
+                              id={`category-${category._id}`}
+                              value={category.name.toLowerCase().replace(/\s+/g, '-')}
+                              onChange={(e) => handleFilterApply(e.target.value)}
+                              colorScheme="green"
+                            >
+                              <Text fontSize="sm" fontWeight="500" textTransform="capitalize">
+                                {category.name}
+                              </Text>
+                            </Checkbox>
+                          </Box>
+                        ))
+                      ) : (
+                        <Text fontSize="sm" color="gray.500" textAlign="center" py={4}>
+                          Loading categories...
+                        </Text>
+                      )}
+                    </VStack>
+                  </Box>
+                </VStack>
               </Box>
             </Box>
-            <Box
-              width={{ base: "100%", md: "100%", xl: "75%" }}
-              padding={{
-                base: "2rem 0 1rem 0",
-                md: "2rem 0.5rem 1rem 0.5rem",
-                xl: "0 0.5rem 1rem 0.5rem",
-              }}
-            >
-              <Box
-                padding={{
-                  base: "1rem 0",
-                  md: "1rem 0",
-                  xl: "0 1rem 0.5rem 1rem",
-                }}
-              >
-                <Heading as={"h2"} size={"md"} className="secondary-extra-bold">
-                  {ProductsTitle}
-                </Heading>
-              </Box>
-              {Products?.length > 0 ? (
-                <Grid
-                  gridTemplateColumns={{
-                    base: "repeat(2, 1fr)",
-                    md: "repeat(3, 1fr)",
-                    xl: "repeat(4, 1fr)",
-                  }}
-                  gridGap={"1rem"}
-                >
-                  {Products.map((product, index) => (
-                    <ProductCard
-                      product={product}
-                      key={index}
-                      userInfo={userInfo}
-                    />
-                  ))}
-                </Grid>
-              ) : (
-                <Box>
-                  <Box padding={"3rem 0"}>
-                    <Text fontSize={"2xl"}>No products currently</Text>
+            {/* Products Grid */}
+            <Box flex="1">
+              <Box bg="white" borderRadius="lg" boxShadow="sm" p={5}>
+                <Flex justify="space-between" align="center" mb={5}>
+                  <VStack align="start" spacing={1}>
+                    <Heading as="h2" size="lg" fontWeight="700">
+                      {ProductsTitle}
+                    </Heading>
+                    {Products?.length > 0 && (
+                      <Text fontSize="sm" color="gray.600">
+                        {Products.length} product{Products.length !== 1 ? 's' : ''} found
+                      </Text>
+                    )}
+                  </VStack>
+                </Flex>
+
+                {isLoading ? (
+                  <Grid
+                    gridTemplateColumns={{
+                      base: "repeat(2, 1fr)",
+                      md: "repeat(3, 1fr)",
+                      lg: "repeat(4, 1fr)",
+                    }}
+                    gap={4}
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+                      <LoaderSkeleton key={item} />
+                    ))}
+                  </Grid>
+                ) : Products?.length > 0 ? (
+                  <Grid
+                    gridTemplateColumns={{
+                      base: "repeat(2, 1fr)",
+                      md: "repeat(3, 1fr)",
+                      lg: "repeat(4, 1fr)",
+                    }}
+                    gap={4}
+                  >
+                    {Products.map((product, index) => (
+                      <ProductCard
+                        product={product}
+                        key={index}
+                        userInfo={userInfo}
+                      />
+                    ))}
+                  </Grid>
+                ) : (
+                  <Box textAlign="center" py={20}>
+                    <Text fontSize="3xl" mb={2}>
+                      🛒
+                    </Text>
+                    <Heading as="h3" size="md" color="gray.600" mb={2}>
+                      No products found
+                    </Heading>
+                    <Text color="gray.500" mb={4}>
+                      Try adjusting your filters or browse all products
+                    </Text>
+                    {selectedFilters.length > 0 && (
+                      <Button colorScheme="green" onClick={clearFilters}>
+                        Clear All Filters
+                      </Button>
+                    )}
                   </Box>
-                </Box>
-              )}
+                )}
+              </Box>
             </Box>
           </Flex>
         </Box>
