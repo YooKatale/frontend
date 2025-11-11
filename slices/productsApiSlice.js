@@ -31,7 +31,7 @@ export const productsApiSlice = apiSlice.injectEndpoints({
     }),
     productsCategoriesGet: builder.mutation({
       query: () => ({
-        url: `${DB_URL}/products/categories`,
+        url: `${DB_URL.replace('/api', '')}/api/categories`,
         method: "GET",
       }),
     }),

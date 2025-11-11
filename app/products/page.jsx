@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import {
   useProductsFilterGetMutation,
   useProductsGetMutation,
+  useProductsCategoriesGetMutation,
 } from "@slices/productsApiSlice";
 
 import ProductCard from "@components/ProductCard";
@@ -25,12 +26,13 @@ import ProductCard from "@components/ProductCard";
 const Products = () => {
   const [ProductsTitle, setProductsTitle] = useState("All Products");
   const [Products, setProducts] = useState([]);
-  // const [productsFilter, setProductsFilter] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   const { userInfo } = useSelector((state) => state.auth);
 
   const [fetchProducts] = useProductsGetMutation();
   const [fetchProductsFilter] = useProductsFilterGetMutation();
+  const [fetchCategories] = useProductsCategoriesGetMutation();
 
   const chakraToast = useToast();
 
@@ -46,7 +48,19 @@ const Products = () => {
   // fetch product categories
   useEffect(() => {
     handleDataFetch();
+    handleCategoriesFetch();
   }, []);
+
+  const handleCategoriesFetch = async () => {
+    try {
+      const res = await fetchCategories().unwrap();
+      if (res?.success && res?.categories) {
+        setCategories(res.categories);
+      }
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  };
 
   // filter functions
   const handleFilterFetch = async (param) => {
@@ -168,27 +182,33 @@ const Products = () => {
               >
                 <Text fontSize={"md"}>By category:</Text>
                 <Box padding={"0.5rem 0 0 0"}>
-                  {CategoriesJson.map((category, index) => (
-                    <Flex margin="0.3rem 0" key={index}>
-                      <Box>
-                        <Checkbox
-                          name="category"
-                          id="category"
-                          width={"100%"}
-                          value={category.toString().toLowerCase()}
-                          onChange={(e) => handleFilterApply(e.target.value)}
-                        />
-                      </Box>
-                      <FormLabel
-                        margin={"0 0.3rem 0 1rem"}
-                        display={"flex"}
-                        htmlFor="category"
-                        className="secondary-light-font"
-                      > 
-                        {category}
-                      </FormLabel>
-                    </Flex>
-                  ))}
+                  {categories.length > 0 ? (
+                    categories.map((category, index) => (
+                      <Flex margin="0.3rem 0" key={index}>
+                        <Box>
+                          <Checkbox
+                            name="category"
+                            id={`category-${category._id}`}
+                            width={"100%"}
+                            value={category.name.toLowerCase().replace(/\s+/g, '-')}
+                            onChange={(e) => handleFilterApply(e.target.value)}
+                          />
+                        </Box>
+                        <FormLabel
+                          margin={"0 0.3rem 0 1rem"}
+                          display={"flex"}
+                          htmlFor={`category-${category._id}`}
+                          className="secondary-light-font"
+                        > 
+                          {category.name}
+                        </FormLabel>
+                      </Flex>
+                    ))
+                  ) : (
+                    <Text fontSize="sm" color="gray.500">
+                      No categories available
+                    </Text>
+                  )}
                 </Box>
               </Box>
             </Box>
