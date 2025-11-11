@@ -1,25 +1,40 @@
 "use client";
 
-import { Badge, border, Box, Flex, Grid, GridItem, Link, Text } from "@chakra-ui/react";
+import {
+  Badge,
+  border,
+  Box,
+  Flex,
+  Grid,
+  GridItem,
+  Link,
+  Text,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import { AiOutlineRight } from "react-icons/ai";
 import LoaderSkeleton from "./LoaderSkeleton";
 import ProductCard from "./ProductCard";
 import { Card } from "antd";
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 
 // Swiper styles
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
-import './SwiperStyles.css';
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+import "./SwiperStyles.css";
 import SwipperComponent from "./Swiper";
 
 const SpecialProducts = ({ Products, userInfo, category, text }) => {
-  const [hovered, setHovered] = useState(false); 
+  const [hovered, setHovered] = useState(false);
   return (
-    <Box >
-      <Box bg="orange.200" py={2} px="2rem" borderRadius="md">
+    <Box>
+      <Box
+        bg="orange.200"
+        py={2}
+        px={{ base: "1rem", md: "2rem" }}
+        borderRadius="md"
+        boxShadow="sm"
+      >
         <Flex justify="space-between" align="center">
           <Text
             fontSize="lg"
@@ -53,9 +68,12 @@ const SpecialProducts = ({ Products, userInfo, category, text }) => {
           </Link>
         </Flex>
       </Box>
-      <SwipperComponent Products={Products} userInfo={userInfo} />
+      <Box mt={4}>
+        <SwipperComponent Products={Products} userInfo={userInfo} />
+      </Box>
     </Box>
   );
 };
 
 export default SpecialProducts;
+
