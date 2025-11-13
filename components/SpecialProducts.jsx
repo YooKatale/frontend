@@ -43,15 +43,20 @@ const SpecialProducts = ({ Products, userInfo, category, text }) => {
                      text;
 
   return (
-    <Box mb={6}>
+    <Box mb={8}>
       <Box
         bgGradient={style.bgGradient}
-        py={3}
+        py={{ base: 3, md: 4 }}
         px={{ base: "1rem", md: "2rem" }}
-        borderRadius="lg"
-        boxShadow="md"
+        borderRadius="xl"
+        boxShadow="lg"
         position="relative"
         overflow="hidden"
+        transition="all 0.3s ease"
+        _hover={{
+          boxShadow: "xl",
+          transform: "translateY(-2px)"
+        }}
         _before={{
           content: '""',
           position: 'absolute',
@@ -59,56 +64,81 @@ const SpecialProducts = ({ Products, userInfo, category, text }) => {
           left: 0,
           right: 0,
           bottom: 0,
-          bgGradient: 'linear(135deg, rgba(255,255,255,0.1) 0%, transparent 50%)',
+          bgGradient: 'linear(135deg, rgba(255,255,255,0.15) 0%, transparent 50%)',
           pointerEvents: 'none',
+        }}
+        _after={{
+          content: '""',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '2px',
+          bgGradient: 'linear(to-r, transparent, rgba(255,255,255,0.5), transparent)',
         }}
       >
         <Flex justify="space-between" align="center" position="relative" zIndex={1}>
-          <HStack spacing={2}>
-            <Icon as={style.icon} color="white" boxSize={{ base: 4, md: 5 }} />
-            <Text
-              fontSize={{ base: "md", md: "lg", lg: "xl" }}
-              fontWeight="700"
-              color="white"
-              textTransform="capitalize"
-              mb={0}
-              textShadow="0 2px 4px rgba(0,0,0,0.2)"
+          <HStack spacing={{ base: 2, md: 3 }}>
+            <Box
+              bg="whiteAlpha.300"
+              p={2}
+              borderRadius="lg"
+              backdropFilter="blur(5px)"
             >
-              {displayText} Products
-            </Text>
-            {Products?.length > 0 && (
-              <Badge
-                colorScheme="whiteAlpha"
-                fontSize={{ base: "xs", md: "sm" }}
-                px={2}
-                py={1}
-                borderRadius="full"
-                bg="whiteAlpha.300"
+              <Icon 
+                as={style.icon} 
+                color="white" 
+                boxSize={{ base: 5, md: 6 }} 
+                filter="drop-shadow(0 2px 4px rgba(0,0,0,0.2))"
+              />
+            </Box>
+            <Box>
+              <Text
+                fontSize={{ base: "lg", md: "xl", lg: "2xl" }}
+                fontWeight="800"
                 color="white"
+                textTransform="capitalize"
+                mb={0}
+                textShadow="0 2px 8px rgba(0,0,0,0.3)"
+                letterSpacing="tight"
               >
-                {Products.length}
-              </Badge>
-            )}
+                {displayText}
+              </Text>
+              {Products?.length > 0 && (
+                <Text
+                  fontSize={{ base: "xs", md: "sm" }}
+                  color="whiteAlpha.900"
+                  fontWeight="600"
+                  mt={-1}
+                >
+                  {Products.length} {Products.length === 1 ? 'Product' : 'Products'} Available
+                </Text>
+              )}
+            </Box>
           </HStack>
           <Link
             href={`/search?q=${category}`}
             color="white"
             fontWeight="700"
-            fontSize={{ base: "sm", md: "md" }}
+            fontSize={{ base: "xs", md: "sm" }}
             display="flex"
             alignItems="center"
             _hover={{ 
               textDecoration: 'none',
-              transform: 'scale(1.05)',
+              transform: 'scale(1.08)',
+              bg: 'whiteAlpha.400'
             }}
-            transition="all 0.2s"
+            transition="all 0.3s ease"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
-            bg="whiteAlpha.200"
-            px={3}
-            py={1.5}
+            bg="whiteAlpha.300"
+            px={{ base: 3, md: 4 }}
+            py={{ base: 1.5, md: 2 }}
             borderRadius="full"
             backdropFilter="blur(10px)"
+            border="1px solid"
+            borderColor="whiteAlpha.400"
+            boxShadow="0 4px 12px rgba(0,0,0,0.15)"
           >
             See All
             <Box
@@ -122,7 +152,7 @@ const SpecialProducts = ({ Products, userInfo, category, text }) => {
           </Link>
         </Flex>
       </Box>
-      <Box mt={4}>
+      <Box mt={4} position="relative">
         <SwipperComponent Products={Products} userInfo={userInfo} />
       </Box>
     </Box>

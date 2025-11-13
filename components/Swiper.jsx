@@ -24,22 +24,22 @@ export default function SwipperComponent({ Products, userInfo }) {
 
   const sliderBreakPoint = {
     0: {
-      slidesPerView: 1.1,
-      spaceBetween: 12,
-      centeredSlides: true,
+      slidesPerView: 2,
+      spaceBetween: 8,
+      centeredSlides: false,
     },
     480: {
-      slidesPerView: 1.6,
-      spaceBetween: 16,
+      slidesPerView: 2,
+      spaceBetween: 10,
       centeredSlides: false,
     },
     640: {
-      slidesPerView: 2.2,
-      spaceBetween: 18,
+      slidesPerView: 3,
+      spaceBetween: 12,
     },
     768: {
       slidesPerView: 3,
-      spaceBetween: 20,
+      spaceBetween: 14,
     },
     1024: {
       slidesPerView: 4,
@@ -70,20 +70,25 @@ export default function SwipperComponent({ Products, userInfo }) {
             key={product?._id || product?.id || product?.slug || index}
             virtualIndex={index}
             style={{
-              borderRadius: 4,
+              borderRadius: 8,
               height: "100%",
               backgroundColor: "transparent",
-              padding: "12px 6px",
+              padding: "6px 2px",
               display: "flex",
             }}
           >
             <Box
               width="100%"
               height="100%"
-              borderRadius="md"
+              borderRadius="lg"
               background="white"
-              boxShadow="sm"
+              boxShadow="md"
               overflow="hidden"
+              transition="all 0.3s ease"
+              _hover={{
+                boxShadow: "xl",
+                transform: "translateY(-2px)"
+              }}
             >
               <ProductCard product={product} userInfo={userInfo} />
             </Box>
@@ -93,12 +98,12 @@ export default function SwipperComponent({ Products, userInfo }) {
     ) : (
       <Grid
         gridTemplateColumns={{
-          base: "repeat(1, 1fr)",
+          base: "repeat(2, 1fr)",
           sm: "repeat(2, 1fr)",
           md: "repeat(4, 1fr)",
           lg: "repeat(5, 1fr)",
         }}
-        gap={6}
+        gap={{ base: 3, sm: 4, md: 6 }}
         alignItems="center"
       >
         {[1, 2, 3, 4, 5].map((item) => (

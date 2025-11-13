@@ -123,7 +123,7 @@ const ProductCard = ({ product, userInfo }) => {
       <Box
         position="relative"
         bg="white"
-        borderRadius="lg"
+        borderRadius={{ base: "md", md: "lg" }}
         overflow="hidden"
         boxShadow={isHovered ? "lg" : "sm"}
         transition="all 0.3s ease"
@@ -137,18 +137,18 @@ const ProductCard = ({ product, userInfo }) => {
         flexDirection="column"
       >
         <Link href={`/product/${product._id}`}>
-          <Box position="relative" bg="gray.50" p={4}>
+          <Box position="relative" bg="gray.50" p={{ base: 2, sm: 3, md: 4 }}>
             {product.discountPercentage && product.discountPercentage !== "0" && (
               <Badge
                 colorScheme="red"
                 position="absolute"
-                top={2}
-                right={2}
+                top={{ base: 1, md: 2 }}
+                right={{ base: 1, md: 2 }}
                 zIndex="2"
-                fontSize="xs"
+                fontSize={{ base: "2xs", md: "xs" }}
                 fontWeight="bold"
-                px={2}
-                py={1}
+                px={{ base: 1, md: 2 }}
+                py={{ base: 0.5, md: 1 }}
                 borderRadius="md"
                 boxShadow="sm"
               >
@@ -160,13 +160,13 @@ const ProductCard = ({ product, userInfo }) => {
               <Badge
                 colorScheme="orange"
                 position="absolute"
-                top={2}
-                left={2}
+                top={{ base: 1, md: 2 }}
+                left={{ base: 1, md: 2 }}
                 zIndex="2"
-                fontSize="xs"
+                fontSize={{ base: "2xs", md: "xs" }}
                 fontWeight="bold"
-                px={2}
-                py={1}
+                px={{ base: 1, md: 2 }}
+                py={{ base: 0.5, md: 1 }}
                 borderRadius="md"
                 boxShadow="sm"
               >
@@ -176,7 +176,7 @@ const ProductCard = ({ product, userInfo }) => {
 
             <Box
               position="relative"
-              height="140px"
+              height={{ base: "100px", sm: "120px", md: "140px" }}
               width="100%"
             >
               {product.images && product.images[0] ? (
@@ -199,7 +199,7 @@ const ProductCard = ({ product, userInfo }) => {
                   height="100%"
                   bg="gray.100"
                 >
-                  <Text fontSize="3xl" color="gray.400">
+                  <Text fontSize={{ base: "2xl", md: "3xl" }} color="gray.400">
                     📦
                   </Text>
                 </Box>
@@ -208,15 +208,16 @@ const ProductCard = ({ product, userInfo }) => {
           </Box>
         </Link>
 
-        <Box py={3} px={3} flex="1" display="flex" flexDirection="column">
+        <Box py={{ base: 2, md: 3 }} px={{ base: 2, md: 3 }} flex="1" display="flex" flexDirection="column">
           <Text
             fontWeight="600"
-            fontSize={{ base: "sm", md: "md" }}
+            fontSize={{ base: "xs", sm: "sm", md: "md" }}
             textTransform="capitalize"
             noOfLines={2}
-            mb={2}
-            minH="40px"
+            mb={{ base: 1, md: 2 }}
+            minH={{ base: "32px", md: "40px" }}
             color="gray.700"
+            lineHeight="tight"
           >
             {product.name}
           </Text>
@@ -224,7 +225,7 @@ const ProductCard = ({ product, userInfo }) => {
           <Box mt="auto">
             <Heading
               fontWeight="700"
-              fontSize={{ base: "lg", md: "xl" }}
+              fontSize={{ base: "md", sm: "lg", md: "xl" }}
               color="green.600"
               mb={1}
             >
@@ -233,9 +234,9 @@ const ProductCard = ({ product, userInfo }) => {
 
             {product.category === "grains and flour" && product.unit && (
               <Text
-                fontSize="xs"
+                fontSize={{ base: "2xs", md: "xs" }}
                 color="gray.500"
-                mb={2}
+                mb={{ base: 1, md: 2 }}
               >
                 per {product.unit}
               </Text>
@@ -243,10 +244,10 @@ const ProductCard = ({ product, userInfo }) => {
 
             {product?.type === "bulk" && product?.description && (
               <Text
-                fontSize="xs"
+                fontSize={{ base: "2xs", md: "xs" }}
                 color="gray.600"
                 noOfLines={2}
-                mb={2}
+                mb={{ base: 1, md: 2 }}
               >
                 {product?.description}
               </Text>
@@ -254,24 +255,26 @@ const ProductCard = ({ product, userInfo }) => {
           </Box>
         </Box>
 
-        <Box px={3} pb={3}>
+        <Box px={{ base: 2, md: 3 }} pb={{ base: 2, md: 3 }}>
           <Button
-            className="w-full text-white bg-green-600 hover:bg-green-700 text-sm gap-2 rounded-lg border-2 border-green-600 transition-all duration-300"
+            className="w-full text-white bg-green-600 hover:bg-green-700 gap-1 rounded-lg border-2 border-green-600 transition-all duration-300"
             onClick={() => handleAddToCartBtnClick(product._id)}
             style={{
-              fontSize: 14,
+              fontSize: 'clamp(10px, 2.5vw, 14px)',
               width: '100%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              padding: 'clamp(6px, 1.5vw, 10px) clamp(8px, 2vw, 12px)',
             }}
           >
             {isLoading ? (
-              <LoaderIcon size={18} className="animate-spin" />
+              <LoaderIcon size={16} className="animate-spin" />
             ) : (
-              <ShoppingCart size={18} />
+              <ShoppingCart size={16} />
             )}
-            Add To Cart
+            <span className="hidden sm:inline">Add To Cart</span>
+            <span className="inline sm:hidden">Add</span>
           </Button>
         </Box>
       </Box>
