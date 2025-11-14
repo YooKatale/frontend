@@ -6,6 +6,7 @@ import CookiePolicy from "@components/CookiePolicy";
 import ScriptTag from "@components/ScriptTag";
 import { Work_Sans } from "next/font/google";
 import ServiceWorker from "@components/ServiceWorker";
+import PushNotifier from "@components/PushNotifier";
 
 const WorkSans = Work_Sans({ subsets: ["latin"] });
 
@@ -16,12 +17,12 @@ export const metadata = {
 };
 
 const RootLayout = ({ children }) => {
-
   return (
     <html lang="en">
       <body className={WorkSans.className}>
         <main>
           {/* <ServiceWorker /> */}
+          <PushNotifier />
           <Providers>
             <Header />
             {children}

@@ -13,7 +13,7 @@ import {
   StackDivider,
   Text,
   useToast,
-  Heading
+  Heading,
 } from "@chakra-ui/react";
 import { CategoriesJson, ThemeColors } from "@constants/constants";
 import Link from "next/link";
@@ -26,7 +26,7 @@ import {
   FaPhone,
   FaTwitter,
   FaGooglePlay, // New Google Play icon
-  FaAppStore,  // New App Store icon
+  FaAppStore, // New App Store icon
 } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import ButtonComponent from "./Button";
@@ -384,7 +384,12 @@ const Footer = () => {
                 href="/subscription"
                 className="md:mr-1 flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
               >
-                <Image src="/assets/images/apple.svg" width={30} height={30} />
+                <Image
+                  src="/assets/images/apple.svg"
+                  width={30}
+                  height={30}
+                  alt=""
+                />
                 <div className="ml-1">
                   <Text color="white" fontSize="sm">
                     App Store
@@ -392,20 +397,25 @@ const Footer = () => {
                 </div>
               </Link>
               <Link
-                 href="/subscription"
-                 className="mt-4 md:mt-0 md:ml-4 flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
+                href="/subscription"
+                className="mt-4 md:mt-0 md:ml-4 flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
               >
-                 <Image src="/assets/images/google.svg" width={30} height={30} />
+                <Image
+                  src="/assets/images/google.svg"
+                  width={30}
+                  height={30}
+                  alt=""
+                />
                 <div className="ml-1">
-                   <Text color="white" fontSize="sm">
+                  <Text color="white" fontSize="sm">
                     Google Play
-                    </Text>
+                  </Text>
                 </div>
-               </Link>
-              </Box>
-            </Flex> 
-          </Box>
-          
+              </Link>
+            </Box>
+          </Flex>
+        </Box>
+
         <Flex
           direction={{ base: "column", md: "column", xl: "row" }}
           justifyContent={{ base: "center", md: "center", xl: "none" }}
@@ -525,7 +535,7 @@ const Footer = () => {
                     xl: "0 0.5rem",
                   }}
                 >
-                   <p className="text-md">Usage Policy</p>
+                  <p className="text-md">Usage Policy</p>
                 </Box>
               </Link>
             </Flex>
@@ -537,4 +547,3 @@ const Footer = () => {
 };
 
 export default Footer;
-

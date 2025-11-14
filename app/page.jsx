@@ -244,7 +244,7 @@ const Home = () => {
                   alignItems={"center"}
                 >
                   {/* <CgShield size={60} color={ThemeColors.darkColor} /> */}
-                  <Image src={Images.cardSecureIcon} width={60} />
+                  <Image src={Images.cardSecureIcon} width={60} alt="" />
                   <Box padding={"0.5rem 0"}>
                     <Text textAlign={"center"} fontSize={"lg"}>
                       Safe, instant & secured
@@ -291,27 +291,30 @@ const Home = () => {
 
       {/* ------------- section 
       ------------------------------- */}
-     <a href="/subscription" style={{ display: "block", textDecoration: "none" }}>
-      <Box
-        background={`url("/assets/images/subscribe.jpg") center center no-repeat`}
-        backgroundSize="cover"
-        h={{ base: "300px", md: "400px", lg: "750px" }}
+      <a
+        href="/subscription"
+        style={{ display: "block", textDecoration: "none" }}
       >
-       <Flex>
-         <Box margin={"auto"} width={{ base: "100%", md: "70%", xl: "50%" }}>
-           <Box padding={{ base: "2rem", md: "2rem 1rem", xl: "2rem 0" }}>
-             <Flex justifyContent={"center"} padding={"1rem 0"}>
-                <DynamicButton
-                 type={"button"}
-                 text={"Subscribe Now "}
-                 size={"lg"}
-               />
-             </Flex>
-           </Box>
-         </Box>
-        </Flex>
-      </Box>
-    </a>
+        <Box
+          background={`url("/assets/images/subscribe.jpg") center center no-repeat`}
+          backgroundSize="cover"
+          h={{ base: "300px", md: "400px", lg: "750px" }}
+        >
+          <Flex>
+            <Box margin={"auto"} width={{ base: "100%", md: "70%", xl: "50%" }}>
+              <Box padding={{ base: "2rem", md: "2rem 1rem", xl: "2rem 0" }}>
+                <Flex justifyContent={"center"} padding={"1rem 0"}>
+                  <DynamicButton
+                    type={"button"}
+                    text={"Subscribe Now "}
+                    size={"lg"}
+                  />
+                </Flex>
+              </Box>
+            </Box>
+          </Flex>
+        </Box>
+      </a>
       {/* ------------- section 
       ------------------------------- */}
       {Products.length > 0 ? (

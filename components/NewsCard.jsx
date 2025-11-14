@@ -14,6 +14,7 @@ const NewsCard = ({ article }) => {
               src={`/assets/images/img2.png`}
               className="rounded-tl-md rounded-tr-md object-cover"
               fill
+              alt=""
             />
           </div>
 

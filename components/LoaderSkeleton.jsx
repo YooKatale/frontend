@@ -4,11 +4,11 @@ const LoaderSkeleton = () => {
   return (
     <div
       role="status"
-      class="max-w-sm p-4  shadow animate-pulse md:p-6 dark:border-gray-700 rounded-md bg-light"
+      className="max-w-sm p-4  shadow animate-pulse md:p-6 dark:border-gray-700 rounded-md bg-light"
     >
-      <div class="flex items-center justify-center h-[9rem] mb-4 bg-gray-300 rounded dark:bg-gray-700">
+      <div className="flex items-center justify-center h-[9rem] mb-4 bg-gray-300 rounded dark:bg-gray-700">
         <svg
-          class="w-10 h-10 text-gray-200 dark:text-gray-600"
+          className="w-10 h-10 text-gray-200 dark:text-gray-600"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           fill="currentColor"
@@ -18,10 +18,10 @@ const LoaderSkeleton = () => {
           <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
         </svg>
       </div>
-      <div class="h-2.5 bg-white rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-      <div class="h-2 bg-white rounded-full dark:bg-gray-700 mb-2.5"></div>
-      <div class="h-2 bg-white rounded-full dark:bg-gray-700 mb-2.5"></div>
-      <div class="h-2 bg-white rounded-full dark:bg-gray-700"></div>
+      <div className="h-2.5 bg-white rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+      <div className="h-2 bg-white rounded-full dark:bg-gray-700 mb-2.5"></div>
+      <div className="h-2 bg-white rounded-full dark:bg-gray-700 mb-2.5"></div>
+      <div className="h-2 bg-white rounded-full dark:bg-gray-700"></div>
     </div>
   );
 };
