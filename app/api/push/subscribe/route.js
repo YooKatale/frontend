@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const subscriptions = new set();
+const subscriptions = new Set();
 
 export async function POST(request) {
   try {
