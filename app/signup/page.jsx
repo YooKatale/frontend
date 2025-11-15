@@ -53,7 +53,6 @@ const SignUp = () => {
   }, []);
 
   const handleSubmit = async (e) => {
-    console.log("Button clicked");
     e.preventDefault();
 
     try {

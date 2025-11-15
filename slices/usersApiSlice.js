@@ -14,6 +14,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     }),
     register: builder.mutation({
       query: (data) => ({
+        // url: `${DB_URL}/users/register`, // no /users/register route in backend
         url: `${DB_URL}/register`,
         method: "POST",
         body: data,

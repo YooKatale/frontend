@@ -1,4 +1,4 @@
-// server.js
+// server.js, file used only for running https locally only, for testing push notification purpose
 const { createServer } = require("https");
 const { parse } = require("url");
 const next = require("next");
