@@ -220,7 +220,7 @@ try {
                           color={ThemeColors.lightColor}
                           style={{ margin: "0 0.3rem 0 0" }}
                         />{" "}
-                        256 754615840
+                        +256786118137
                       </Text>
                       <Text
                         display={"flex"}
@@ -232,7 +232,7 @@ try {
                           color={ThemeColors.lightColor}
                           style={{ margin: "0 0.3rem 0 0" }}
                         />
-                        info@yookatale.com
+                        info@yookatale.app
                       </Text>
                     </Box>
                     <Box padding={"1rem 0"}>
@@ -264,7 +264,7 @@ try {
                           </Link>
                         </Box>
                         <Box margin={"0 0.7rem 0 0"}>
-                          <Link href={"https://wa.me/256754615840"}>
+                          <Link href={"https://wa.me/256786118137"}>
                             <FaWhatsapp
                               size={23}
                               color={ThemeColors.lightColor}

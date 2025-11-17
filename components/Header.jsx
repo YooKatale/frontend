@@ -199,7 +199,7 @@ const Header = () => {
                 padding="0.75rem 1.5rem" // Consistent padding
                 _hover={{ bg: "orange.500" }}
               >
-                Call: +256 754 615840
+                Call: +256 786 118137
               </Button>
             </Box>
           </Flex>
