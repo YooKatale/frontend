@@ -90,7 +90,7 @@ const ProductCard = ({ product, userInfo }) => {
         status: "error",
         duration: 5000,
         isClosable: false,
-        position:'top'
+        position: 'top'
       });
 
       setSignInStateModal((prev) => !prev);
@@ -114,117 +114,183 @@ const ProductCard = ({ product, userInfo }) => {
     }
   };
 
-  
- 
+
+
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <>
-    
-
- 
-        <Box>
-          <Link href={`/product/${product._id}`}>
-            {product.discountPercentage && (
+      <Box
+        position="relative"
+        bg="white"
+        borderRadius={{ base: "md", md: "lg" }}
+        overflow="hidden"
+        boxShadow={isHovered ? "lg" : "sm"}
+        transition="all 0.3s ease"
+        transform={isHovered ? "translateY(-4px)" : "translateY(0)"}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        border="1px solid"
+        borderColor={isHovered ? "green.300" : "gray.200"}
+        height="100%"
+        display="flex"
+        flexDirection="column"
+      >
+        <Link href={`/product/${product._id}`}>
+          <Box position="relative" bg="gray.50" p={{ base: 2, sm: 3, md: 4 }}>
+            {product.discountPercentage && product.discountPercentage !== "0" && (
               <Badge
                 colorScheme="red"
                 position="absolute"
-                size="sm"
-                zIndex="1"
-                paddingX={"0.5rem"}
-                style={{
-                  width: "2rem",
-                  height: "2rem",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                top={{ base: 1, md: 2 }}
+                right={{ base: 1, md: 2 }}
+                zIndex="2"
+                fontSize={{ base: "2xs", md: "xs" }}
+                fontWeight="bold"
+                px={{ base: 1, md: 2 }}
+                py={{ base: 0.5, md: 1 }}
+                borderRadius="md"
+                boxShadow="sm"
               >
-                {product?.type == "bulk" && product?.type}
-                {product.discountPercentage != "0" &&
-                  product.discountPercentage}
+                -{product.discountPercentage}%
               </Badge>
             )}
 
-            <div className="flex justify-center items-center h-full relative">
-              <img
-                src={product.images[0]}
-                style={{height:100, width:100}}
-                alt={product.images}
-              />
-            </div>
-          </Link>
+            {product?.type === "bulk" && (
+              <Badge
+                colorScheme="orange"
+                position="absolute"
+                top={{ base: 1, md: 2 }}
+                left={{ base: 1, md: 2 }}
+                zIndex="2"
+                fontSize={{ base: "2xs", md: "xs" }}
+                fontWeight="bold"
+                px={{ base: 1, md: 2 }}
+                py={{ base: 0.5, md: 1 }}
+                borderRadius="md"
+                boxShadow="sm"
+              >
+                BULK
+              </Badge>
+            )}
 
+            <Box
+              position="relative"
+              height={{ base: "100px", sm: "120px", md: "140px" }}
+              width="100%"
+            >
+              {product.images && product.images[0] ? (
+                <Image
+                  src={product.images[0]}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                  style={{
+                    objectFit: 'cover',
+                    transition: 'transform 0.3s ease-in-out',
+                    transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                  }}
+                />
+              ) : (
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  height="100%"
+                  bg="gray.100"
+                >
+                  <Text fontSize={{ base: "2xl", md: "3xl" }} color="gray.400">
+                    📦
+                  </Text>
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </Link>
 
-
-
-
-          <Box py={2} px={2}>
+        <Box py={{ base: 2, md: 3 }} px={{ base: 2, md: 3 }} flex="1" display="flex" flexDirection="column">
           <Text
-            className="secondary-light-font"
-            textAlign={{ base: "left", sm: "center" }}
-            fontSize={{ base: "md", sm: "lg" }}
-            textTransform={'capitalize'}
-            whiteSpace= 'nowrap'
-      overflow= 'hidden'
-      textOverflow= 'ellipsis'
+            fontWeight="600"
+            fontSize={{ base: "xs", sm: "sm", md: "md" }}
+            textTransform="capitalize"
+            noOfLines={2}
+            mb={{ base: 1, md: 2 }}
+            minH={{ base: "32px", md: "40px" }}
+            color="gray.700"
+            lineHeight="tight"
           >
             {product.name}
           </Text>
-          <Heading
-            fontWeight="600"
-            textAlign="center"
-            fontSize={{ base: "sm", sm: "md", lg: "lg" }}
-            color="dark"
-          >
-            {`UGX ${FormatCurr(product.price)}`}
-          </Heading>
-          {product.category === "grains and flour" && (
-            <Text
-              className="secondary-light-font"
-              textAlign="center"
-              fontSize={{ base: "sm", sm: "md" }}
-            >
-              per {product.unit}
-            </Text>
-          )}
-          {product?.type === "bulk" && (
-            <Text
-              className="secondary-light-font"
-              textAlign="center"
-              fontSize={{ base: "sm", sm: "md" }}
-            >
-              {product?.description}
-            </Text>
-          )}
-        </Box>
 
-          <Box className="py-[0.3rem] flex justify-center">
-            <Button
-              className="text-white text-md bg-dark hover:bg-transparent hover:text-dark text-base gap-2 rounded-lg border-[1.7px] border-dark"
-              onClick={() => handleAddToCartBtnClick(product._id)}
-              style={{fontSize:14}}
+          <Box mt="auto">
+            <Heading
+              fontWeight="700"
+              fontSize={{ base: "md", sm: "lg", md: "xl" }}
+              color="green.600"
+              mb={1}
             >
-              {isLoading ? (
-                <LoaderIcon size={20} />
-              ) : (
-                <ShoppingCart size={20} />
-              )}{" "}
-              Add To Cart
-            </Button>
+              UGX {FormatCurr(product.price)}
+            </Heading>
+
+            {product.category === "grains and flour" && product.unit && (
+              <Text
+                fontSize={{ base: "2xs", md: "xs" }}
+                color="gray.500"
+                mb={{ base: 1, md: 2 }}
+              >
+                per {product.unit}
+              </Text>
+            )}
+
+            {product?.type === "bulk" && product?.description && (
+              <Text
+                fontSize={{ base: "2xs", md: "xs" }}
+                color="gray.600"
+                noOfLines={2}
+                mb={{ base: 1, md: 2 }}
+              >
+                {product?.description}
+              </Text>
+            )}
           </Box>
         </Box>
+
+        <Box px={{ base: 2, md: 3 }} pb={{ base: 2, md: 3 }}>
+          <Button
+            className="w-full text-white bg-green-600 hover:bg-green-700 gap-1 rounded-lg border-2 border-green-600 transition-all duration-300"
+            onClick={() => handleAddToCartBtnClick(product._id)}
+            style={{
+              fontSize: 'clamp(10px, 2.5vw, 14px)',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 'clamp(6px, 1.5vw, 10px) clamp(8px, 2vw, 12px)',
+            }}
+          >
+            {isLoading ? (
+              <LoaderIcon size={16} className="animate-spin" />
+            ) : (
+              <ShoppingCart size={16} />
+            )}
+            <span className="hidden sm:inline">Add To Cart</span>
+            <span className="inline sm:hidden">Add</span>
+          </Button>
+        </Box>
+      </Box>
       {/* Sign-in / Sign-up form */}
 
       <Modal isOpen={isOpen} onClose={onClose}>
-  <ModalOverlay />
-  <ModalContent className="bg-light" maxW="800px">
-    <ModalCloseButton />
-    <ModalBody>
-      <SignIn redirect={null} callback={handleListeningToSignIn} ismodal={true}/>
-    </ModalBody>
-  </ModalContent>
-</Modal>
+        <ModalOverlay />
+        <ModalContent className="bg-light" maxW="800px">
+          <ModalCloseButton />
+          <ModalBody>
+            <SignIn redirect={null} callback={handleListeningToSignIn} ismodal={true} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
- 
+
 export default ProductCard;

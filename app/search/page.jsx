@@ -28,13 +28,18 @@ const Search = () => {
   const handleDataFetch = async () => {
     try {
       const res = await fetchProducts(param).unwrap();
-      console.log(res);
+      console.log("Search Results:", res);
 
       if (res?.status && res?.status == "Success") {
-        setProducts(res?.Products);
+        // Remove duplicates by using a Map with product _id as key
+        const uniqueProducts = Array.from(
+          new Map(res?.Products?.map(product => [product._id, product])).values()
+        );
+        setProducts(uniqueProducts);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Search error:", error);
+      setProducts([]);
     }
   };
 
