@@ -72,9 +72,9 @@ const Footer = () => {
   const chakraToast = useToast();
   const[invitee, setInvitee]=useState("")
   const { isOpen: isReferralOpen, onOpen: openRefferal, onClose: closeReferral } = useDisclosure();
-  const shareUrl = "https://www.yookatale.com"; // URL to be shared
+  const shareUrl = "https://www.yookatale.app"; // URL to be shared
   const defaultMessage =
-    "Hey, I am using YooKatale. Forget about going to the market. Enjoy low cost discounted products and never miss a meal with your friends and family!"; // Default message
+    "Hey, I am using YooKatale. Forget about cooking or going to the market. Enjoy a variety of customizable meals for breakfast, lunch & supper at discounted prices with access to credit, never miss a meal by using our premium, family & business subscription plans with friends and family!:: https://www.yookatale.app\n\nSign up for free today & invite friends & loved ones www.yookatale.app/signup\n\nEarn 20,000UGX to 50,000UGX & other Gifts for every member you invite.\n\nwww.yookatale.app/subscription"; // Default message
 
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
@@ -122,7 +122,7 @@ const Footer = () => {
     if (userInfo?._id) {  // Ensure that userInfo and _id are defined
       const referralCodetemp = generateReferralCode(userInfo._id);
       setreferralCode(referralCodetemp)
-      setreferralUrl(`https://yookatale.com/signup?ref=${referralCodetemp}`);
+      setreferralUrl(`https://yookatale.app/signup?ref=${referralCodetemp}`);
     }
   }, [userInfo]);  // Dependency array to run this when userInfo changes  
 
