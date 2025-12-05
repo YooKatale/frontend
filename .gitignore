@@ -35,3 +35,5 @@ webpack.config.js
 *.tsbuildinfo
 next-env.d.ts
 mine.txt
+
+*.md

@@ -1,0 +1,24 @@
+{
+  "name": "payment-blur-overlay",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.jsx",
+  "scripts": {
+    "test": "echo \"No tests specified\""
+  },
+  "keywords": [
+    "blur",
+    "overlay",
+    "payment",
+    "protection",
+    "react",
+    "nextjs"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  }
+}
+

@@ -10,6 +10,7 @@ import ServiceWorker from "@components/ServiceWorker";
 import { CacheProvider } from "@chakra-ui/next-js";
 import { ChakraProvider } from "@chakra-ui/react";
 import { Suspense } from "react";
+import AdvertCard from "@components/advert";
 
 const WorkSans = Work_Sans({ subsets: ["latin"] });
 
@@ -32,6 +33,7 @@ const RootLayout = ({ children }) => {
             <Footer />
             </Suspense>
             <CookiePolicy />
+            <AdvertCard />
           </Providers>
           {/* <ScriptTag /> */} 
       </body>

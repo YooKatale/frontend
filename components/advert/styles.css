@@ -1,0 +1,86 @@
+.payment-blur-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999999;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+}
+
+.payment-blur-content {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 3rem 4rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  max-width: 500px;
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.payment-blur-message h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #1a1a1a;
+}
+
+.payment-blur-message p {
+  font-size: 1.1rem;
+  color: #4a4a4a;
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.payment-blur-subtitle {
+  font-size: 0.95rem;
+  color: #666;
+  margin-top: 1rem;
+}
+
+/* Ensure body content is blurred */
+body.payment-blur-active {
+  overflow: hidden;
+}
+
+/* Alternative: More aggressive blur */
+.payment-blur-overlay.aggressive {
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  background: rgba(0, 0, 0, 0.85);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .payment-blur-content {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+    max-width: 90%;
+  }
+
+  .payment-blur-message h2 {
+    font-size: 1.5rem;
+  }
+
+  .payment-blur-message p {
+    font-size: 1rem;
+  }
+}
+
