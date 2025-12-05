@@ -24,6 +24,7 @@ import { setCredentials } from "@slices/authSlice";
 import { redirect, useRouter } from "next/navigation";
 import ButtonComponent from "@components/Button";
 import { Loader } from "lucide-react";
+import Image from "next/image";
 
 const SignUp = () => {
   // states
@@ -121,12 +122,11 @@ const [referralCode, setReferralCode]= useState(null);
       <Box>
         <Box paddingBottom={"3rem"}>
           <Box padding={"1rem 0"}>
-
-            <Heading as={"h2"} fontSize={"lg"} textAlign={"center"}>
-              Are you new
+            <Heading as={"h2"} fontSize={"2xl"} textAlign={"center"} mb={4}>
+              Welcome to Yookatale.
             </Heading>
-            <Text fontSize={"3xl"} textAlign={"center"}>
-              Create a new account
+            <Text fontSize={"xl"} textAlign={"center"} mb={2} fontWeight={"bold"}>
+              Yoo mobile food market.
             </Text>
             <Flex>
               <Box
@@ -136,6 +136,104 @@ const [referralCode, setReferralCode]= useState(null);
                 background={ThemeColors.primaryColor}
               ></Box>
             </Flex>
+            <Box padding={"1.5rem 0"} textAlign={"center"}>
+              <Text fontSize={"md"} mb={3} lineHeight={"1.8"}>
+                Forget about cooking or going to the market by subscribing for Freemium, Premium, Family or Business Plan.
+              </Text>
+              <Text fontSize={"md"} mb={3} lineHeight={"1.8"}>
+                Discover and customize your meals, set your own time when to eat, where to eat from with friends, family and loved ones while earning loyalty rewards, gifts and discounts.
+              </Text>
+            </Box>
+            <Box padding={"1rem 0"} textAlign={"center"}>
+              <Text fontSize={"md"} mb={2}>
+                <Link href="/signup" style={{ color: ThemeColors.darkColor, textDecoration: "underline" }}>
+                  Freely Signup www.yookatale.app/signup
+                </Link>
+              </Text>
+              <Text fontSize={"md"} mb={2}>
+                <Link href="/subscription" style={{ color: ThemeColors.darkColor, textDecoration: "underline" }}>
+                  Subscribe www.yookatale.app/subscription
+                </Link>
+              </Text>
+              <Text fontSize={"md"} mb={3}>
+                <Link href="/partner" style={{ color: ThemeColors.darkColor, textDecoration: "underline" }}>
+                  Partner with us www.yookatale.app/partner
+                </Link>
+              </Text>
+            </Box>
+            
+            {/* Payment Options */}
+            <Box padding={"1.5rem 0"} textAlign={"center"}>
+              <Heading as={"h3"} fontSize={"lg"} mb={3}>
+                Payment Options
+              </Heading>
+              <Flex justifyContent={"center"} flexWrap={"wrap"} gap={3}>
+                <Box
+                  padding={"1rem 1.5rem"}
+                  border={"1.7px solid " + ThemeColors.darkColor}
+                  borderRadius={"0.5rem"}
+                  minWidth={"150px"}
+                >
+                  <Text fontSize={"md"} textAlign={"center"}>
+                    Mobile Money
+                  </Text>
+                </Box>
+                <Box
+                  padding={"1rem 1.5rem"}
+                  border={"1.7px solid " + ThemeColors.darkColor}
+                  borderRadius={"0.5rem"}
+                  minWidth={"150px"}
+                >
+                  <Text fontSize={"md"} textAlign={"center"}>
+                    Credit/Debit Card
+                  </Text>
+                </Box>
+                <Box
+                  padding={"1rem 1.5rem"}
+                  border={"1.7px solid " + ThemeColors.darkColor}
+                  borderRadius={"0.5rem"}
+                  minWidth={"150px"}
+                >
+                  <Text fontSize={"md"} textAlign={"center"}>
+                    Cash on Delivery
+                  </Text>
+                </Box>
+                <Box
+                  padding={"1rem 1.5rem"}
+                  border={"1.7px solid " + ThemeColors.darkColor}
+                  borderRadius={"0.5rem"}
+                  minWidth={"150px"}
+                >
+                  <Text fontSize={"md"} textAlign={"center"}>
+                    Pay Later
+                  </Text>
+                </Box>
+              </Flex>
+            </Box>
+
+            {/* Android & iOS Icons */}
+            <Box padding={"1.5rem 0"} textAlign={"center"}>
+              <Flex justifyContent={"center"} gap={4} flexWrap={"wrap"}>
+                <Link
+                  href="/subscription"
+                  className="flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
+                >
+                  <Image src="/assets/images/apple.svg" width={30} height={30} alt="appstore_img" />
+                  <Text color={ThemeColors.darkColor} fontSize="sm" ml={2}>
+                    App Store
+                  </Text>
+                </Link>
+                <Link
+                  href="/subscription"
+                  className="flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
+                >
+                  <Image src="/assets/images/google.svg" width={30} height={30} alt="playstore_img" />
+                  <Text color={ThemeColors.darkColor} fontSize="sm" ml={2}>
+                    Google Play
+                  </Text>
+                </Link>
+              </Flex>
+            </Box>
           </Box>
           <Flex>
             <Box

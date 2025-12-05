@@ -741,7 +741,7 @@ const UsagePolicy = () => {
                 </Heading>
               </Box>
               <Box padding={"0.5rem 0 0 1rem"}>
-                <Text margin={"0.5rem 0"}>(+256754615840)</Text>
+                <Text margin={"0.5rem 0"}>(+256786118137)</Text>
               </Box>
             </Box>
             <Box padding={"0.5rem 0 1rem 0"}>
@@ -761,7 +761,7 @@ const UsagePolicy = () => {
                 </Text>
                 <Text margin={"0.5rem 0"}>
                   For questions or complaints about communications from Us,
-                  please contact us at +256754615840 or via our Customer Call
+                  please contact us at +256786118137 or via our Customer Call
                   Line.
                 </Text>
               </Box>
