@@ -10,7 +10,7 @@ const AdvertCard = () => {
   useEffect(() => {
     // // Check if blur should be enabled
     // const blurEnabled =false;
-    setIsEnabled(true);
+    setIsEnabled(false);
   }, []);
 
   if (!isEnabled) {
