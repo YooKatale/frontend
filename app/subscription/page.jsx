@@ -20,6 +20,8 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import SubscriptionCard from "@components/SubscriptionCard";
+import MealCalendar from "@components/MealCalendar";
+import FoodAlgaeBoxModal from "@components/FoodAlgaeBoxModal";
 
 import { Images, ThemeColors } from "@constants/constants";
 import {
@@ -97,87 +99,122 @@ const Subscription = () => {
   return (
     <>
       <Box>
-        <Box padding={"3rem 0 5rem 0"}>
+        <Box padding={{ base: "2rem 0 3rem 0", md: "3rem 0 5rem 0" }}>
           <Box>
-            <Flex>
+            <Box
+              margin={"auto"}
+              width={{ base: "95%", md: "90%", lg: "85%", xl: "80%", "2xl": "75%" }}
+              maxWidth={"1400px"}
+            >
+              {/* Header Section */}
               <Box
-                margin={"auto"}
-                width={{ base: "90%", md: "100%", xl: "70%" }}
+                padding={{
+                  base: "1rem 0",
+                  md: "1rem 0",
+                  lg: "2rem 0",
+                }}
+                textAlign={"center"}
               >
-                <Flex
-                  flexDirection={{
-                    base: "column-reverse",
-                    md: "column-reverse",
-                    xl: "row",
-                  }}
+                <Text
+                  textAlign={"center"}
+                  fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
+                  className="secondary-light-font"
+                  marginBottom={"1rem"}
                 >
-                  <Box
-                    width={{ base: "100%", md: "80%", xl: "40%" }}
-                    padding={"2rem 0"}
+                  Subscribe to our payment plan
+                </Text>
+
+                <Text
+                  textAlign={"center"}
+                  fontSize={{ base: "xl", md: "2xl", lg: "3xl", xl: "4xl" }}
+                  fontWeight={"semibold"}
+                  marginBottom={{ base: "2rem", md: "2.5rem", lg: "3rem" }}
+                >
+                  Get{" "}
+                  <Text
+                    as={"span"}
+                    fontWeight={"bold"}
+                    color={ThemeColors.darkColor}
+                    fontSize={{ base: "xl", md: "2xl", lg: "3xl", xl: "4xl" }}
                   >
-                    {subscriptionPackages.length > 0 &&
-                      subscriptionPackages.map((card, index) => (
-                        <SubscriptionCard
-                          card={card}
-                          key={index}
-                          handleClick={handleSubmit}
-                        />
-                      ))}
-                  </Box>
+                    25%
+                  </Text>{" "}
+                  subscription discount
+                </Text>
 
-                  <Box width={{ base: "100%", md: "80%", xl: "60%" }}>
-                    <Box
-                      padding={{
-                        base: "1rem 0 2rem 0",
-                        md: "1rem 0",
-                        xl: "3rem",
-                      }}
-                    >
-                      <Text
-                        textAlign={"center"}
-                        fontSize={"2xl"}
-                        className="secondary-light-font"
-                      >
-                        Subscribe to our payment plan
-                      </Text>
-
-                      <Text
-                        textAlign={"center"}
-                        fontSize={{ base: "2xl", md: "3xl", xl: "4xl" }}
-                      >
-                        Get{" "}
-                        <span
-                          style={{
-                            textAlign: "center",
-                            fontWeight: "bold",
-                            color: ThemeColors.darkColor,
-                            textTransform: "capitalize",
-                            fontSize: "2xl",
-                          }}
-                        >
-                          {" "}
-                          25%
-                        </span>{" "}
-                        subscription discount
-                      </Text>
-                    </Box>
-
-                    <div className="py-8 lg:block hidden">
-                      <div className="flex justify-center items-center relative">
-                        <Image
-                          src={Images.img5}
-                          height={300}
-                          width={300}
-                          alt="icon"
-                        />
-                      </div>
-                    </div>
-                  </Box>
-                </Flex>
+                {/* Image Section - Right below header */}
+                <Box
+                  display={"flex"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  paddingY={{ base: "1rem", md: "1.5rem", lg: "2rem" }}
+                  marginBottom={{ base: "2rem", md: "2.5rem", lg: "3rem" }}
+                >
+                  <Image
+                    src={Images.img5}
+                    height={300}
+                    width={300}
+                    alt="subscription icon"
+                    style={{
+                      maxWidth: "100%",
+                      height: "auto",
+                      objectFit: "contain",
+                    }}
+                  />
+                </Box>
               </Box>
-            </Flex>
+
+              {/* Subscription Cards Grid */}
+              <Grid
+                gridTemplateColumns={{
+                  base: "1fr",
+                  md: "repeat(2, 1fr)",
+                  lg: "repeat(3, 1fr)",
+                }}
+                gap={{ base: "1.5rem", md: "2rem", lg: "2.5rem" }}
+                marginBottom={{ base: "2rem", md: "3rem" }}
+                alignItems={"stretch"}
+              >
+                {subscriptionPackages.length > 0 &&
+                  subscriptionPackages.map((card, index) => (
+                    <SubscriptionCard
+                      card={card}
+                      key={index}
+                      handleClick={handleSubmit}
+                    />
+                  ))}
+              </Grid>
+            </Box>
           </Box>
         </Box>
+
+        {/* Meal Calendar Section */}
+        {subscriptionPackages.length > 0 && (
+          <Box padding={"3rem 0"}>
+            <Box width={{ base: "90%", md: "100%", xl: "70%" }} margin={"auto"}>
+              {subscriptionPackages.map((card, index) => (
+                <MealCalendar key={index} planType={card.type} />
+              ))}
+            </Box>
+          </Box>
+        )}
+
+        {/* Food Algae Box Section */}
+        {userInfo && subscriptionPackages.length > 0 && (
+          <Box padding={"2rem 0 3rem 0"}>
+            <Box width={{ base: "90%", md: "100%", xl: "70%" }} margin={"auto"}>
+              <Flex justifyContent="center" gap={4} flexWrap="wrap">
+                {subscriptionPackages.map((card, index) => (
+                  <FoodAlgaeBoxModal
+                    key={index}
+                    userId={userInfo._id}
+                    planType={card.type}
+                  />
+                ))}
+              </Flex>
+            </Box>
+          </Box>
+        )}
       </Box>
     </>
   );

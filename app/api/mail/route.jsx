@@ -1,29 +1,22 @@
 import { emailTemplate, partneremailNotification } from "@constants/constants";
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
+import transporter, { defaultSender } from "@lib/emailConfig";
 
-//Lets leave this to be accessible to other services/functions
-
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "yookatale256@gmail.com",
-    pass: "yomarket256!",
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+// Using SendGrid SMTP service - emails sent from yookatale256@gmail.com via sendgrid.net
 export const POST = async (req, res) => {
   try {
     const { email } = await req.json();
     // Send the welcome email
-    const mailOptions = {
-      from: "yookatale256@gmail.com",
-      to: email,
-      subject: "Welcome to our Food Market!",
-      html: emailTemplate,
-    };
+      const mailOptions = {
+        from: {
+          name: defaultSender.name,
+          address: defaultSender.email, // yookatale256@gmail.com via sendgrid.net
+        },
+        replyTo: defaultSender.email,
+        to: email,
+        subject: "Welcome to our Food Market!",
+        html: emailTemplate,
+      };
 
     await transporter.sendMail(mailOptions);
 
@@ -43,7 +36,11 @@ export const POST2 = async(req, res)=>{
     if (body.length) {
       body.map((key, index) => {
         mailOptions = {
-          from: "yookatale256@gmail.com",
+          from: {
+            name: defaultSender.name,
+            address: defaultSender.email, // yookatale256@gmail.com via sendgrid.net
+          },
+          replyTo: defaultSender.email,
           to: key.email,
           subject: "A new order has been created",
           html: partneremailNotification,

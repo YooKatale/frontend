@@ -18,6 +18,13 @@ export const metadata = {
   title: "yookatale",
   description:
     "YooKatale Uganda | Online Food shopping, Organic and Fresh Foods Mobile Market, Affordable, Reliable & Convenient",
+  manifest: "/manifest.json",
+  themeColor: "#1a202c",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "YooKatale",
+  },
 };
 
 const RootLayout = ({ children }) => {
@@ -25,9 +32,9 @@ const RootLayout = ({ children }) => {
   return (
     <html lang="en">
       <body className={WorkSans.className} suppressHydrationWarning>
-          {/* <ServiceWorker /> */}
           <Providers>
             <Suspense>
+            <ServiceWorker />
             <Header />
             {children}
             <Footer />

@@ -13,6 +13,7 @@ import {
   Select,
   Checkbox,
   Spinner,
+  Stack,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import Link from "next/link";
@@ -38,7 +39,11 @@ const SignUp = () => {
   const [vegan, setVegan] = useState(false);
   const [address, setAddress] = useState("");
   const [isLoading, setLoading] = useState(false);
-const [referralCode, setReferralCode]= useState(null);
+  const [referralCode, setReferralCode] = useState(null);
+  // Notification preferences
+  const [notifyViaCall, setNotifyViaCall] = useState(false);
+  const [notifyViaWhatsApp, setNotifyViaWhatsApp] = useState(false);
+  const [notifyViaEmail, setNotifyViaEmail] = useState(true); // Default
   const { push } = useRouter();
 
   const chakraToast = useToast();
@@ -87,7 +92,12 @@ const [referralCode, setReferralCode]= useState(null);
         dob,
         address,
         password,
-        referenceCode
+        referenceCode,
+        notificationPreferences: {
+          calls: notifyViaCall,
+          whatsapp: notifyViaWhatsApp,
+          email: notifyViaEmail,
+        },
       }).unwrap();
 
       dispatch(setCredentials({ ...res }));
@@ -418,13 +428,46 @@ const [referralCode, setReferralCode]= useState(null);
                   </Text>
                 </Box>
 
+                {/* Notification Preferences */}
+                <Box padding={"1rem 0"} borderTop={"1px solid"} borderColor={"gray.200"} marginTop={"1rem"}>
+                  <Text fontSize={"md"} fontWeight={"bold"} marginBottom={"0.75rem"} color={ThemeColors.darkColor}>
+                    Notification Preferences
+                  </Text>
+                  <Text fontSize={"sm"} color={"gray.600"} marginBottom={"1rem"}>
+                    Choose how you'd like to receive notifications (Email is default)
+                  </Text>
+                  <Stack spacing={3}>
+                    <Checkbox
+                      isChecked={notifyViaEmail}
+                      onChange={(e) => setNotifyViaEmail(e.target.checked)}
+                      colorScheme="blue"
+                    >
+                      <Text fontSize={"sm"}>Email Notifications (Default)</Text>
+                    </Checkbox>
+                    <Checkbox
+                      isChecked={notifyViaCall}
+                      onChange={(e) => setNotifyViaCall(e.target.checked)}
+                      colorScheme="green"
+                    >
+                      <Text fontSize={"sm"}>Phone Call Notifications</Text>
+                    </Checkbox>
+                    <Checkbox
+                      isChecked={notifyViaWhatsApp}
+                      onChange={(e) => setNotifyViaWhatsApp(e.target.checked)}
+                      colorScheme="green"
+                    >
+                      <Text fontSize={"sm"}>WhatsApp Notifications</Text>
+                    </Checkbox>
+                  </Stack>
+                </Box>
+
                 <Box padding={"0.5rem 0"}>
                   <div className="flex">
                     <input
                       type="checkbox"
                       name="vegan"
-                      value={vegan}
-                      onChange={(e) => setVegan(e.target.value)}
+                      checked={vegan}
+                      onChange={(e) => setVegan(e.target.checked)}
                       className="mr-4"
                     />
                     <p className="">Are you vegetarian ?</p>

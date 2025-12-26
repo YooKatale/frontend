@@ -1,0 +1,44 @@
+{
+  "name": "YooKatale - Online Food Shopping",
+  "short_name": "YooKatale",
+  "description": "YooKatale Uganda | Online Food shopping, Organic and Fresh Foods Mobile Market, Affordable, Reliable & Convenient",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a202c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/icons/logo2.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/logo2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "shopping", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Subscription Plans",
+      "short_name": "Subscribe",
+      "description": "View and subscribe to meal plans",
+      "url": "/subscription",
+      "icons": [{ "src": "/assets/icons/logo2.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Products",
+      "short_name": "Products",
+      "description": "Browse food products",
+      "url": "/products",
+      "icons": [{ "src": "/assets/icons/logo2.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
+}
+
