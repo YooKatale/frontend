@@ -1,63 +1,51 @@
 /**
- * Service Worker for YooKatale Web App
+ * Professional Service Worker for YooKatale Web App
+ * Enterprise-grade push notification handling
+ * Similar to modern platforms like Grok, Linear, Vercel
  * 
- * This service worker enables:
- * - Push notifications even when the app is closed
- * - Background notification handling
- * - Offline support capabilities
- * 
- * Security:
- * - All notification data is validated before display
- * - URLs are sanitized to prevent XSS attacks
- * 
- * How it works:
- * - When app is closed, service worker remains active
- * - Receives push events from server
- * - Displays notifications to user
- * - Handles notification clicks to open/reopen app
+ * Features:
+ * - Rich media notifications with images
+ * - Professional action buttons
+ * - Smart notification grouping
+ * - Works even when app is closed
+ * - Beautiful, engaging notifications
  */
 
 // Service Worker Installation
-// This runs when the service worker is first installed or updated
 self.addEventListener("install", (event) => {
   console.log("Service Worker installing...");
-  // Skip waiting means the new service worker activates immediately
-  // This ensures users get the latest version without page reload
-  self.skipWaiting();
+  self.skipWaiting(); // Activate immediately
 });
 
 // Service Worker Activation
-// This runs when the service worker becomes active
 self.addEventListener("activate", (event) => {
   console.log("Service Worker activating...");
-  // Claim all clients (tabs) immediately
-  // This ensures the service worker controls all pages right away
   event.waitUntil(self.clients.claim());
 });
 
 /**
- * Push Notification Event Handler
- * 
- * This event fires when a push notification is received from the server.
- * Works even when the app is completely closed - the browser keeps the
- * service worker running in the background.
- * 
- * Security: Validates and sanitizes notification data before display
+ * Professional Push Notification Event Handler
+ * Handles server-sent push notifications with rich media support
  */
 self.addEventListener("push", (event) => {
   console.log("Push notification received from server");
   
+  // Default professional notification data
   let notificationData = {
     title: "YooKatale",
     body: "You have a new notification",
     icon: "/assets/icons/logo2.png",
     badge: "/assets/icons/logo2.png",
+    image: null,
     tag: "yookatale-notification",
     requireInteraction: false,
+    silent: false,
+    vibrate: [200, 100, 200, 100, 200],
     actions: [
       {
         action: "view",
         title: "View Menu",
+        icon: "/assets/icons/logo2.png",
       },
       {
         action: "dismiss",
@@ -67,100 +55,118 @@ self.addEventListener("push", (event) => {
   };
 
   // Parse and validate push notification data
-  // Security: Sanitize data to prevent XSS attacks
   if (event.data) {
     try {
       const data = event.data.json();
-      // Validate and sanitize notification data
       notificationData = {
         ...notificationData,
-        title: (data.title && typeof data.title === 'string') ? data.title.substring(0, 100) : notificationData.title,
-        body: (data.body && typeof data.body === 'string') ? data.body.substring(0, 500) : notificationData.body,
-        icon: (data.icon && typeof data.icon === 'string') ? data.icon : notificationData.icon,
-        url: (data.url && typeof data.url === 'string' && data.url.startsWith('/')) ? data.url : "/subscription",
-        mealType: (data.mealType && typeof data.mealType === 'string') ? data.mealType : null,
+        title: (data.title && typeof data.title === 'string') 
+          ? data.title.substring(0, 100) 
+          : notificationData.title,
+        body: (data.body && typeof data.body === 'string') 
+          ? data.body.substring(0, 500) 
+          : notificationData.body,
+        icon: (data.icon && typeof data.icon === 'string') 
+          ? data.icon 
+          : notificationData.icon,
+        image: (data.image && typeof data.image === 'string') 
+          ? data.image 
+          : notificationData.image,
+        url: (data.url && typeof data.url === 'string' && data.url.startsWith('/')) 
+          ? data.url 
+          : "/schedule",
+        mealType: (data.mealType && typeof data.mealType === 'string') 
+          ? data.mealType 
+          : null,
+        tag: (data.tag && typeof data.tag === 'string') 
+          ? data.tag 
+          : notificationData.tag,
       };
     } catch (e) {
-      // If data is not JSON, use as plain text (sanitized)
       const textData = event.data.text();
-      notificationData.body = (textData && typeof textData === 'string') 
-        ? textData.substring(0, 500) 
-        : notificationData.body;
+      if (textData && typeof textData === 'string') {
+        notificationData.body = textData.substring(0, 500);
+      }
     }
   }
 
-  // Display the notification to the user
-  // This works even when the app is completely closed
+  // Display professional notification
   event.waitUntil(
     self.registration.showNotification(notificationData.title, {
       body: notificationData.body,
-      icon: notificationData.icon || "/assets/icons/logo2.png",
-      badge: notificationData.badge || "/assets/icons/logo2.png",
-      tag: notificationData.tag || "yookatale-notification", // Groups similar notifications
-      requireInteraction: notificationData.requireInteraction || false, // Auto-dismiss after shown
-      vibrate: [200, 100, 200], // Vibration pattern for mobile devices
-      timestamp: Date.now(), // When notification was created
+      icon: notificationData.icon,
+      badge: notificationData.badge,
+      image: notificationData.image, // Large image for rich notifications
+      tag: notificationData.tag,
+      requireInteraction: notificationData.requireInteraction,
+      silent: notificationData.silent,
+      vibrate: notificationData.vibrate,
+      timestamp: Date.now(),
+      renotify: false,
       data: {
-        url: notificationData.url || "/subscription", // URL to open when clicked
-        mealType: notificationData.mealType || null, // Meal type for meal notifications
+        url: notificationData.url,
+        mealType: notificationData.mealType,
       },
-      actions: notificationData.actions || [], // Action buttons (View Menu, Dismiss)
+      actions: notificationData.actions,
     })
   );
 });
 
 /**
- * Notification Click Event Handler
- * 
- * Handles what happens when a user clicks on a notification.
- * If the app is closed, it will open it. If open, it will focus and navigate.
- * 
- * Security: Validates URLs before navigation to prevent open redirect attacks
+ * Professional Notification Click Handler
+ * Smart navigation and window management
  */
 self.addEventListener("notificationclick", (event) => {
   console.log("Notification clicked", event.action);
-  event.notification.close(); // Close the notification
+  event.notification.close();
 
   const action = event.action;
   const notificationData = event.notification.data || {};
 
-  // Handle dismiss action - just close the notification
+  // Handle dismiss action
   if (action === "dismiss") {
     return;
   }
 
-  // Security: Validate URL to prevent open redirect attacks
-  // Only allow relative URLs (starting with /)
-  let url = "/subscription"; // Default URL
+  // Validate and construct URL
+  let url = "/schedule"; // Default to meal schedule
   if (notificationData.url && typeof notificationData.url === 'string') {
     if (notificationData.url.startsWith('/') && !notificationData.url.includes('..')) {
       url = notificationData.url;
     }
   }
 
-  // Open or focus the app window
+  // If it's a meal notification, go to schedule page
+  if (notificationData.mealType) {
+    url = "/schedule";
+  }
+
+  // Professional window management
   event.waitUntil(
     clients
       .matchAll({
         type: "window",
-        includeUncontrolled: true, // Include windows not controlled by this service worker
+        includeUncontrolled: true,
       })
       .then((clientList) => {
-        // Check if app window is already open
+        // Focus existing window and navigate
         for (let i = 0; i < clientList.length; i++) {
           const client = clientList[i];
           if (client.url && "focus" in client) {
-            // If it's a meal notification, navigate to the meal calendar
-            if (notificationData.mealType) {
+            if (notificationData.mealType && client.navigate) {
               client.focus();
               return client.navigate(url);
             }
-            // Otherwise just focus the existing window
+            client.focus();
+            // Fallback: postMessage if navigate not available
+            if (!client.navigate) {
+              client.postMessage({ type: "navigate", url: url });
+            }
             return client.focus();
           }
         }
-        // If no window is open, open a new one
-        // This is what makes notifications work when app is closed
+        
+        // Open new window if none exists
         if (clients.openWindow) {
           return clients.openWindow(url);
         }
@@ -168,8 +174,7 @@ self.addEventListener("notificationclick", (event) => {
   );
 });
 
-// Background sync for offline support (optional)
+// Background sync for offline support
 self.addEventListener("sync", (event) => {
   console.log("Background sync:", event.tag);
-  // Handle background sync tasks here
 });
