@@ -52,8 +52,8 @@ const Search = () => {
       <div>
         <div className="lg:py-8 lg:px-20 sm:px-12 px-8">
           <h3 className="text-lg flex">
-            Showing results for:{" "}
-            <span className="text-lg text-primary mx-2">{param}</span>
+            Showing results for:
+            <h3 className="text-lg text-primary mx-2">{param}</h3>
           </h3>
         </div>
         <div className="flex">
