@@ -78,15 +78,15 @@ const Header = () => {
               />
             </Link>
             <Box display={{ base: "none", md: "block" }}>
-              <Button
-                as={Link}
-                href="/products"
-                variant="outline"
-                fontSize="0.875rem"
-                leftIcon={<AiOutlineMenu />}
-              >
-                All Categories
-              </Button>
+              <Link href="/products" style={{ textDecoration: "none" }}>
+                <Button
+                  variant="outline"
+                  fontSize="0.875rem"
+                  leftIcon={<AiOutlineMenu />}
+                >
+                  All Categories
+                </Button>
+              </Link>
             </Box>
           </Flex>
 
@@ -144,34 +144,8 @@ const Header = () => {
             {/* Account and Cart */}
             <Flex align="center">
               {/* Cart Button */}
-              <Button
-                as={Link}
-                href="/cart"
-                variant="outline"
-                sx={{
-                  mr: 2,
-                  background: "green",
-                  color: "white",
-                  fontSize: "0.875rem",
-                  _hover: {
-                    backgroundColor: "gray.100",
-                    color: "green",
-                  },
-                }}
-                leftIcon={<FaShoppingCart />}
-              >
-                Cart
-              </Button>
-              {/* Sign In or Account Button */}
-              {userInfo ? (
-                <Box as={Link} href="/account" ml={4} display="flex" alignItems="center">
-                  <FaUser size="20px" />
-                </Box>
-              ) : (
+              <Link href="/cart" style={{ textDecoration: "none" }}>
                 <Button
-                  as={Link}
-                  href="/signin"
-                  ml={4}
                   variant="outline"
                   sx={{
                     mr: 2,
@@ -183,10 +157,35 @@ const Header = () => {
                       color: "green",
                     },
                   }}
-                  leftIcon={<FaUser />}
+                  leftIcon={<FaShoppingCart />}
                 >
-                  Sign In
+                  Cart
                 </Button>
+              </Link>
+              {/* Sign In or Account Button */}
+              {userInfo ? (
+                <Link href="/account" style={{ textDecoration: "none", marginLeft: "1rem", display: "flex", alignItems: "center" }}>
+                  <FaUser size="20px" />
+                </Link>
+              ) : (
+                <Link href="/signin" style={{ textDecoration: "none", marginLeft: "1rem" }}>
+                  <Button
+                    variant="outline"
+                    sx={{
+                      mr: 2,
+                      background: "green",
+                      color: "white",
+                      fontSize: "0.875rem",
+                      _hover: {
+                        backgroundColor: "gray.100",
+                        color: "green",
+                      },
+                    }}
+                    leftIcon={<FaUser />}
+                  >
+                    Sign In
+                  </Button>
+                </Link>
               )}
             </Flex>
             {/* Call to Action Button */}
