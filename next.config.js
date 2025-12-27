@@ -40,8 +40,9 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60,
-    // Only disable optimization for local development if needed
-    unoptimized: process.env.NODE_ENV === 'development' ? false : false,
+    // Image optimization enabled (included free on Vercel)
+    // On Vercel, Next.js Image Optimization API is included - no 402 errors
+    unoptimized: false,
   },
   // Ensure static assets are served correctly
   assetPrefix: process.env.NODE_ENV === "production" ? "" : "",
