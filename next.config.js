@@ -13,26 +13,30 @@ const nextConfig = {
         protocol: "https",
         hostname: "yookatale.s3.eu-north-1.amazonaws.com",
         port: "",
+        pathname: "/**",
       },
       {
         protocol: "http",
         hostname: "localhost",
         port: "",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "www.yookatale.app",
         port: "",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "yookatale.app",
         port: "",
+        pathname: "/**",
       },
     ],
     // Disable image optimization to avoid 402 errors (Payment Required)
     // This allows images to load directly without Next.js Image Optimization API
-    // Local images will be served from /public directory directly
+    // Works the same way as localhost - images served directly
     unoptimized: true,
   },
   // Ensure static assets are served correctly
