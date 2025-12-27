@@ -43,11 +43,29 @@ const Payment = ({ params }) => {
   }
 
   const handleDataFetch = async () => {
-    const res = await fetchOrder(params.id).unwrap();
+    try {
+      const res = await fetchOrder(params.id).unwrap();
 
-    if (res.data.status != "") router.push("/");
+      if (res.data?.status && res.data.status != "") {
+        router.push("/");
+        return;
+      }
 
-    if (res.status == "Success") setOrder({ ...res.data });
+      if (res.status == "Success" || res.status == "success") {
+        setOrder({ ...res.data });
+      } else {
+        throw new Error(res.message || "Failed to fetch order");
+      }
+    } catch (error) {
+      console.error("Error fetching order:", error);
+      chakraToast({
+        title: "Error",
+        description: error.data?.message || error.message || "Unexpected error occurred. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   const fetchSubscriptionStatus = async () => {

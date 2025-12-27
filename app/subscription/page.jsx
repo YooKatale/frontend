@@ -18,9 +18,11 @@ import {
   Textarea,
   useDisclosure,
   useToast,
+  Divider,
+  Badge,
 } from "@chakra-ui/react";
 import SubscriptionCard from "@components/SubscriptionCard";
-import MealCalendar from "@components/MealCalendar";
+import UnifiedMealSubscriptionCard from "@components/UnifiedMealSubscriptionCard";
 import FoodAlgaeBoxModal from "@components/FoodAlgaeBoxModal";
 
 import { Images, ThemeColors } from "@constants/constants";
@@ -32,6 +34,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { Calendar } from "lucide-react";
 
 const Subscription = () => {
   const [subscriptionPackages, setSubscriptionPackages] = useState([]);
@@ -142,25 +145,34 @@ const Subscription = () => {
                   subscription discount
                 </Text>
 
-                {/* Image Section - Right below header */}
+                {/* Image Section - Compact and Responsive */}
                 <Box
                   display={"flex"}
                   justifyContent={"center"}
                   alignItems={"center"}
-                  paddingY={{ base: "1rem", md: "1.5rem", lg: "2rem" }}
-                  marginBottom={{ base: "2rem", md: "2.5rem", lg: "3rem" }}
+                  paddingY={{ base: "0.5rem", md: "0.75rem" }}
+                  marginBottom={{ base: "1rem", md: "1.5rem" }}
+                  maxHeight={{ base: "120px", md: "150px", lg: "180px" }}
+                  overflow="hidden"
                 >
-                  <Image
-                    src={Images.img5}
-                    height={300}
-                    width={300}
-                    alt="subscription icon"
-                    style={{
-                      maxWidth: "100%",
-                      height: "auto",
-                      objectFit: "contain",
-                    }}
-                  />
+                  <Box
+                    position="relative"
+                    width={{ base: "200px", md: "250px", lg: "280px" }}
+                    height={{ base: "120px", md: "150px", lg: "180px" }}
+                    flexShrink={0}
+                  >
+                    <Image
+                      src={Images.img5}
+                      alt="subscription icon"
+                      fill
+                      sizes="(max-width: 768px) 200px, (max-width: 1200px) 250px, 280px"
+                      style={{
+                        objectFit: "contain",
+                        objectPosition: "center",
+                      }}
+                      priority
+                    />
+                  </Box>
                 </Box>
               </Box>
 
@@ -188,33 +200,88 @@ const Subscription = () => {
           </Box>
         </Box>
 
-        {/* Meal Calendar Section */}
+        {/* Unified Meal Subscription & Calendar Section - Organized by Plan Type */}
         {subscriptionPackages.length > 0 && (
-          <Box padding={"3rem 0"}>
-            <Box width={{ base: "90%", md: "100%", xl: "70%" }} margin={"auto"}>
-              {subscriptionPackages.map((card, index) => (
-                <MealCalendar key={index} planType={card.type} />
-              ))}
+          <Box padding={{ base: "3rem 0", md: "4rem 0", lg: "5rem 0" }} background="gray.50">
+            <Box
+              margin={"auto"}
+              width={{ base: "95%", md: "90%", lg: "85%", xl: "80%", "2xl": "75%" }}
+              maxWidth={"1400px"}
+            >
+              {/* Section Header */}
+              <Box marginBottom={{ base: "2rem", md: "3rem" }} textAlign="center">
+                <Flex alignItems="center" justifyContent="center" gap="0.5rem" marginBottom="0.5rem">
+                  <Calendar size={24} color={ThemeColors.darkColor} />
+                  <Heading
+                    as="h2"
+                    fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
+                    fontWeight="bold"
+                    color={ThemeColors.darkColor}
+                  >
+                    Meal Subscription & Weekly Calendar
+                  </Heading>
+                </Flex>
+                <Text fontSize={{ base: "sm", md: "md" }} color="gray.600">
+                  Choose your meals, view pricing, and see the weekly meal calendar for each plan
+                </Text>
+              </Box>
+
+              <Stack spacing={{ base: "3rem", md: "4rem", lg: "5rem" }}>
+                {subscriptionPackages.map((card, index) => {
+                  const planType = card.type;
+                  
+                  return (
+                    <Box key={index}>
+                      {/* Unified Meal Subscription & Calendar Card */}
+                      <UnifiedMealSubscriptionCard planType={planType} />
+
+                      {/* Food Algae Box Section */}
+                      {userInfo && (
+                        <Box
+                          marginTop={{ base: "2rem", md: "2.5rem" }}
+                          padding={{ base: "1.5rem", md: "2rem" }}
+                          background="blue.50"
+                          borderRadius="lg"
+                          border="1px solid"
+                          borderColor="blue.200"
+                        >
+                          <Flex
+                            justifyContent="space-between"
+                            alignItems="center"
+                            flexDirection={{ base: "column", md: "row" }}
+                            gap={{ base: "1rem", md: "2rem" }}
+                          >
+                            <Box flex="1">
+                              <Heading
+                                as="h3"
+                                fontSize={{ base: "lg", md: "xl" }}
+                                fontWeight="bold"
+                                color={ThemeColors.darkColor}
+                                marginBottom="0.5rem"
+                              >
+                                Add Food Algae Box
+                              </Heading>
+                              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
+                                Enhance your meal plan with nutritious food algae supplements
+                              </Text>
+                            </Box>
+                            <Box>
+                              <FoodAlgaeBoxModal
+                                userId={userInfo._id}
+                                planType={planType}
+                              />
+                            </Box>
+                          </Flex>
+                        </Box>
+                      )}
+                    </Box>
+                  );
+                })}
+              </Stack>
             </Box>
           </Box>
         )}
 
-        {/* Food Algae Box Section */}
-        {userInfo && subscriptionPackages.length > 0 && (
-          <Box padding={"2rem 0 3rem 0"}>
-            <Box width={{ base: "90%", md: "100%", xl: "70%" }} margin={"auto"}>
-              <Flex justifyContent="center" gap={4} flexWrap="wrap">
-                {subscriptionPackages.map((card, index) => (
-                  <FoodAlgaeBoxModal
-                    key={index}
-                    userId={userInfo._id}
-                    planType={card.type}
-                  />
-                ))}
-              </Flex>
-            </Box>
-          </Box>
-        )}
       </Box>
     </>
   );

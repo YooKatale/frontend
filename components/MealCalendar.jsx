@@ -21,11 +21,12 @@ import {
   Stack
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Save, Calendar, ChevronLeft, ChevronRight, Edit } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import Image from "next/image";
+import { getMealForDay } from "@lib/mealMenuConfig";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -47,132 +48,86 @@ const MealCalendar = ({ planType = "premium" }) => {
   });
 
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [selectedMealSubscription, setSelectedMealSubscription] = useState(null);
 
   const toast = useToast();
 
-  // Default menu for middle-income earners (ready-to-cook and ready-to-eat)
-  // Images can be edited by admin/customer care/procurement
-  const weeklyMenu = {
-    monday: {
-      breakfast: [
-        { meal: "Chapati with Beans", type: "ready-to-eat", quantity: "2 pieces", image: "/assets/images/meals/chapati-beans.jpg" },
-        { meal: "Porridge & Mandazi", type: "ready-to-eat", quantity: "1 bowl", image: "/assets/images/meals/porridge.jpg" },
-        { meal: "Rice & Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-stew.jpg" },
-      ],
-      lunch: [
-        { meal: "Matooke & Groundnut Sauce", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/matooke.jpg" },
-        { meal: "Rice & Chicken", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-chicken.jpg" },
-        { meal: "Posho & Beans", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/posho-beans.jpg" },
-      ],
-      supper: [
-        { meal: "Rice & Fish", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-fish.jpg" },
-        { meal: "Sweet Potatoes & Vegetables", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/sweet-potatoes.jpg" },
-        { meal: "Cassava & Meat Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/cassava-stew.jpg" },
-      ],
-    },
-    tuesday: {
-      breakfast: [
-        { meal: "Chapati with Beans", type: "ready-to-eat", quantity: "2 pieces", image: "/assets/images/meals/chapati-beans.jpg" },
-        { meal: "Porridge & Mandazi", type: "ready-to-eat", quantity: "1 bowl", image: "/assets/images/meals/porridge.jpg" },
-        { meal: "Rice & Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-stew.jpg" },
-      ],
-      lunch: [
-        { meal: "Matooke & Groundnut Sauce", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/matooke.jpg" },
-        { meal: "Rice & Chicken", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-chicken.jpg" },
-        { meal: "Posho & Beans", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/posho-beans.jpg" },
-      ],
-      supper: [
-        { meal: "Rice & Fish", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-fish.jpg" },
-        { meal: "Sweet Potatoes & Vegetables", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/sweet-potatoes.jpg" },
-        { meal: "Cassava & Meat Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/cassava-stew.jpg" },
-      ],
-    },
-    wednesday: {
-      breakfast: [
-        { meal: "Chapati with Beans", type: "ready-to-eat", quantity: "2 pieces", image: "/assets/images/meals/chapati-beans.jpg" },
-        { meal: "Porridge & Mandazi", type: "ready-to-eat", quantity: "1 bowl", image: "/assets/images/meals/porridge.jpg" },
-        { meal: "Rice & Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-stew.jpg" },
-      ],
-      lunch: [
-        { meal: "Matooke & Groundnut Sauce", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/matooke.jpg" },
-        { meal: "Rice & Chicken", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-chicken.jpg" },
-        { meal: "Posho & Beans", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/posho-beans.jpg" },
-      ],
-      supper: [
-        { meal: "Rice & Fish", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-fish.jpg" },
-        { meal: "Sweet Potatoes & Vegetables", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/sweet-potatoes.jpg" },
-        { meal: "Cassava & Meat Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/cassava-stew.jpg" },
-      ],
-    },
-    thursday: {
-      breakfast: [
-        { meal: "Chapati with Beans", type: "ready-to-eat", quantity: "2 pieces", image: "/assets/images/meals/chapati-beans.jpg" },
-        { meal: "Porridge & Mandazi", type: "ready-to-eat", quantity: "1 bowl", image: "/assets/images/meals/porridge.jpg" },
-        { meal: "Rice & Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-stew.jpg" },
-      ],
-      lunch: [
-        { meal: "Matooke & Groundnut Sauce", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/matooke.jpg" },
-        { meal: "Rice & Chicken", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-chicken.jpg" },
-        { meal: "Posho & Beans", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/posho-beans.jpg" },
-      ],
-      supper: [
-        { meal: "Rice & Fish", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-fish.jpg" },
-        { meal: "Sweet Potatoes & Vegetables", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/sweet-potatoes.jpg" },
-        { meal: "Cassava & Meat Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/cassava-stew.jpg" },
-      ],
-    },
-    friday: {
-      breakfast: [
-        { meal: "Chapati with Beans", type: "ready-to-eat", quantity: "2 pieces", image: "/assets/images/meals/chapati-beans.jpg" },
-        { meal: "Porridge & Mandazi", type: "ready-to-eat", quantity: "1 bowl", image: "/assets/images/meals/porridge.jpg" },
-        { meal: "Rice & Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-stew.jpg" },
-      ],
-      lunch: [
-        { meal: "Matooke & Groundnut Sauce", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/matooke.jpg" },
-        { meal: "Rice & Chicken", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-chicken.jpg" },
-        { meal: "Posho & Beans", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/posho-beans.jpg" },
-      ],
-      supper: [
-        { meal: "Rice & Fish", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-fish.jpg" },
-        { meal: "Sweet Potatoes & Vegetables", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/sweet-potatoes.jpg" },
-        { meal: "Cassava & Meat Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/cassava-stew.jpg" },
-      ],
-    },
-    saturday: {
-      breakfast: [
-        { meal: "Chapati with Beans", type: "ready-to-eat", quantity: "2 pieces", image: "/assets/images/meals/chapati-beans.jpg" },
-        { meal: "Porridge & Mandazi", type: "ready-to-eat", quantity: "1 bowl", image: "/assets/images/meals/porridge.jpg" },
-        { meal: "Rice & Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-stew.jpg" },
-      ],
-      lunch: [
-        { meal: "Matooke & Groundnut Sauce", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/matooke.jpg" },
-        { meal: "Rice & Chicken", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-chicken.jpg" },
-        { meal: "Posho & Beans", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/posho-beans.jpg" },
-      ],
-      supper: [
-        { meal: "Rice & Fish", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-fish.jpg" },
-        { meal: "Sweet Potatoes & Vegetables", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/sweet-potatoes.jpg" },
-        { meal: "Cassava & Meat Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/cassava-stew.jpg" },
-      ],
-    },
-    sunday: {
-      breakfast: [
-        { meal: "Chapati with Beans", type: "ready-to-eat", quantity: "2 pieces", image: "/assets/images/meals/chapati-beans.jpg" },
-        { meal: "Porridge & Mandazi", type: "ready-to-eat", quantity: "1 bowl", image: "/assets/images/meals/porridge.jpg" },
-        { meal: "Rice & Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-stew.jpg" },
-      ],
-      lunch: [
-        { meal: "Matooke & Groundnut Sauce", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/matooke.jpg" },
-        { meal: "Rice & Chicken", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-chicken.jpg" },
-        { meal: "Posho & Beans", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/posho-beans.jpg" },
-      ],
-      supper: [
-        { meal: "Rice & Fish", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/rice-fish.jpg" },
-        { meal: "Sweet Potatoes & Vegetables", type: "ready-to-eat", quantity: "1 plate", image: "/assets/images/meals/sweet-potatoes.jpg" },
-        { meal: "Cassava & Meat Stew", type: "ready-to-cook", quantity: "1 plate", image: "/assets/images/meals/cassava-stew.jpg" },
-      ],
-    },
-  };
+  // Load meal subscription from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("mealSubscription");
+      if (stored) {
+        try {
+          const subscription = JSON.parse(stored);
+          if (subscription.planType === planType) {
+            setSelectedMealSubscription(subscription);
+          }
+        } catch (e) {
+          console.error("Error parsing meal subscription:", e);
+        }
+      }
+    }
+
+    // Listen for meal subscription updates
+    const handleStorageChange = () => {
+      const stored = localStorage.getItem("mealSubscription");
+      if (stored) {
+        try {
+          const subscription = JSON.parse(stored);
+          if (subscription.planType === planType) {
+            setSelectedMealSubscription(subscription);
+          }
+        } catch (e) {
+          console.error("Error parsing meal subscription:", e);
+        }
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [planType]);
+
+  // Build weekly menu from configuration - showing both ready-to-eat and ready-to-cook options
+  // Default to middle income earners (can be made configurable later)
+  const weeklyMenu = useMemo(() => {
+    const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+    const mealTypes = ["breakfast", "lunch", "supper"];
+    const menu = {};
+    const incomeLevel = "middle"; // Default to middle income, can be made configurable
+
+    days.forEach((day) => {
+      menu[day] = {};
+      mealTypes.forEach((mealType) => {
+        // Get both ready-to-eat and ready-to-cook versions
+        const readyToEat = getMealForDay(day, mealType, incomeLevel, "ready-to-eat");
+        const readyToCook = getMealForDay(day, mealType, incomeLevel, "ready-to-cook");
+        
+        menu[day][mealType] = [];
+        
+        if (readyToEat) {
+          menu[day][mealType].push({
+            meal: readyToEat.meal,
+            type: "ready-to-eat",
+            quantity: readyToEat.quantity,
+            description: readyToEat.description,
+            image: readyToEat.image || "/assets/images/img5.png",
+          });
+        }
+        
+        if (readyToCook) {
+          menu[day][mealType].push({
+            meal: readyToCook.meal,
+            type: "ready-to-cook",
+            quantity: readyToCook.quantity,
+            description: readyToCook.description,
+            image: readyToCook.image || "/assets/images/img5.png",
+          });
+        }
+      });
+    });
+    
+    return menu;
+  }, [planType]);
 
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
@@ -298,30 +253,43 @@ const MealCalendar = ({ planType = "premium" }) => {
                   </Heading>
 
                   {/* Breakfast Section */}
-                  <Box marginBottom={"1.5rem"}>
-                    <Text
-                      fontSize={{ base: "sm", md: "md" }}
-                      fontWeight={"bold"}
-                      color={ThemeColors.darkColor}
-                      marginBottom={"0.75rem"}
-                    >
-                      Breakfast (6:00 AM - 10:00 AM)
-                    </Text>
-                    <Stack spacing={2}>
-                      {dayMenu.breakfast.map((item, idx) => (
+        <Box marginBottom={"1.5rem"}>
+                    <Flex justifyContent="space-between" alignItems="center" marginBottom={"0.75rem"}>
+                      <Text
+                        fontSize={{ base: "sm", md: "md" }}
+                        fontWeight={"bold"}
+                        color={ThemeColors.darkColor}
+                      >
+                        Breakfast (6:00 AM - 10:00 AM)
+                      </Text>
+                      {selectedMealSubscription?.meals?.some(
+                        (m) => m.mealType === "breakfast"
+                      ) && (
+                        <Badge colorScheme="green" fontSize="xs">
+                          Subscribed
+                        </Badge>
+                      )}
+                    </Flex>
+          <Stack spacing={2}>
+                      {dayMenu.breakfast.map((item, idx) => {
+                        const isSubscribed = selectedMealSubscription?.meals?.some(
+                          (m) => m.mealType === "breakfast" && m.prepType === item.type
+                        );
+                        return (
                         <Box
-                          key={idx}
+                key={idx}
                           padding={"0.75rem"}
-                          background={"gray.50"}
+                          background={isSubscribed ? "green.50" : "gray.50"}
                           borderRadius={"md"}
-                          border={"1px solid"}
-                          borderColor={"gray.100"}
+                          border={"2px solid"}
+                          borderColor={isSubscribed ? "green.300" : "gray.100"}
+                          position="relative"
                         >
                           <Flex gap={"0.75rem"} alignItems={"flex-start"}>
                             <Box
                               width={{ base: "60px", md: "80px" }}
                               height={{ base: "60px", md: "80px" }}
-                              borderRadius={"md"}
+                borderRadius={"md"}
                               overflow={"hidden"}
                               flexShrink={0}
                               background={"gray.200"}
@@ -339,6 +307,11 @@ const MealCalendar = ({ planType = "premium" }) => {
                               <Text fontSize={{ base: "xs", md: "sm" }} fontWeight={"medium"} marginBottom={"0.25rem"}>
                                 {item.meal}
                               </Text>
+                              {item.description && (
+                                <Text fontSize={{ base: "2xs", md: "xs" }} color={"gray.500"} marginBottom={"0.5rem"}>
+                                  {item.description}
+                                </Text>
+                              )}
                               <Flex gap={"0.5rem"} alignItems={"center"} flexWrap={"wrap"}>
                                 <Badge
                                   colorScheme={item.type === "ready-to-eat" ? "green" : "blue"}
@@ -353,35 +326,49 @@ const MealCalendar = ({ planType = "premium" }) => {
                             </Box>
                           </Flex>
                         </Box>
-                      ))}
-                    </Stack>
-                  </Box>
+                        );
+                      })}
+          </Stack>
+        </Box>
 
                   {/* Lunch Section */}
-                  <Box marginBottom={"1.5rem"}>
-                    <Text
-                      fontSize={{ base: "sm", md: "md" }}
-                      fontWeight={"bold"}
-                      color={ThemeColors.darkColor}
-                      marginBottom={"0.75rem"}
-                    >
-                      Lunch (12:00 PM - 3:00 PM)
-                    </Text>
-                    <Stack spacing={2}>
-                      {dayMenu.lunch.map((item, idx) => (
+        <Box marginBottom={"1.5rem"}>
+                    <Flex justifyContent="space-between" alignItems="center" marginBottom={"0.75rem"}>
+                      <Text
+                        fontSize={{ base: "sm", md: "md" }}
+                        fontWeight={"bold"}
+                        color={ThemeColors.darkColor}
+                      >
+                        Lunch (12:00 PM - 3:00 PM)
+                      </Text>
+                      {selectedMealSubscription?.meals?.some(
+                        (m) => m.mealType === "lunch"
+                      ) && (
+                        <Badge colorScheme="green" fontSize="xs">
+                          Subscribed
+                        </Badge>
+                      )}
+                    </Flex>
+          <Stack spacing={2}>
+                      {dayMenu.lunch.map((item, idx) => {
+                        const isSubscribed = selectedMealSubscription?.meals?.some(
+                          (m) => m.mealType === "lunch" && m.prepType === item.type
+                        );
+                        return (
                         <Box
-                          key={idx}
+                key={idx}
                           padding={"0.75rem"}
-                          background={"gray.50"}
+                          background={isSubscribed ? "green.50" : "gray.50"}
                           borderRadius={"md"}
-                          border={"1px solid"}
-                          borderColor={"gray.100"}
+                          border={"2px solid"}
+                          borderColor={isSubscribed ? "green.300" : "gray.100"}
+                          position="relative"
                         >
                           <Flex gap={"0.75rem"} alignItems={"flex-start"}>
                             <Box
                               width={{ base: "60px", md: "80px" }}
                               height={{ base: "60px", md: "80px" }}
-                              borderRadius={"md"}
+                borderRadius={"md"}
                               overflow={"hidden"}
                               flexShrink={0}
                               background={"gray.200"}
@@ -409,39 +396,58 @@ const MealCalendar = ({ planType = "premium" }) => {
                                 <Text fontSize={"xs"} color={"gray.600"}>
                                   {item.quantity}
                                 </Text>
+                                {isSubscribed && (
+                                  <Badge colorScheme="green" fontSize="xs" marginLeft="auto">
+                                    ✓ Active
+                                  </Badge>
+                                )}
                               </Flex>
                             </Box>
                           </Flex>
                         </Box>
-                      ))}
-                    </Stack>
-                  </Box>
+                        );
+                      })}
+          </Stack>
+        </Box>
 
                   {/* Supper Section */}
                   <Box marginBottom={"1rem"}>
-                    <Text
-                      fontSize={{ base: "sm", md: "md" }}
-                      fontWeight={"bold"}
-                      color={ThemeColors.darkColor}
-                      marginBottom={"0.75rem"}
-                    >
-                      Supper (5:00 PM - 10:00 PM)
-                    </Text>
-                    <Stack spacing={2}>
-                      {dayMenu.supper.map((item, idx) => (
+                    <Flex justifyContent="space-between" alignItems="center" marginBottom={"0.75rem"}>
+                      <Text
+                        fontSize={{ base: "sm", md: "md" }}
+                        fontWeight={"bold"}
+                        color={ThemeColors.darkColor}
+                      >
+                        Supper (5:00 PM - 10:00 PM)
+                      </Text>
+                      {selectedMealSubscription?.meals?.some(
+                        (m) => m.mealType === "supper"
+                      ) && (
+                        <Badge colorScheme="green" fontSize="xs">
+                          Subscribed
+                        </Badge>
+                      )}
+                    </Flex>
+          <Stack spacing={2}>
+                      {dayMenu.supper.map((item, idx) => {
+                        const isSubscribed = selectedMealSubscription?.meals?.some(
+                          (m) => m.mealType === "supper" && m.prepType === item.type
+                        );
+                        return (
                         <Box
-                          key={idx}
+                key={idx}
                           padding={"0.75rem"}
-                          background={"gray.50"}
+                          background={isSubscribed ? "green.50" : "gray.50"}
                           borderRadius={"md"}
-                          border={"1px solid"}
-                          borderColor={"gray.100"}
+                          border={"2px solid"}
+                          borderColor={isSubscribed ? "green.300" : "gray.100"}
+                          position="relative"
                         >
                           <Flex gap={"0.75rem"} alignItems={"flex-start"}>
                             <Box
                               width={{ base: "60px", md: "80px" }}
                               height={{ base: "60px", md: "80px" }}
-                              borderRadius={"md"}
+                borderRadius={"md"}
                               overflow={"hidden"}
                               flexShrink={0}
                               background={"gray.200"}
@@ -459,6 +465,11 @@ const MealCalendar = ({ planType = "premium" }) => {
                               <Text fontSize={{ base: "xs", md: "sm" }} fontWeight={"medium"} marginBottom={"0.25rem"}>
                                 {item.meal}
                               </Text>
+                              {item.description && (
+                                <Text fontSize={{ base: "2xs", md: "xs" }} color={"gray.500"} marginBottom={"0.5rem"}>
+                                  {item.description}
+                                </Text>
+                              )}
                               <Flex gap={"0.5rem"} alignItems={"center"} flexWrap={"wrap"}>
                                 <Badge
                                   colorScheme={item.type === "ready-to-eat" ? "green" : "blue"}
@@ -473,30 +484,31 @@ const MealCalendar = ({ planType = "premium" }) => {
                             </Box>
                           </Flex>
                         </Box>
-                      ))}
-                    </Stack>
-                  </Box>
+                        );
+                      })}
+          </Stack>
+        </Box>
 
                   {/* Vegetarian Sauce Option */}
-                  <Box
+        <Box
                     padding={"0.75rem"}
                     background={"green.50"}
-                    borderRadius={"md"}
+          borderRadius={"md"}
                     border={"1px solid"}
                     borderColor={"green.200"}
-                  >
-                    <Checkbox
+        >
+          <Checkbox
                       isChecked={vegetarianSauceOptions[dayKey]}
                       onChange={() => handleVegetarianSauceChange(day)}
-                      colorScheme="green"
+            colorScheme="green"
                       size={{ base: "sm", md: "md" }}
-                    >
+          >
                       <Text fontSize={{ base: "xs", md: "sm" }} fontWeight={"medium"}>
                         Vegetarian Sauce Option
-                      </Text>
-                    </Checkbox>
+            </Text>
+          </Checkbox>
                   </Box>
-                </Box>
+        </Box>
               </SwiperSlide>
             );
           })}
@@ -531,6 +543,27 @@ const MealCalendar = ({ planType = "premium" }) => {
           className="swiper-button-next-custom"
           size={{ base: "sm", md: "md" }}
         />
+      </Box>
+
+      {/* Delivery Disclaimer */}
+      <Box
+        padding={"1rem"}
+        background={"blue.50"}
+        borderRadius={"md"}
+        border={"1px solid"}
+        borderColor={"blue.200"}
+        marginTop={"1.5rem"}
+      >
+        <Text fontSize={{ base: "xs", md: "sm" }} fontWeight={"medium"}>
+          <Text as="span" fontWeight={"bold"}>
+            Free Delivery:
+          </Text>{" "}
+          Within 3km distance.{" "}
+          <Text as="span" fontWeight={"bold"}>
+            Extra:
+          </Text>{" "}
+          950 UGX per additional kilometer.
+        </Text>
       </Box>
 
       {/* Save Button */}

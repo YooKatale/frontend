@@ -1,10 +1,9 @@
-import { Box, Flex, Grid, Text, Heading, Stack, Modal, ModalOverlay, ModalContent, ModalBody, useDisclosure, Spinner } from "@chakra-ui/react";
+import { Box, Flex, Grid, Text, Heading, Stack, Modal, ModalOverlay, ModalContent, ModalBody, useDisclosure, Spinner, HStack, Icon, Button } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import React, { useState } from "react";
-import ButtonComponent from "./Button";
 import { FormatCurr } from "@utils/utils";
 import SubscriptionTerms from "./SubscriptionTerms";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Star, ArrowRight } from "lucide-react";
 
 const SubscriptionCard = ({ card, handleClick }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -61,17 +60,20 @@ const SubscriptionCard = ({ card, handleClick }) => {
             minHeight={"0"}
           >
             <Box padding={"0.5rem 0 1rem 0"} flexShrink={0}>
-              <Heading
-                as={"h2"}
-                size={"md"}
-                display={"flex"}
-                textAlign={"center"}
+              <Flex
                 justifyContent={"center"}
-                className="secondary-light-font"
+                alignItems={"center"}
                 flexWrap={"wrap"}
                 gap={"0.25rem"}
               >
-                YooKatale
+                <Heading
+                  as={"h2"}
+                  size={"md"}
+                  textAlign={"center"}
+                  className="secondary-light-font"
+                >
+                  YooKatale
+                </Heading>
                 <Heading
                   as={"h2"}
                   textTransform={"capitalize"}
@@ -82,7 +84,7 @@ const SubscriptionCard = ({ card, handleClick }) => {
                 >
                   {card.type}
                 </Heading>
-              </Heading>
+              </Flex>
             </Box>
 
             <Box padding={"0.5rem 0 1rem 0"}>
@@ -460,22 +462,34 @@ const SubscriptionCard = ({ card, handleClick }) => {
                   </>
                 ) : null}
 
-                {/* Rate & Comment - Non-clickable */}
+                {/* Star Rating Display */}
                 <Box
                   paddingY={"0.75rem"}
                   marginTop={"0.5rem"}
                   borderTop={"1px solid"}
                   borderColor={"gray.200"}
                 >
-                  <Text 
-                    textAlign={"left"} 
-                    fontSize={{ base: "xs", md: "sm" }}
-                    lineHeight={"1.8"}
-                    color={"gray.700"}
-                    fontWeight={"medium"}
-                  >
-                    ✓ Rate & Comment
-                  </Text>
+                  <Flex alignItems="center" gap={2}>
+                    <HStack spacing={0.5}>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Icon
+                          key={star}
+                          as={Star}
+                          w={{ base: 4, md: 5 }}
+                          h={{ base: 4, md: 5 }}
+                          color={star <= (card?.rating || 5) ? "yellow.400" : "gray.300"}
+                          fill={star <= (card?.rating || 5) ? "currentColor" : "none"}
+                        />
+                      ))}
+                    </HStack>
+                    <Text 
+                      fontSize={{ base: "xs", md: "sm" }}
+                      color={"gray.600"}
+                      fontWeight={"medium"}
+                    >
+                      ({card?.rating || 5}.0)
+                    </Text>
+                  </Flex>
                 </Box>
               </Stack>
             </Box>
@@ -503,49 +517,42 @@ const SubscriptionCard = ({ card, handleClick }) => {
                   }, 1500);
                 }}
               >
-                <Box
-                  as="button"
+                <Button
                   width={"100%"}
                   maxWidth={{ base: "100%", md: "280px" }}
-                  paddingY={{ base: "0.75rem", md: "0.875rem" }}
-                  paddingX={"1.5rem"}
+                  height={{ base: "44px", md: "48px" }}
                   background={ThemeColors.darkColor}
                   color={"white"}
-                  borderRadius={"md"}
+                  borderRadius={"lg"}
                   fontWeight={"semibold"}
-                  fontSize={{ base: "sm", md: "base" }}
-                  display={"flex"}
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  gap={"0.5rem"}
-                  transition={"all 0.2s ease"}
+                  fontSize={{ base: "sm", md: "md" }}
+                  isLoading={isLoading}
+                  loadingText="Processing..."
+                  leftIcon={<ArrowRight size={18} />}
                   _hover={{
                     background: "transparent",
                     color: ThemeColors.darkColor,
                     border: "2px solid",
                     borderColor: ThemeColors.darkColor,
                     transform: "translateY(-2px)",
-                    boxShadow: "md",
+                    boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
                   }}
                   _active={{
                     transform: "translateY(0)",
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                   }}
-                  disabled={isLoading}
-                  opacity={isLoading ? 0.7 : 1}
-                  cursor={isLoading ? "not-allowed" : "pointer"}
+                  transition={"all 0.3s ease"}
+                  boxShadow={"0 4px 6px rgba(0,0,0,0.1)"}
+                  onClick={() => {
+                    setIsLoading((prev) => (prev ? false : true));
+                    handleClick(card?._id);
+                    setTimeout(() => {
+                      setIsLoading((prev) => (prev ? false : true));
+                    }, 1500);
+                  }}
                 >
-                  {isLoading && (
-                    <Spinner 
-                      size="sm" 
-                      color="currentColor" 
-                      thickness="2px"
-                      speed="0.65s"
-                    />
-                  )}
-                  <Text as="span" fontWeight={"inherit"}>
-                    {isLoading ? "Processing..." : `Get ${card?.type}`}
-                  </Text>
-                </Box>
+                  Subscribe to {card?.type || "Plan"}
+                </Button>
               </Box>
             </Box>
 
@@ -556,19 +563,19 @@ const SubscriptionCard = ({ card, handleClick }) => {
               flexShrink={0}
               textAlign={"center"}
             >
-              <Text
-                fontSize={{ base: "sm", md: "base" }}
+              <Button
+                variant="link"
                 color={ThemeColors.darkColor}
+                fontSize={{ base: "sm", md: "md" }}
                 fontWeight={"semibold"}
-                cursor={"pointer"}
-                textDecoration={"underline"}
-                display={"inline-flex"}
-                alignItems={"center"}
-                gap={"0.5rem"}
-                transition={"all 0.2s ease"}
+                leftIcon={<UserPlus size={18} />}
+                rightIcon={<ArrowRight size={16} />}
                 _hover={{
-                  opacity: 0.8,
+                  textDecoration: "underline",
+                  color: ThemeColors.primaryColor,
+                  transform: "translateX(4px)",
                 }}
+                transition={"all 0.2s ease"}
                 onClick={() => {
                   const inviteSection = document.getElementById("refer");
                   if (inviteSection) {
@@ -576,9 +583,8 @@ const SubscriptionCard = ({ card, handleClick }) => {
                   }
                 }}
               >
-                <UserPlus size={16} />
-                Invite a friend to test
-              </Text>
+                Invite a Friend to Test
+              </Button>
             </Box>
 
             <Box 
@@ -589,18 +595,22 @@ const SubscriptionCard = ({ card, handleClick }) => {
               paddingX={{ base: "1rem", md: "1.5rem" }}
               marginTop={"auto"}
             >
-              <Text
+              <Button
+                variant="link"
                 fontSize={{ base: "xs", md: "sm" }}
                 textAlign={"center"}
-                cursor={"pointer"}
-                textDecoration={"underline"}
                 color={"gray.600"}
+                fontWeight={"medium"}
+                width={"100%"}
+                _hover={{
+                  color: ThemeColors.darkColor,
+                  textDecoration: "underline",
+                }}
                 onClick={onOpen}
-                _hover={{ color: ThemeColors.darkColor }}
                 marginBottom={"0.75rem"}
               >
-                Terms and conditions apply
-              </Text>
+                Terms and Conditions Apply
+              </Button>
               
               {/* Delivery Terms Summary */}
               <Box
@@ -610,12 +620,12 @@ const SubscriptionCard = ({ card, handleClick }) => {
                 border={"1px solid"}
                 borderColor={"blue.200"}
               >
-                <Box>
-                  <Text as="span" fontWeight={"bold"}>Free Delivery:</Text>{" "}
-                  <Text as="span">Within 3km distance. </Text>
-                  <Text as="span" fontWeight={"bold"}>Extra:</Text>{" "}
+                <Flex flexWrap="wrap" gap="0.25rem" alignItems="center">
+                  <Text as="span" fontWeight={"bold"}>Free Delivery:</Text>
+                  <Text as="span">Within 3km distance.</Text>
+                  <Text as="span" fontWeight={"bold"}>Extra:</Text>
                   <Text as="span">950 UGX per additional kilometer.</Text>
-                </Box>
+                </Flex>
               </Box>
             </Box>
 

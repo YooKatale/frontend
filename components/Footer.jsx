@@ -510,24 +510,28 @@ try {
           justifyContent={{ base: "center", md: "center", xl: "none" }}
         >
           <Box padding={{ base: "0.5rem 0", md: "0.5rem 0", xl: "1rem 2rem" }}>
-            <Text
+            <Flex
               fontSize="md"
-              display={"flex"}
               justifyContent={{ base: "center", md: "center", xl: "none" }}
+              alignItems="center"
+              flexWrap="wrap"
             >
-              &copy; {new Date().getFullYear()}
+              <Text as="span" fontSize="md">
+                &copy; {new Date().getFullYear()}
+              </Text>
               <Text
+                as="span"
                 color={ThemeColors.primaryColor}
                 margin={"0 0.3rem"}
                 fontSize="lg"
                 textTransform={"uppercase"}
               >
                 yookatale
-              </Text>{" "}
-              <span style={{ margin: "0.1rem 0 0 0" }}>
+              </Text>
+              <Text as="span" fontSize="md" style={{ margin: "0.1rem 0 0 0" }}>
                 All rights reserved
-              </span>
-            </Text>
+              </Text>
+            </Flex>
           </Box>
 
           <Spacer display={{ base: "none", md: "none", xl: "block" }} />
