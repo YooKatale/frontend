@@ -471,24 +471,36 @@ const SubscriptionCard = ({ card, handleClick }) => {
                 >
                   <Flex alignItems="center" gap={2}>
                     <HStack spacing={0.5}>
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Icon
-                          key={star}
-                          as={Star}
-                          w={{ base: 4, md: 5 }}
-                          h={{ base: 4, md: 5 }}
-                          color={star <= (card?.rating || 5) ? "yellow.400" : "gray.300"}
-                          fill={star <= (card?.rating || 5) ? "currentColor" : "none"}
-                        />
-                      ))}
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        const rating = card?.rating || 0; // Use actual rating from card, default to 0 if not set
+                        const isFilled = star <= Math.round(rating);
+                        return (
+                          <Icon
+                            key={star}
+                            as={Star}
+                            w={{ base: 4, md: 5 }}
+                            h={{ base: 4, md: 5 }}
+                            color={isFilled ? "yellow.400" : "gray.300"}
+                            fill={isFilled ? "currentColor" : "none"}
+                          />
+                        );
+                      })}
                     </HStack>
                     <Text 
                       fontSize={{ base: "xs", md: "sm" }}
                       color={"gray.600"}
                       fontWeight={"medium"}
                     >
-                      ({card?.rating || 5}.0)
+                      ({card?.rating ? card.rating.toFixed(1) : "0.0"})
                     </Text>
+                    {card?.ratingCount && (
+                      <Text 
+                        fontSize={{ base: "2xs", md: "xs" }}
+                        color={"gray.500"}
+                      >
+                        ({card.ratingCount} {card.ratingCount === 1 ? "rating" : "ratings"})
+                      </Text>
+                    )}
                   </Flex>
                 </Box>
               </Stack>

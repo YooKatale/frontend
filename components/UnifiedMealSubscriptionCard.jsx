@@ -969,6 +969,21 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                 </Flex>
               </Box>
             )}
+
+            {/* Delivery Information */}
+            <Box
+              marginTop="1.5rem"
+              padding="1rem"
+              background="blue.50"
+              borderRadius="lg"
+              border="1px solid"
+              borderColor="blue.200"
+            >
+              <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="medium" color="gray.700">
+                <Text as="span" fontWeight="bold">Free Delivery:</Text> Within 3km distance.{" "}
+                <Text as="span" fontWeight="bold">Extra:</Text> 950 UGX per additional kilometer.
+              </Text>
+            </Box>
           </ModalBody>
           <ModalFooter
             padding={{ base: "1rem 1.5rem", md: "1.5rem 2rem" }}
