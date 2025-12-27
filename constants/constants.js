@@ -60,7 +60,7 @@ export const CategoriesJson = [
   "Supplements",
 ];
 
-export const DisplayImages = [img, img1, img2, img3, img4];
+export const DisplayImages = [Images.img, Images.img1, Images.img2, Images.img3, Images.img4];
 
 export const Lorem = {
   short:
