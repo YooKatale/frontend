@@ -25,6 +25,14 @@ export const metadata = {
     statusBarStyle: "default",
     title: "YooKatale",
   },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 const RootLayout = ({ children }) => {

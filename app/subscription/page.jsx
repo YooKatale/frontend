@@ -58,16 +58,22 @@ const Subscription = () => {
       const res = await fetchPackages().unwrap();
 
       if (res?.status == "Success") {
-        chakraToast({
-          description: "Please login to continue",
-          status: "success",
-          duration: 5000,
-          isClosable: false,
-        });
+        // Only show login message if user is NOT logged in
+        if (!userInfo || !userInfo._id) {
+          chakraToast({
+            title: "Login Required",
+            description: "Please login to continue",
+            status: "info",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
 
         setSubscriptionPackages(res?.data);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error fetching subscription packages:", error);
+    }
   };
 
   useEffect(() => {
@@ -225,6 +231,7 @@ const Subscription = () => {
                   Choose your meals, view pricing, and see the weekly meal calendar for each plan
                 </Text>
               </Box>
+
 
               <Stack spacing={{ base: "3rem", md: "4rem", lg: "5rem" }}>
                 {subscriptionPackages.map((card, index) => {

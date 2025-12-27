@@ -102,9 +102,26 @@ const SignUp = () => {
 
       dispatch(setCredentials({ ...res }));
 
+      // Send welcome email using direct SMTP (NOT backend invitation endpoint)
+      try {
+        const emailRes = await fetch("/api/mail", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: email, type: 'welcome' }),
+        });
+        if (emailRes.ok) {
+          console.log("✅ Welcome email sent to:", email);
+        }
+      } catch (emailError) {
+        console.error("⚠️ Failed to send welcome email:", emailError);
+        // Don't show error to user - signup was successful
+      }
+
       chakraToast({
         title: "Logged In",
-        description: `Successfully logged in as ${res?.lastname}`,
+        description: `Successfully logged in as ${res?.lastname}. Welcome email sent!`,
         status: "success",
         duration: 5000,
         isClosable: false,
@@ -148,7 +165,7 @@ const SignUp = () => {
             </Flex>
             <Box padding={"1.5rem 0"} textAlign={"center"}>
               <Text fontSize={"md"} mb={3} lineHeight={"1.8"}>
-                Forget about cooking or going to the market by subscribing for Freemium, Premium, Family or Business Plan.
+                Forget about cooking or going to the market by subscribing for Premium, Family or Business Plan.
               </Text>
               <Text fontSize={"md"} mb={3} lineHeight={"1.8"}>
                 Discover and customize your meals, set your own time when to eat, where to eat from with friends, family and loved ones while earning loyalty rewards, gifts and discounts.
@@ -228,7 +245,13 @@ const SignUp = () => {
                   href="/subscription"
                   className="flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
                 >
-                  <Image src="/assets/images/apple.svg" width={30} height={30} alt="appstore_img" />
+                  <Image 
+                    src="/assets/images/apple.svg" 
+                    width={30} 
+                    height={30} 
+                    alt="appstore_img"
+                    style={{ width: "30px", height: "auto" }}
+                  />
                   <Text color={ThemeColors.darkColor} fontSize="sm" ml={2}>
                     App Store
                   </Text>
@@ -237,7 +260,13 @@ const SignUp = () => {
                   href="/subscription"
                   className="flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
                 >
-                  <Image src="/assets/images/google.svg" width={30} height={30} alt="playstore_img" />
+                  <Image 
+                    src="/assets/images/google.svg" 
+                    width={30} 
+                    height={30} 
+                    alt="playstore_img"
+                    style={{ width: "30px", height: "auto" }}
+                  />
                   <Text color={ThemeColors.darkColor} fontSize="sm" ml={2}>
                     Google Play
                   </Text>

@@ -29,7 +29,7 @@ import {
   useToast
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
-import { useCreateReferralCodeMutation, useNewsletterPostMutation, useSendReferralEmailMutation } from "@slices/usersApiSlice";
+import { useCreateReferralCodeMutation, useNewsletterPostMutation } from "@slices/usersApiSlice";
 import { Loader } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -68,7 +68,6 @@ const Footer = () => {
   const [isReferralLoading, setIsReferralLoading] = useState(false);
   const [createNewsletter] = useNewsletterPostMutation();
   const [createReferralCode]=useCreateReferralCodeMutation();
-  const [sendMailInvitation]=useSendReferralEmailMutation()
   const chakraToast = useToast();
   const[invitee, setInvitee]=useState("")
   const { isOpen: isReferralOpen, onOpen: openRefferal, onClose: closeReferral } = useDisclosure();
@@ -88,9 +87,24 @@ const Footer = () => {
         // Clear email value
         setNewsletterEmail("");
 
+        // Send newsletter email using direct SMTP (NOT backend invitation endpoint)
+        try {
+          await fetch("/api/mail", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: NewsletterEmail, type: 'newsletter' }),
+          });
+          console.log("✅ Newsletter email sent to:", NewsletterEmail);
+        } catch (emailError) {
+          console.error("⚠️ Failed to send newsletter email:", emailError);
+          // Don't show error to user - newsletter subscription was successful
+        }
+
         return chakraToast({
           title: "Success",
-          description: "Successfully subscribed to the newsletter",
+          description: "Successfully subscribed to the newsletter. Newsletter email sent!",
           status: "success",
           duration: 5000,
           isClosable: false,
@@ -162,32 +176,45 @@ const Footer = () => {
 
 const handleMailInvitation = async () => {
   setIsReferralLoading(true)
-  const toPayload={
-    email: invitee,
-    referralCode: referralCode
+  
+  try {
+    // Send invitation email using direct SMTP (NOT backend invitation endpoint)
+    const response = await fetch("/api/mail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ 
+        email: invitee, 
+        type: 'invitation',
+        referralCode: referralCode // Include referral code for tracking
+      }),
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      setIsReferralLoading(false);
+      return chakraToast({
+        title: "Success",
+        description: "Successfully sent Invitation",
+        status: "success",
+        duration: 5000,
+        isClosable: false,
+      });
+    } else {
+      throw new Error("Failed to send invitation");
+    }
+  } catch (error) {
+    console.error("Error sending invitation:", error);
+    setIsReferralLoading(false);
+    return chakraToast({
+      title: "Error",
+      description: "Sending Invitation failed",
+      status: "error",
+      duration: 5000,
+      isClosable: false,
+    });
   }
-try {
-  const res = await sendMailInvitation(toPayload)
-  if (res?.data?.status === "Success") {
-    setIsReferralLoading(false)
-  return chakraToast({
-    title: "Success",
-    description: "Successfully sent Invitation",
-    status: "success",
-    duration: 5000,
-    isClosable: false,
-  });
-}
-} catch (error) {
-  setIsReferralLoading(false)
-  return chakraToast({
-    title: "Error",
-    description: "Sending Invitation failed",
-    status: "error",
-    duration: 5000,
-    isClosable: false,
-  });
-}
 }
   return (
     <>
@@ -483,7 +510,13 @@ try {
                 href="/subscription"
                 className="md:mr-1 flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
               >
-                <Image src="/assets/images/apple.svg" width={30} height={30} alt="appstore_img" />
+                <Image 
+                  src="/assets/images/apple.svg" 
+                  width={30} 
+                  height={30} 
+                  alt="appstore_img"
+                  style={{ width: "30px", height: "auto" }}
+                />
                 <div className="ml-1">
                   <Text color="white" fontSize="sm">
                     App Store
@@ -494,7 +527,13 @@ try {
                  href="/subscription"
                  className="mt-4 md:mt-0 md:ml-4 flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
               >
-                 <Image src="/assets/images/google.svg" width={30} height={30} alt="playstore_img"/>
+                 <Image 
+                   src="/assets/images/google.svg" 
+                   width={30} 
+                   height={30} 
+                   alt="playstore_img"
+                   style={{ width: "30px", height: "auto" }}
+                 />
                 <div className="ml-1">
                    <Text color="white" fontSize="sm">
                     Google Play

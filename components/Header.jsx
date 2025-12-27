@@ -78,16 +78,15 @@ const Header = () => {
               />
             </Link>
             <Box display={{ base: "none", md: "block" }}>
-              <Link href="/products" passHref>
-                <Button
-                  variant="outline"
-                  fontSize="0.875rem" // Smaller font size for buttons
-                  //padding="0.5rem 1rem" // Padding inside buttons
-                  leftIcon={<AiOutlineMenu />}
-                >
-                  All Categories
-                </Button>
-              </Link>
+              <Button
+                as={Link}
+                href="/products"
+                variant="outline"
+                fontSize="0.875rem"
+                leftIcon={<AiOutlineMenu />}
+              >
+                All Categories
+              </Button>
             </Box>
           </Flex>
 
@@ -145,48 +144,49 @@ const Header = () => {
             {/* Account and Cart */}
             <Flex align="center">
               {/* Cart Button */}
-              <Link href="/cart">
+              <Button
+                as={Link}
+                href="/cart"
+                variant="outline"
+                sx={{
+                  mr: 2,
+                  background: "green",
+                  color: "white",
+                  fontSize: "0.875rem",
+                  _hover: {
+                    backgroundColor: "gray.100",
+                    color: "green",
+                  },
+                }}
+                leftIcon={<FaShoppingCart />}
+              >
+                Cart
+              </Button>
+              {/* Sign In or Account Button */}
+              {userInfo ? (
+                <Box as={Link} href="/account" ml={4} display="flex" alignItems="center">
+                  <FaUser size="20px" />
+                </Box>
+              ) : (
                 <Button
+                  as={Link}
+                  href="/signin"
+                  ml={4}
                   variant="outline"
                   sx={{
                     mr: 2,
                     background: "green",
                     color: "white",
-                    fontSize: "0.875rem", // Ensure smaller font size
+                    fontSize: "0.875rem",
                     _hover: {
                       backgroundColor: "gray.100",
                       color: "green",
                     },
                   }}
-                  leftIcon={<FaShoppingCart />}
+                  leftIcon={<FaUser />}
                 >
-                  Cart
+                  Sign In
                 </Button>
-              </Link>
-              {/* Sign In or Account Button */}
-              {userInfo ? (
-                <Link href="/account" ml={4}>
-                  <FaUser size="20px" />
-                </Link>
-              ) : (
-                <Link href="/signin" ml={4}>
-                  <Button
-                    variant="outline"
-                    sx={{
-                      mr: 2,
-                      background: "green",
-                      color: "white",
-                      fontSize: "0.875rem", // Keep font size consistent
-                      _hover: {
-                        backgroundColor: "gray.100",
-                        color: "green",
-                      },
-                    }}
-                    leftIcon={<FaUser />}
-                  >
-                    Sign In
-                  </Button>
-                </Link>
               )}
             </Flex>
             {/* Call to Action Button */}

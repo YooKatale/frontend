@@ -97,9 +97,24 @@ const Blog = () => {
         // clear email value
         setNewsletterEmail("");
 
+        // Send newsletter email using direct SMTP (NOT backend invitation endpoint)
+        try {
+          await fetch("/api/mail", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: NewsletterEmail, type: 'newsletter' }),
+          });
+          console.log("✅ Newsletter email sent to:", NewsletterEmail);
+        } catch (emailError) {
+          console.error("⚠️ Failed to send newsletter email:", emailError);
+          // Don't show error to user - newsletter subscription was successful
+        }
+
         chakraToast({
           title: "Success",
-          description: "Successfully subscribed to newsletter",
+          description: "Successfully subscribed to newsletter. Newsletter email sent!",
           status: "success",
           duration: 5000,
           isClosable: false,

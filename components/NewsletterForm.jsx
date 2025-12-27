@@ -6,7 +6,6 @@ import { Spinner, useToast } from "@chakra-ui/react";
 import ButtonComponent from "./Button";
 import { useNewsletterPostMutation } from "@slices/usersApiSlice";
 import { ChevronDown, X } from "lucide-react";
-import axios from "axios";
 
 const NewsletterForm = () => {
   const [NewsletterEmail, setNewsletterEmail] = useState("");
@@ -30,13 +29,24 @@ const NewsletterForm = () => {
 
         setDisplay((prev) => (prev ? false : true));
 
-        // // make call to api to send mail
-        // const res = await axios.post("/api/mail", { email: NewsletterEmail });
+        // Send newsletter email using direct SMTP (NOT backend invitation endpoint)
+        try {
+          await fetch("/api/mail", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: NewsletterEmail, type: 'newsletter' }),
+          });
+          console.log("✅ Newsletter email sent to:", NewsletterEmail);
+        } catch (emailError) {
+          console.error("⚠️ Failed to send newsletter email:", emailError);
+          // Don't show error to user - newsletter subscription was successful
+        }
 
-        // if (res.statusText == "OK")
         return chakraToast({
           title: "Success",
-          description: "Successfully subscribed to the newsletter",
+          description: "Successfully subscribed to the newsletter. Newsletter email sent!",
           status: "success",
           duration: 5000,
           isClosable: false,

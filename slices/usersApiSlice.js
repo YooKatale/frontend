@@ -128,6 +128,61 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    sendWelcomeEmail: builder.mutation({
+      query: (data) => {
+        // Build payload - structure must be DIFFERENT from invitation
+        const emailType = data.type || 'welcome';
+        const isInvitation = emailType === 'invitation' || !emailType;
+        
+        const payload = {
+          email: data.email,
+          emailType: emailType, // 'welcome', 'newsletter', or 'meal_notification'
+          subject: data.subject, // REQUIRED - email subject
+          html: data.html, // REQUIRED - email HTML template
+          template: data.html, // ALTERNATIVE: Some backends use 'template' instead of 'html'
+          emailBody: data.html, // ALTERNATIVE: Some backends use 'emailBody'
+          message: data.html, // ALTERNATIVE: Some backends use 'message'
+          // EXPLICIT FLAGS: Backend must check these to use custom template instead of invitation
+          useCustomTemplate: !isInvitation, // true for welcome, newsletter, meal_notification
+          customTemplate: !isInvitation, // Alternative flag name
+          isNotification: !isInvitation, // This is NOT an invitation
+          // Additional fields for meal notifications
+          userName: data.userName || null,
+          mealType: data.mealType || null,
+          meals: data.meals || null,
+        };
+        
+        // CRITICAL: ONLY include referralCode if it's actually an invitation
+        // Backend uses invitation template if referralCode exists, so DO NOT include it for other types
+        if (data.referralCode && isInvitation) {
+          payload.referralCode = data.referralCode;
+        }
+        // DO NOT include referralCode field at all for non-invitations
+        // Including it (even as null) might make backend think it's an invitation
+        
+        console.log("📧 sendWelcomeEmail payload:", {
+          email: payload.email,
+          emailType: payload.emailType,
+          useCustomTemplate: payload.useCustomTemplate,
+          hasHtml: !!payload.html,
+          hasReferralCode: 'referralCode' in payload,
+          referralCodeValue: payload.referralCode
+        });
+        
+        return {
+          url: `${DB_URL}/sendReferralEmail`,
+          method: "POST",
+          body: payload,
+        };
+      },
+    }),
+    sendMealNotificationEmail: builder.mutation({
+      query: (data) => ({
+        url: `${DB_URL}/sendMealNotificationEmail`,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -150,5 +205,7 @@ export const {
   useForgotPasswordMutation, 
   useResetPasswordMutation,
   useCreateReferralCodeMutation,
-  useSendReferralEmailMutation
+  useSendReferralEmailMutation,
+  useSendWelcomeEmailMutation,
+  useSendMealNotificationEmailMutation
 } = usersApiSlice;

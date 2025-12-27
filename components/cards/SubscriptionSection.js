@@ -16,10 +16,11 @@ export default function Subscription() {
       <Image
         src="/assets/images/subnew.jpeg"
         alt="Subscription Image"
-        layout="responsive" // Ensures responsiveness
         width={600} 
-        height={400} 
+        height={400}
         style={{
+          width: '100%',
+          height: 'auto',
           objectFit: 'contain',
         }}
       />
