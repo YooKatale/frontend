@@ -1,6 +1,15 @@
-// Use string paths for images to ensure they work in both development and production
-// Public folder paths are served directly by Next.js at the root level
-// This approach works reliably in all environments (localhost and production)
+import cardSecureIcon from "@public/assets/icons/card-secure.png";
+import customerServiceIcon from "@public/assets/icons/customer-service.png";
+import logo from "@public/assets/icons/logo.jpg";
+import logo1 from "@public/assets/icons/logo1.png";
+import logo2 from "@public/assets/icons/logo2.png";
+import logo3 from "@public/assets/icons/logo3.jpg";
+import img from "@public/assets/images/img.png";
+import img1 from "@public/assets/images/img1.png";
+import img2 from "@public/assets/images/img2.png";
+import img3 from "@public/assets/images/img3.png";
+import img4 from "@public/assets/images/img4.png";
+import img5 from "@public/assets/images/img5.png";
 
 export const ThemeColors = {
   primaryColor: "#185f2d",
@@ -9,21 +18,19 @@ export const ThemeColors = {
   lightColor: "#F0F0F0",
 };
 
-// Image paths - using absolute paths from public folder
-// These paths work in both development (localhost) and production (yookatale.app)
 export const Images = {
-  logo: "/assets/icons/logo.jpg",
-  logo1: "/assets/icons/logo1.png",
-  logo2: "/assets/icons/logo2.png",
-  logo3: "/assets/icons/logo3.jpg",
-  img: "/assets/images/img.png",
-  img1: "/assets/images/img1.png",
-  img2: "/assets/images/img2.png",
-  img3: "/assets/images/img3.png",
-  img4: "/assets/images/img4.png",
-  img5: "/assets/images/img5.png",
-  customerServiceIcon: "/assets/icons/customer-service.png",
-  cardSecureIcon: "/assets/icons/card-secure.png",
+  logo,
+  logo1,
+  logo2,
+  logo3,
+  img,
+  img1,
+  img2,
+  img3,
+  img4,
+  img5,
+  customerServiceIcon,
+  cardSecureIcon,
 };
 
 export const CategoriesJsond= [
@@ -60,7 +67,7 @@ export const CategoriesJson = [
   "Supplements",
 ];
 
-export const DisplayImages = [Images.img, Images.img1, Images.img2, Images.img3, Images.img4];
+export const DisplayImages = [img, img1, img2, img3, img4];
 
 export const Lorem = {
   short:
