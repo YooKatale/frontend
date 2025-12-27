@@ -135,12 +135,13 @@ export const POST = async (req, res) => {
 
     // Prepare email options with validated and sanitized data
     // Security: All user inputs are sanitized before being used
+    // Always use info@yookatale.app as sender email
     const mailOptions = {
       from: {
-        name: defaultSender.name || "YooKatale",
-        address: defaultSender.email || "info@yookatale.app",
+        name: "YooKatale",
+        address: "info@yookatale.app", // Explicitly set sender email
       },
-      replyTo: defaultSender.email || "info@yookatale.app",
+      replyTo: "info@yookatale.app", // Reply-to address
       to: email, // Already validated above
       subject: subject,
       html: emailHtml, // Pre-defined templates, safe from injection
