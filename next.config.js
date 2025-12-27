@@ -13,30 +13,43 @@ const nextConfig = {
         protocol: "https",
         hostname: "yookatale.s3.eu-north-1.amazonaws.com",
         port: "",
+        pathname: "/**",
       },
       {
         protocol: "http",
         hostname: "localhost",
         port: "",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "www.yookatale.app",
         port: "",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "yookatale.app",
         port: "",
+        pathname: "/**",
       },
     ],
-    // Disable image optimization to avoid 402 errors (Payment Required)
-    // This allows images to load directly without Next.js Image Optimization API
-    // Local images will be served from /public directory directly
-    unoptimized: true,
+    // Enable image optimization for better performance
+    // Next.js will optimize images automatically on Vercel
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 60,
+    // Only disable optimization for local development if needed
+    unoptimized: process.env.NODE_ENV === 'development' ? false : false,
   },
   // Ensure static assets are served correctly
   assetPrefix: process.env.NODE_ENV === "production" ? "" : "",
+  // Enable compression
+  compress: true,
+  // Performance optimizations
+  poweredByHeader: false,
+  reactStrictMode: true,
 };
 
 module.exports = nextConfig;

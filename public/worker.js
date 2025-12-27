@@ -47,17 +47,22 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("push", (event) => {
   console.log("Push notification received from server");
   
+  // Enhanced notification defaults with rich media support
   let notificationData = {
     title: "YooKatale",
     body: "You have a new notification",
     icon: "/assets/icons/logo2.png",
     badge: "/assets/icons/logo2.png",
+    image: null, // Large image for rich notifications (if provided)
     tag: "yookatale-notification",
     requireInteraction: false,
+    silent: false,
+    vibrate: [200, 100, 200, 100, 200],
     actions: [
       {
         action: "view",
         title: "View Menu",
+        icon: "/assets/icons/logo2.png",
       },
       {
         action: "dismiss",
@@ -89,22 +94,36 @@ self.addEventListener("push", (event) => {
     }
   }
 
-  // Display the notification to the user
+  // Display the notification to the user with enhanced features
   // This works even when the app is completely closed
   event.waitUntil(
     self.registration.showNotification(notificationData.title, {
       body: notificationData.body,
       icon: notificationData.icon || "/assets/icons/logo2.png",
       badge: notificationData.badge || "/assets/icons/logo2.png",
+      image: notificationData.image || null, // Large image for rich notifications (if supported)
       tag: notificationData.tag || "yookatale-notification", // Groups similar notifications
-      requireInteraction: notificationData.requireInteraction || false, // Auto-dismiss after shown
-      vibrate: [200, 100, 200], // Vibration pattern for mobile devices
-      timestamp: Date.now(), // When notification was created
+      requireInteraction: notificationData.requireInteraction !== undefined ? notificationData.requireInteraction : false,
+      silent: notificationData.silent !== undefined ? notificationData.silent : false,
+      vibrate: notificationData.vibrate || [200, 100, 200, 100, 200], // Enhanced vibration pattern
+      timestamp: notificationData.timestamp || Date.now(),
+      renotify: notificationData.renotify !== undefined ? notificationData.renotify : false,
       data: {
-        url: notificationData.url || "/subscription", // URL to open when clicked
-        mealType: notificationData.mealType || null, // Meal type for meal notifications
+        url: notificationData.url || "/schedule",
+        mealType: notificationData.mealType || null,
+        ...notificationData.data,
       },
-      actions: notificationData.actions || [], // Action buttons (View Menu, Dismiss)
+      actions: notificationData.actions || [
+        {
+          action: "view",
+          title: "View Menu",
+          icon: "/assets/icons/logo2.png",
+        },
+        {
+          action: "dismiss",
+          title: "Dismiss",
+        },
+      ],
     })
   );
 });
@@ -150,10 +169,17 @@ self.addEventListener("notificationclick", (event) => {
         for (let i = 0; i < clientList.length; i++) {
           const client = clientList[i];
           if (client.url && "focus" in client) {
-            // If it's a meal notification, navigate to the meal calendar
+            // If it's a meal notification, navigate to the schedule/meal calendar
             if (notificationData.mealType) {
               client.focus();
-              return client.navigate(url);
+              // Use navigate if available (modern browsers)
+              if (client.navigate) {
+                return client.navigate(url);
+              } else {
+                // Fallback: postMessage to navigate
+                client.postMessage({ type: "navigate", url: url });
+                return client.focus();
+              }
             }
             // Otherwise just focus the existing window
             return client.focus();
