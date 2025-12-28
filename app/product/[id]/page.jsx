@@ -26,6 +26,7 @@ import { ShoppingCart } from "lucide-react";
 import { FormatCurr } from "@utils/utils";
 import SpecialProducts from "@components/SpecialProducts";
 import SignIn from "@app/signin/page";
+import RatingAndComment from "@components/RatingAndComment";
 
 const Product = ({ params }) => {
   // get user information stored in the localstorage
@@ -158,12 +159,12 @@ const Product = ({ params }) => {
 
   //handle increase quantity
   const handleIncreaseQuantity = () => {
-    setQuantity((prev, curr) => (curr = prev + 1));
+    setQuantity((prev) => prev + 1);
   };
 
   //handle reduce quantity
   const handleDecreaseQuantity = () => {
-    if (quantity !== 1) setQuantity((prev, curr) => (curr = prev - 1));
+    if (quantity > 1) setQuantity((prev) => prev - 1);
   };
 
   // function to listen to add to cart button click
@@ -178,10 +179,7 @@ const Product = ({ params }) => {
         isClosable: false,
       });
 
-      setSignInStateModal((prev) => (prev ? false : true));
-
-      // set loading to be false
-      setLoading((prevState) => (prevState ? false : true));
+      setSignInStateModal(true);
 
       return;
     }
@@ -420,6 +418,11 @@ const Product = ({ params }) => {
                 </Box>
               </Box>
             </Flex>
+
+            {/* Ratings and Comments Section */}
+            {ProductData?._id && (
+              <RatingAndComment productId={ProductData._id} userInfo={userInfo} />
+            )}
 
             <div className="py-8">
               <div className="">

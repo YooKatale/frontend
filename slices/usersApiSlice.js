@@ -29,6 +29,26 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    productCommentsGet: builder.mutation({
+      query: (productId) => ({
+        url: `${DB_URL}/products/${productId}/comments`,
+        method: "GET",
+      }),
+    }),
+    commentCreate: builder.mutation({
+      query: (data) => ({
+        url: `${DB_URL}/products/comment`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    ratingCreate: builder.mutation({
+      query: (data) => ({
+        url: `${DB_URL}/products/rating`,
+        method: "POST",
+        body: data,
+      }),
+    }),
     subscriptionPackageGet: builder.mutation({
       query: () => ({
         url: `${DB_URL}/subscription/package/get`,
@@ -191,6 +211,9 @@ export const {
   useRegisterMutation,
   useLogoutMutation,
   useCommentsGetMutation,
+  useProductCommentsGetMutation,
+  useCommentCreateMutation,
+  useRatingCreateMutation,
   useSubscriptionPackageGetMutation,
   useSubscriptionPostMutation,
   useMessagePostMutation,

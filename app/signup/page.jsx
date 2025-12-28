@@ -58,16 +58,19 @@ const SignUp = () => {
     if (userInfo) return push("/");
     if (typeof window !== 'undefined') {
       const urlpath = new URLSearchParams(window.location.search);
-      urlpath.get('ref') !==undefined && setReferralCode(urlpath.get('ref'))
+      const refCode = urlpath.get('ref');
+      if (refCode !== null && refCode !== undefined) {
+        setReferralCode(refCode);
+      }
     }
-  }, []);
+  }, [userInfo, push]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       // set loading to be true
-      setLoading((prevState) => (prevState ? false : true));
+      setLoading(true);
 
       if (!e.target.terms.checked) {
         chakraToast({
@@ -78,7 +81,8 @@ const SignUp = () => {
           isClosable: false,
         });
 
-        return setLoading((prevState) => (prevState ? false : true));
+        setLoading(false);
+        return;
       }
       const referenceCode = referralCode !== null && referralCode !== undefined && referralCode.toString().trim() !== ""? referralCode:undefined;
 
@@ -130,7 +134,7 @@ const SignUp = () => {
       push("/");
     } catch (err) {
       // set loading to be false
-      setLoading((prevState) => (prevState ? false : true));
+      setLoading(false);
 
       chakraToast({
         title: "Error",
@@ -362,15 +366,16 @@ const SignUp = () => {
                   gridGap={"1rem"}
                 >
                   <Box padding={"0.5rem 0"}>
-                    <FormControl>
+                    <FormControl isRequired>
                       <FormLabel htmlFor="email">Email *</FormLabel>
                       <Input
-                        type="text"
-                        id={`email${Math.random(0,10000)}`}
+                        type="email"
+                        id="email"
                         placeholder="email is required"
                         name="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        required
                       />
                     </FormControl>
                   </Box>

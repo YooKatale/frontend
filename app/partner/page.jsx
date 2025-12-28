@@ -61,8 +61,8 @@ const Partner = () => {
         status: 'Unverified'
       };
      
-      const response = await registerVendor(data);
-      if (response.data.status === "Success") {
+      const response = await registerVendor(data).unwrap();
+      if (response.status === "Success") {
         chakraToast({
           title: 'Vendor form',
           description: 'Successfully Submitted vendor form',
@@ -70,17 +70,17 @@ const Partner = () => {
           duration: 5000,
           isClosable: false,
         });
-      setFormData({
-        name: '',
-        address: '',
-        phone: '',
-        email: '',
-        category: '',
-        vegan: false,
-        terms: false,
-      });
+        setFormData({
+          name: '',
+          address: '',
+          phone: '',
+          email: '',
+          category: '',
+          vegan: false,
+          terms: false,
+        });
+        setLoading(false);
       }
-      setLoading(false);
     } catch (error) {
       setLoading(false);
 
@@ -88,7 +88,7 @@ const Partner = () => {
 
       chakraToast({
         title: 'Error',
-        description: error.response?.data?.message || 'An unexpected error occurred',
+        description: error.data?.message || error.error || 'An unexpected error occurred',
         status: 'error',
         duration: 5000,
         isClosable: false,

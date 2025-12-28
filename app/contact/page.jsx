@@ -128,15 +128,15 @@ const Contact = () => {
                         </FormControl>
                       </Box>
                       <Box padding={"0.5rem 0"}>
-                        <FormControl>
+                        <FormControl isRequired>
                           <FormLabel htmlFor="email">Email</FormLabel>
                           <Input
-                            type="text"
-                          
+                            type="email"
                             placeholder="email is required"
                             name="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            required
                           />
                         </FormControl>
                       </Box>

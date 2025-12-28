@@ -48,7 +48,7 @@ const SignIn = ({ redirect, callback, ismodal }) => {
 
     try {
       // set loading to be true
-      setLoading((prevState) => (prevState ? false : true));
+      setLoading(true);
 
       const res = await login({ email, password }).unwrap();
 
@@ -56,11 +56,13 @@ const SignIn = ({ redirect, callback, ismodal }) => {
 
       chakraToast({
         title: "Logged In",
-        description: `Successfully logged in as ${res?.lastname}`,
+        description: `Successfully logged in as ${res?.lastname || res?.firstname || 'User'}`,
         status: "success",
         duration: 5000,
         isClosable: false,
       });
+
+      setLoading(false);
 
       if (callback) return callback({ loggedIn: true, user: res?._id });
 
@@ -69,7 +71,7 @@ const SignIn = ({ redirect, callback, ismodal }) => {
       push("/");
     } catch (err) {
       // set loading to be false
-      setLoading((prevState) => (prevState ? false : true));
+      setLoading(false);
 
       chakraToast({
         title: "Error has occured",
@@ -114,26 +116,28 @@ const SignIn = ({ redirect, callback, ismodal }) => {
               }}
             >
               <form onSubmit={submitHandler}>
-                <FormControl mt={-6}>
+                <FormControl mt={-6} isRequired>
                   <FormLabel htmlFor="email">Email</FormLabel>
                   <Input
                     type="email"
-                    id={`email${Math.random(0,10000)}`}
+                    id="email"
                     placeholder="Email is required"
                     value={email}
                     name="email"
                     onChange={(e) => setEmail(e.target.value)}
+                    required
                   />
                 </FormControl>
-                <FormControl mt={4}>
+                <FormControl mt={4} isRequired>
                   <FormLabel htmlFor="password">Password</FormLabel>
                   <Input
                     type="password"
                     placeholder="password is required"
                     name="password"
                     value={password}
-                    id={`password${Math.random(0,10000)}`}
+                    id="password"
                     onChange={(e) => setPassword(e.target.value)}
+                    required
                   />
                 </FormControl>
                 <Box padding="1rem 0">
