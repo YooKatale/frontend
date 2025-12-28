@@ -31,23 +31,34 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification?.title || payload.data?.title || "YooKatale";
   const notificationBody = payload.notification?.body || payload.data?.body || "You have a new notification";
   
+  // Use absolute URLs for icons (required for background notifications)
+  const iconUrl = payload.notification?.icon || payload.data?.icon || "https://www.yookatale.app/assets/icons/logo2.png";
+  const badgeUrl = "https://www.yookatale.app/assets/icons/logo2.png";
+  
   const notificationOptions = {
     body: notificationBody,
-    icon: payload.notification?.icon || payload.data?.icon || "/assets/icons/logo2.png",
-    badge: "/assets/icons/logo2.png",
+    icon: iconUrl,
+    badge: badgeUrl,
+    image: payload.notification?.image || payload.data?.image || undefined, // Large image for rich notifications
     tag: payload.data?.mealType || payload.notification?.tag || "yookatale-notification",
-    requireInteraction: false,
+    requireInteraction: false, // Don't require user interaction (auto-dismiss)
     vibrate: [200, 100, 200],
     timestamp: Date.now(),
+    silent: false, // Make sure notifications make sound
     data: {
-      url: payload.data?.url || "/schedule",
+      url: payload.data?.url || payload.fcmOptions?.link || "https://www.yookatale.app/schedule",
       mealType: payload.data?.mealType,
-      click_action: payload.data?.url || payload.fcmOptions?.link || "/schedule",
+      click_action: payload.data?.url || payload.fcmOptions?.link || "https://www.yookatale.app/schedule",
     },
     actions: [
       {
         action: 'open',
         title: 'Open App',
+        icon: iconUrl,
+      },
+      {
+        action: 'close',
+        title: 'Close',
       },
     ],
   };
@@ -80,7 +91,7 @@ self.addEventListener("notificationclick", (event) => {
         }
         // Otherwise, open a new window
         if (clients.openWindow) {
-          const url = event.notification.data?.url || "/";
+          const url = event.notification.data?.url || event.notification.data?.click_action || "https://www.yookatale.app/";
           return clients.openWindow(url);
         }
       })
