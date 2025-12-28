@@ -24,10 +24,11 @@ export async function POST(request) {
     let notificationBody = "Don't forget to order your meal!";
 
     // TEST MODE: Always send test notifications every minute for testing
-    if (testMode || !mealType) {
+    if (testMode === true || !mealType) {
       const now = new Date();
+      const timeString = now.toLocaleTimeString();
       notificationTitle = "🔔 YooKatale Test Notification";
-      notificationBody = `Test notification - ${now.toLocaleTimeString()} - Sent every minute for testing`;
+      notificationBody = `Test notification at ${timeString} - Testing notifications every minute`;
     } else if (mealType === "breakfast") {
       notificationTitle = "🍳 Breakfast Time!";
       notificationBody = "Start your day right with a healthy breakfast from YooKatale!";
