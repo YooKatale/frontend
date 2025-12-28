@@ -22,25 +22,41 @@ firebase.initializeApp(firebaseConfig);
 // Retrieve an instance of Firebase Messaging
 const messaging = firebase.messaging();
 
-// Handle background messages
+// Handle background messages (when app is closed)
 messaging.onBackgroundMessage((payload) => {
-  console.log("Background message received:", payload);
+  console.log("[SW] Background message received:", payload);
 
-  const notificationTitle = payload.notification?.title || "YooKatale";
+  // Extract notification data from payload
+  // FCM sends notifications in payload.notification (for display) and payload.data (for app logic)
+  const notificationTitle = payload.notification?.title || payload.data?.title || "YooKatale";
+  const notificationBody = payload.notification?.body || payload.data?.body || "You have a new notification";
+  
   const notificationOptions = {
-    body: payload.notification?.body || "You have a new notification",
-    icon: payload.notification?.icon || "/assets/icons/logo2.png",
+    body: notificationBody,
+    icon: payload.notification?.icon || payload.data?.icon || "/assets/icons/logo2.png",
     badge: "/assets/icons/logo2.png",
-    tag: payload.data?.mealType || "yookatale-notification",
+    tag: payload.data?.mealType || payload.notification?.tag || "yookatale-notification",
     requireInteraction: false,
     vibrate: [200, 100, 200],
+    timestamp: Date.now(),
     data: {
-      url: payload.data?.url || "/subscription",
+      url: payload.data?.url || "/schedule",
       mealType: payload.data?.mealType,
+      click_action: payload.data?.url || payload.fcmOptions?.link || "/schedule",
     },
+    actions: [
+      {
+        action: 'open',
+        title: 'Open App',
+      },
+    ],
   };
 
-  return self.registration.showNotification(notificationTitle, notificationOptions);
+  console.log("[SW] Showing notification:", notificationTitle, notificationOptions);
+  
+  return self.registration.showNotification(notificationTitle, notificationOptions).catch((error) => {
+    console.error("[SW] Error showing notification:", error);
+  });
 });
 
 // Handle notification clicks
