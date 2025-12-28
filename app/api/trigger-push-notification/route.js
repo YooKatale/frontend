@@ -23,8 +23,8 @@ export async function POST(request) {
     let notificationTitle = "YooKatale";
     let notificationBody = "Don't forget to order your meal!";
 
-    if (testMode) {
-      // TEST MODE: Send test notification every minute
+    // TEST MODE: Always send test notifications every minute for testing
+    if (testMode || !mealType) {
       const now = new Date();
       notificationTitle = "🔔 YooKatale Test Notification";
       notificationBody = `Test notification - ${now.toLocaleTimeString()} - Sent every minute for testing`;
