@@ -197,33 +197,58 @@ const RatingAndComment = ({ productId, userInfo }) => {
   };
 
   return (
-    <Box padding={{ base: "2rem 1rem", md: "2rem", xl: "2rem 2rem" }} marginTop="2rem">
-      <Heading as="h2" size="lg" marginBottom="1.5rem" color={ThemeColors.darkColor}>
+    <Box 
+      padding={{ base: "1.5rem 0.75rem", sm: "2rem 1rem", md: "2rem", xl: "2rem 2rem" }} 
+      marginTop={{ base: "1.5rem", md: "2rem" }}
+      width="100%"
+    >
+      <Heading 
+        as="h2" 
+        size={{ base: "md", sm: "lg" }} 
+        marginBottom={{ base: "1rem", md: "1.5rem" }} 
+        color={ThemeColors.darkColor}
+        fontSize={{ base: "xl", sm: "2xl", md: "3xl" }}
+      >
         Ratings & Reviews
       </Heading>
 
       {/* Average Rating Display */}
       {totalRatings > 0 && (
         <Box
-          padding="1.5rem"
-          borderRadius="lg"
+          padding={{ base: "1rem", sm: "1.25rem", md: "1.5rem" }}
+          borderRadius={{ base: "md", md: "lg" }}
           bg="gray.50"
-          marginBottom="2rem"
+          marginBottom={{ base: "1.5rem", md: "2rem" }}
           border="1px solid"
           borderColor="gray.200"
+          width="100%"
         >
-          <Flex alignItems="center" gap={4} flexWrap="wrap">
+          <Flex 
+            alignItems="center" 
+            gap={{ base: 2, sm: 3, md: 4 }} 
+            flexWrap="wrap"
+            direction={{ base: "column", sm: "row" }}
+            textAlign={{ base: "center", sm: "left" }}
+          >
             <Box>
-              <Text fontSize="3xl" fontWeight="bold" color={ThemeColors.darkColor}>
+              <Text 
+                fontSize={{ base: "2xl", sm: "3xl", md: "3xl" }} 
+                fontWeight="bold" 
+                color={ThemeColors.darkColor}
+              >
                 {averageRating.toFixed(1)}
               </Text>
-              <Text fontSize="sm" color="gray.600">
+              <Text fontSize={{ base: "xs", sm: "sm" }} color="gray.600">
                 out of 5
               </Text>
             </Box>
             <Box>
               {renderStars(Math.round(averageRating))}
-              <Text fontSize="sm" color="gray.600" marginTop="0.5rem">
+              <Text 
+                fontSize={{ base: "xs", sm: "sm" }} 
+                color="gray.600" 
+                marginTop={{ base: "0.25rem", md: "0.5rem" }}
+              >
                 Based on {totalRatings} {totalRatings === 1 ? "rating" : "ratings"}
               </Text>
             </Box>
@@ -234,14 +259,21 @@ const RatingAndComment = ({ productId, userInfo }) => {
       {/* Comment Form */}
       {userInfo ? (
         <Box
-          padding="1.5rem"
-          borderRadius="lg"
+          padding={{ base: "1rem", sm: "1.25rem", md: "1.5rem" }}
+          borderRadius={{ base: "md", md: "lg" }}
           border="1px solid"
           borderColor="gray.200"
-          marginBottom="2rem"
+          marginBottom={{ base: "1.5rem", md: "2rem" }}
           bg="white"
+          width="100%"
         >
-          <Heading as="h3" size="md" marginBottom="1rem" color={ThemeColors.darkColor}>
+          <Heading 
+            as="h3" 
+            size={{ base: "sm", md: "md" }} 
+            marginBottom={{ base: "0.75rem", md: "1rem" }} 
+            color={ThemeColors.darkColor}
+            fontSize={{ base: "lg", sm: "xl", md: "2xl" }}
+          >
             Write a Review
           </Heading>
           <form onSubmit={handleSubmit}>
@@ -250,7 +282,11 @@ const RatingAndComment = ({ productId, userInfo }) => {
               <Box onMouseLeave={() => setHoveredRating(0)}>
                 {renderStars(rating, true)}
               </Box>
-              <Text fontSize="sm" color="gray.600" marginTop="0.5rem">
+              <Text 
+                fontSize={{ base: "xs", sm: "sm" }} 
+                color="gray.600" 
+                marginTop={{ base: "0.25rem", md: "0.5rem" }}
+              >
                 {rating > 0 ? `You rated this product ${rating} ${rating === 1 ? "star" : "stars"}` : "Click to rate"}
               </Text>
             </FormControl>
@@ -261,9 +297,10 @@ const RatingAndComment = ({ productId, userInfo }) => {
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Share your thoughts about this product..."
-                rows={4}
+                rows={{ base: 3, md: 4 }}
                 resize="vertical"
                 required
+                fontSize={{ base: "sm", md: "md" }}
               />
             </FormControl>
 
@@ -329,37 +366,64 @@ const RatingAndComment = ({ productId, userInfo }) => {
             {comments.map((item, index) => (
               <Box
                 key={item._id || index}
-                padding="1.5rem"
-                borderRadius="lg"
+                padding={{ base: "1rem", sm: "1.25rem", md: "1.5rem" }}
+                borderRadius={{ base: "md", md: "lg" }}
                 border="1px solid"
                 borderColor="gray.200"
-                marginBottom="1rem"
+                marginBottom={{ base: "0.75rem", md: "1rem" }}
                 bg="white"
+                width="100%"
               >
-                <Flex alignItems="flex-start" gap={4}>
+                <Flex 
+                  alignItems="flex-start" 
+                  gap={{ base: 2, sm: 3, md: 4 }}
+                  direction={{ base: "column", sm: "row" }}
+                >
                   <Avatar
                     name={item.userName || item.user?.firstname || "User"}
-                    size="md"
+                    size={{ base: "sm", md: "md" }}
                     bg={ThemeColors.primaryColor}
                   />
-                  <Box flex={1}>
-                    <Flex alignItems="center" gap={2} marginBottom="0.5rem" flexWrap="wrap">
-                      <Text fontWeight="bold" fontSize="md">
+                  <Box flex={1} width="100%">
+                    <Flex 
+                      alignItems={{ base: "flex-start", sm: "center" }} 
+                      gap={2} 
+                      marginBottom={{ base: "0.25rem", md: "0.5rem" }} 
+                      flexWrap="wrap"
+                      direction={{ base: "column", sm: "row" }}
+                    >
+                      <Text 
+                        fontWeight="bold" 
+                        fontSize={{ base: "sm", sm: "md" }}
+                        lineHeight={{ base: "1.3", md: "1.4" }}
+                      >
                         {item.userName || item.user?.firstname || item.user?.email?.split("@")[0] || "Anonymous"}
                       </Text>
                       {item.rating && (
                         <Flex alignItems="center" gap={1}>
                           {renderStars(item.rating)}
-                          <Text fontSize="sm" color="gray.600" marginLeft="0.5rem">
+                          <Text 
+                            fontSize={{ base: "xs", sm: "sm" }} 
+                            color="gray.600" 
+                            marginLeft="0.5rem"
+                          >
                             {item.rating}/5
                           </Text>
                         </Flex>
                       )}
                     </Flex>
-                    <Text fontSize="xs" color="gray.600" marginBottom="0.75rem">
+                    <Text 
+                      fontSize={{ base: "2xs", sm: "xs" }} 
+                      color="gray.600" 
+                      marginBottom={{ base: "0.5rem", md: "0.75rem" }}
+                    >
                       {formatDate(item.createdAt || item.date)}
                     </Text>
-                    <Text fontSize="md" lineHeight="1.6" color="gray.700">
+                    <Text 
+                      fontSize={{ base: "sm", sm: "md" }} 
+                      lineHeight={{ base: "1.5", md: "1.6" }} 
+                      color="gray.700"
+                    >
                       {item.comment || item.text}
                     </Text>
                   </Box>

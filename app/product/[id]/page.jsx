@@ -197,34 +197,49 @@ const Product = ({ params }) => {
 
   return (
     <>
-      <Box>
-        <Box padding={"0 2rem"}>
-          <Box paddingBottom={"1rem"}>
-            <Heading as={"h2"} size={"sm"} display={"flex"}>
+      <Box width="100%" minHeight="100vh" bg="white">
+        <Box 
+          padding={{ base: "0 1rem", sm: "0 1.5rem", md: "0 2rem" }}
+          width="100%"
+          maxWidth="1400px"
+          margin="0 auto"
+        >
+          <Box paddingBottom={{ base: "0.75rem", md: "1rem" }}>
+            <Heading 
+              as={"h2"} 
+              size={{ base: "xs", sm: "sm" }} 
+              display={"flex"}
+              flexWrap="wrap"
+              gap="0.25rem"
+              fontSize={{ base: "xs", sm: "sm" }}
+            >
               Home/product/
-              <Heading as={"h2"} size={"sm"} color={ThemeColors.darkColor}>
+              <Heading as={"h2"} size={{ base: "xs", sm: "sm" }} color={ThemeColors.darkColor}>
                 {ProductData?.category ? ProductData?.category : "category"}
               </Heading>
             </Heading>
           </Box>
 
-          <Box padding={{ base: "1rem 0", md: "1rem 0", xl: "1rem 2rem" }}>
+          <Box padding={{ base: "0.75rem 0", sm: "1rem 0", md: "1rem 0", xl: "1rem 2rem" }}>
             <Flex
               borderTop={"1.7px solid " + ThemeColors.lightColor}
-              direction={{ base: "column", md: "column", xl: "row" }}
+              direction={{ base: "column", lg: "row" }}
+              gap={{ base: "1rem", lg: "2rem" }}
+              paddingTop={{ base: "1rem", md: "1.5rem" }}
             >
-              <Box width={{ base: "100%", md: "90%", xl: "45%" }}>
-                <Box id="main-product-image" position={"relative"}>
+              <Box width={{ base: "100%", lg: "45%" }} flexShrink={0}>
+                <Box id="main-product-image" position={"relative"} width="100%">
                   <Box
                     position="relative"
                     width="100%"
-                    height={{ base: "300px", md: "400px", lg: "500px" }}
-                    borderRadius="xl"
+                    height={{ base: "250px", sm: "300px", md: "400px", lg: "500px" }}
+                    borderRadius={{ base: "lg", md: "xl" }}
                     overflow="hidden"
                     bg="gray.50"
-                    boxShadow="md"
+                    boxShadow={{ base: "sm", md: "md" }}
                     border="1px solid"
                     borderColor="gray.200"
+                    marginBottom={{ base: "0.75rem", md: "1rem" }}
                   >
                     {ProductData?.images && ProductData?.images[0] ? (
                       <Image
@@ -251,22 +266,23 @@ const Product = ({ params }) => {
                       </Flex>
                     )}
                   </Box>
-                  <Box padding={"1rem 0"}>
+                  <Box padding={{ base: "0.5rem 0", md: "1rem 0" }}>
                     <Grid
                       gridTemplateColumns={{
                         base: "repeat(3, 1fr)",
+                        sm: "repeat(4, 1fr)",
                         md: "repeat(4, 1fr)",
                         lg: "repeat(5, 1fr)",
                       }}
-                      gap={3}
+                      gap={{ base: 2, md: 3 }}
                     >
                       {ProductData?.images && ProductData?.images.length > 0
                         ? ProductData.images.map((image, index) => (
                             <Box
                               key={index}
                               position="relative"
-                              height={{ base: "80px", md: "100px" }}
-                              borderRadius="lg"
+                              height={{ base: "60px", sm: "70px", md: "80px", lg: "100px" }}
+                              borderRadius={{ base: "md", md: "lg" }}
                               overflow="hidden"
                               bg="gray.50"
                               border="2px solid"
@@ -438,23 +454,38 @@ const Product = ({ params }) => {
             </div>
 
             {/* // signin / signup form */}
-            <div
-              className={`fixed top-[10%] lg:left-[30%] left-[5%] lg:right-[30%] right-[5%] bottom-[10%] z-[990] bg-light py-6 rounded-md shadow-md ${
-                SignInStateModal
-                  ? "visible translate-y-0"
-                  : "invisible translate-y-[150%]"
-              }`}
+            <Box
+              position="fixed"
+              top={{ base: "5%", md: "10%" }}
+              left={{ base: "5%", md: "10%", lg: "30%" }}
+              right={{ base: "5%", md: "10%", lg: "30%" }}
+              bottom={{ base: "5%", md: "10%" }}
+              zIndex={990}
+              bg="white"
+              padding={{ base: "1rem", md: "1.5rem" }}
+              borderRadius={{ base: "md", md: "lg" }}
+              boxShadow="2xl"
+              transform={SignInStateModal ? "translateY(0)" : "translateY(150%)"}
+              visibility={SignInStateModal ? "visible" : "hidden"}
+              transition="all 0.3s ease"
+              maxHeight={{ base: "90vh", md: "80vh" }}
+              overflowY="auto"
             >
-              <div
-                className="absolute top-4 right-4"
+              <Box
+                position="absolute"
+                top={{ base: "0.5rem", md: "1rem" }}
+                right={{ base: "0.5rem", md: "1rem" }}
                 onClick={() =>
                   setSignInStateModal((prev) => (prev ? false : true))
                 }
+                cursor="pointer"
+                padding="0.5rem"
+                _hover={{ bg: "gray.100", borderRadius: "md" }}
               >
-                <AiOutlineClose size={30} style={{ cursor: "pointer" }} />
-              </div>
+                <AiOutlineClose size={{ base: 24, md: 30 }} />
+              </Box>
               <SignIn redirect={null} callback={handleListeningToSignIn} />
-            </div>
+            </Box>
           </Box>
         </Box>
       </Box>

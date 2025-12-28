@@ -11,6 +11,8 @@ import { CacheProvider } from "@chakra-ui/next-js";
 import { ChakraProvider } from "@chakra-ui/react";
 import { Suspense } from "react";
 import AdvertCard from "@components/advert";
+import AppStoreRatingPrompt from "@components/AppStoreRatingPrompt";
+import PlatformFeedbackModal from "@components/PlatformFeedbackModal";
 
 const WorkSans = Work_Sans({ subsets: ["latin"] });
 
@@ -49,6 +51,8 @@ const RootLayout = ({ children }) => {
             </Suspense>
             <CookiePolicy />
             <AdvertCard />
+            <AppStoreRatingPrompt />
+            <PlatformFeedbackModal />
           </Providers>
           {/* <ScriptTag /> */} 
       </body>

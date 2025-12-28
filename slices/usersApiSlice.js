@@ -49,6 +49,20 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    appRatingCreate: builder.mutation({
+      query: (data) => ({
+        url: `${DB_URL}/ratings/app`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    platformFeedbackCreate: builder.mutation({
+      query: (data) => ({
+        url: `${DB_URL}/ratings/platform`,
+        method: "POST",
+        body: data,
+      }),
+    }),
     subscriptionPackageGet: builder.mutation({
       query: () => ({
         url: `${DB_URL}/subscription/package/get`,
@@ -214,6 +228,8 @@ export const {
   useProductCommentsGetMutation,
   useCommentCreateMutation,
   useRatingCreateMutation,
+  useAppRatingCreateMutation,
+  usePlatformFeedbackCreateMutation,
   useSubscriptionPackageGetMutation,
   useSubscriptionPostMutation,
   useMessagePostMutation,

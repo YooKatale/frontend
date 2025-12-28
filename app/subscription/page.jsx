@@ -107,44 +107,52 @@ const Subscription = () => {
 
   return (
     <>
-      <Box>
-        <Box padding={{ base: "2rem 0 3rem 0", md: "3rem 0 5rem 0" }}>
-          <Box>
+      <Box minHeight="100vh" bg="white">
+        <Box 
+          padding={{ base: "1.5rem 0 2rem 0", sm: "2rem 0 3rem 0", md: "3rem 0 4rem 0", lg: "3rem 0 5rem 0" }}
+          width="100%"
+        >
+          <Box width="100%">
             <Box
               margin={"auto"}
-              width={{ base: "95%", md: "90%", lg: "85%", xl: "80%", "2xl": "75%" }}
+              width={{ base: "100%", sm: "95%", md: "90%", lg: "85%", xl: "80%", "2xl": "75%" }}
               maxWidth={"1400px"}
+              paddingX={{ base: "1rem", sm: "1.5rem", md: "2rem" }}
             >
               {/* Header Section */}
               <Box
                 padding={{
-                  base: "1rem 0",
-                  md: "1rem 0",
+                  base: "0.5rem 0 1rem 0",
+                  sm: "1rem 0",
+                  md: "1.5rem 0",
                   lg: "2rem 0",
                 }}
                 textAlign={"center"}
               >
                 <Text
                   textAlign={"center"}
-                  fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
+                  fontSize={{ base: "lg", sm: "xl", md: "2xl", lg: "3xl" }}
                   className="secondary-light-font"
-                  marginBottom={"1rem"}
+                  marginBottom={{ base: "0.75rem", md: "1rem" }}
+                  lineHeight={{ base: "1.4", md: "1.5" }}
                 >
                   Subscribe to our payment plan
                 </Text>
 
                 <Text
                   textAlign={"center"}
-                  fontSize={{ base: "xl", md: "2xl", lg: "3xl", xl: "4xl" }}
+                  fontSize={{ base: "lg", sm: "xl", md: "2xl", lg: "3xl", xl: "4xl" }}
                   fontWeight={"semibold"}
-                  marginBottom={{ base: "2rem", md: "2.5rem", lg: "3rem" }}
+                  marginBottom={{ base: "1.5rem", sm: "2rem", md: "2.5rem", lg: "3rem" }}
+                  lineHeight={{ base: "1.3", md: "1.4" }}
+                  paddingX={{ base: "0.5rem", md: "0" }}
                 >
                   Get{" "}
                   <Text
                     as={"span"}
                     fontWeight={"bold"}
                     color={ThemeColors.darkColor}
-                    fontSize={{ base: "xl", md: "2xl", lg: "3xl", xl: "4xl" }}
+                    fontSize={{ base: "lg", sm: "xl", md: "2xl", lg: "3xl", xl: "4xl" }}
                   >
                     25%
                   </Text>{" "}
@@ -186,12 +194,14 @@ const Subscription = () => {
               <Grid
                 gridTemplateColumns={{
                   base: "1fr",
+                  sm: "1fr",
                   md: "repeat(2, 1fr)",
                   lg: "repeat(3, 1fr)",
                 }}
-                gap={{ base: "1.5rem", md: "2rem", lg: "2.5rem" }}
-                marginBottom={{ base: "2rem", md: "3rem" }}
+                gap={{ base: "1.25rem", sm: "1.5rem", md: "2rem", lg: "2.5rem" }}
+                marginBottom={{ base: "1.5rem", sm: "2rem", md: "3rem" }}
                 alignItems={"stretch"}
+                width="100%"
               >
                 {subscriptionPackages.length > 0 &&
                   subscriptionPackages.map((card, index) => (
@@ -208,71 +218,94 @@ const Subscription = () => {
 
         {/* Unified Meal Subscription & Calendar Section - Organized by Plan Type */}
         {subscriptionPackages.length > 0 && (
-          <Box padding={{ base: "3rem 0", md: "4rem 0", lg: "5rem 0" }} background="gray.50">
+          <Box 
+            padding={{ base: "2rem 0", sm: "2.5rem 0", md: "3rem 0", lg: "4rem 0", xl: "5rem 0" }} 
+            background="gray.50"
+            width="100%"
+          >
             <Box
               margin={"auto"}
-              width={{ base: "95%", md: "90%", lg: "85%", xl: "80%", "2xl": "75%" }}
+              width={{ base: "100%", sm: "95%", md: "90%", lg: "85%", xl: "80%", "2xl": "75%" }}
               maxWidth={"1400px"}
+              paddingX={{ base: "1rem", sm: "1.5rem", md: "2rem" }}
             >
               {/* Section Header */}
-              <Box marginBottom={{ base: "2rem", md: "3rem" }} textAlign="center">
-                <Flex alignItems="center" justifyContent="center" gap="0.5rem" marginBottom="0.5rem">
-                  <Calendar size={24} color={ThemeColors.darkColor} />
+              <Box marginBottom={{ base: "1.5rem", sm: "2rem", md: "3rem" }} textAlign="center">
+                <Flex 
+                  alignItems="center" 
+                  justifyContent="center" 
+                  gap={{ base: "0.25rem", md: "0.5rem" }} 
+                  marginBottom={{ base: "0.25rem", md: "0.5rem" }}
+                  flexWrap="wrap"
+                >
+                  <Calendar size={{ base: 16, md: 18 }} color={ThemeColors.darkColor} />
                   <Heading
                     as="h2"
-                    fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
+                    fontSize={{ base: "lg", sm: "xl", md: "2xl", lg: "3xl" }}
                     fontWeight="bold"
                     color={ThemeColors.darkColor}
+                    lineHeight={{ base: "1.3", md: "1.4" }}
                   >
                     Meal Subscription & Weekly Calendar
                   </Heading>
                 </Flex>
-                <Text fontSize={{ base: "sm", md: "md" }} color="gray.600">
+                <Text 
+                  fontSize={{ base: "xs", sm: "sm", md: "md" }} 
+                  color="gray.600"
+                  paddingX={{ base: "0.5rem", md: "0" }}
+                  lineHeight={{ base: "1.5", md: "1.6" }}
+                >
                   Choose your meals, view pricing, and see the weekly meal calendar for each plan
                 </Text>
               </Box>
 
 
-              <Stack spacing={{ base: "3rem", md: "4rem", lg: "5rem" }}>
+              <Stack spacing={{ base: "2rem", sm: "2.5rem", md: "3rem", lg: "4rem", xl: "5rem" }}>
                 {subscriptionPackages.map((card, index) => {
                   const planType = card.type;
                   
                   return (
-                    <Box key={index}>
+                    <Box key={index} width="100%">
                       {/* Unified Meal Subscription & Calendar Card */}
                       <UnifiedMealSubscriptionCard planType={planType} />
 
                       {/* Food Algae Box Section */}
                       {userInfo && (
                         <Box
-                          marginTop={{ base: "2rem", md: "2.5rem" }}
-                          padding={{ base: "1.5rem", md: "2rem" }}
+                          marginTop={{ base: "1.5rem", sm: "2rem", md: "2.5rem" }}
+                          padding={{ base: "1rem", sm: "1.25rem", md: "1.5rem", lg: "2rem" }}
                           background="blue.50"
-                          borderRadius="lg"
+                          borderRadius={{ base: "md", md: "lg" }}
                           border="1px solid"
                           borderColor="blue.200"
+                          width="100%"
                         >
                           <Flex
                             justifyContent="space-between"
-                            alignItems="center"
+                            alignItems={{ base: "flex-start", md: "center" }}
                             flexDirection={{ base: "column", md: "row" }}
-                            gap={{ base: "1rem", md: "2rem" }}
+                            gap={{ base: "1rem", sm: "1.25rem", md: "2rem" }}
                           >
-                            <Box flex="1">
+                            <Box flex="1" width={{ base: "100%", md: "auto" }}>
                               <Heading
                                 as="h3"
-                                fontSize={{ base: "lg", md: "xl" }}
+                                fontSize={{ base: "md", sm: "lg", md: "xl" }}
                                 fontWeight="bold"
                                 color={ThemeColors.darkColor}
-                                marginBottom="0.5rem"
+                                marginBottom={{ base: "0.25rem", md: "0.5rem" }}
+                                lineHeight={{ base: "1.3", md: "1.4" }}
                               >
                                 Add Food Algae Box
                               </Heading>
-                              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
+                              <Text 
+                                fontSize={{ base: "xs", sm: "sm", md: "sm" }} 
+                                color="gray.600"
+                                lineHeight={{ base: "1.5", md: "1.6" }}
+                              >
                                 Enhance your meal plan with nutritious food algae supplements
                               </Text>
                             </Box>
-                            <Box>
+                            <Box width={{ base: "100%", md: "auto" }}>
                               <FoodAlgaeBoxModal
                                 userId={userInfo._id}
                                 planType={planType}
