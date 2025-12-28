@@ -25,6 +25,8 @@ const messaging = firebase.messaging();
 // Handle background messages (when app is closed)
 messaging.onBackgroundMessage((payload) => {
   console.log("[SW] Background message received:", payload);
+  console.log("[SW] Payload notification:", payload.notification);
+  console.log("[SW] Payload data:", payload.data);
 
   // Extract notification data from payload
   // FCM sends notifications in payload.notification (for display) and payload.data (for app logic)
@@ -32,28 +34,38 @@ messaging.onBackgroundMessage((payload) => {
   const notificationBody = payload.notification?.body || payload.data?.body || "You have a new notification";
   
   // Use absolute URLs for icons (required for background notifications)
-  const iconUrl = payload.notification?.icon || payload.data?.icon || "https://www.yookatale.app/assets/icons/logo2.png";
+  const iconUrl = "https://www.yookatale.app/assets/icons/logo2.png";
   const badgeUrl = "https://www.yookatale.app/assets/icons/logo2.png";
+  
+  // Get URL from various possible locations in payload
+  const notificationUrl = payload.data?.url || 
+                         payload.data?.click_action || 
+                         payload.fcmOptions?.link || 
+                         payload.webpush?.fcmOptions?.link ||
+                         "https://www.yookatale.app/schedule";
   
   const notificationOptions = {
     body: notificationBody,
     icon: iconUrl,
     badge: badgeUrl,
-    image: payload.notification?.image || payload.data?.image || undefined, // Large image for rich notifications
-    tag: payload.data?.mealType || payload.notification?.tag || "yookatale-notification",
-    requireInteraction: false, // Don't require user interaction (auto-dismiss)
+    image: payload.notification?.image || payload.data?.image || undefined,
+    tag: payload.data?.mealType || payload.data?.tag || "yookatale-notification",
+    requireInteraction: false,
     vibrate: [200, 100, 200],
     timestamp: Date.now(),
-    silent: false, // Make sure notifications make sound
+    silent: false,
+    renotify: true,
     data: {
-      url: payload.data?.url || payload.fcmOptions?.link || "https://www.yookatale.app/schedule",
-      mealType: payload.data?.mealType,
-      click_action: payload.data?.url || payload.fcmOptions?.link || "https://www.yookatale.app/schedule",
+      url: notificationUrl,
+      mealType: payload.data?.mealType || '',
+      click_action: notificationUrl,
+      title: notificationTitle,
+      body: notificationBody,
     },
     actions: [
       {
         action: 'open',
-        title: 'Open App',
+        title: 'View Schedule',
         icon: iconUrl,
       },
       {
@@ -63,11 +75,23 @@ messaging.onBackgroundMessage((payload) => {
     ],
   };
 
-  console.log("[SW] Showing notification:", notificationTitle, notificationOptions);
+  console.log("[SW] Showing notification:", notificationTitle);
+  console.log("[SW] Notification options:", notificationOptions);
   
-  return self.registration.showNotification(notificationTitle, notificationOptions).catch((error) => {
-    console.error("[SW] Error showing notification:", error);
-  });
+  // Show notification - this is critical for popups
+  return self.registration.showNotification(notificationTitle, notificationOptions)
+    .then(() => {
+      console.log("[SW] ✅ Notification displayed successfully");
+    })
+    .catch((error) => {
+      console.error("[SW] ❌ Error showing notification:", error);
+      // Try again with minimal options if full options fail
+      return self.registration.showNotification(notificationTitle, {
+        body: notificationBody,
+        icon: iconUrl,
+        data: { url: notificationUrl }
+      });
+    });
 });
 
 // Handle notification clicks
