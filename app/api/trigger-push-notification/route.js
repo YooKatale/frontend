@@ -28,7 +28,7 @@ export async function POST(request) {
       const now = new Date();
       const timeString = now.toLocaleTimeString();
       notificationTitle = "🔔 YooKatale Test Notification";
-      notificationBody = `Test notification at ${timeString} - Testing notifications every minute`;
+      notificationBody = `⏰ ${timeString} - Testing notifications every minute - Please check your browser notifications!`;
     } else if (mealType === "breakfast") {
       notificationTitle = "🍳 Breakfast Time!";
       notificationBody = "Start your day right with a healthy breakfast from YooKatale!";
