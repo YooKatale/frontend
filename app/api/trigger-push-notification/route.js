@@ -45,7 +45,7 @@ export async function POST(request) {
     try {
       // Get backend base URL (without /api suffix)
       // Using the same backend URL as fcmService.js
-      const backendBaseUrl = "https://yookatale-server-app.onrender.com";
+      const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://yookatale-server.onrender.com";
       
       // Try to call backend endpoint to send push notifications
       // The backend should implement an endpoint that:
