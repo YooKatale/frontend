@@ -18,14 +18,17 @@ export async function POST(request) {
 
     console.log("📤 Triggering FCM push notification...", { mealType, userId, testMode });
 
-    // Determine notification message based on meal type
-    const now = new Date();
-    const currentHour = now.getHours();
-    
+    // Determine notification message
+    // TEST MODE: Always send test notifications every minute regardless of meal type
     let notificationTitle = "YooKatale";
     let notificationBody = "Don't forget to order your meal!";
 
-    if (mealType === "breakfast") {
+    if (testMode) {
+      // TEST MODE: Send test notification every minute
+      const now = new Date();
+      notificationTitle = "🔔 YooKatale Test Notification";
+      notificationBody = `Test notification - ${now.toLocaleTimeString()} - Sent every minute for testing`;
+    } else if (mealType === "breakfast") {
       notificationTitle = "🍳 Breakfast Time!";
       notificationBody = "Start your day right with a healthy breakfast from YooKatale!";
     } else if (mealType === "lunch") {
@@ -34,9 +37,6 @@ export async function POST(request) {
     } else if (mealType === "supper") {
       notificationTitle = "🌙 Supper Time!";
       notificationBody = "End your day with a delicious supper from YooKatale!";
-    } else if (testMode) {
-      notificationTitle = "🔔 YooKatale Notification";
-      notificationBody = `Test notification - ${new Date().toLocaleTimeString()}`;
     }
 
     // Call backend to send FCM push notifications
