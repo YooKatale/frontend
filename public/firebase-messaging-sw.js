@@ -4,15 +4,16 @@
 importScripts("https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging-compat.js");
 
-// Firebase configuration
+// Firebase configuration - Must match yookatale-aa476 project for VAPID key to work
 const firebaseConfig = {
-  apiKey: "AIzaSyD0-6naVPXSMcsW9s_X0dCXJu5C_5g90Dk",
-  authDomain: "yookatale-e3eed.firebaseapp.com",
-  projectId: "yookatale-e3eed",
-  storageBucket: "yookatale-e3eed.appspot.com",
-  messagingSenderId: "910776417074",
-  appId: "1:910776417074:web:de9e4d3e15d4b3145a352b",
-  measurementId: "G-YGT5LE4NPV"
+  apiKey: "AIzaSyC-7kaqMQSnWTywa0oz3IfMWPP7yS6GrJA",
+  authDomain: "yookatale-aa476.firebaseapp.com",
+  databaseURL: "https://yookatale-aa476-default-rtdb.firebaseio.com",
+  projectId: "yookatale-aa476",
+  storageBucket: "yookatale-aa476.appspot.com",
+  messagingSenderId: "1091927934214",
+  appId: "1:1091927934214:web:1a02f21b6eb03f96f0ca87",
+  measurementId: "G-2YYF0QCSRV"
 };
 
 // Initialize Firebase
