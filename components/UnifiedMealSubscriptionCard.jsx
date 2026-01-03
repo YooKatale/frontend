@@ -522,6 +522,16 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                     colorScheme="blue"
                                     leftIcon={<ShoppingCart size={14} />}
                                     onClick={async () => {
+                                      if (!userInfo?._id) {
+                                        toast({
+                                          title: "Login Required",
+                                          description: "Please login to subscribe",
+                                          status: "warning",
+                                          duration: 3000,
+                                        });
+                                        router.push("/signin");
+                                        return;
+                                      }
                                       const mealKey = `${mealType}-${defaultMeal.type}-weekly`;
                                       setSubscribingMeals((prev) => ({ ...prev, [mealKey]: true }));
                                       try {
@@ -546,7 +556,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                           order: {
                                             payment: { paymentMethod: "", transactionId: "" },
                                             deliveryAddress: "NAN",
-                                            specialRequests: `Single meal subscription: ${defaultMeal.meal} (Weekly)`,
+                                            specialRequests: `Single meal subscription: ${defaultMeal.meal} (Weekly) - ${planName} Plan`,
                                             orderTotal: defaultMeal.pricing.weekly,
                                           },
                                         };
@@ -585,6 +595,16 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                     colorScheme="green"
                                     leftIcon={<ShoppingCart size={14} />}
                                     onClick={async () => {
+                                      if (!userInfo?._id) {
+                                        toast({
+                                          title: "Login Required",
+                                          description: "Please login to subscribe",
+                                          status: "warning",
+                                          duration: 3000,
+                                        });
+                                        router.push("/signin");
+                                        return;
+                                      }
                                       const mealKey = `${mealType}-${defaultMeal.type}-monthly`;
                                       setSubscribingMeals((prev) => ({ ...prev, [mealKey]: true }));
                                       try {
@@ -609,7 +629,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                           order: {
                                             payment: { paymentMethod: "", transactionId: "" },
                                             deliveryAddress: "NAN",
-                                            specialRequests: `Single meal subscription: ${defaultMeal.meal} (Monthly)`,
+                                            specialRequests: `Single meal subscription: ${defaultMeal.meal} (Monthly) - ${planName} Plan`,
                                             orderTotal: defaultMeal.pricing.monthly,
                                           },
                                         };
@@ -722,6 +742,16 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                     colorScheme="blue"
                                     leftIcon={<ShoppingCart size={14} />}
                                     onClick={async () => {
+                                      if (!userInfo?._id) {
+                                        toast({
+                                          title: "Login Required",
+                                          description: "Please login to subscribe",
+                                          status: "warning",
+                                          duration: 3000,
+                                        });
+                                        router.push("/signin");
+                                        return;
+                                      }
                                       const mealKey = `${mealType}-${defaultMeal.type}-weekly`;
                                       setSubscribingMeals((prev) => ({ ...prev, [mealKey]: true }));
                                       try {
@@ -746,7 +776,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                           order: {
                                             payment: { paymentMethod: "", transactionId: "" },
                                             deliveryAddress: "NAN",
-                                            specialRequests: `Single meal subscription: ${defaultMeal.meal} (Weekly)`,
+                                            specialRequests: `Single meal subscription: ${defaultMeal.meal} (Weekly) - ${planName} Plan`,
                                             orderTotal: defaultMeal.pricing.weekly,
                                           },
                                         };
@@ -785,6 +815,16 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                     colorScheme="green"
                                     leftIcon={<ShoppingCart size={14} />}
                                     onClick={async () => {
+                                      if (!userInfo?._id) {
+                                        toast({
+                                          title: "Login Required",
+                                          description: "Please login to subscribe",
+                                          status: "warning",
+                                          duration: 3000,
+                                        });
+                                        router.push("/signin");
+                                        return;
+                                      }
                                       const mealKey = `${mealType}-${defaultMeal.type}-monthly`;
                                       setSubscribingMeals((prev) => ({ ...prev, [mealKey]: true }));
                                       try {
@@ -809,7 +849,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                           order: {
                                             payment: { paymentMethod: "", transactionId: "" },
                                             deliveryAddress: "NAN",
-                                            specialRequests: `Single meal subscription: ${defaultMeal.meal} (Monthly)`,
+                                            specialRequests: `Single meal subscription: ${defaultMeal.meal} (Monthly) - ${planName} Plan`,
                                             orderTotal: defaultMeal.pricing.monthly,
                                           },
                                         };
