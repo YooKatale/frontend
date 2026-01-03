@@ -302,7 +302,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
         const orderId = res.data?.Order || res.data?.order || res.Order || res.order;
         
         if (orderId) {
-          // Save to Food Algae Box
+          // Save to Food Algy (allergies)
           if (typeof window !== "undefined" && userInfo?._id) {
             const foodAlgaeBoxData = {
               userId: userInfo._id,
@@ -314,7 +314,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
             };
             localStorage.setItem(`foodAlgaeBox_${userInfo._id}`, JSON.stringify(foodAlgaeBoxData));
             
-            // Dispatch event for Food Algae Box to update
+            // Dispatch event for Food Algy to update
             window.dispatchEvent(
               new CustomEvent("menuUpdated", {
                 detail: { menuData: foodAlgaeBoxData },
@@ -459,132 +459,407 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                       {day}
                     </Heading>
 
-                    {/* Meal Types - Compact View */}
+                    {/* Meal Types - Premium Plan Only: Breakfast (Ready-to-Eat) & Lunch (Ready-to-Cook) */}
                     <Stack spacing={3}>
-                      {["breakfast", "lunch", "supper"].map((mealType) => {
+                      {/* Breakfast - Premium Plan - Ready-to-Eat (Default) */}
+                      {(() => {
+                        const mealType = "breakfast";
                         const meals = dayMenu[mealType] || [];
-                        const mealTypeLabel = mealType.charAt(0).toUpperCase() + mealType.slice(1);
-                        const timeRanges = {
-                          breakfast: "6:00 AM - 10:00 AM",
-                          lunch: "12:00 PM - 3:00 PM",
-                          supper: "5:00 PM - 10:00 PM",
-                        };
+                        // Filter to show only ready-to-eat for breakfast (premium plan)
+                        const readyToEatMeals = meals.filter(m => m.type === "ready-to-eat");
+                        const defaultMeal = readyToEatMeals[0] || meals[0];
+                        const timeRange = "6:00 AM - 10:00 AM";
+                        const isSubscribed = defaultMeal && isMealSubscribed(mealType, defaultMeal.type, "weekly") || isMealSubscribed(mealType, defaultMeal?.type, "monthly");
 
-                        return (
+                        return defaultMeal ? (
                           <Box
-                            key={mealType}
-                            onClick={() => handleMealClick(dayKey, mealType)}
                             padding={{ base: "1rem", md: "1.25rem" }}
-                            background="white"
+                            background={isSubscribed ? "green.50" : "white"}
                             borderRadius="lg"
                             border="2px solid"
-                            borderColor="gray.200"
+                            borderColor={isSubscribed ? "green.400" : "gray.200"}
                             position="relative"
-                            _hover={{
-                              background: "blue.50",
-                              borderColor: ThemeColors.darkColor,
-                              transform: "translateY(-2px)",
-                              boxShadow: "md",
-                            }}
-                            transition="all 0.3s ease"
-                            cursor="pointer"
                           >
-                            {/* Click Indicator */}
-                            <Flex
-                              position="absolute"
-                              top="0.5rem"
-                              right="0.5rem"
-                              alignItems="center"
-                              gap="0.25rem"
-                              paddingX="0.5rem"
-                              paddingY="0.25rem"
-                              background={ThemeColors.darkColor}
-                              color="white"
-                              borderRadius="full"
-                              fontSize="2xs"
-                              fontWeight="medium"
-                            >
-                              <Eye size={12} />
-                              <Text>View</Text>
-                            </Flex>
-
                             <Flex justifyContent="space-between" alignItems="center" marginBottom="0.75rem">
                               <Box>
                                 <Text fontSize={{ base: "sm", md: "md" }} fontWeight="bold" color={ThemeColors.darkColor}>
-                                  {mealTypeLabel}
+                                  Breakfast
                                 </Text>
                                 <Text fontSize={{ base: "2xs", md: "xs" }} color="gray.500" marginTop="0.125rem">
-                                  {timeRanges[mealType]}
+                                  {timeRange}
                                 </Text>
                               </Box>
+                              {isSubscribed && (
+                                <Badge colorScheme="green" fontSize="xs">
+                                  Subscribed
+                                </Badge>
+                              )}
                             </Flex>
                             
-                            {/* Show first meal as preview */}
-                            {meals.length > 0 && (
-                              <Box>
-                                <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" marginBottom="0.5rem" color="gray.700">
-                                  {meals[0].meal}
-                                </Text>
-                                <Flex gap={2} alignItems="center" flexWrap="wrap" marginBottom="0.5rem">
-                                  <Badge 
-                                    colorScheme={meals[0].type === "ready-to-eat" ? "green" : "blue"} 
-                                    fontSize={{ base: "2xs", md: "xs" }}
-                                    paddingX="0.5rem"
-                                    paddingY="0.125rem"
-                                  >
-                                    {meals[0].type}
-                                  </Badge>
-                                  {meals[0].pricing && (
-                                    <>
-                                      <Text fontSize={{ base: "2xs", md: "xs" }} fontWeight="semibold" color={ThemeColors.darkColor}>
-                                        {formatPrice(meals[0].pricing.weekly)}/wk
-                                      </Text>
-                                      <Text fontSize={{ base: "2xs", md: "xs" }} fontWeight="semibold" color={ThemeColors.darkColor}>
-                                        {formatPrice(meals[0].pricing.monthly)}/mo
-                                      </Text>
-                                    </>
-                                  )}
+                            <Box marginBottom="1rem">
+                              <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" marginBottom="0.5rem" color="gray.700">
+                                {defaultMeal.meal}
+                              </Text>
+                              <Badge colorScheme="green" fontSize={{ base: "2xs", md: "xs" }} paddingX="0.5rem" paddingY="0.125rem" marginBottom="0.5rem">
+                                READY-TO-EAT
+                              </Badge>
+                              {defaultMeal.pricing && (
+                                <Flex gap={2} alignItems="center" flexWrap="wrap" marginBottom="0.75rem">
+                                  <Text fontSize={{ base: "2xs", md: "xs" }} fontWeight="semibold" color={ThemeColors.darkColor}>
+                                    {formatPrice(defaultMeal.pricing.weekly)}/wk
+                                  </Text>
+                                  <Text fontSize={{ base: "2xs", md: "xs" }} fontWeight="semibold" color={ThemeColors.darkColor}>
+                                    {formatPrice(defaultMeal.pricing.monthly)}/mo
+                                  </Text>
                                 </Flex>
-                                
-                                {/* View More Options Button */}
-                                {meals.length > 1 && (
-                                  <Box
-                                    marginTop="0.75rem"
-                                    padding="0.5rem"
-                                    background="blue.50"
-                                    borderRadius="md"
-                                    border="1px solid"
-                                    borderColor="blue.200"
+                              )}
+                              
+                              {/* Payment Buttons */}
+                              {!isSubscribed && (
+                                <Stack spacing={2} marginTop="0.75rem">
+                                  <Button
+                                    size="sm"
+                                    colorScheme="blue"
+                                    leftIcon={<ShoppingCart size={14} />}
+                                    onClick={async () => {
+                                      const mealKey = `${mealType}-${defaultMeal.type}-weekly`;
+                                      setSubscribingMeals((prev) => ({ ...prev, [mealKey]: true }));
+                                      try {
+                                        const schedulePayload = {
+                                          user: userInfo._id,
+                                          products: {
+                                            mealSubscription: true,
+                                            planType: planType,
+                                            incomeLevel: incomeLevel,
+                                            meals: [{
+                                              mealType: mealType,
+                                              prepType: defaultMeal.type,
+                                              duration: "weekly",
+                                              price: defaultMeal.pricing.weekly,
+                                              mealName: defaultMeal.meal,
+                                            }],
+                                          },
+                                          scheduleDays: [],
+                                          scheduleTime: "",
+                                          repeatSchedule: false,
+                                          scheduleFor: "meal_subscription",
+                                          order: {
+                                            payment: { paymentMethod: "", transactionId: "" },
+                                            deliveryAddress: "NAN",
+                                            specialRequests: `Single meal subscription: ${defaultMeal.meal} (Weekly)`,
+                                            orderTotal: defaultMeal.pricing.weekly,
+                                          },
+                                        };
+                                        const res = await createSchedule(schedulePayload).unwrap();
+                                        if (res.status === "Success" || res.status === "success") {
+                                          const orderId = res.data?.Order || res.data?.order;
+                                          if (orderId) {
+                                            toast({
+                                              title: "Subscription Created",
+                                              description: "Redirecting to payment...",
+                                              status: "success",
+                                              duration: 2000,
+                                            });
+                                            router.push(`/payment/${orderId}`);
+                                          }
+                                        }
+                                      } catch (error) {
+                                        toast({
+                                          title: "Error",
+                                          description: error.data?.message || "Failed to subscribe",
+                                          status: "error",
+                                          duration: 5000,
+                                        });
+                                      } finally {
+                                        setSubscribingMeals((prev) => ({ ...prev, [mealKey]: false }));
+                                      }
+                                    }}
+                                    isLoading={subscribingMeals[`${mealType}-${defaultMeal.type}-weekly`]}
+                                    width="100%"
+                                    fontSize={{ base: "xs", md: "sm" }}
                                   >
-                                    <Flex alignItems="center" justifyContent="space-between">
-                                      <Flex alignItems="center" gap="0.5rem">
-                                        <Box
-                                          width="24px"
-                                          height="24px"
-                                          borderRadius="full"
-                                          background={ThemeColors.darkColor}
-                                          display="flex"
-                                          alignItems="center"
-                                          justifyContent="center"
-                                          color="white"
-                                        >
-                                          <Text fontSize="2xs" fontWeight="bold">
-                                            +{meals.length - 1}
-                                          </Text>
-                                        </Box>
-                                        <Text fontSize={{ base: "2xs", md: "xs" }} fontWeight="medium" color={ThemeColors.darkColor}>
-                                          {meals.length - 1} more option{meals.length > 2 ? "s" : ""} available
-                                        </Text>
-                                      </Flex>
-                                      <ArrowRight size={14} color={ThemeColors.darkColor} />
-                                    </Flex>
-                                  </Box>
-                                )}
-                              </Box>
-                            )}
+                                    Pay Weekly - {formatPrice(defaultMeal.pricing.weekly)}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    colorScheme="green"
+                                    leftIcon={<ShoppingCart size={14} />}
+                                    onClick={async () => {
+                                      const mealKey = `${mealType}-${defaultMeal.type}-monthly`;
+                                      setSubscribingMeals((prev) => ({ ...prev, [mealKey]: true }));
+                                      try {
+                                        const schedulePayload = {
+                                          user: userInfo._id,
+                                          products: {
+                                            mealSubscription: true,
+                                            planType: planType,
+                                            incomeLevel: incomeLevel,
+                                            meals: [{
+                                              mealType: mealType,
+                                              prepType: defaultMeal.type,
+                                              duration: "monthly",
+                                              price: defaultMeal.pricing.monthly,
+                                              mealName: defaultMeal.meal,
+                                            }],
+                                          },
+                                          scheduleDays: [],
+                                          scheduleTime: "",
+                                          repeatSchedule: false,
+                                          scheduleFor: "meal_subscription",
+                                          order: {
+                                            payment: { paymentMethod: "", transactionId: "" },
+                                            deliveryAddress: "NAN",
+                                            specialRequests: `Single meal subscription: ${defaultMeal.meal} (Monthly)`,
+                                            orderTotal: defaultMeal.pricing.monthly,
+                                          },
+                                        };
+                                        const res = await createSchedule(schedulePayload).unwrap();
+                                        if (res.status === "Success" || res.status === "success") {
+                                          const orderId = res.data?.Order || res.data?.order;
+                                          if (orderId) {
+                                            toast({
+                                              title: "Subscription Created",
+                                              description: "Redirecting to payment...",
+                                              status: "success",
+                                              duration: 2000,
+                                            });
+                                            router.push(`/payment/${orderId}`);
+                                          }
+                                        }
+                                      } catch (error) {
+                                        toast({
+                                          title: "Error",
+                                          description: error.data?.message || "Failed to subscribe",
+                                          status: "error",
+                                          duration: 5000,
+                                        });
+                                      } finally {
+                                        setSubscribingMeals((prev) => ({ ...prev, [mealKey]: false }));
+                                      }
+                                    }}
+                                    isLoading={subscribingMeals[`${mealType}-${defaultMeal.type}-monthly`]}
+                                    width="100%"
+                                    fontSize={{ base: "xs", md: "sm" }}
+                                  >
+                                    Pay Monthly - {formatPrice(defaultMeal.pricing.monthly)}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    colorScheme="blue"
+                                    leftIcon={<Eye size={14} />}
+                                    onClick={() => handleMealClick(dayKey, mealType)}
+                                    width="100%"
+                                    fontSize={{ base: "xs", md: "sm" }}
+                                  >
+                                    Choose Other Options
+                                  </Button>
+                                </Stack>
+                              )}
+                            </Box>
                           </Box>
-                        );
-                      })}
+                        ) : null;
+                      })()}
+
+                      {/* Lunch - Ready-to-Cook (Default) */}
+                      {(() => {
+                        const mealType = "lunch";
+                        const meals = dayMenu[mealType] || [];
+                        // Filter to show only ready-to-cook for lunch
+                        const readyToCookMeals = meals.filter(m => m.type === "ready-to-cook");
+                        const defaultMeal = readyToCookMeals[0] || meals[0];
+                        const timeRange = "12:00 PM - 3:00 PM";
+                        const isSubscribed = defaultMeal && (isMealSubscribed(mealType, defaultMeal.type, "weekly") || isMealSubscribed(mealType, defaultMeal?.type, "monthly"));
+
+                        return defaultMeal ? (
+                          <Box
+                            padding={{ base: "1rem", md: "1.25rem" }}
+                            background={isSubscribed ? "green.50" : "white"}
+                            borderRadius="lg"
+                            border="2px solid"
+                            borderColor={isSubscribed ? "green.400" : "gray.200"}
+                            position="relative"
+                          >
+                            <Flex justifyContent="space-between" alignItems="center" marginBottom="0.75rem">
+                              <Box>
+                                <Text fontSize={{ base: "sm", md: "md" }} fontWeight="bold" color={ThemeColors.darkColor}>
+                                  Lunch
+                                </Text>
+                                <Text fontSize={{ base: "2xs", md: "xs" }} color="gray.500" marginTop="0.125rem">
+                                  {timeRange}
+                                </Text>
+                              </Box>
+                              {isSubscribed && (
+                                <Badge colorScheme="green" fontSize="xs">
+                                  Subscribed
+                                </Badge>
+                              )}
+                            </Flex>
+                            
+                            <Box marginBottom="1rem">
+                              <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" marginBottom="0.5rem" color="gray.700">
+                                {defaultMeal.meal}
+                              </Text>
+                              <Badge colorScheme="blue" fontSize={{ base: "2xs", md: "xs" }} paddingX="0.5rem" paddingY="0.125rem" marginBottom="0.5rem">
+                                READY-TO-COOK
+                              </Badge>
+                              {defaultMeal.pricing && (
+                                <Flex gap={2} alignItems="center" flexWrap="wrap" marginBottom="0.75rem">
+                                  <Text fontSize={{ base: "2xs", md: "xs" }} fontWeight="semibold" color={ThemeColors.darkColor}>
+                                    {formatPrice(defaultMeal.pricing.weekly)}/wk
+                                  </Text>
+                                  <Text fontSize={{ base: "2xs", md: "xs" }} fontWeight="semibold" color={ThemeColors.darkColor}>
+                                    {formatPrice(defaultMeal.pricing.monthly)}/mo
+                                  </Text>
+                                </Flex>
+                              )}
+                              
+                              {/* Payment Buttons */}
+                              {!isSubscribed && (
+                                <Stack spacing={2} marginTop="0.75rem">
+                                  <Button
+                                    size="sm"
+                                    colorScheme="blue"
+                                    leftIcon={<ShoppingCart size={14} />}
+                                    onClick={async () => {
+                                      const mealKey = `${mealType}-${defaultMeal.type}-weekly`;
+                                      setSubscribingMeals((prev) => ({ ...prev, [mealKey]: true }));
+                                      try {
+                                        const schedulePayload = {
+                                          user: userInfo._id,
+                                          products: {
+                                            mealSubscription: true,
+                                            planType: planType,
+                                            incomeLevel: incomeLevel,
+                                            meals: [{
+                                              mealType: mealType,
+                                              prepType: defaultMeal.type,
+                                              duration: "weekly",
+                                              price: defaultMeal.pricing.weekly,
+                                              mealName: defaultMeal.meal,
+                                            }],
+                                          },
+                                          scheduleDays: [],
+                                          scheduleTime: "",
+                                          repeatSchedule: false,
+                                          scheduleFor: "meal_subscription",
+                                          order: {
+                                            payment: { paymentMethod: "", transactionId: "" },
+                                            deliveryAddress: "NAN",
+                                            specialRequests: `Single meal subscription: ${defaultMeal.meal} (Weekly)`,
+                                            orderTotal: defaultMeal.pricing.weekly,
+                                          },
+                                        };
+                                        const res = await createSchedule(schedulePayload).unwrap();
+                                        if (res.status === "Success" || res.status === "success") {
+                                          const orderId = res.data?.Order || res.data?.order;
+                                          if (orderId) {
+                                            toast({
+                                              title: "Subscription Created",
+                                              description: "Redirecting to payment...",
+                                              status: "success",
+                                              duration: 2000,
+                                            });
+                                            router.push(`/payment/${orderId}`);
+                                          }
+                                        }
+                                      } catch (error) {
+                                        toast({
+                                          title: "Error",
+                                          description: error.data?.message || "Failed to subscribe",
+                                          status: "error",
+                                          duration: 5000,
+                                        });
+                                      } finally {
+                                        setSubscribingMeals((prev) => ({ ...prev, [mealKey]: false }));
+                                      }
+                                    }}
+                                    isLoading={subscribingMeals[`${mealType}-${defaultMeal.type}-weekly`]}
+                                    width="100%"
+                                    fontSize={{ base: "xs", md: "sm" }}
+                                  >
+                                    Pay Weekly - {formatPrice(defaultMeal.pricing.weekly)}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    colorScheme="green"
+                                    leftIcon={<ShoppingCart size={14} />}
+                                    onClick={async () => {
+                                      const mealKey = `${mealType}-${defaultMeal.type}-monthly`;
+                                      setSubscribingMeals((prev) => ({ ...prev, [mealKey]: true }));
+                                      try {
+                                        const schedulePayload = {
+                                          user: userInfo._id,
+                                          products: {
+                                            mealSubscription: true,
+                                            planType: planType,
+                                            incomeLevel: incomeLevel,
+                                            meals: [{
+                                              mealType: mealType,
+                                              prepType: defaultMeal.type,
+                                              duration: "monthly",
+                                              price: defaultMeal.pricing.monthly,
+                                              mealName: defaultMeal.meal,
+                                            }],
+                                          },
+                                          scheduleDays: [],
+                                          scheduleTime: "",
+                                          repeatSchedule: false,
+                                          scheduleFor: "meal_subscription",
+                                          order: {
+                                            payment: { paymentMethod: "", transactionId: "" },
+                                            deliveryAddress: "NAN",
+                                            specialRequests: `Single meal subscription: ${defaultMeal.meal} (Monthly)`,
+                                            orderTotal: defaultMeal.pricing.monthly,
+                                          },
+                                        };
+                                        const res = await createSchedule(schedulePayload).unwrap();
+                                        if (res.status === "Success" || res.status === "success") {
+                                          const orderId = res.data?.Order || res.data?.order;
+                                          if (orderId) {
+                                            toast({
+                                              title: "Subscription Created",
+                                              description: "Redirecting to payment...",
+                                              status: "success",
+                                              duration: 2000,
+                                            });
+                                            router.push(`/payment/${orderId}`);
+                                          }
+                                        }
+                                      } catch (error) {
+                                        toast({
+                                          title: "Error",
+                                          description: error.data?.message || "Failed to subscribe",
+                                          status: "error",
+                                          duration: 5000,
+                                        });
+                                      } finally {
+                                        setSubscribingMeals((prev) => ({ ...prev, [mealKey]: false }));
+                                      }
+                                    }}
+                                    isLoading={subscribingMeals[`${mealType}-${defaultMeal.type}-monthly`]}
+                                    width="100%"
+                                    fontSize={{ base: "xs", md: "sm" }}
+                                  >
+                                    Pay Monthly - {formatPrice(defaultMeal.pricing.monthly)}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    colorScheme="blue"
+                                    leftIcon={<Eye size={14} />}
+                                    onClick={() => handleMealClick(dayKey, mealType)}
+                                    width="100%"
+                                    fontSize={{ base: "xs", md: "sm" }}
+                                  >
+                                    Choose Other Options
+                                  </Button>
+                                </Stack>
+                              )}
+                            </Box>
+                          </Box>
+                        ) : null;
+                      })()}
                     </Stack>
                   </Box>
                 </SwiperSlide>

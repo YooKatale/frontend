@@ -269,15 +269,15 @@ const Subscription = () => {
                       {/* Unified Meal Subscription & Calendar Card */}
                       <UnifiedMealSubscriptionCard planType={planType} />
 
-                      {/* Food Algae Box Section */}
+                      {/* Food Algy Section - Allergies */}
                       {userInfo && (
                         <Box
                           marginTop={{ base: "1.5rem", sm: "2rem", md: "2.5rem" }}
                           padding={{ base: "1rem", sm: "1.25rem", md: "1.5rem", lg: "2rem" }}
-                          background="blue.50"
+                          background="orange.50"
                           borderRadius={{ base: "md", md: "lg" }}
                           border="1px solid"
-                          borderColor="blue.200"
+                          borderColor="orange.200"
                           width="100%"
                         >
                           <Flex
@@ -295,14 +295,14 @@ const Subscription = () => {
                                 marginBottom={{ base: "0.25rem", md: "0.5rem" }}
                                 lineHeight={{ base: "1.3", md: "1.4" }}
                               >
-                                Add Food Algae Box
+                                Food Algy
                               </Heading>
                               <Text 
                                 fontSize={{ base: "xs", sm: "sm", md: "sm" }} 
                                 color="gray.600"
                                 lineHeight={{ base: "1.5", md: "1.6" }}
                               >
-                                Enhance your meal plan with nutritious food algae supplements
+                                Select foods you don't eat (allergies and dietary restrictions)
                               </Text>
                             </Box>
                             <Box width={{ base: "100%", md: "auto" }}>

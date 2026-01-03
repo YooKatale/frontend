@@ -145,7 +145,7 @@ const MealCalendar = ({ planType = "premium" }) => {
       menu: weeklyMenu,
     };
     
-    // Trigger Food Algae Box update
+    // Trigger Food Algy update
     const event = new CustomEvent("menuUpdated", {
       detail: { menuData },
     });

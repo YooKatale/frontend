@@ -64,8 +64,8 @@ import Image from "next/image";
 import { formatPrice } from "@lib/mealPricingConfig";
 
 /**
- * Professional Food Algae Space Box Component
- * Comprehensive meal preference management with advanced features
+ * Food Algy Component
+ * Select foods you don't eat (allergies and dietary restrictions)
  */
 const FoodAlgaeBoxModal = ({ userId, planType, triggerButton }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -161,7 +161,7 @@ const FoodAlgaeBoxModal = ({ userId, planType, triggerButton }) => {
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `food-algae-box-${new Date().toISOString().split("T")[0]}.json`;
+    link.download = `food-algy-${new Date().toISOString().split("T")[0]}.json`;
     link.click();
     toast({
       title: "Exported",
@@ -187,7 +187,7 @@ const FoodAlgaeBoxModal = ({ userId, planType, triggerButton }) => {
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `food-algae-box-${new Date().toISOString().split("T")[0]}.csv`;
+    link.download = `food-algy-${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
     toast({
       title: "Exported",
@@ -201,7 +201,7 @@ const FoodAlgaeBoxModal = ({ userId, planType, triggerButton }) => {
     if (!savedMenu) return;
     try {
       const shareData = {
-        title: "My Food Algae Box",
+        title: "My Food Algy",
         text: `Check out my meal preferences! ${stats?.mealCount || 0} meals selected.`,
         url: window.location.href,
       };
@@ -223,13 +223,13 @@ const FoodAlgaeBoxModal = ({ userId, planType, triggerButton }) => {
   };
 
   const handleDelete = () => {
-    if (window.confirm("Are you sure you want to clear your Food Algae Box? This action cannot be undone.")) {
+    if (window.confirm("Are you sure you want to clear your Food Algy? This action cannot be undone.")) {
       localStorage.removeItem(`foodAlgaeBox_${userId}`);
       setSavedMenu(null);
       setLastUpdated(null);
       toast({
         title: "Cleared",
-        description: "Food Algae Box has been cleared",
+        description: "Food Algy has been cleared",
         status: "success",
         duration: 2000,
       });
@@ -245,12 +245,12 @@ const FoodAlgaeBoxModal = ({ userId, planType, triggerButton }) => {
       ) : (
         <Button
           onClick={onOpen}
-          colorScheme="green"
+          colorScheme="orange"
           leftIcon={<Package size={18} />}
           size="md"
           variant="outline"
         >
-          View Food Algae Box
+          View Food Algy
         </Button>
       )}
 
@@ -284,9 +284,9 @@ const FoodAlgaeBoxModal = ({ userId, planType, triggerButton }) => {
               <Package size={24} color="white" />
             </Box>
             <Box flex="1">
-              <Heading fontSize={{ base: "lg", md: "xl" }}>Food Algae Space Box</Heading>
+              <Heading fontSize={{ base: "lg", md: "xl" }}>Food Algy</Heading>
               <Text fontSize="xs" color="gray.200" marginTop="0.25rem">
-                Your personalized meal preferences hub
+                Select foods you don't eat (allergies and dietary restrictions)
               </Text>
             </Box>
             {lastUpdated && (
@@ -314,11 +314,10 @@ const FoodAlgaeBoxModal = ({ userId, planType, triggerButton }) => {
                   <Package size={64} color="#CBD5E0" />
                 </Box>
                 <Heading fontSize="xl" color="gray.700" mb={3}>
-                  Your Food Algae Box is Empty
+                  Your Food Algy is Empty
                 </Heading>
                 <Text fontSize="md" color="gray.500" mb={6} maxWidth="500px" margin="0 auto">
-                  Start customizing your meal calendar to save your preferences here. Your selected meals,
-                  vegetarian options, and sauce preferences will be automatically saved.
+                  Select foods you don't eat due to allergies or dietary restrictions. This helps us customize your meal plan accordingly.
                 </Text>
                 <Button
                   colorScheme="blue"
