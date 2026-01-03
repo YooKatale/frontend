@@ -5,7 +5,7 @@
  * Can be triggered by:
  * - Vercel Cron Jobs (recommended)
  * - External cron services (cron-job.org, EasyCron, etc.)
- * - Manual API calls (for testing)
+ * - Manual API calls
  * 
  * Security:
  * - Protected by CRON_SECRET environment variable

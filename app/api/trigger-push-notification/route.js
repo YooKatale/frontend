@@ -4,7 +4,7 @@
  * This endpoint triggers the backend to send FCM push notifications to all registered users.
  * The backend will send notifications via FCM, which works even when the app is closed.
  * 
- * This is called by the client-side polling service every minute (for testing).
+ * This is called by the client-side polling service every minute.
  * In production, you could also call this from a cron job or other scheduler.
  */
 
