@@ -115,13 +115,30 @@ const SignIn = ({ redirect, callback, ismodal }) => {
                 href="/"
                 _hover={{ transform: "scale(1.05)" }}
                 transition="all 0.2s"
+                position="relative"
+                width="150px"
+                height="150px"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                bg="white"
+                borderRadius="full"
+                boxShadow="0 4px 20px rgba(0, 0, 0, 0.1)"
+                p={4}
               >
                 <Image
                   src="/assets/images/logo1.png"
-                  alt="Yookatale Logo"
-                  width={120}
-                  height={120}
-                  style={{ objectFit: "contain" }}
+                  alt="YooKatale Logo"
+                  width={130}
+                  height={130}
+                  style={{ 
+                    objectFit: "contain",
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    width: "auto",
+                    height: "auto"
+                  }}
+                  priority
                 />
               </Box>
             </Flex>
