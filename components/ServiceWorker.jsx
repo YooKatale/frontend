@@ -11,28 +11,23 @@ const ServiceWorker = () => {
 
   async function handleSend() {
     try {
-      console.log("🔔 Starting FCM notification setup...");
-      
       // Initialize Firebase Cloud Messaging (FCM)
       // This will request permission, get FCM token, save it to server, and set up listeners
       const token = await initializeFCM(userInfo);
       
       if (token) {
-        console.log("✅ FCM initialized successfully");
-        
         // Setup foreground message listener (when app is open)
         setupForegroundMessageListener(userInfo);
         
         // Start polling for notifications (calls backend every minute to trigger FCM notifications)
         // This allows notifications to work even when app is closed
         startNotificationPolling(userInfo);
-        
-        console.log("✅ Notification system fully initialized - notifications will work even when app is closed!");
-      } else {
-        console.warn("⚠️ FCM token not available - notifications may not work when app is closed");
       }
     } catch (error) {
-      console.error("❌ Error setting up FCM notifications:", error);
+      // Silently handle errors - notifications will retry on next page load
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error setting up FCM notifications:", error);
+      }
     }
   }
 
