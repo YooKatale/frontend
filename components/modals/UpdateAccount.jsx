@@ -1,8 +1,8 @@
 "use client";
 
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Label } from "@components/ui/label";
+import { Input } from "@components/ui/input";
+import { Button } from "@components/ui/button";
 import { Loader2, X } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useToast } from "@components/ui/use-toast";
