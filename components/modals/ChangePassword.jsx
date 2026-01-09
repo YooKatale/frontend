@@ -246,7 +246,7 @@ const ChangePassword = ({ closeModal }) => {
               </Button>
               <Button
                 type="submit"
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium"
                 disabled={isLoading}
               >
                 {isLoading && <Loader2 className="animate-spin mr-2" size={18} />}

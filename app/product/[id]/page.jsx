@@ -85,7 +85,7 @@ const Product = ({ params }) => {
         handleSimilarProductFetch(res.data.category);
       }
     } catch (error) {
-      console.log({ error });
+      // Error handled by toast
     }
   };
 

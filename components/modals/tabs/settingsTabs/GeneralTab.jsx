@@ -28,19 +28,13 @@ const GeneralTab = () => {
             <ButtonComponent 
               type={"button"} 
               text={"Change Password"} 
-              onClick={() => {
-                console.log("Change Password clicked");
-                onPasswordOpen();
-              }}
+              onClick={onPasswordOpen}
               size="regular"
             />
             <ButtonComponent 
               type={"button"} 
               text={"Update Details"} 
-              onClick={() => {
-                console.log("Update Details clicked");
-                onUpdateOpen();
-              }}
+              onClick={onUpdateOpen}
               size="regular"
             />
           </Flex>

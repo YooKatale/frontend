@@ -70,7 +70,7 @@ const Cart = () => {
             // FIX: Ensure cartId is always set - try multiple fields
             const cartId = cart._id || cart.cartId || cart.id;
             if (!cartId) {
-              console.error('Cart item missing ID:', cart);
+              // Skip items without ID
               continue; // Skip items without ID
             }
             
@@ -98,7 +98,7 @@ const Cart = () => {
 
       // setCart(CartProductsItems);
     } catch (error) {
-      console.log(error);
+      // Error handled by toast
     }
   };
 

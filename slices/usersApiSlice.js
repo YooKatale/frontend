@@ -193,10 +193,6 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         }
         // DO NOT include referralCode field at all for non-invitations
         // Including it (even as null) might make backend think it's an invitation
-        
-        console.log("📧 sendWelcomeEmail payload:", {
-          email: payload.email,
-          emailType: payload.emailType,
           useCustomTemplate: payload.useCustomTemplate,
           hasHtml: !!payload.html,
           hasReferralCode: 'referralCode' in payload,
