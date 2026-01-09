@@ -67,17 +67,21 @@ const Cart = () => {
         // loop through the arrays and combine the data
         if (CartItems?.length > 0 && CartProductsItems?.length > 0) {
           for (let cart of CartItems) {
-            // Ensure cartId is always set - EXACT WEBAPP LOGIC
+            // FIX: Ensure cartId is always set - try multiple fields
             const cartId = cart._id || cart.cartId || cart.id;
             if (!cartId) {
               console.error('Cart item missing ID:', cart);
               continue; // Skip items without ID
             }
             
+            // FIX: Ensure quantity is always at least 1
+            const quantity = cart.quantity && cart.quantity > 0 ? cart.quantity : 1;
+            
             TempCart.push({
               ...cart,
               cartId: cartId, // Always ensure cartId is set
               _id: cart._id || cartId, // Keep _id for compatibility
+              quantity: quantity, // Ensure quantity is at least 1
               ...CartProductsItems.filter(
                 (product) => product._id === cart.productId
               )[0],
