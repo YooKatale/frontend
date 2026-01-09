@@ -67,9 +67,17 @@ const Cart = () => {
         // loop through the arrays and combine the data
         if (CartItems?.length > 0 && CartProductsItems?.length > 0) {
           for (let cart of CartItems) {
+            // Ensure cartId is always set - EXACT WEBAPP LOGIC
+            const cartId = cart._id || cart.cartId || cart.id;
+            if (!cartId) {
+              console.error('Cart item missing ID:', cart);
+              continue; // Skip items without ID
+            }
+            
             TempCart.push({
               ...cart,
-              cartId: cart._id,
+              cartId: cartId, // Always ensure cartId is set
+              _id: cart._id || cartId, // Keep _id for compatibility
               ...CartProductsItems.filter(
                 (product) => product._id === cart.productId
               )[0],
@@ -137,9 +145,44 @@ const Cart = () => {
   };
 
   const IncreaseProductQuantity = async (id) => {
-    const currentProductIndex = Cart.findIndex((cart) => cart.cartId === id);
+    // Ensure cartId is valid
+    if (!id || id === "" || id === null || id === undefined) {
+      chakraToast({
+        title: "Error",
+        description: "Cart ID is required",
+        status: "error",
+        duration: 5000,
+        isClosable: false,
+      });
+      return;
+    }
     
-    if (currentProductIndex === -1) return;
+    const currentProductIndex = Cart.findIndex((cart) => cart.cartId === id || cart._id === id);
+    
+    if (currentProductIndex === -1) {
+      chakraToast({
+        title: "Error",
+        description: "Cart item not found",
+        status: "error",
+        duration: 5000,
+        isClosable: false,
+      });
+      return;
+    }
+    
+    // Get the actual cartId (prefer cartId, fallback to _id)
+    const actualCartId = Cart[currentProductIndex].cartId || Cart[currentProductIndex]._id;
+    
+    if (!actualCartId) {
+      chakraToast({
+        title: "Error",
+        description: "Cart ID is missing",
+        status: "error",
+        duration: 5000,
+        isClosable: false,
+      });
+      return;
+    }
     
     const newQuantity = Cart[currentProductIndex].quantity + 1;
     
@@ -155,10 +198,10 @@ const Cart = () => {
     setCart(updatedCart);
     calcCartTotal(updatedCart);
     
-    // Update backend
+    // Update backend - ensure cartId is always passed
     try {
       await updateCartItem({
-        cartId: id,
+        cartId: actualCartId,
         quantity: newQuantity,
         userId: userInfo?._id,
       }).unwrap();
@@ -180,9 +223,46 @@ const Cart = () => {
   };
   
   const ReduceProductQuantity = async (id) => {
-    const currentProductIndex = Cart.findIndex((cart) => cart.cartId === id);
+    // Ensure cartId is valid
+    if (!id || id === "" || id === null || id === undefined) {
+      chakraToast({
+        title: "Error",
+        description: "Cart ID is required",
+        status: "error",
+        duration: 5000,
+        isClosable: false,
+      });
+      return;
+    }
+    
+    const currentProductIndex = Cart.findIndex((cart) => cart.cartId === id || cart._id === id);
   
-    if (currentProductIndex === -1 || Cart[currentProductIndex].quantity <= 1) {
+    if (currentProductIndex === -1) {
+      chakraToast({
+        title: "Error",
+        description: "Cart item not found",
+        status: "error",
+        duration: 5000,
+        isClosable: false,
+      });
+      return;
+    }
+    
+    if (Cart[currentProductIndex].quantity <= 1) {
+      return;
+    }
+    
+    // Get the actual cartId (prefer cartId, fallback to _id)
+    const actualCartId = Cart[currentProductIndex].cartId || Cart[currentProductIndex]._id;
+    
+    if (!actualCartId) {
+      chakraToast({
+        title: "Error",
+        description: "Cart ID is missing",
+        status: "error",
+        duration: 5000,
+        isClosable: false,
+      });
       return;
     }
     
@@ -200,10 +280,10 @@ const Cart = () => {
     setCart(updatedCart);
     calcCartTotal(updatedCart);
     
-    // Update backend
+    // Update backend - ensure cartId is always passed
     try {
       await updateCartItem({
-        cartId: id,
+        cartId: actualCartId,
         quantity: newQuantity,
         userId: userInfo?._id,
       }).unwrap();
