@@ -106,7 +106,7 @@ const ChangePassword = ({ closeModal }) => {
       if (response.data?.status === "Success") {
         toast({
           title: "Success",
-          description: "Password changed successfully. Please log in again with your new password.",
+          description: "Password changed successfully. Redirecting to login...",
         });
 
         // Clear form
@@ -125,7 +125,7 @@ const ChangePassword = ({ closeModal }) => {
             localStorage.removeItem("userInfo");
             window.location.href = '/signin';
           }
-        }, 2000);
+        }, 1500);
       }
     } catch (err) {
       toast({

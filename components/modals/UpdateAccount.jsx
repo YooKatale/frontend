@@ -53,13 +53,19 @@ const UpdateAccount = ({ closeModal }) => {
       if (response.data?.status === "Success") {
         toast({
           title: "Success",
-          description: "Account updated successfully. Please refresh the page to see changes.",
+          description: "Account updated successfully. Refreshing page...",
         });
+        
+        // Update localStorage with new user data
+        const updatedUserInfo = { ...userInfo, ...userData };
+        localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
+        
         closeModal(false);
+        
         // Refresh page after 1 second
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 1500);
       }
     } catch (err) {
       toast({
