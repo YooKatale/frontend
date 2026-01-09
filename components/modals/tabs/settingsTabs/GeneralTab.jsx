@@ -19,67 +19,140 @@ const GeneralTab = () => {
       {isPasswordOpen && <ChangePassword closeModal={onPasswordClose} />}
 
       <Box>
-        <Box padding={"1rem 0"}>
-          <Flex justifyContent={"end"} gap={3}>
+        <Box padding={"1rem 0"} mb={4}>
+          <Flex 
+            justifyContent={{ base: "center", md: "end" }} 
+            gap={3}
+            flexWrap="wrap"
+          >
             <ButtonComponent 
               type={"button"} 
               text={"Change Password"} 
-              onClick={onPasswordOpen}
+              onClick={() => {
+                console.log("Change Password clicked");
+                onPasswordOpen();
+              }}
+              size="regular"
             />
             <ButtonComponent 
               type={"button"} 
               text={"Update Details"} 
-              onClick={onUpdateOpen}
+              onClick={() => {
+                console.log("Update Details clicked");
+                onUpdateOpen();
+              }}
+              size="regular"
             />
           </Flex>
         </Box>
-        <Box padding={"0.5rem 1rem"}>
+        <Box 
+          padding={"1.5rem"} 
+          bg="gray.50" 
+          borderRadius="lg"
+          border="1px solid"
+          borderColor="gray.200"
+        >
+          <Text 
+            fontSize="xl" 
+            fontWeight="bold" 
+            mb={4}
+            color="gray.800"
+          >
+            Personal Information
+          </Text>
           <Grid
             gridTemplateColumns={{
-              base: "repeat(2, 1fr)",
-              md: "repeat(3, 1fr)",
-              xl: "repeat(4, 1fr)",
+              base: "repeat(1, 1fr)",
+              md: "repeat(2, 1fr)",
+              lg: "repeat(3, 1fr)",
             }}
-            gridGap={"1rem"}
+            gridGap={"1.5rem"}
           >
-            <Box>
-              <Text fontSize={"lg"}>First Name</Text>
+            <Box
+              p={4}
+              bg="white"
+              borderRadius="md"
+              border="1px solid"
+              borderColor="gray.200"
+              _hover={{ boxShadow: "sm" }}
+            >
+              <Text fontSize={"sm"} color="gray.600" mb={1}>First Name</Text>
               <Text
-                fontSize={"md"}
+                fontSize={"lg"}
                 fontWeight={"bold"}
+                color="gray.800"
               >{`${userInfo?.firstname || 'N/A'}`}</Text>
             </Box>
-            <Box>
-              <Text fontSize={"lg"}>Last Name</Text>
+            <Box
+              p={4}
+              bg="white"
+              borderRadius="md"
+              border="1px solid"
+              borderColor="gray.200"
+              _hover={{ boxShadow: "sm" }}
+            >
+              <Text fontSize={"sm"} color="gray.600" mb={1}>Last Name</Text>
               <Text
-                fontSize={"md"}
+                fontSize={"lg"}
                 fontWeight={"bold"}
+                color="gray.800"
               >{`${userInfo?.lastname || 'N/A'}`}</Text>
             </Box>
-            <Box>
-              <Text fontSize={"lg"}>Email</Text>
+            <Box
+              p={4}
+              bg="white"
+              borderRadius="md"
+              border="1px solid"
+              borderColor="gray.200"
+              _hover={{ boxShadow: "sm" }}
+            >
+              <Text fontSize={"sm"} color="gray.600" mb={1}>Email</Text>
               <Text
-                fontSize={"md"}
+                fontSize={"lg"}
                 fontWeight={"bold"}
+                color="gray.800"
               >{`${userInfo?.email || 'N/A'}`}</Text>
             </Box>
-            <Box>
-              <Text fontSize={"lg"}>Phone Number</Text>
+            <Box
+              p={4}
+              bg="white"
+              borderRadius="md"
+              border="1px solid"
+              borderColor="gray.200"
+              _hover={{ boxShadow: "sm" }}
+            >
+              <Text fontSize={"sm"} color="gray.600" mb={1}>Phone Number</Text>
               <Text
-                fontSize={"md"}
+                fontSize={"lg"}
                 fontWeight={"bold"}
+                color="gray.800"
               >{`${userInfo?.phone || 'N/A'}`}</Text>
             </Box>
-            <Box>
-              <Text fontSize={"lg"}>Gender</Text>
+            <Box
+              p={4}
+              bg="white"
+              borderRadius="md"
+              border="1px solid"
+              borderColor="gray.200"
+              _hover={{ boxShadow: "sm" }}
+            >
+              <Text fontSize={"sm"} color="gray.600" mb={1}>Gender</Text>
               <Text
-                fontSize={"md"}
+                fontSize={"lg"}
                 fontWeight={"bold"}
+                color="gray.800"
               >{`${userInfo?.gender || 'N/A'}`}</Text>
             </Box>
-            <Box>
-              <Text fontSize={"lg"}>Vegan</Text>
-              <Text fontSize={"md"} fontWeight={"bold"}>{`${
+            <Box
+              p={4}
+              bg="white"
+              borderRadius="md"
+              border="1px solid"
+              borderColor="gray.200"
+              _hover={{ boxShadow: "sm" }}
+            >
+              <Text fontSize={"sm"} color="gray.600" mb={1}>Vegan</Text>
+              <Text fontSize={"lg"} fontWeight={"bold"} color="gray.800">{`${
                 userInfo?.vegan ? "Vegan" : "Not Vegan"
               }`}</Text>
             </Box>

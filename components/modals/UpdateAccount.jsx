@@ -29,6 +29,16 @@ const UpdateAccount = ({ closeModal }) => {
 
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Please login to update your profile",
+        });
+        setLoading(false);
+        return;
+      }
+
       const response = await axios.put(
         `${DB_URL}/users/${userInfo?._id}`,
         userData,

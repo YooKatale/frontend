@@ -78,6 +78,16 @@ const ChangePassword = ({ closeModal }) => {
 
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Please login to change your password",
+        });
+        setLoading(false);
+        return;
+      }
+
       const response = await axios.post(
         `${DB_URL}/auth/change-password`,
         {
