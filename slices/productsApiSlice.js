@@ -60,6 +60,16 @@ export const productsApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    cartUpdate: builder.mutation({
+      query: (data) => ({
+        url: `${DB_URL}/product/cart/${data.cartId}`,
+        method: "PUT",
+        body: {
+          quantity: data.quantity,
+          userId: data.userId,
+        },
+      }),
+    }),
     cartCheckout: builder.mutation({
       query: (data) => ({
         url: `${DB_URL}/products/cart/checkout`,
@@ -118,6 +128,7 @@ export const {
   useCartCreateMutation,
   useCartMutation,
   useCartDeleteMutation,
+  useCartUpdateMutation,
   useSearchMutation,
   useNewScheduleMutation,
   useOrdersMutation,

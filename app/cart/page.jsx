@@ -28,6 +28,7 @@ import Header from "@components/Header";
 import {
   useCartDeleteMutation,
   useCartMutation,
+  useCartUpdateMutation,
 } from "@slices/productsApiSlice";
 import CartCard from "@components/CartCard";
 import { FormatCurr } from "@utils/utils";
@@ -45,6 +46,7 @@ const Cart = () => {
 
   const [fetchCart] = useCartMutation();
   const [deleteCartItem] = useCartDeleteMutation();
+  const [updateCartItem] = useCartUpdateMutation();
 
   const chakraToast = useToast();
   const router = useRouter();
@@ -134,37 +136,91 @@ const Cart = () => {
     }
   };
 
-  const IncreaseProductQuantity = (id) => {
+  const IncreaseProductQuantity = async (id) => {
     const currentProductIndex = Cart.findIndex((cart) => cart.cartId === id);
-  
+    
+    if (currentProductIndex === -1) return;
+    
+    const newQuantity = Cart[currentProductIndex].quantity + 1;
+    
+    // Optimistically update UI
     const updatedProduct = {
       ...Cart[currentProductIndex],
-      quantity: Cart[currentProductIndex].quantity + 1,
+      quantity: newQuantity,
     };
   
     const updatedCart = [...Cart];
     updatedCart[currentProductIndex] = updatedProduct;
   
     setCart(updatedCart);
-  
     calcCartTotal(updatedCart);
+    
+    // Update backend
+    try {
+      await updateCartItem({
+        cartId: id,
+        quantity: newQuantity,
+        userId: userInfo?._id,
+      }).unwrap();
+    } catch (err) {
+      // Revert on error
+      const revertedCart = [...Cart];
+      revertedCart[currentProductIndex] = Cart[currentProductIndex];
+      setCart(revertedCart);
+      calcCartTotal(revertedCart);
+      
+      chakraToast({
+        title: "Error",
+        description: err.data?.message || "Failed to update quantity",
+        status: "error",
+        duration: 5000,
+        isClosable: false,
+      });
+    }
   };
   
-  const ReduceProductQuantity = (id) => {
+  const ReduceProductQuantity = async (id) => {
     const currentProductIndex = Cart.findIndex((cart) => cart.cartId === id);
   
-    if (Cart[currentProductIndex].quantity > 1) {
-      const updatedProduct = {
-        ...Cart[currentProductIndex],
-        quantity: Cart[currentProductIndex].quantity - 1,
-      };
+    if (currentProductIndex === -1 || Cart[currentProductIndex].quantity <= 1) {
+      return;
+    }
+    
+    const newQuantity = Cart[currentProductIndex].quantity - 1;
+    
+    // Optimistically update UI
+    const updatedProduct = {
+      ...Cart[currentProductIndex],
+      quantity: newQuantity,
+    };
   
-      const updatedCart = [...Cart];
-      updatedCart[currentProductIndex] = updatedProduct;
+    const updatedCart = [...Cart];
+    updatedCart[currentProductIndex] = updatedProduct;
   
-      setCart(updatedCart);
-  
-      calcCartTotal(updatedCart);
+    setCart(updatedCart);
+    calcCartTotal(updatedCart);
+    
+    // Update backend
+    try {
+      await updateCartItem({
+        cartId: id,
+        quantity: newQuantity,
+        userId: userInfo?._id,
+      }).unwrap();
+    } catch (err) {
+      // Revert on error
+      const revertedCart = [...Cart];
+      revertedCart[currentProductIndex] = Cart[currentProductIndex];
+      setCart(revertedCart);
+      calcCartTotal(revertedCart);
+      
+      chakraToast({
+        title: "Error",
+        description: err.data?.message || "Failed to update quantity",
+        status: "error",
+        duration: 5000,
+        isClosable: false,
+      });
     }
   };
   
