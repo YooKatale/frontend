@@ -1,16 +1,21 @@
 "use client";
 
-import { Box, Flex, Grid, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Flex, Grid, Text, useDisclosure, Button as ChakraButton } from "@chakra-ui/react";
 import ButtonComponent from "@components/Button";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import UpdateAccount from "@components/modals/UpdateAccount";
 import ChangePassword from "@components/modals/ChangePassword";
+import { useToast } from "@components/ui/use-toast";
+import axios from "axios";
+import { DB_URL } from "@config/config";
 
 const GeneralTab = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const { isOpen: isUpdateOpen, onOpen: onUpdateOpen, onClose: onUpdateClose } = useDisclosure();
   const { isOpen: isPasswordOpen, onOpen: onPasswordOpen, onClose: onPasswordClose } = useDisclosure();
+  const { toast } = useToast();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   return (
     <>
@@ -37,6 +42,42 @@ const GeneralTab = () => {
               onClick={onUpdateOpen}
               size="regular"
             />
+            <ChakraButton
+              colorScheme="red"
+              onClick={async () => {
+                if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
+                try {
+                  setIsDeleting(true);
+                  const token = localStorage.getItem("token");
+                  if (!token) {
+                    toast({ variant: "destructive", title: "Not authenticated", description: "Please log in to delete your account." });
+                    setIsDeleting(false);
+                    return;
+                  }
+                  const res = await axios.delete(`${DB_URL}/users/${userInfo?._id}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                  });
+                  if (res.data?.status === "Success" || res.status === 200) {
+                    toast({ title: "Account deleted", description: "Your account has been deleted." });
+                    // clear local session
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("userInfo");
+                    // redirect to homepage
+                    window.location.href = "/";
+                  } else {
+                    toast({ variant: "destructive", title: "Delete failed", description: res.data?.message || "Failed to delete account" });
+                  }
+                } catch (err) {
+                  toast({ variant: "destructive", title: "Error", description: err.response?.data?.message || err.message || "Failed to delete account" });
+                } finally {
+                  setIsDeleting(false);
+                }
+              }}
+              isLoading={isDeleting}
+              size="md"
+            >
+              Delete Account
+            </ChakraButton>
           </Flex>
         </Box>
         <Box 
