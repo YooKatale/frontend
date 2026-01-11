@@ -215,7 +215,7 @@ export default function LocationSearchPicker({
     }
   }, []);
 
-  // Search for places as user types
+  // Search for places as user types - Optimized for speed
   useEffect(() => {
     if (!mapsLoaded || !autocompleteServiceRef.current || mapsError) {
       if (searchQuery && searchQuery.length >= 2 && !mapsLoaded && !mapsError) {
@@ -233,7 +233,7 @@ export default function LocationSearchPicker({
     }
 
     setIsLoading(true);
-    // Debounce search
+    // Reduced debounce time for faster results (150ms instead of 300ms)
     const timeoutId = setTimeout(() => {
       if (!autocompleteServiceRef.current) {
         setIsLoading(false);
@@ -263,7 +263,7 @@ export default function LocationSearchPicker({
         setIsLoading(false);
         setSuggestions([]);
       }
-    }, 300);
+    }, 150); // Faster debounce - 150ms instead of 300ms
 
     return () => {
       clearTimeout(timeoutId);
@@ -364,7 +364,7 @@ export default function LocationSearchPicker({
 
           const data = await response.json();
 
-          if (data.results && data.results.length > 0) {
+          if (data.status === 'OK' && data.results && data.results.length > 0) {
             const location = {
               lat: position.coords.latitude,
               lng: position.coords.longitude,
@@ -387,8 +387,25 @@ export default function LocationSearchPicker({
               status: 'success',
               duration: 2000,
             });
+          } else if (data.status === 'ZERO_RESULTS') {
+            // Fallback: create location from coordinates if geocoding fails
+            const location = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              address: `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`,
+              address1: `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`,
+              address2: '',
+            };
+            setSelectedLocation(location);
+            setSearchQuery(location.address);
+            toast({
+              title: 'Location Detected',
+              description: 'Using coordinates. You can edit the address if needed.',
+              status: 'info',
+              duration: 3000,
+            });
           } else {
-            throw new Error('No results found');
+            throw new Error(data.error_message || 'No results found');
           }
         } catch (error) {
           console.error('Error getting address:', error);
@@ -447,7 +464,27 @@ export default function LocationSearchPicker({
 
   const handleClose = (e) => {
     e?.stopPropagation();
-    if (!required && onClose) {
+    // Always allow closing - save empty location to allow browsing
+    if (onClose) {
+      onClose();
+    }
+  };
+
+  const handleContinueBrowsing = (e) => {
+    e?.stopPropagation();
+    // Save a temporary "browsing" location so user can continue
+    const browsingLocation = {
+      lat: null,
+      lng: null,
+      address: 'Browsing - Location not set',
+      address1: '',
+      address2: '',
+    };
+    localStorage.setItem('yookatale_delivery_location', JSON.stringify(browsingLocation));
+    if (onLocationSelected) {
+      onLocationSelected(browsingLocation);
+    }
+    if (onClose) {
       onClose();
     }
   };
@@ -455,16 +492,16 @@ export default function LocationSearchPicker({
   return (
     <Modal
       isOpen={true}
-      onClose={required ? undefined : handleClose}
+      onClose={handleClose}
       size="md"
-      closeOnOverlayClick={!required}
-      closeOnEsc={!required}
+      closeOnOverlayClick={true}
+      closeOnEsc={true}
       isCentered
       motionPreset="scale"
       blockScrollOnMount={false}
       trapFocus={true}
     >
-      <ModalOverlay bg="blackAlpha.500" backdropFilter="blur(4px)" onClick={required ? undefined : handleClose} />
+      <ModalOverlay bg="blackAlpha.500" backdropFilter="blur(4px)" onClick={handleClose} />
       <ModalContent
         maxW="480px"
         w="90%"
@@ -487,7 +524,6 @@ export default function LocationSearchPicker({
           zIndex={10001}
           onClick={handleClose}
           aria-label="Close location picker"
-          display={required ? 'none' : 'block'}
         />
 
         <ModalBody p={0} overflow="hidden" onClick={(e) => e.stopPropagation()}>
@@ -663,6 +699,35 @@ export default function LocationSearchPicker({
                 >
                   {isGettingCurrentLocation ? 'Getting location...' : 'Use current location'}
                 </Button>
+
+                {/* Continue Browsing Button */}
+                {required && (
+                  <Button
+                    id="continue-browsing-button"
+                    name="continue-browsing"
+                    type="button"
+                    onClick={handleContinueBrowsing}
+                    variant="outline"
+                    borderColor="gray.300"
+                    color="gray.700"
+                    size="md"
+                    width="100%"
+                    borderRadius="xl"
+                    h="44px"
+                    fontSize="14px"
+                    fontWeight="600"
+                    _hover={{
+                      bg: 'gray.50',
+                      borderColor: 'gray.400',
+                    }}
+                    transition="all 0.2s"
+                    cursor="pointer"
+                    zIndex={1}
+                    position="relative"
+                  >
+                    Continue browsing without location
+                  </Button>
+                )}
               </VStack>
             </Box>
 

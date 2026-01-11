@@ -34,7 +34,7 @@ export default function LocationGate({ children }) {
   }, []);
 
   const handleLocationSelected = (locationData) => {
-    // Save location to localStorage
+    // Save location to localStorage (even if it's a browsing placeholder)
     localStorage.setItem('yookatale_delivery_location', JSON.stringify(locationData));
     setLocation(locationData);
     setShowLocationPicker(false);
