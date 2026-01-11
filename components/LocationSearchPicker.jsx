@@ -387,12 +387,11 @@ export default function LocationSearchPicker({
             setRecentLocations(updated);
             localStorage.setItem('yookatale_recent_locations', JSON.stringify(updated));
 
-            toast({
-              title: 'Success',
-              description: 'Location detected successfully',
-              status: 'success',
-              duration: 2000,
-            });
+            // Automatically confirm and save location
+            onLocationSelected(location);
+            if (onClose) {
+              onClose();
+            }
           } else if (data.status === 'ZERO_RESULTS') {
             // Fallback: create location from coordinates if geocoding fails
             const location = {
@@ -404,12 +403,17 @@ export default function LocationSearchPicker({
             };
             setSelectedLocation(location);
             setSearchQuery(location.address);
-            toast({
-              title: 'Location Detected',
-              description: 'Using coordinates. You can edit the address if needed.',
-              status: 'info',
-              duration: 3000,
-            });
+            
+            // Save to recent locations
+            const updated = [location, ...recentLocations.filter(l => l.address !== location.address)].slice(0, 5);
+            setRecentLocations(updated);
+            localStorage.setItem('yookatale_recent_locations', JSON.stringify(updated));
+
+            // Automatically confirm and save location
+            onLocationSelected(location);
+            if (onClose) {
+              onClose();
+            }
           } else {
             throw new Error(data.error_message || 'No results found');
           }
@@ -904,8 +908,8 @@ export default function LocationSearchPicker({
               )}
             </Box>
 
-            {/* Confirm Button - Fixed at Bottom (only show if location was selected from "Use current location") */}
-            {selectedLocation && !suggestions.length && (
+            {/* Confirm Button - Fixed at Bottom (only shown when needed for manual confirmation) */}
+            {false && selectedLocation && (
               <Box
                 p={4}
                 borderTop="1px solid"
