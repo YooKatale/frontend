@@ -10,6 +10,7 @@ import {
   Heading,
   Select,
   Spacer,
+  Text,
   Textarea,
   Input,
   useToast,
