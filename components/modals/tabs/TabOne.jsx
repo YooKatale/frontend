@@ -18,7 +18,7 @@ import {
 import ButtonComponent from "@components/Button";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import LocationPicker from "@components/LocationPicker";
+import LocationSearchPicker from "@components/LocationSearchPicker";
 // import React from 'react'
 
 const TabOne = ({ updateTabIndex, fetchData }) => {
@@ -239,8 +239,11 @@ const TabOne = ({ updateTabIndex, fetchData }) => {
               <Text fontSize="xs" color="green.600" fontWeight="bold" mb={1}>
                 ✓ Location Selected
               </Text>
-              <Text fontSize="xs" color="green.700">
-                Coordinates: {deliveryAddress.latitude.toFixed(6)}, {deliveryAddress.longitude.toFixed(6)}
+              <Text fontSize="xs" color="green.700" noOfLines={2} mb={1}>
+                {deliveryAddress.address1 || 'Location selected'}
+              </Text>
+              <Text fontSize="xs" color="green.600">
+                Coordinates: {deliveryAddress.latitude?.toFixed(6) || '0'}, {deliveryAddress.longitude?.toFixed(6) || '0'}
               </Text>
             </Box>
           )}
@@ -253,13 +256,16 @@ const TabOne = ({ updateTabIndex, fetchData }) => {
             gridGap={"1rem"}
           >
             <FormControl>
-              <FormLabel htmlFor="address1">Address 1</FormLabel>
+              <FormLabel htmlFor="address1">Delivery Address</FormLabel>
               <Textarea
                 name="address1"
                 id="address1"
-                placeholder="Delivery address or select on map"
+                placeholder="Search and select location on map above, or enter manually"
                 value={deliveryAddress.address1}
                 onChange={handleDeliveryDataChange}
+                readOnly={!!deliveryAddress.latitude} // Make read-only if location was selected from map
+                cursor={deliveryAddress.latitude ? 'not-allowed' : 'text'}
+                bg={deliveryAddress.latitude ? 'gray.50' : 'white'}
               />
             </FormControl>
             <FormControl>
@@ -276,15 +282,11 @@ const TabOne = ({ updateTabIndex, fetchData }) => {
         </Box>
         
         {showLocationPicker && (
-          <LocationPicker
+          <LocationSearchPicker
             onLocationSelected={handleLocationSelected}
             onClose={() => setShowLocationPicker(false)}
             initialAddress={deliveryAddress.address1}
-            initialLocation={
-              deliveryAddress.latitude && deliveryAddress.longitude
-                ? { lat: deliveryAddress.latitude, lng: deliveryAddress.longitude }
-                : null
-            }
+            required={false}
           />
         )}
         <Box padding={"0.5rem 0"}>
