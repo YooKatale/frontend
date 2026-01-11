@@ -191,14 +191,10 @@ const Home = () => {
   return (
     <Box 
       width="100%"
-      maxWidth={{
-        base: "22rem",
-        sm: "40rem",
-        md: "60rem",
-        lg: "80rem",
-      }}
+      maxWidth="100%"
       margin="0 auto"
-      bg="gray.50"
+      bg="white"
+      minH="100vh"
     >
       {/* Hero Section with Animation */}
       <motion.div
@@ -209,8 +205,8 @@ const Home = () => {
         <Hero />
       </motion.div>
 
-      {/* Categories Section with Stagger Animation */}
-      <Box pt="4rem" mx="auto" px={{ base: 4, md: 6 }}>
+      {/* Categories Section - Glovo Style with YooKatale Colors */}
+      <Box pt={{ base: "2rem", md: "3rem", lg: "4rem" }} mx="auto" px={{ base: 4, md: 6, lg: 8 }} bg="white">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -218,21 +214,22 @@ const Home = () => {
         >
           <Heading
             as="h2"
-            fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
-            fontWeight="700"
-            mb={2}
+            fontSize={{ base: "1.75rem", md: "2.5rem", lg: "3rem" }}
+            fontWeight="800"
+            mb={3}
             textAlign="center"
-            color="gray.800"
-            letterSpacing="-0.02em"
+            color="gray.900"
+            letterSpacing="-0.03em"
           >
             Shop by Category
           </Heading>
           <Box
             height="4px"
-            width="80px"
-            margin="1rem auto 2rem"
-            background={ThemeColors.primaryColor}
+            width="100px"
+            margin="0 auto 2.5rem"
+            background="#185F2D"
             borderRadius="full"
+            boxShadow="0 2px 8px rgba(24, 95, 45, 0.3)"
           />
         </motion.div>
 

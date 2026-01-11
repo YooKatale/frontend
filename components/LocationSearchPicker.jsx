@@ -14,17 +14,24 @@ import {
   ListItem,
   Avatar,
   Badge,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalBody,
+  ModalCloseButton,
 } from '@chakra-ui/react';
 import { Search, MapPin, X, Navigation } from 'lucide-react';
 
 /**
- * Glovo-style Location Search Picker
+ * Glovo-style Location Search Picker - Full Page Modal
  * Features:
+ * - Full-page modal covering the whole screen (like Glovo)
  * - Search-based location entry (like Glovo)
  * - Google Places Autocomplete
  * - Current location button
  * - Recent locations
- * - Required on app/web access
+ * - Beautiful, professional UI matching Glovo design
+ * - YooKatale theme colors (#185F2D)
  */
 export default function LocationSearchPicker({
   onLocationSelected,
@@ -125,7 +132,19 @@ export default function LocationSearchPicker({
       return;
     }
 
-    if (!autocompleteServiceRef.current) return;
+    // Wait for Google Maps to be ready
+    if (!window.google || !window.google.maps || !window.google.maps.places) {
+      return;
+    }
+
+    if (!autocompleteServiceRef.current) {
+      try {
+        autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService();
+      } catch (e) {
+        console.error('Error creating AutocompleteService:', e);
+        return;
+      }
+    }
 
     const request = {
       input: searchQuery,
@@ -271,287 +290,388 @@ export default function LocationSearchPicker({
   };
 
   return (
-    <Box
-      position="fixed"
-      top={0}
-      left={0}
-      right={0}
-      bottom={0}
-      bg="white"
-      zIndex={9999}
-      display="flex"
-      flexDirection="column"
+    <Modal
+      isOpen={true}
+      onClose={required ? undefined : (onClose || (() => {}))}
+      size="full"
+      closeOnOverlayClick={!required}
+      closeOnEsc={!required}
+      isCentered
+      motionPreset="slideInBottom"
     >
-      {/* Header - Glovo Style */}
-      <Box
-        p={4}
-        borderBottom="1px solid"
-        borderColor="gray.200"
+      <ModalOverlay bg="blackAlpha.700" backdropFilter="blur(4px)" />
+      <ModalContent
+        m={0}
+        maxW="100vw"
+        maxH="100vh"
+        h="100vh"
+        borderRadius={0}
         bg="white"
-        boxShadow="0 2px 4px rgba(0,0,0,0.1)"
       >
-        <HStack spacing={3} mb={3} align="center">
-          {onClose && (
-            <IconButton
-              icon={<X size={20} />}
-              onClick={onClose}
-              variant="ghost"
-              size="sm"
-              aria-label="Close"
-              borderRadius="full"
-              _hover={{ bg: 'gray.100' }}
-            />
-          )}
-          <Text fontSize="lg" fontWeight="700" flex={1} color="gray.800">
-            {required ? 'Where should we deliver?' : 'Select Delivery Location'}
-          </Text>
-        </HStack>
-
-        {/* Search Input - Glovo Style */}
-        <Box position="relative">
-          <Input
-            ref={searchInputRef}
-            placeholder="Search for an address or place..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            size="lg"
-            borderRadius="xl"
-            pl={12}
-            pr={10}
-            h="52px"
-            fontSize="16px"
-            borderColor="gray.300"
-            bg="gray.50"
-            _focus={{
-              borderColor: '#185F2D',
-              boxShadow: '0 0 0 2px rgba(24, 95, 45, 0.1)',
-              bg: 'white',
-            }}
-            _hover={{
-              borderColor: 'gray.400',
-            }}
-          />
-          <Box
-            position="absolute"
-            left={4}
-            top="50%"
-            transform="translateY(-50%)"
-            color="gray.400"
-            pointerEvents="none"
-          >
-            <Search size={22} />
-          </Box>
-          {searchQuery && (
-            <IconButton
-              position="absolute"
-              right={2}
-              top="50%"
-              transform="translateY(-50%)"
-              icon={<X size={16} />}
-              onClick={() => {
-                setSearchQuery('');
-                setSuggestions([]);
-                setSelectedLocation(null);
-              }}
-              variant="ghost"
-              size="sm"
-              aria-label="Clear"
-            />
-          )}
-        </Box>
-
-        {/* Current Location Button - Glovo Style */}
-        <Button
-          mt={3}
-          leftIcon={isGettingCurrentLocation ? (
-            <Box 
-              className="animate-spin"
-              style={{ 
-                width: '18px', 
-                height: '18px', 
-                border: '2px solid #e0e0e0', 
-                borderTop: '2px solid #185F2D', 
-                borderRadius: '50%' 
-              }}
-            />
-          ) : (
-            <Navigation size={18} />
-          )}
-          onClick={getCurrentLocation}
-          variant="outline"
-          colorScheme="green"
-          size="md"
-          width="100%"
-          borderRadius="xl"
-          h="48px"
-          fontSize="15px"
-          fontWeight="600"
-          borderColor="gray.300"
-          _hover={{
-            bg: 'green.50',
-            borderColor: '#185F2D',
-          }}
-          isDisabled={isGettingCurrentLocation}
-        >
-          {isGettingCurrentLocation ? 'Getting location...' : 'Use current location'}
-        </Button>
-      </Box>
-
-      {/* Suggestions / Recent Locations */}
-      <Box flex={1} overflowY="auto" bg="gray.50">
-        {isLoading && (
-          <Box textAlign="center" py={8}>
-            <Text color="gray.500">Loading location details...</Text>
-          </Box>
-        )}
-
-        {/* Suggestions */}
-        {suggestions.length > 0 && (
-          <Box bg="white" borderBottom="1px solid" borderColor="gray.200">
-            <Text px={4} py={2} fontSize="xs" fontWeight="bold" color="gray.500" textTransform="uppercase">
-              Suggestions
-            </Text>
-            <List spacing={0}>
-              {suggestions.map((prediction) => (
-                <ListItem
-                  key={prediction.place_id}
-                  px={4}
-                  py={3}
-                  borderBottom="1px solid"
-                  borderColor="gray.100"
-                  cursor="pointer"
-                  _hover={{ bg: 'gray.50' }}
-                  onClick={() => getPlaceDetails(prediction.place_id)}
-                >
-                  <HStack spacing={3}>
-                    <MapPin size={20} color="gray" />
-                    <VStack align="start" spacing={0} flex={1}>
-                      <Text fontWeight="600" fontSize="sm">
-                        {prediction.structured_formatting.main_text}
-                      </Text>
-                      <Text fontSize="xs" color="gray.500">
-                        {prediction.structured_formatting.secondary_text}
-                      </Text>
-                    </VStack>
-                  </HStack>
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-        )}
-
-        {/* Recent Locations */}
-        {suggestions.length === 0 && recentLocations.length > 0 && (
-          <Box bg="white">
-            <Text px={4} py={2} fontSize="xs" fontWeight="bold" color="gray.500" textTransform="uppercase">
-              Recent Locations
-            </Text>
-            <List spacing={0}>
-              {recentLocations.map((location, index) => (
-                <ListItem
-                  key={index}
-                  px={4}
-                  py={3}
-                  borderBottom="1px solid"
-                  borderColor="gray.100"
-                  cursor="pointer"
-                  _hover={{ bg: 'gray.50' }}
-              onClick={() => {
-                const locData = {
-                  lat: location.lat,
-                  lng: location.lng,
-                  address: location.address,
-                  address1: location.address,
-                  address2: '',
-                };
-                setSelectedLocation(locData);
-                setSearchQuery(location.address);
-                onLocationSelected(locData);
-                if (onClose) onClose();
-              }}
-                >
-                  <HStack spacing={3}>
-                    <Avatar size="sm" bg="green.100" icon={<MapPin size={16} color="green" />} />
-                    <VStack align="start" spacing={0} flex={1}>
-                      <Text fontWeight="600" fontSize="sm" noOfLines={1}>
-                        {location.address}
-                      </Text>
-                      <Badge colorScheme="green" fontSize="xs" mt={1}>
-                        Tap to use
-                      </Badge>
-                    </VStack>
-                  </HStack>
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-        )}
-
-        {/* Empty State */}
-        {suggestions.length === 0 && recentLocations.length === 0 && !isLoading && (
-          <Box textAlign="center" py={12} px={4}>
-            <MapPin size={48} color="gray" style={{ margin: '0 auto 16px' }} />
-            <Text fontSize="lg" fontWeight="600" mb={2} color="gray.700">
-              {required ? 'Where should we deliver?' : 'Search for a location'}
-            </Text>
-            <Text fontSize="sm" color="gray.500">
-              {required
-                ? 'Enter your delivery address to continue'
-                : 'Type an address or use your current location'}
-            </Text>
-          </Box>
-        )}
-      </Box>
-
-      {/* Confirm Button */}
-      {selectedLocation && (
-        <Box
-          p={4}
-          borderTop="1px solid"
-          borderColor="gray.200"
+        <ModalCloseButton
+          size="lg"
+          borderRadius="full"
           bg="white"
-          boxShadow="0 -2px 10px rgba(0,0,0,0.1)"
-        >
-          <VStack spacing={3} align="stretch">
-            <Box p={3} bg="green.50" borderRadius="md" border="1px solid" borderColor="green.200">
-              <HStack spacing={2} mb={1}>
-                <MapPin size={16} color="green" />
-                <Text fontSize="xs" fontWeight="bold" color="green.700">
-                  Selected Location
-                </Text>
-              </HStack>
-              <Text fontSize="sm" color="gray.700" noOfLines={2}>
-                {selectedLocation.address}
-              </Text>
-            </Box>
-            <Button
-              width="100%"
-              bg="#185F2D"
-              color="white"
-              size="lg"
-              height="56px"
-              fontSize="18px"
-              fontWeight="700"
-              borderRadius="xl"
-              onClick={confirmLocation}
-              isDisabled={!selectedLocation}
-              _hover={{
-                bg: '#154924',
-              }}
-              _active={{
-                bg: '#123d1f',
-              }}
-              _disabled={{
-                bg: 'gray.300',
-                cursor: 'not-allowed',
-              }}
-              boxShadow="0 4px 12px rgba(24, 95, 45, 0.3)"
+          color="gray.600"
+          _hover={{ bg: 'gray.100' }}
+          top={4}
+          right={4}
+          zIndex={10000}
+          display={required ? 'none' : 'block'}
+        />
+
+        <ModalBody p={0} overflow="hidden">
+          <Box
+            display="flex"
+            flexDirection="column"
+            h="100vh"
+            bg="white"
+          >
+            {/* Header - Glovo Style with YooKatale Colors */}
+            <Box
+              p={6}
+              borderBottom="1px solid"
+              borderColor="gray.200"
+              bg="white"
+              boxShadow="0 2px 8px rgba(0,0,0,0.08)"
             >
-              Confirm Location
-            </Button>
-          </VStack>
-        </Box>
-      )}
-    </Box>
+              <VStack spacing={4} align="stretch">
+                {/* Title */}
+                <Text
+                  fontSize="28px"
+                  fontWeight="700"
+                  color="gray.800"
+                  textAlign="center"
+                  letterSpacing="-0.5px"
+                >
+                  {required ? 'Where shall we deliver to?' : 'Select Delivery Location'}
+                </Text>
+
+                {/* Search Input - Glovo Style */}
+                <Box position="relative">
+                  <Input
+                    ref={searchInputRef}
+                    placeholder="Search address"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    size="lg"
+                    borderRadius="xl"
+                    pl={14}
+                    pr={12}
+                    h="56px"
+                    fontSize="16px"
+                    borderColor="gray.300"
+                    bg="gray.50"
+                    _focus={{
+                      borderColor: '#185F2D',
+                      boxShadow: '0 0 0 3px rgba(24, 95, 45, 0.1)',
+                      bg: 'white',
+                    }}
+                    _hover={{
+                      borderColor: 'gray.400',
+                      bg: 'white',
+                    }}
+                    autoFocus
+                  />
+                  <Box
+                    position="absolute"
+                    left={5}
+                    top="50%"
+                    transform="translateY(-50%)"
+                    color="gray.400"
+                    pointerEvents="none"
+                  >
+                    <Search size={24} />
+                  </Box>
+                  {searchQuery && (
+                    <IconButton
+                      position="absolute"
+                      right={2}
+                      top="50%"
+                      transform="translateY(-50%)"
+                      icon={<X size={18} />}
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSuggestions([]);
+                        setSelectedLocation(null);
+                      }}
+                      variant="ghost"
+                      size="sm"
+                      aria-label="Clear"
+                      borderRadius="full"
+                      _hover={{ bg: 'gray.100' }}
+                    />
+                  )}
+                </Box>
+
+                {/* Current Location Button - Glovo Style */}
+                <Button
+                  leftIcon={isGettingCurrentLocation ? (
+                    <Box
+                      className="animate-spin"
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        border: '2px solid #e0e0e0',
+                        borderTop: '2px solid #185F2D',
+                        borderRadius: '50%'
+                      }}
+                    />
+                  ) : (
+                    <Navigation size={20} />
+                  )}
+                  onClick={getCurrentLocation}
+                  variant="solid"
+                  bg="#185F2D"
+                  color="white"
+                  size="lg"
+                  width="100%"
+                  borderRadius="xl"
+                  h="52px"
+                  fontSize="16px"
+                  fontWeight="600"
+                  _hover={{
+                    bg: '#154924',
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 4px 12px rgba(24, 95, 45, 0.3)',
+                  }}
+                  _active={{
+                    bg: '#123d1f',
+                    transform: 'translateY(0)',
+                  }}
+                  transition="all 0.2s"
+                  isDisabled={isGettingCurrentLocation}
+                >
+                  {isGettingCurrentLocation ? 'Getting location...' : 'Use current location'}
+                </Button>
+              </VStack>
+            </Box>
+
+            {/* Suggestions / Recent Locations */}
+            <Box flex={1} overflowY="auto" bg="gray.50">
+              {isLoading && (
+                <Box textAlign="center" py={12}>
+                  <Box
+                    display="inline-block"
+                    w="40px"
+                    h="40px"
+                    border="4px solid #e0e0e0"
+                    borderTop="4px solid #185F2D"
+                    borderRadius="50%"
+                    className="animate-spin"
+                    mb={4}
+                  />
+                  <Text color="gray.600" fontSize="14px">Loading location details...</Text>
+                </Box>
+              )}
+
+              {/* Suggestions */}
+              {!isLoading && suggestions.length > 0 && (
+                <Box bg="white" borderBottom="1px solid" borderColor="gray.200">
+                  <Text
+                    px={6}
+                    py={3}
+                    fontSize="11px"
+                    fontWeight="700"
+                    color="gray.500"
+                    textTransform="uppercase"
+                    letterSpacing="0.5px"
+                  >
+                    Suggestions
+                  </Text>
+                  <List spacing={0}>
+                    {suggestions.map((prediction, index) => (
+                      <ListItem
+                        key={prediction.place_id}
+                        px={6}
+                        py={4}
+                        borderBottom={index < suggestions.length - 1 ? "1px solid" : "none"}
+                        borderColor="gray.100"
+                        cursor="pointer"
+                        _hover={{ bg: '#185F2D' + '08' }}
+                        onClick={() => getPlaceDetails(prediction.place_id)}
+                        transition="all 0.2s"
+                      >
+                        <HStack spacing={4} align="start">
+                          <Box
+                            mt={1}
+                            p={2}
+                            bg="#185F2D"
+                            borderRadius="lg"
+                            color="white"
+                          >
+                            <MapPin size={18} />
+                          </Box>
+                          <VStack align="start" spacing={1} flex={1}>
+                            <Text fontWeight="600" fontSize="15px" color="gray.800">
+                              {prediction.structured_formatting.main_text}
+                            </Text>
+                            <Text fontSize="13px" color="gray.500">
+                              {prediction.structured_formatting.secondary_text}
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              )}
+
+              {/* Recent Locations */}
+              {!isLoading && suggestions.length === 0 && recentLocations.length > 0 && (
+                <Box bg="white">
+                  <Text
+                    px={6}
+                    py={3}
+                    fontSize="11px"
+                    fontWeight="700"
+                    color="gray.500"
+                    textTransform="uppercase"
+                    letterSpacing="0.5px"
+                  >
+                    Recent Locations
+                  </Text>
+                  <List spacing={0}>
+                    {recentLocations.map((location, index) => (
+                      <ListItem
+                        key={index}
+                        px={6}
+                        py={4}
+                        borderBottom={index < recentLocations.length - 1 ? "1px solid" : "none"}
+                        borderColor="gray.100"
+                        cursor="pointer"
+                        _hover={{ bg: '#185F2D' + '08' }}
+                        onClick={() => {
+                          const locData = {
+                            lat: location.lat,
+                            lng: location.lng,
+                            address: location.address,
+                            address1: location.address,
+                            address2: '',
+                          };
+                          setSelectedLocation(locData);
+                          setSearchQuery(location.address);
+                          onLocationSelected(locData);
+                          if (onClose) onClose();
+                        }}
+                        transition="all 0.2s"
+                      >
+                        <HStack spacing={4} align="center">
+                          <Avatar
+                            size="md"
+                            bg="#185F2D"
+                            icon={<MapPin size={20} color="white" />}
+                          />
+                          <VStack align="start" spacing={0} flex={1}>
+                            <Text fontWeight="600" fontSize="15px" color="gray.800" noOfLines={1}>
+                              {location.address}
+                            </Text>
+                            <Badge
+                              colorScheme="green"
+                              fontSize="10px"
+                              mt={1}
+                              px={2}
+                              py={0.5}
+                              borderRadius="md"
+                            >
+                              Tap to use
+                            </Badge>
+                          </VStack>
+                        </HStack>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              )}
+
+              {/* Empty State */}
+              {!isLoading && suggestions.length === 0 && recentLocations.length === 0 && (
+                <Box textAlign="center" py={16} px={6}>
+                  <Box
+                    display="inline-flex"
+                    p={6}
+                    bg="#185F2D" + '10'
+                    borderRadius="full"
+                    mb={6}
+                  >
+                    <MapPin size={56} color="#185F2D" />
+                  </Box>
+                  <Text fontSize="20px" fontWeight="700" mb={2} color="gray.800">
+                    {required ? 'Where shall we deliver to?' : 'Search for a location'}
+                  </Text>
+                  <Text fontSize="15px" color="gray.500" maxW="400px" mx="auto">
+                    {required
+                      ? 'Enter your delivery address to continue shopping'
+                      : 'Type an address or use your current location'}
+                  </Text>
+                </Box>
+              )}
+            </Box>
+
+            {/* Confirm Button - Fixed at Bottom */}
+            {selectedLocation && (
+              <Box
+                p={6}
+                borderTop="1px solid"
+                borderColor="gray.200"
+                bg="white"
+                boxShadow="0 -4px 12px rgba(0,0,0,0.08)"
+              >
+                <VStack spacing={4} align="stretch">
+                  <Box
+                    p={4}
+                    bg="#185F2D" + '10'
+                    borderRadius="xl"
+                    border="2px solid"
+                    borderColor="#185F2D"
+                  >
+                    <HStack spacing={3} mb={2}>
+                      <Box
+                        p={1.5}
+                        bg="#185F2D"
+                        borderRadius="md"
+                        color="white"
+                      >
+                        <MapPin size={16} />
+                      </Box>
+                      <Text fontSize="11px" fontWeight="700" color="#185F2D" textTransform="uppercase">
+                        Selected Location
+                      </Text>
+                    </HStack>
+                    <Text fontSize="14px" color="gray.700" noOfLines={2} fontWeight="500">
+                      {selectedLocation.address}
+                    </Text>
+                  </Box>
+                  <Button
+                    width="100%"
+                    bg="#185F2D"
+                    color="white"
+                    size="lg"
+                    height="56px"
+                    fontSize="18px"
+                    fontWeight="700"
+                    borderRadius="xl"
+                    onClick={confirmLocation}
+                    _hover={{
+                      bg: '#154924',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 20px rgba(24, 95, 45, 0.4)',
+                    }}
+                    _active={{
+                      bg: '#123d1f',
+                      transform: 'translateY(0)',
+                    }}
+                    transition="all 0.2s"
+                    boxShadow="0 4px 12px rgba(24, 95, 45, 0.3)"
+                  >
+                    Confirm Location
+                  </Button>
+                </VStack>
+              </Box>
+            )}
+          </Box>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }

@@ -90,20 +90,34 @@ const Header = () => {
             </Box>
           </Flex>
 
-          {/* Search Bar */}
-          <Box mx={4} display={{ base: "none", md: "block" }} w={"12rem"} >
+          {/* Search Bar - Glovo Style */}
+          <Box mx={4} display={{ base: "none", md: "block" }} w={"16rem"} >
             <form onSubmit={handleSearchFormSubmit}>
-              <InputGroup size="md" w={'12rem'} px={1} py={1}>
-                <InputLeftElement pointerEvents="none">
-                  <FaSearch color="gray.300" />
+              <InputGroup size="md" w={'16rem'}>
+                <InputLeftElement pointerEvents="none" pl={3}>
+                  <FaSearch color="gray.400" size={18} />
                 </InputLeftElement>
                 <Input
                   type="text"
-                  placeholder="Search for products"
+                  placeholder="Search for products..."
                   value={searchParam}
                   onChange={(e) => setSearchParam(e.target.value)}
-                  fontSize="0.875rem"  // Smaller font size for inputs
-                  paddingLeft="1.78rem"  // Increase left padding to avoid overlap with icon
+                  fontSize="0.9375rem"
+                  h="42px"
+                  borderRadius="xl"
+                  bg="gray.50"
+                  borderColor="gray.300"
+                  paddingLeft="3rem"
+                  _focus={{
+                    bg: 'white',
+                    borderColor: '#185F2D',
+                    boxShadow: '0 0 0 2px rgba(24, 95, 45, 0.1)',
+                  }}
+                  _hover={{
+                    borderColor: 'gray.400',
+                    bg: 'white',
+                  }}
+                  transition="all 0.2s"
                 />
               </InputGroup>
             </form>
