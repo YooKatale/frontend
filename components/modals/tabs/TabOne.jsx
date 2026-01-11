@@ -15,8 +15,9 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import ButtonComponent from "@components/Button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import LocationPicker from "@components/LocationPicker";
 // import React from 'react'
 
 const TabOne = ({ updateTabIndex, fetchData }) => {
@@ -25,7 +26,11 @@ const TabOne = ({ updateTabIndex, fetchData }) => {
   const [deliveryAddress, setDeliveryAddress] = useState({
     address1: "",
     address2: "",
+    latitude: null,
+    longitude: null,
   });
+  
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
 
   const [specialRequests, setSpecialRequests] = useState({
     peeledFood: false,
@@ -45,6 +50,35 @@ const TabOne = ({ updateTabIndex, fetchData }) => {
   const handleDeliveryDataChange = (e) => {
     setDeliveryAddress({ ...deliveryAddress, [e.target.name]: e.target.value });
   };
+
+  const handleLocationSelected = (locationData) => {
+    setDeliveryAddress({
+      ...deliveryAddress,
+      address1: locationData.address || locationData.address1 || deliveryAddress.address1,
+      latitude: locationData.latitude,
+      longitude: locationData.longitude,
+    });
+    setShowLocationPicker(false);
+  };
+
+  // Load Google Maps script
+  useEffect(() => {
+    if (showLocationPicker && !window.google) {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+      
+      script.onload = () => {
+        // Script loaded
+      };
+      
+      return () => {
+        // Cleanup if needed
+      };
+    }
+  }, [showLocationPicker]);
 
   const handlePersonalInfoChange = (e) => {
     setPersonalInfo({ ...personalInfo, [e.target.name]: e.target.value });
@@ -179,6 +213,31 @@ const TabOne = ({ updateTabIndex, fetchData }) => {
         </Box>
 
         <Box padding={"1rem 0"}>
+          <Box mb={4}>
+            <ButtonComponent
+              type="button"
+              text="📍 Select Location on Map"
+              onClick={() => setShowLocationPicker(true)}
+              style={{ backgroundColor: '#185F2D', color: 'white', width: '100%' }}
+            />
+          </Box>
+          {deliveryAddress.latitude && deliveryAddress.longitude && (
+            <Box
+              p={3}
+              mb={4}
+              bg="green.50"
+              borderRadius="md"
+              border="1px solid"
+              borderColor="green.200"
+            >
+              <Text fontSize="xs" color="green.600" fontWeight="bold" mb={1}>
+                ✓ Location Selected
+              </Text>
+              <Text fontSize="xs" color="green.700">
+                Coordinates: {deliveryAddress.latitude.toFixed(6)}, {deliveryAddress.longitude.toFixed(6)}
+              </Text>
+            </Box>
+          )}
           <Grid
             gridTemplateColumns={{
               base: "repeat(1, 1fr)",
@@ -192,7 +251,7 @@ const TabOne = ({ updateTabIndex, fetchData }) => {
               <Textarea
                 name="address1"
                 id="address1"
-                placeholder="Delivery address"
+                placeholder="Delivery address or select on map"
                 value={deliveryAddress.address1}
                 onChange={handleDeliveryDataChange}
               />
@@ -202,13 +261,26 @@ const TabOne = ({ updateTabIndex, fetchData }) => {
               <Textarea
                 name="address2"
                 id="address2"
-                placeholder="Delivery address"
+                placeholder="Delivery address (optional)"
                 value={deliveryAddress.address2}
                 onChange={handleDeliveryDataChange}
               />
             </FormControl>
           </Grid>
         </Box>
+        
+        {showLocationPicker && (
+          <LocationPicker
+            onLocationSelected={handleLocationSelected}
+            onClose={() => setShowLocationPicker(false)}
+            initialAddress={deliveryAddress.address1}
+            initialLocation={
+              deliveryAddress.latitude && deliveryAddress.longitude
+                ? { lat: deliveryAddress.latitude, lng: deliveryAddress.longitude }
+                : null
+            }
+          />
+        )}
         <Box padding={"0.5rem 0"}>
           <Box>
             <Heading as={"h3"} size={"md"}>
