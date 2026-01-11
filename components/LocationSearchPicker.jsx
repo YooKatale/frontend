@@ -309,6 +309,12 @@ export default function LocationSearchPicker({
           const updated = [location, ...recentLocations.filter(l => l.address !== location.address)].slice(0, 5);
           setRecentLocations(updated);
           localStorage.setItem('yookatale_recent_locations', JSON.stringify(updated));
+
+          // Automatically confirm and save location when selected (like Glovo)
+          onLocationSelected(location);
+          if (onClose) {
+            onClose();
+          }
         } else {
           toast({
             title: 'Error',
@@ -898,8 +904,8 @@ export default function LocationSearchPicker({
               )}
             </Box>
 
-            {/* Confirm Button - Fixed at Bottom */}
-            {selectedLocation && (
+            {/* Confirm Button - Fixed at Bottom (only show if location was selected from "Use current location") */}
+            {selectedLocation && !suggestions.length && (
               <Box
                 p={4}
                 borderTop="1px solid"

@@ -100,38 +100,7 @@ const Hero = () => {
           </Box>
         </Box>
 
-        {/* Hero Content */}
-        <Box
-          position="relative"
-          zIndex={5}
-          height="100%"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          px={6}
-          textAlign="center"
-        >
-          <Text
-            fontSize={{ base: "2.5rem", md: "4rem", lg: "5rem" }}
-            fontWeight="800"
-            color="white"
-            mb={4}
-            letterSpacing="-0.02em"
-            textShadow="0 2px 8px rgba(0,0,0,0.3)"
-          >
-            Explore Uganda
-          </Text>
-          <Text
-            fontSize={{ base: "1rem", md: "1.25rem" }}
-            color="white"
-            fontWeight="500"
-            maxW="600px"
-            textShadow="0 1px 4px rgba(0,0,0,0.3)"
-          >
-            Fresh groceries, organic foods, and everything you need delivered to your door
-          </Text>
-        </Box>
+        {/* Hero Content - Empty for cleaner look */}
       </Box>
 
       {/* Location Picker Modal */}
