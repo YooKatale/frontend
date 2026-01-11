@@ -449,11 +449,19 @@ export default function LocationSearchPicker({
                   borderColor="gray.100"
                   cursor="pointer"
                   _hover={{ bg: 'gray.50' }}
-                  onClick={() => {
-                    setSelectedLocation(location);
-                    setSearchQuery(location.address);
-                    confirmLocation();
-                  }}
+              onClick={() => {
+                const locData = {
+                  lat: location.lat,
+                  lng: location.lng,
+                  address: location.address,
+                  address1: location.address,
+                  address2: '',
+                };
+                setSelectedLocation(locData);
+                setSearchQuery(location.address);
+                onLocationSelected(locData);
+                if (onClose) onClose();
+              }}
                 >
                   <HStack spacing={3}>
                     <Avatar size="sm" bg="green.100" icon={<MapPin size={16} color="green" />} />
@@ -511,10 +519,26 @@ export default function LocationSearchPicker({
             </Box>
             <Button
               width="100%"
-              colorScheme="green"
+              bg="#185F2D"
+              color="white"
               size="lg"
+              height="56px"
+              fontSize="18px"
+              fontWeight="700"
+              borderRadius="xl"
               onClick={confirmLocation}
               isDisabled={!selectedLocation}
+              _hover={{
+                bg: '#154924',
+              }}
+              _active={{
+                bg: '#123d1f',
+              }}
+              _disabled={{
+                bg: 'gray.300',
+                cursor: 'not-allowed',
+              }}
+              boxShadow="0 4px 12px rgba(24, 95, 45, 0.3)"
             >
               Confirm Location
             </Button>
