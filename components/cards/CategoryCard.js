@@ -76,18 +76,19 @@ const CategoryCard = ({ category }) => {
         overflow="hidden"
         borderRadius="xl"
         bg="white"
-        boxShadow={isHovered ? 'lg' : 'md'}
+        boxShadow={isHovered ? '0 8px 20px rgba(0,0,0,0.12)' : '0 2px 8px rgba(0,0,0,0.08)'}
         transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-        transform={isHovered ? 'translateY(-4px)' : 'translateY(0)'}
+        transform={isHovered ? 'translateY(-6px)' : 'translateY(0)'}
         cursor="pointer"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        border="1px solid"
-        borderColor={isHovered ? 'green.400' : 'gray.200'}
+        border="2px solid"
+        borderColor={isHovered ? '#185F2D' : 'transparent'}
         _hover={{
           '& .category-overlay': {
             opacity: 1,
           },
+          borderColor: '#185F2D',
         }}
       >
         <VStack spacing={2} p={3}>
@@ -118,11 +119,17 @@ const CategoryCard = ({ category }) => {
                 alignItems="center"
                 justifyContent="center"
                 height="100%"
-                bg="green.50"
+                bgGradient="linear(to-br, #185F2D10, #185F2D05)"
               >
-                <Text fontSize="3xl" color="green.500">
+                <Box
+                  p={4}
+                  borderRadius="full"
+                  bg="#185F2D"
+                  color="white"
+                  fontSize="2xl"
+                >
                   🛒
-                </Text>
+                </Box>
               </Box>
             )}
             

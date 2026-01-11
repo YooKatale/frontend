@@ -69,13 +69,24 @@ const Header = () => {
           {/* Left Section - Logo and Categories Dropdown */}
           <Flex align="center">
             <Link href="/">
-              <Image
-                src="/assets/icons/logo2.png"
-                alt="Logo"
-                height={100} // Adjust logo size using relative units
-                width={100}
-
-              />
+              <Box
+                as="span"
+                display="flex"
+                alignItems="center"
+                _hover={{ transform: 'scale(1.05)' }}
+                transition="transform 0.2s"
+              >
+                <Image
+                  src="/assets/icons/logo2.png"
+                  alt="YooKatale Logo"
+                  height={90}
+                  width={90}
+                  priority
+                  style={{
+                    objectFit: 'contain',
+                  }}
+                />
+              </Box>
             </Link>
             <Box display={{ base: "none", md: "block" }}>
               <Button

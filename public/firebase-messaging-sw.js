@@ -33,9 +33,10 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification?.title || payload.data?.title || "YooKatale";
   const notificationBody = payload.notification?.body || payload.data?.body || "You have a new notification";
   
-  // Use absolute URLs for icons (required for background notifications) - Use YooKatale logo1
-  const iconUrl = "https://www.yookatale.app/assets/icons/logo1.webp";
-  const badgeUrl = "https://www.yookatale.app/assets/icons/logo1.webp";
+  // Use absolute URLs for icons (required for background notifications) - Use YooKatale original logo
+  // Using logo2.png which is the YooKatale logo, or fallback to logo if logo1 doesn't exist
+  const iconUrl = "https://www.yookatale.app/assets/icons/logo2.png";
+  const badgeUrl = "https://www.yookatale.app/assets/icons/logo2.png";
   
   // Get URL from various possible locations in payload
   const notificationUrl = payload.data?.url || 

@@ -43,19 +43,19 @@ const SpecialProducts = ({ Products, userInfo, category, text }) => {
                      text;
 
   return (
-    <Box mb={8}>
+    <Box mb={8} mx={{ base: 2, md: 4, lg: 6 }}>
       <Box
         bgGradient={style.bgGradient}
-        py={{ base: 3, md: 4 }}
-        px={{ base: "1rem", md: "2rem" }}
-        borderRadius="xl"
-        boxShadow="lg"
+        py={{ base: 4, md: 5 }}
+        px={{ base: "1.5rem", md: "2rem", lg: "2.5rem" }}
+        borderRadius="2xl"
+        boxShadow="0 4px 12px rgba(0,0,0,0.15)"
         position="relative"
         overflow="hidden"
         transition="all 0.3s ease"
         _hover={{
-          boxShadow: "xl",
-          transform: "translateY(-2px)"
+          boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+          transform: "translateY(-4px)"
         }}
         _before={{
           content: '""',

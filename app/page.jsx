@@ -268,13 +268,15 @@ const Home = () => {
               }}
               gap={{ base: 4, md: 5, lg: 6 }}
               py={8}
+              px={{ base: 2, md: 4 }}
             >
               {displayCategories.map((category, index) => (
                 <motion.div
                   key={category._id || index}
                   variants={itemVariants}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  transition={{ duration: 0.2 }}
+                  whileHover={{ scale: 1.08, y: -8 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  style={{ willChange: 'transform' }}
                 >
                   <CategoryCard
                     category={typeof category === 'string' ? category : category.name}
