@@ -16,28 +16,69 @@ export default function LocationGate({ children }) {
 
   useEffect(() => {
     // Check if location is already saved
-    const savedLocation = localStorage.getItem('yookatale_delivery_location');
-    if (savedLocation) {
+    const checkLocation = () => {
       try {
-        const parsed = JSON.parse(savedLocation);
-        setLocation(parsed);
-        setIsLoading(false);
-        setShowLocationPicker(false);
+        const savedLocation = localStorage.getItem('yookatale_delivery_location');
+        if (savedLocation) {
+          const parsed = JSON.parse(savedLocation);
+          // Validate location - must have address and not be browsing placeholder
+          if (parsed && parsed.address && parsed.address !== 'Browsing - Location not set') {
+            console.log('Valid location found:', parsed);
+            setLocation(parsed);
+            setShowLocationPicker(false);
+          } else {
+            console.log('Invalid or browsing location, showing picker');
+            setLocation(null);
+            setShowLocationPicker(true);
+          }
+        } else {
+          console.log('No location saved, showing picker');
+          setLocation(null);
+          setShowLocationPicker(true);
+        }
       } catch (e) {
-        setIsLoading(false);
+        console.error('Error parsing location:', e);
+        setLocation(null);
         setShowLocationPicker(true);
+      } finally {
+        setIsLoading(false);
       }
-    } else {
-      setIsLoading(false);
-      setShowLocationPicker(true);
-    }
+    };
+
+    checkLocation();
+
+    // Listen for storage changes (when location is saved from another tab/component)
+    const handleStorageChange = (e) => {
+      if (e.key === 'yookatale_delivery_location') {
+        checkLocation();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const handleLocationSelected = (locationData) => {
-    // Save location to localStorage (even if it's a browsing placeholder)
-    localStorage.setItem('yookatale_delivery_location', JSON.stringify(locationData));
-    setLocation(locationData);
-    setShowLocationPicker(false);
+    console.log('LocationGate: handleLocationSelected called with:', locationData);
+    try {
+      // Validate location data
+      if (!locationData || !locationData.address) {
+        console.error('Invalid location data:', locationData);
+        return;
+      }
+
+      // Save location to localStorage
+      const locationJson = JSON.stringify(locationData);
+      localStorage.setItem('yookatale_delivery_location', locationJson);
+      console.log('LocationGate: Location saved to localStorage');
+
+      // Update state
+      setLocation(locationData);
+      setShowLocationPicker(false);
+      console.log('LocationGate: Location state updated, modal closed');
+    } catch (error) {
+      console.error('LocationGate: Error saving location:', error);
+    }
   };
 
   // Always render children (homepage) in background, overlay modal when needed

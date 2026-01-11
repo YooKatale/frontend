@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -102,6 +102,53 @@ export default function LocationSearchPicker({
       }, 0);
     });
   };
+
+  // Save location helper - ensures location is saved properly
+  const saveLocation = useCallback((location) => {
+    try {
+      console.log('Saving location:', location);
+      
+      // Validate location has required fields
+      if (!location || !location.address) {
+        console.error('Invalid location object:', location);
+        return false;
+      }
+
+      // Save to main location storage
+      localStorage.setItem('yookatale_delivery_location', JSON.stringify(location));
+      console.log('Location saved to localStorage');
+
+      // Save to recent locations
+      const updated = [location, ...recentLocations.filter(l => l.address !== location.address)].slice(0, 5);
+      setRecentLocations(updated);
+      localStorage.setItem('yookatale_recent_locations', JSON.stringify(updated));
+
+      // Call the callback
+      if (onLocationSelected) {
+        onLocationSelected(location);
+        console.log('onLocationSelected callback called');
+      }
+
+      // Close modal
+      if (onClose) {
+        setTimeout(() => {
+          onClose();
+          console.log('Modal closed');
+        }, 100);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error saving location:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save location. Please try again.',
+        status: 'error',
+        duration: 3000,
+      });
+      return false;
+    }
+  }, [recentLocations, onLocationSelected, onClose, toast]);
 
   // Load Google Maps script with async loading
   useEffect(() => {
@@ -273,7 +320,10 @@ export default function LocationSearchPicker({
 
   // Get place details from place_id
   const getPlaceDetails = (placeId) => {
+    console.log('Getting place details for:', placeId);
+    
     if (!placesServiceRef.current) {
+      console.error('PlacesService not available');
       toast({
         title: 'Error',
         description: 'Location services not ready. Please try again.',
@@ -292,6 +342,8 @@ export default function LocationSearchPicker({
     try {
       placesServiceRef.current.getDetails(request, (place, status) => {
         setIsLoading(false);
+        console.log('Place details response:', { status, place: place ? 'exists' : 'null' });
+        
         if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
           const location = {
             lat: place.geometry.location.lat(),
@@ -301,21 +353,18 @@ export default function LocationSearchPicker({
             address2: '',
           };
 
+          console.log('Location data prepared:', location);
           setSelectedLocation(location);
           setSearchQuery(location.address);
           setSuggestions([]);
 
-          // Save to recent locations
-          const updated = [location, ...recentLocations.filter(l => l.address !== location.address)].slice(0, 5);
-          setRecentLocations(updated);
-          localStorage.setItem('yookatale_recent_locations', JSON.stringify(updated));
-
-          // Automatically confirm and save location when selected (like Glovo)
-          onLocationSelected(location);
-          if (onClose) {
-            onClose();
+          // Save location using helper function
+          const saved = saveLocation(location);
+          if (!saved) {
+            console.error('Failed to save location');
           }
         } else {
+          console.error('Place details error:', status);
           toast({
             title: 'Error',
             description: 'Failed to get location details. Please try again.',
@@ -351,9 +400,11 @@ export default function LocationSearchPicker({
     }
 
     setIsGettingCurrentLocation(true);
+    console.log('Getting current location...');
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        console.log('Position received:', position.coords);
         try {
           const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
           if (!apiKey) {
@@ -369,6 +420,7 @@ export default function LocationSearchPicker({
           }
 
           const data = await response.json();
+          console.log('Geocoding response:', data.status);
 
           if (data.status === 'OK' && data.results && data.results.length > 0) {
             const location = {
@@ -379,18 +431,14 @@ export default function LocationSearchPicker({
               address2: '',
             };
 
+            console.log('Current location prepared:', location);
             setSelectedLocation(location);
             setSearchQuery(location.address);
 
-            // Save to recent locations
-            const updated = [location, ...recentLocations.filter(l => l.address !== location.address)].slice(0, 5);
-            setRecentLocations(updated);
-            localStorage.setItem('yookatale_recent_locations', JSON.stringify(updated));
-
-            // Automatically confirm and save location
-            onLocationSelected(location);
-            if (onClose) {
-              onClose();
+            // Save location using helper function
+            const saved = saveLocation(location);
+            if (!saved) {
+              console.error('Failed to save current location');
             }
           } else if (data.status === 'ZERO_RESULTS') {
             // Fallback: create location from coordinates if geocoding fails
@@ -401,18 +449,15 @@ export default function LocationSearchPicker({
               address1: `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`,
               address2: '',
             };
+            
+            console.log('Location from coordinates prepared:', location);
             setSelectedLocation(location);
             setSearchQuery(location.address);
             
-            // Save to recent locations
-            const updated = [location, ...recentLocations.filter(l => l.address !== location.address)].slice(0, 5);
-            setRecentLocations(updated);
-            localStorage.setItem('yookatale_recent_locations', JSON.stringify(updated));
-
-            // Automatically confirm and save location
-            onLocationSelected(location);
-            if (onClose) {
-              onClose();
+            // Save location using helper function
+            const saved = saveLocation(location);
+            if (!saved) {
+              console.error('Failed to save location from coordinates');
             }
           } else {
             throw new Error(data.error_message || 'No results found');
@@ -468,8 +513,11 @@ export default function LocationSearchPicker({
       return;
     }
 
-    onLocationSelected(selectedLocation);
-    if (onClose) onClose();
+    console.log('Confirming location:', selectedLocation);
+    const saved = saveLocation(selectedLocation);
+    if (!saved) {
+      console.error('Failed to confirm location');
+    }
   };
 
   const handleClose = (e) => {
@@ -490,12 +538,10 @@ export default function LocationSearchPicker({
       address1: '',
       address2: '',
     };
-    localStorage.setItem('yookatale_delivery_location', JSON.stringify(browsingLocation));
-    if (onLocationSelected) {
-      onLocationSelected(browsingLocation);
-    }
-    if (onClose) {
-      onClose();
+    console.log('Saving browsing location:', browsingLocation);
+    const saved = saveLocation(browsingLocation);
+    if (!saved) {
+      console.error('Failed to save browsing location');
     }
   };
 
@@ -784,7 +830,9 @@ export default function LocationSearchPicker({
                         cursor="pointer"
                         _hover={{ bg: '#185F2D08' }}
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
+                          console.log('Suggestion clicked:', prediction.place_id);
                           getPlaceDetails(prediction.place_id);
                         }}
                         transition="all 0.2s"
@@ -839,6 +887,7 @@ export default function LocationSearchPicker({
                         cursor="pointer"
                         _hover={{ bg: '#185F2D08' }}
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           const locData = {
                             lat: location.lat,
@@ -847,10 +896,13 @@ export default function LocationSearchPicker({
                             address1: location.address,
                             address2: '',
                           };
+                          console.log('Recent location clicked:', locData);
                           setSelectedLocation(locData);
                           setSearchQuery(location.address);
-                          onLocationSelected(locData);
-                          if (onClose) onClose();
+                          const saved = saveLocation(locData);
+                          if (!saved) {
+                            console.error('Failed to save recent location');
+                          }
                         }}
                         transition="all 0.2s"
                       >
@@ -963,7 +1015,7 @@ export default function LocationSearchPicker({
                     _hover={{
                       bg: '#154924',
                       transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 20px rgba(24, 95, 45, 0.4)',
+                      boxShadow: '0 8px 20px rgba(24, 95, 45, 00.4)',
                     }}
                     _active={{
                       bg: '#123d1f',
