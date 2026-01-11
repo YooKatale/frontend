@@ -43,17 +43,68 @@ export default function LocationSearchPicker({
   const searchInputRef = useRef(null);
   const toast = useToast();
 
-  // Initialize Google Places Autocomplete
+  // Load Google Maps script if not already loaded
   useEffect(() => {
-    if (!window.google || !window.google.maps) return;
+    if (window.google && window.google.maps && window.google.maps.places) {
+      // Google Maps already loaded
+      if (!autocompleteServiceRef.current) {
+        autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService();
+      }
+      if (!placesServiceRef.current) {
+        placesServiceRef.current = new window.google.maps.places.PlacesService(
+          document.createElement('div')
+        );
+      }
+    } else {
+      // Load Google Maps script
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+      if (!apiKey) {
+        console.warn('Google Maps API key is not set');
+        return;
+      }
 
-    if (!autocompleteServiceRef.current) {
-      autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService();
-    }
-    if (!placesServiceRef.current) {
-      placesServiceRef.current = new window.google.maps.places.PlacesService(
-        document.createElement('div')
-      );
+      // Check if script already exists
+      if (document.querySelector(`script[src*="maps.googleapis.com"]`)) {
+        // Script exists, wait for it to load
+        const checkGoogle = setInterval(() => {
+          if (window.google && window.google.maps && window.google.maps.places) {
+            clearInterval(checkGoogle);
+            if (!autocompleteServiceRef.current) {
+              autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService();
+            }
+            if (!placesServiceRef.current) {
+              placesServiceRef.current = new window.google.maps.places.PlacesService(
+                document.createElement('div')
+              );
+            }
+          }
+        }, 100);
+
+        return () => clearInterval(checkGoogle);
+      }
+
+      // Create and load script
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        if (window.google && window.google.maps && window.google.maps.places) {
+          if (!autocompleteServiceRef.current) {
+            autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService();
+          }
+          if (!placesServiceRef.current) {
+            placesServiceRef.current = new window.google.maps.places.PlacesService(
+              document.createElement('div')
+            );
+          }
+        }
+      };
+      document.head.appendChild(script);
+
+      return () => {
+        // Cleanup if needed
+      };
     }
 
     // Load recent locations from localStorage
@@ -231,18 +282,15 @@ export default function LocationSearchPicker({
       display="flex"
       flexDirection="column"
     >
-      {/* Header */}
+      {/* Header - Glovo Style */}
       <Box
         p={4}
         borderBottom="1px solid"
         borderColor="gray.200"
         bg="white"
-        boxShadow="sm"
+        boxShadow="0 2px 4px rgba(0,0,0,0.1)"
       >
-        <HStack spacing={3} mb={3}>
-          <Text fontSize="xl" fontWeight="bold" flex={1}>
-            {required ? 'Where should we deliver?' : 'Select Delivery Location'}
-          </Text>
+        <HStack spacing={3} mb={3} align="center">
           {onClose && (
             <IconButton
               icon={<X size={20} />}
@@ -250,8 +298,13 @@ export default function LocationSearchPicker({
               variant="ghost"
               size="sm"
               aria-label="Close"
+              borderRadius="full"
+              _hover={{ bg: 'gray.100' }}
             />
           )}
+          <Text fontSize="lg" fontWeight="700" flex={1} color="gray.800">
+            {required ? 'Where should we deliver?' : 'Select Delivery Location'}
+          </Text>
         </HStack>
 
         {/* Search Input */}
@@ -273,12 +326,13 @@ export default function LocationSearchPicker({
           />
           <Box
             position="absolute"
-            left={3}
+            left={4}
             top="50%"
             transform="translateY(-50%)"
-            color="gray.500"
+            color="gray.400"
+            pointerEvents="none"
           >
-            <Search size={20} />
+            <Search size={22} />
           </Box>
           {searchQuery && (
             <IconButton
@@ -299,15 +353,37 @@ export default function LocationSearchPicker({
           )}
         </Box>
 
-        {/* Current Location Button */}
+        {/* Current Location Button - Glovo Style */}
         <Button
           mt={3}
-          leftIcon={isGettingCurrentLocation ? <Box className="animate-spin"><Navigation size={18} /></Box> : <Navigation size={18} />}
+          leftIcon={isGettingCurrentLocation ? (
+            <Box 
+              className="animate-spin"
+              style={{ 
+                width: '18px', 
+                height: '18px', 
+                border: '2px solid #e0e0e0', 
+                borderTop: '2px solid #185F2D', 
+                borderRadius: '50%' 
+              }}
+            />
+          ) : (
+            <Navigation size={18} />
+          )}
           onClick={getCurrentLocation}
           variant="outline"
           colorScheme="green"
-          size="sm"
+          size="md"
           width="100%"
+          borderRadius="xl"
+          h="48px"
+          fontSize="15px"
+          fontWeight="600"
+          borderColor="gray.300"
+          _hover={{
+            bg: 'green.50',
+            borderColor: '#185F2D',
+          }}
           isDisabled={isGettingCurrentLocation}
         >
           {isGettingCurrentLocation ? 'Getting location...' : 'Use current location'}

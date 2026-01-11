@@ -1,26 +1,25 @@
-"use client";
-import Header from "@components/Header";
-import Footer from "@components/Footer";
 import { Providers } from "./providers";
 import "./globals.css";
-import CookiePolicy from "@components/CookiePolicy";
-import ScriptTag from "@components/ScriptTag";
 import { Work_Sans } from "next/font/google";
-import ServiceWorker from "@components/ServiceWorker";
 import { CacheProvider } from "@chakra-ui/next-js";
 import { ChakraProvider } from "@chakra-ui/react";
-import { Suspense, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import AdvertCard from "@components/advert";
-import AppStoreRatingPrompt from "@components/AppStoreRatingPrompt";
-import PlatformFeedbackModal from "@components/PlatformFeedbackModal";
 
-// Dynamically import LocationGate to avoid SSR issues
-const LocationGate = dynamic(() => import("@components/LocationGate"), {
+// Dynamically import ClientLayoutWrapper to avoid SSR issues (contains all client components)
+const ClientLayoutWrapper = dynamic(() => import("@components/ClientLayoutWrapper"), {
   ssr: false,
   loading: () => (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      <div>Loading...</div>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f7f7f7' }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ width: '50px', height: '50px', border: '4px solid #e0e0e0', borderTop: '4px solid #185F2D', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }}></div>
+        <p style={{ color: '#666', fontSize: '14px' }}>Loading YooKatale...</p>
+      </div>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   ),
 });
@@ -53,18 +52,9 @@ const RootLayout = ({ children }) => {
     <html lang="en">
       <body className={WorkSans.className} suppressHydrationWarning>
           <Providers>
-            <Suspense>
-            <ServiceWorker />
-            <LocationGate>
-              <Header />
+            <ClientLayoutWrapper>
               {children}
-              <Footer />
-            </LocationGate>
-            </Suspense>
-            <CookiePolicy />
-            <AdvertCard />
-            <AppStoreRatingPrompt />
-            <PlatformFeedbackModal />
+            </ClientLayoutWrapper>
           </Providers>
           {/* <ScriptTag /> */} 
       </body>
