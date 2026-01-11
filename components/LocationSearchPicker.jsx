@@ -324,7 +324,7 @@ export default function LocationSearchPicker({
       isCentered
       motionPreset="scale"
     >
-      <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(8px)" />
+      <ModalOverlay bg="blackAlpha.500" backdropFilter="blur(4px)" />
       <ModalContent
         maxW="600px"
         maxH="90vh"
