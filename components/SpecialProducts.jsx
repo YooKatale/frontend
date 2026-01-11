@@ -88,7 +88,9 @@ const SpecialProducts = ({ Products, userInfo, category, text }) => {
               <Icon 
                 as={style.icon} 
                 color="white" 
-                boxSize={{ base: 5, md: 6 }} 
+                boxSize="24px"
+                w={{ base: "20px", md: "24px" }}
+                h={{ base: "20px", md: "24px" }}
                 filter="drop-shadow(0 2px 4px rgba(0,0,0,0.2))"
               />
             </Box>

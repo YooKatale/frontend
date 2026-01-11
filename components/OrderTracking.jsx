@@ -156,7 +156,9 @@ export default function OrderTracking({ orderId, initialOrder }) {
         mb={6}
         textAlign="center"
       >
-        <StatusIcon size={64} style={{ margin: "0 auto 16px" }} />
+        <Box display="flex" justifyContent="center" mb={4}>
+          <StatusIcon size={64} />
+        </Box>
         <Heading size="lg" mb={2}>
           {statusInfo.text}
         </Heading>
