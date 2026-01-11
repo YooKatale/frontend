@@ -42,7 +42,7 @@ export default function LocationGate({ children }) {
 
   // Always render children (homepage) in background, overlay modal when needed
   return (
-    <Box position="relative" width="100%" height="100%">
+    <>
       {/* Render homepage content in background */}
       <Box
         width="100%"
@@ -80,19 +80,19 @@ export default function LocationGate({ children }) {
         )}
       </Box>
 
-      {/* Show location picker modal as overlay when needed */}
+      {/* Show location picker modal as overlay when needed - rendered outside to avoid pointer-events issues */}
       {(showLocationPicker || !location) && !isLoading && (
         <LocationSearchPicker
           onLocationSelected={handleLocationSelected}
-          required={true}
+          required={!location}
           onClose={() => {
-            // Can't close if location is required
-            if (!location) {
-              return;
+            // Allow closing only if location is already set, or if not required
+            if (location || !showLocationPicker) {
+              setShowLocationPicker(false);
             }
           }}
         />
       )}
-    </Box>
+    </>
   );
 }

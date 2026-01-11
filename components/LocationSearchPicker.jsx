@@ -318,67 +318,81 @@ export default function LocationSearchPicker({
     <Modal
       isOpen={true}
       onClose={required ? undefined : (onClose || (() => {}))}
-      size="xl"
+      size="md"
       closeOnOverlayClick={!required}
       closeOnEsc={!required}
       isCentered
       motionPreset="scale"
+      blockScrollOnMount={false}
+      trapFocus={true}
     >
       <ModalOverlay bg="blackAlpha.500" backdropFilter="blur(4px)" />
       <ModalContent
-        maxW="600px"
-        maxH="90vh"
+        maxW="480px"
+        w="90%"
+        maxH="85vh"
         borderRadius="2xl"
         bg="white"
         boxShadow="0 20px 60px rgba(0,0,0,0.3)"
         overflow="hidden"
+        zIndex={9999}
+        position="relative"
       >
         <ModalCloseButton
-          size="lg"
+          size="md"
           borderRadius="full"
           bg="white"
           color="gray.600"
-          _hover={{ bg: 'gray.100' }}
-          top={4}
-          right={4}
-          zIndex={10000}
-          display={required ? 'none' : 'block'}
+          _hover={{ bg: 'gray.100', color: 'gray.800' }}
+          top={3}
+          right={3}
+          zIndex={10001}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!required && onClose) {
+              onClose();
+            }
+          }}
+          aria-label="Close location picker"
         />
 
         <ModalBody p={0} overflow="hidden">
           <Box display="flex" flexDirection="column" maxH="90vh">
             {/* Header */}
             <Box
-              p={6}
+              p={5}
               borderBottom="1px solid"
               borderColor="gray.200"
               bg="white"
+              position="relative"
+              zIndex={1}
             >
-              <VStack spacing={4} align="stretch">
+              <VStack spacing={3} align="stretch">
                 {/* Title */}
                 <Text
-                  fontSize="24px"
+                  fontSize="20px"
                   fontWeight="700"
                   color="gray.800"
                   textAlign="center"
                   letterSpacing="-0.5px"
+                  px={2}
                 >
                   {required ? 'Where shall we deliver to?' : 'Select Delivery Location'}
                 </Text>
 
                 {/* Search Input */}
-                <Box position="relative">
+                <Box position="relative" zIndex={1}>
                   <Input
                     ref={searchInputRef}
                     placeholder="Search address"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    size="lg"
+                    size="md"
                     borderRadius="xl"
-                    pl={14}
-                    pr={12}
-                    h="56px"
-                    fontSize="16px"
+                    pl={12}
+                    pr={10}
+                    h="48px"
+                    fontSize="15px"
                     borderColor="gray.300"
                     bg="gray.50"
                     _focus={{
@@ -392,6 +406,7 @@ export default function LocationSearchPicker({
                     }}
                     autoFocus
                     disabled={!mapsLoaded}
+                    cursor={mapsLoaded ? 'text' : 'not-allowed'}
                   />
                   <Box
                     position="absolute"
@@ -442,25 +457,28 @@ export default function LocationSearchPicker({
                     <Box
                       className="animate-spin"
                       style={{
-                        width: '20px',
-                        height: '20px',
+                        width: '18px',
+                        height: '18px',
                         border: '2px solid #e0e0e0',
                         borderTop: '2px solid #185F2D',
                         borderRadius: '50%'
                       }}
                     />
                   ) : (
-                    <Navigation size={20} />
+                    <Navigation size={18} />
                   )}
-                  onClick={getCurrentLocation}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    getCurrentLocation();
+                  }}
                   variant="solid"
                   bg="#185F2D"
                   color="white"
-                  size="lg"
+                  size="md"
                   width="100%"
                   borderRadius="xl"
-                  h="52px"
-                  fontSize="16px"
+                  h="48px"
+                  fontSize="15px"
                   fontWeight="600"
                   _hover={{
                     bg: '#154924',
@@ -473,6 +491,9 @@ export default function LocationSearchPicker({
                   }}
                   transition="all 0.2s"
                   isDisabled={isGettingCurrentLocation || !mapsLoaded}
+                  cursor={isGettingCurrentLocation || !mapsLoaded ? 'not-allowed' : 'pointer'}
+                  zIndex={1}
+                  position="relative"
                 >
                   {isGettingCurrentLocation ? 'Getting location...' : 'Use current location'}
                 </Button>
@@ -480,7 +501,7 @@ export default function LocationSearchPicker({
             </Box>
 
             {/* Suggestions / Recent Locations */}
-            <Box flex={1} overflowY="auto" bg="gray.50" maxH="400px">
+            <Box flex={1} overflowY="auto" bg="gray.50" maxH="350px" position="relative" zIndex={1}>
               {isLoading && (
                 <Box textAlign="center" py={12}>
                   <Box
@@ -643,11 +664,13 @@ export default function LocationSearchPicker({
             {/* Confirm Button - Fixed at Bottom */}
             {selectedLocation && (
               <Box
-                p={6}
+                p={4}
                 borderTop="1px solid"
                 borderColor="gray.200"
                 bg="white"
                 boxShadow="0 -4px 12px rgba(0,0,0,0.08)"
+                position="relative"
+                zIndex={1}
               >
                 <VStack spacing={4} align="stretch">
                   <Box
@@ -678,12 +701,15 @@ export default function LocationSearchPicker({
                     width="100%"
                     bg="#185F2D"
                     color="white"
-                    size="lg"
-                    height="56px"
-                    fontSize="18px"
+                    size="md"
+                    height="48px"
+                    fontSize="16px"
                     fontWeight="700"
                     borderRadius="xl"
-                    onClick={confirmLocation}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      confirmLocation();
+                    }}
                     _hover={{
                       bg: '#154924',
                       transform: 'translateY(-2px)',
@@ -695,6 +721,9 @@ export default function LocationSearchPicker({
                     }}
                     transition="all 0.2s"
                     boxShadow="0 4px 12px rgba(24, 95, 45, 0.3)"
+                    cursor="pointer"
+                    zIndex={1}
+                    position="relative"
                   >
                     Confirm Location
                   </Button>
