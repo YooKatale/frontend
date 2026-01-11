@@ -86,8 +86,8 @@ export default function LocationGate({ children }) {
           onLocationSelected={handleLocationSelected}
           required={!location}
           onClose={() => {
-            // Allow closing only if location is already set, or if not required
-            if (location || !showLocationPicker) {
+            // Only allow closing if location is already set (not required)
+            if (location) {
               setShowLocationPicker(false);
             }
           }}
