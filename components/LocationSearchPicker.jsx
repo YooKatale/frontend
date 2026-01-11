@@ -590,7 +590,7 @@ export default function LocationSearchPicker({
                   <Box
                     display="inline-flex"
                     p={6}
-                    bg="#185F2D" + '10'
+                    bg="#185F2D10"
                     borderRadius="full"
                     mb={6}
                   >
