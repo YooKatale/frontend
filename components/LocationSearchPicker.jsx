@@ -44,6 +44,7 @@ export default function LocationSearchPicker({
   const [isGettingCurrentLocation, setIsGettingCurrentLocation] = useState(false);
   const [recentLocations, setRecentLocations] = useState([]);
   const [mapsLoaded, setMapsLoaded] = useState(false);
+  const [mapsError, setMapsError] = useState(false);
   const autocompleteServiceRef = useRef(null);
   const placesServiceRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -53,12 +54,20 @@ export default function LocationSearchPicker({
   useEffect(() => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
     if (!apiKey) {
-      console.warn('Google Maps API key is not set');
+      console.error('Google Maps API key is not set');
+      setMapsError(true);
+      toast({
+        title: 'Configuration Error',
+        description: 'Google Maps API key is missing. Please contact support.',
+        status: 'error',
+        duration: 5000,
+      });
       return;
     }
 
     // Check if already loaded
     if (window.google && window.google.maps && window.google.maps.places) {
+      console.log('Google Maps already loaded');
       setMapsLoaded(true);
       initializeServices();
       return;
@@ -67,30 +76,45 @@ export default function LocationSearchPicker({
     // Check if script already exists
     const existingScript = document.querySelector(`script[src*="maps.googleapis.com"]`);
     if (existingScript) {
+      console.log('Google Maps script exists, waiting for load...');
       // Script exists, wait for it to load
+      let attempts = 0;
+      const maxAttempts = 50; // 5 seconds max
       const checkGoogle = setInterval(() => {
+        attempts++;
         if (window.google && window.google.maps && window.google.maps.places) {
           clearInterval(checkGoogle);
+          console.log('Google Maps loaded from existing script');
           setMapsLoaded(true);
           initializeServices();
+        } else if (attempts >= maxAttempts) {
+          clearInterval(checkGoogle);
+          console.error('Timeout waiting for Google Maps to load');
+          setMapsError(true);
         }
       }, 100);
       return () => clearInterval(checkGoogle);
     }
 
     // Create and load script with async attribute
+    console.log('Loading Google Maps script...');
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
     script.async = true;
     script.defer = true;
     script.onload = () => {
+      console.log('Google Maps script loaded');
       if (window.google && window.google.maps && window.google.maps.places) {
         setMapsLoaded(true);
         initializeServices();
+      } else {
+        console.error('Google Maps loaded but APIs not available');
+        setMapsError(true);
       }
     };
     script.onerror = () => {
       console.error('Failed to load Google Maps script');
+      setMapsError(true);
       toast({
         title: 'Error',
         description: 'Failed to load Google Maps. Please refresh the page.',
@@ -101,13 +125,13 @@ export default function LocationSearchPicker({
     document.head.appendChild(script);
 
     // Load recent locations from localStorage
-    const saved = localStorage.getItem('yookatale_recent_locations');
-    if (saved) {
-      try {
+    try {
+      const saved = localStorage.getItem('yookatale_recent_locations');
+      if (saved) {
         setRecentLocations(JSON.parse(saved));
-      } catch (e) {
-        console.error('Error loading recent locations:', e);
       }
+    } catch (e) {
+      console.error('Error loading recent locations:', e);
     }
   }, []);
 
@@ -118,26 +142,37 @@ export default function LocationSearchPicker({
         placesServiceRef.current = new window.google.maps.places.PlacesService(
           document.createElement('div')
         );
+        console.log('Google Maps services initialized');
       }
     } catch (e) {
       console.error('Error initializing Google Maps services:', e);
+      setMapsError(true);
     }
   };
 
   // Search for places as user types
   useEffect(() => {
-    if (!mapsLoaded || !autocompleteServiceRef.current) {
+    if (!mapsLoaded || !autocompleteServiceRef.current || mapsError) {
+      if (searchQuery && searchQuery.length >= 2 && !mapsLoaded) {
+        // Show loading state
+        setIsLoading(true);
+      }
       return;
     }
 
     if (!searchQuery || searchQuery.length < 2) {
       setSuggestions([]);
+      setIsLoading(false);
       return;
     }
 
+    setIsLoading(true);
     // Debounce search
     const timeoutId = setTimeout(() => {
-      if (!autocompleteServiceRef.current) return;
+      if (!autocompleteServiceRef.current) {
+        setIsLoading(false);
+        return;
+      }
 
       const request = {
         input: searchQuery,
@@ -147,6 +182,7 @@ export default function LocationSearchPicker({
 
       try {
         autocompleteServiceRef.current.getPlacePredictions(request, (predictions, status) => {
+          setIsLoading(false);
           if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
             setSuggestions(predictions);
           } else if (status === window.google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
@@ -158,12 +194,16 @@ export default function LocationSearchPicker({
         });
       } catch (error) {
         console.error('Error fetching place predictions:', error);
+        setIsLoading(false);
         setSuggestions([]);
       }
     }, 300);
 
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, mapsLoaded]);
+    return () => {
+      clearTimeout(timeoutId);
+      setIsLoading(false);
+    };
+  }, [searchQuery, mapsLoaded, mapsError]);
 
   // Get place details from place_id
   const getPlaceDetails = (placeId) => {
@@ -185,6 +225,7 @@ export default function LocationSearchPicker({
 
     try {
       placesServiceRef.current.getDetails(request, (place, status) => {
+        setIsLoading(false);
         if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
           const location = {
             lat: place.geometry.location.lat(),
@@ -202,10 +243,7 @@ export default function LocationSearchPicker({
           const updated = [location, ...recentLocations.filter(l => l.address !== location.address)].slice(0, 5);
           setRecentLocations(updated);
           localStorage.setItem('yookatale_recent_locations', JSON.stringify(updated));
-
-          setIsLoading(false);
         } else {
-          setIsLoading(false);
           toast({
             title: 'Error',
             description: 'Failed to get location details. Please try again.',
@@ -226,7 +264,10 @@ export default function LocationSearchPicker({
     }
   };
 
-  const getCurrentLocation = () => {
+  const getCurrentLocation = (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+
     if (!navigator.geolocation) {
       toast({
         title: 'Error',
@@ -250,6 +291,11 @@ export default function LocationSearchPicker({
           const response = await fetch(
             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=${apiKey}`
           );
+          
+          if (!response.ok) {
+            throw new Error('Geocoding request failed');
+          }
+
           const data = await response.json();
 
           if (data.results && data.results.length > 0) {
@@ -268,14 +314,23 @@ export default function LocationSearchPicker({
             const updated = [location, ...recentLocations.filter(l => l.address !== location.address)].slice(0, 5);
             setRecentLocations(updated);
             localStorage.setItem('yookatale_recent_locations', JSON.stringify(updated));
+
+            toast({
+              title: 'Success',
+              description: 'Location detected successfully',
+              status: 'success',
+              duration: 2000,
+            });
+          } else {
+            throw new Error('No results found');
           }
         } catch (error) {
           console.error('Error getting address:', error);
           toast({
             title: 'Error',
-            description: 'Failed to get address from location',
+            description: 'Failed to get address from location. Please try searching manually.',
             status: 'error',
-            duration: 3000,
+            duration: 4000,
           });
         } finally {
           setIsGettingCurrentLocation(false);
@@ -283,11 +338,21 @@ export default function LocationSearchPicker({
       },
       (error) => {
         console.error('Geolocation error:', error);
+        let errorMessage = 'Failed to get your location. ';
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMessage += 'Please allow location access in your browser settings.';
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          errorMessage += 'Location information is unavailable.';
+        } else if (error.code === error.TIMEOUT) {
+          errorMessage += 'Location request timed out.';
+        } else {
+          errorMessage += 'Please try searching manually.';
+        }
         toast({
-          title: 'Error',
-          description: 'Failed to get your location. Please allow location access or search manually.',
+          title: 'Location Error',
+          description: errorMessage,
           status: 'error',
-          duration: 4000,
+          duration: 5000,
         });
         setIsGettingCurrentLocation(false);
       },
@@ -383,10 +448,21 @@ export default function LocationSearchPicker({
                 {/* Search Input */}
                 <Box position="relative" zIndex={1}>
                   <Input
+                    id="location-search-input"
+                    name="location-search"
                     ref={searchInputRef}
                     placeholder="Search address"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setSearchQuery(value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && suggestions.length > 0) {
+                        e.preventDefault();
+                        getPlaceDetails(suggestions[0].place_id);
+                      }
+                    }}
                     size="md"
                     borderRadius="xl"
                     pl={12}
@@ -395,6 +471,7 @@ export default function LocationSearchPicker({
                     fontSize="15px"
                     borderColor="gray.300"
                     bg="gray.50"
+                    autoComplete="address-line1"
                     _focus={{
                       borderColor: '#185F2D',
                       boxShadow: '0 0 0 3px rgba(24, 95, 45, 0.1)',
@@ -405,8 +482,8 @@ export default function LocationSearchPicker({
                       bg: 'white',
                     }}
                     autoFocus
-                    disabled={!mapsLoaded}
-                    cursor={mapsLoaded ? 'text' : 'not-allowed'}
+                    disabled={mapsError}
+                    cursor={mapsError ? 'not-allowed' : 'text'}
                   />
                   <Box
                     position="absolute"
@@ -415,8 +492,9 @@ export default function LocationSearchPicker({
                     transform="translateY(-50%)"
                     color="gray.400"
                     pointerEvents="none"
+                    zIndex={2}
                   >
-                    <Search size={24} />
+                    <Search size={20} />
                   </Box>
                   {searchQuery && (
                     <IconButton
@@ -425,34 +503,56 @@ export default function LocationSearchPicker({
                       top="50%"
                       transform="translateY(-50%)"
                       icon={<X size={18} />}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setSearchQuery('');
                         setSuggestions([]);
                         setSelectedLocation(null);
+                        searchInputRef.current?.focus();
                       }}
                       variant="ghost"
                       size="sm"
-                      aria-label="Clear"
+                      aria-label="Clear search"
                       borderRadius="full"
                       _hover={{ bg: 'gray.100' }}
+                      zIndex={2}
                     />
                   )}
-                  {!mapsLoaded && (
+                  {!mapsLoaded && !mapsError && (
                     <Box
                       position="absolute"
                       right={12}
                       top="50%"
                       transform="translateY(-50%)"
-                      fontSize="12px"
+                      fontSize="11px"
                       color="gray.400"
+                      pointerEvents="none"
+                      zIndex={2}
                     >
-                      Loading...
+                      Loading maps...
+                    </Box>
+                  )}
+                  {mapsError && (
+                    <Box
+                      position="absolute"
+                      right={12}
+                      top="50%"
+                      transform="translateY(-50%)"
+                      fontSize="11px"
+                      color="red.400"
+                      pointerEvents="none"
+                      zIndex={2}
+                    >
+                      Error
                     </Box>
                   )}
                 </Box>
 
                 {/* Current Location Button */}
                 <Button
+                  id="use-current-location-button"
+                  name="use-current-location"
+                  type="button"
                   leftIcon={isGettingCurrentLocation ? (
                     <Box
                       className="animate-spin"
@@ -467,10 +567,7 @@ export default function LocationSearchPicker({
                   ) : (
                     <Navigation size={18} />
                   )}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    getCurrentLocation();
-                  }}
+                  onClick={getCurrentLocation}
                   variant="solid"
                   bg="#185F2D"
                   color="white"
@@ -490,8 +587,8 @@ export default function LocationSearchPicker({
                     transform: 'translateY(0)',
                   }}
                   transition="all 0.2s"
-                  isDisabled={isGettingCurrentLocation || !mapsLoaded}
-                  cursor={isGettingCurrentLocation || !mapsLoaded ? 'not-allowed' : 'pointer'}
+                  isDisabled={isGettingCurrentLocation || mapsError}
+                  cursor={isGettingCurrentLocation || mapsError ? 'not-allowed' : 'pointer'}
                   zIndex={1}
                   position="relative"
                 >
@@ -502,7 +599,7 @@ export default function LocationSearchPicker({
 
             {/* Suggestions / Recent Locations */}
             <Box flex={1} overflowY="auto" bg="gray.50" maxH="350px" position="relative" zIndex={1}>
-              {isLoading && (
+              {isLoading && suggestions.length === 0 && (
                 <Box textAlign="center" py={12}>
                   <Box
                     display="inline-block"
@@ -514,7 +611,7 @@ export default function LocationSearchPicker({
                     className="animate-spin"
                     mb={4}
                   />
-                  <Text color="gray.600" fontSize="14px">Loading location details...</Text>
+                  <Text color="gray.600" fontSize="14px">Searching locations...</Text>
                 </Box>
               )}
 
@@ -542,7 +639,10 @@ export default function LocationSearchPicker({
                         borderColor="gray.100"
                         cursor="pointer"
                         _hover={{ bg: '#185F2D08' }}
-                        onClick={() => getPlaceDetails(prediction.place_id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          getPlaceDetails(prediction.place_id);
+                        }}
                         transition="all 0.2s"
                       >
                         <HStack spacing={4} align="start">
@@ -594,7 +694,8 @@ export default function LocationSearchPicker({
                         borderColor="gray.100"
                         cursor="pointer"
                         _hover={{ bg: '#185F2D08' }}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           const locData = {
                             lat: location.lat,
                             lng: location.lng,
@@ -698,6 +799,9 @@ export default function LocationSearchPicker({
                     </Text>
                   </Box>
                   <Button
+                    id="confirm-location-button"
+                    name="confirm-location"
+                    type="button"
                     width="100%"
                     bg="#185F2D"
                     color="white"
