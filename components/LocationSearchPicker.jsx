@@ -545,6 +545,41 @@ export default function LocationSearchPicker({
     }
   };
 
+  // Handle manual address entry (when user types and presses Enter without selecting suggestion)
+  const handleManualAddressEntry = (addressText) => {
+    console.log('Manual address entry:', addressText);
+    
+    if (!addressText || addressText.trim().length < 3) {
+      toast({
+        title: 'Invalid address',
+        description: 'Please enter at least 3 characters',
+        status: 'warning',
+        duration: 3000,
+      });
+      return;
+    }
+
+    // Create location object from manual entry (without coordinates)
+    const manualLocation = {
+      lat: null,
+      lng: null,
+      address: addressText.trim(),
+      address1: addressText.trim(),
+      address2: '',
+    };
+
+    console.log('Manual location prepared:', manualLocation);
+    setSelectedLocation(manualLocation);
+    setSearchQuery(addressText.trim());
+    setSuggestions([]);
+
+    // Save location using helper function
+    const saved = saveLocation(manualLocation);
+    if (!saved) {
+      console.error('Failed to save manual location');
+    }
+  };
+
   return (
     <Modal
       isOpen={true}
@@ -619,9 +654,15 @@ export default function LocationSearchPicker({
                       setSearchQuery(value);
                     }}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && suggestions.length > 0) {
+                      if (e.key === 'Enter') {
                         e.preventDefault();
-                        getPlaceDetails(suggestions[0].place_id);
+                        if (suggestions.length > 0) {
+                          // Select first suggestion if available
+                          getPlaceDetails(suggestions[0].place_id);
+                        } else if (searchQuery.trim().length >= 3) {
+                          // Allow manual address entry if no suggestions but text is long enough
+                          handleManualAddressEntry(searchQuery.trim());
+                        }
                       }
                     }}
                     size="md"
