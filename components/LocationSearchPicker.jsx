@@ -307,7 +307,7 @@ export default function LocationSearchPicker({
           </Text>
         </HStack>
 
-        {/* Search Input */}
+        {/* Search Input - Glovo Style */}
         <Box position="relative">
           <Input
             ref={searchInputRef}
@@ -315,13 +315,20 @@ export default function LocationSearchPicker({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             size="lg"
-            borderRadius="lg"
-            pl={10}
+            borderRadius="xl"
+            pl={12}
             pr={10}
+            h="52px"
+            fontSize="16px"
             borderColor="gray.300"
+            bg="gray.50"
             _focus={{
-              borderColor: 'green.500',
-              boxShadow: '0 0 0 1px green.500',
+              borderColor: '#185F2D',
+              boxShadow: '0 0 0 2px rgba(24, 95, 45, 0.1)',
+              bg: 'white',
+            }}
+            _hover={{
+              borderColor: 'gray.400',
             }}
           />
           <Box
