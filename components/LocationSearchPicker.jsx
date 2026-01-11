@@ -488,7 +488,7 @@ export default function LocationSearchPicker({
                         borderBottom={index < suggestions.length - 1 ? "1px solid" : "none"}
                         borderColor="gray.100"
                         cursor="pointer"
-                        _hover={{ bg: '#185F2D' + '08' }}
+                        _hover={{ bg: '#185F2D08' }}
                         onClick={() => getPlaceDetails(prediction.place_id)}
                         transition="all 0.2s"
                       >
@@ -540,7 +540,7 @@ export default function LocationSearchPicker({
                         borderBottom={index < recentLocations.length - 1 ? "1px solid" : "none"}
                         borderColor="gray.100"
                         cursor="pointer"
-                        _hover={{ bg: '#185F2D' + '08' }}
+                        _hover={{ bg: '#185F2D08' }}
                         onClick={() => {
                           const locData = {
                             lat: location.lat,
@@ -620,7 +620,7 @@ export default function LocationSearchPicker({
                 <VStack spacing={4} align="stretch">
                   <Box
                     p={4}
-                    bg="#185F2D" + '10'
+                    bg="#185F2D10"
                     borderRadius="xl"
                     border="2px solid"
                     borderColor="#185F2D"
