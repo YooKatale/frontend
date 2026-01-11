@@ -1,4 +1,4 @@
-//'use client'
+"use client";
 import Header from "@components/Header";
 import Footer from "@components/Footer";
 import { Providers } from "./providers";
@@ -9,10 +9,21 @@ import { Work_Sans } from "next/font/google";
 import ServiceWorker from "@components/ServiceWorker";
 import { CacheProvider } from "@chakra-ui/next-js";
 import { ChakraProvider } from "@chakra-ui/react";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import AdvertCard from "@components/advert";
 import AppStoreRatingPrompt from "@components/AppStoreRatingPrompt";
 import PlatformFeedbackModal from "@components/PlatformFeedbackModal";
+
+// Dynamically import LocationGate to avoid SSR issues
+const LocationGate = dynamic(() => import("@components/LocationGate"), {
+  ssr: false,
+  loading: () => (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div>Loading...</div>
+    </div>
+  ),
+});
 
 const WorkSans = Work_Sans({ subsets: ["latin"] });
 
@@ -38,16 +49,17 @@ export const metadata = {
 };
 
 const RootLayout = ({ children }) => {
-
   return (
     <html lang="en">
       <body className={WorkSans.className} suppressHydrationWarning>
           <Providers>
             <Suspense>
             <ServiceWorker />
-            <Header />
-            {children}
-            <Footer />
+            <LocationGate>
+              <Header />
+              {children}
+              <Footer />
+            </LocationGate>
             </Suspense>
             <CookiePolicy />
             <AdvertCard />
