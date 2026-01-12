@@ -138,19 +138,29 @@ const Product = ({ params }) => {
       }
 
       if (res.error) {
+        const errorMessage = res.error.data?.message || "Failed to add to cart";
+        const isAlreadyInCart = errorMessage.toLowerCase().includes('already') && 
+                                (errorMessage.toLowerCase().includes('cart') || 
+                                 errorMessage.toLowerCase().includes('added'));
+        
         chakraToast({
-          title: "Error",
-          description: res.error.data?.message,
-          status: "error",
+          title: isAlreadyInCart ? "Product Already in Cart" : "Error",
+          description: isAlreadyInCart ? "Product already added to cart" : errorMessage,
+          status: isAlreadyInCart ? "warning" : "error",
           duration: 5000,
           isClosable: false,
         });
       }
     } catch (err) {
+      const errorMessage = err.message?.error || err.error || "Failed to add to cart";
+      const isAlreadyInCart = errorMessage.toLowerCase().includes('already') && 
+                              (errorMessage.toLowerCase().includes('cart') || 
+                               errorMessage.toLowerCase().includes('added'));
+      
       chakraToast({
-        title: "Error",
-        description: err.message.error || err.error,
-        status: "error",
+        title: isAlreadyInCart ? "Product Already in Cart" : "Error",
+        description: isAlreadyInCart ? "Product already added to cart" : errorMessage,
+        status: isAlreadyInCart ? "warning" : "error",
         duration: 5000,
         isClosable: false,
       });

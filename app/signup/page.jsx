@@ -124,14 +124,17 @@ const SignUp = () => {
       }
 
       chakraToast({
-        title: "Logged In",
-        description: `Successfully logged in as ${res?.lastname}. Welcome email sent!`,
+        title: "Account Created Successfully! 🎉",
+        description: `Welcome to Yookatale, ${res?.firstname || res?.lastname || 'User'}! Your account has been created. Please sign in to continue.`,
         status: "success",
         duration: 5000,
         isClosable: false,
       });
 
-      push("/");
+      // Redirect to login page after a brief delay
+      setTimeout(() => {
+        push("/signin");
+      }, 1500);
     } catch (err) {
       // set loading to be false
       setLoading(false);

@@ -67,10 +67,15 @@ const ProductCard = ({ product, userInfo }) => {
         });
       }
     } catch (err) {
+      const errorMessage = err.message?.error || err?.data.message || err.error || "Error";
+      const isAlreadyInCart = errorMessage.toLowerCase().includes('already') && 
+                              (errorMessage.toLowerCase().includes('cart') || 
+                               errorMessage.toLowerCase().includes('added'));
+      
       chakraToast({
-        description:
-          err.message?.error || err?.data.message || err.error || "Error",
-        status: "error",
+        title: isAlreadyInCart ? "Product Already in Cart" : "Error",
+        description: isAlreadyInCart ? "Product already added to cart" : errorMessage,
+        status: isAlreadyInCart ? "warning" : "error",
         duration: 5000,
         isClosable: false,
       });
