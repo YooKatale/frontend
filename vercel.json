@@ -1,4 +1,16 @@
 {
-  "installCommand": "npm install --no-optional",
-  "buildCommand": "npm run build"
+  "crons": [
+    {
+      "path": "/api/subscription/daily-calendar?mealType=breakfast",
+      "schedule": "0 6,7,8,9,10 * * *"
+    },
+    {
+      "path": "/api/subscription/daily-calendar?mealType=lunch",
+      "schedule": "0 12,13,14,15 * * *"
+    },
+    {
+      "path": "/api/subscription/daily-calendar?mealType=supper",
+      "schedule": "0 17,18,19,20,21,22 * * *"
+    }
+  ]
 }

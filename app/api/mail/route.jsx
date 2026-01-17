@@ -24,10 +24,12 @@
  * - newsletter: Sent to newsletter subscribers  
  * - meal_notification: Sent for meal reminders (breakfast, lunch, supper)
  * - invitation: Sent when users invite friends via referral system
+ * - subscription: Sent to new subscribers with app download links
  */
 
 import { emailTemplate, newsletterEmailTemplate, invitationEmailTemplate } from "@constants/constants";
 import { getMealCalendarEmailTemplate } from "@constants/mealCalendarEmailTemplate";
+import { subscriptionEmailTemplate } from "@constants/subscriptionEmailTemplate";
 import { NextResponse } from "next/server";
 import transporter, { defaultSender } from "@lib/emailConfig";
 
@@ -80,7 +82,7 @@ export const POST = async (req, res) => {
     const sanitizedGreeting = sanitizeInput(greeting);
     
     // Security: Validate email type to prevent template injection
-    const validTypes = ['welcome', 'newsletter', 'meal_notification', 'invitation'];
+    const validTypes = ['welcome', 'newsletter', 'meal_notification', 'invitation', 'subscription'];
     const emailType = validTypes.includes(type) ? type : 'welcome';
     
     // Check if email transporter is configured
@@ -99,7 +101,11 @@ export const POST = async (req, res) => {
     // Templates are pre-defined to prevent template injection attacks
     let emailHtml, subject, emailTypeLabel;
     
-    if (emailType === 'newsletter') {
+    if (emailType === 'subscription') {
+      emailHtml = subscriptionEmailTemplate;
+      subject = "Welcome to Yookatale - Download Our App & Start Your Food Journey! 🍽️";
+      emailTypeLabel = "subscription";
+    } else if (emailType === 'newsletter') {
       emailHtml = newsletterEmailTemplate;
       subject = "YooKatale Newsletter - Subscription Plans & Latest News";
       emailTypeLabel = "newsletter";
