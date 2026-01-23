@@ -16,7 +16,7 @@ export default function SubscriptionTestPage() {
   const [bulkResults, setBulkResults] = useState(null);
   const toast = useToast();
 
-  const handleTestEmails = async () => {
+  const handleTestEmails = async (emailType = "subscription") => {
     setIsLoading(true);
     setTestResults(null);
 
@@ -26,16 +26,18 @@ export default function SubscriptionTestPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ type: emailType }),
       });
 
       const result = await response.json();
 
       if (response.ok && result.success) {
         setTestResults(result);
+        const label = emailType === "welcome" ? "welcome" : "subscription";
         toast({
-          title: "Test Emails Sent!",
-          description: `Successfully sent ${result.successCount} out of ${result.total} test emails`,
-          status: "success",
+          title: `Test ${label.charAt(0).toUpperCase() + label.slice(1)} Emails Sent!`,
+          description: `Sent ${result.successCount} of ${result.total} to test addresses`,
+          status: result.successCount > 0 ? "success" : "warning",
           duration: 5000,
         });
       } else {
@@ -64,16 +66,17 @@ export default function SubscriptionTestPage() {
 
     try {
       // Read CSV file from public folder
-      const response = await fetch("/email_list.csv");
+      const response = await fetch("/emailnew.csv");
       const csvText = await response.text();
       const lines = csvText.split("\n").map((line) => line.trim()).filter((line) => line.length > 0);
-      const emails = lines
+      let emails = lines
         .slice(1) // Skip header
         .map((line) => {
           const parts = line.split(",");
           return parts[0]?.trim().toLowerCase();
         })
         .filter((email) => email && email.includes("@"));
+      emails = emails.slice(0, 580); // First 580 only
 
       if (emails.length === 0) {
         toast({
@@ -139,26 +142,36 @@ export default function SubscriptionTestPage() {
               Step 1: Test Emails (REQUIRED)
             </Heading>
             <Text mb={4} color="gray.700">
-              Send test subscription emails to 3 test addresses first to verify the email template looks good.
+              Send test emails to 3 addresses first to verify templates. Use <strong>subscription</strong> for bulk CSV emails; use <strong>welcome</strong> for new signups.
             </Text>
             <Text fontSize="sm" color="gray.600" mb={4}>
-              Test emails: arihotimothy89@gmail.com, timothy.arihoz@protonmail.com, yookatale256@gmail.com
+              Test emails: arihotimothy89@gmail.com, timothy.arhoz@protonmail.com, yookatale256@gmail.com
             </Text>
-            <Button
-              onClick={handleTestEmails}
-              isLoading={isLoading}
-              colorScheme="blue"
-              size="lg"
-              width="full"
-            >
-              {isLoading ? <Spinner size="sm" mr={2} /> : null}
-              Send Test Emails
-            </Button>
+            <HStack spacing={3} flexWrap="wrap">
+              <Button
+                onClick={() => handleTestEmails("subscription")}
+                isLoading={isLoading}
+                colorScheme="blue"
+                size="lg"
+              >
+                {isLoading ? <Spinner size="sm" mr={2} /> : null}
+                Send Test Subscription Emails
+              </Button>
+              <Button
+                onClick={() => handleTestEmails("welcome")}
+                isLoading={isLoading}
+                colorScheme="teal"
+                size="lg"
+                variant="outline"
+              >
+                Send Test Welcome Emails
+              </Button>
+            </HStack>
 
             {testResults && (
               <Box mt={4} p={4} bg="white" borderRadius="md">
                 <Text fontWeight="bold" mb={2}>
-                  Test Results:
+                  Test Results {testResults.type ? `(${testResults.type})` : ""}:
                 </Text>
                 <Text>Total: {testResults.total}</Text>
                 <Text color="green.600">Success: {testResults.successCount}</Text>
@@ -179,13 +192,13 @@ export default function SubscriptionTestPage() {
           {/* Bulk Subscription Section */}
           <Box p={6} bg="green.50" borderRadius="md" border="1px solid" borderColor="green.200">
             <Heading size="md" mb={4} color="green.700">
-              Step 2: Bulk Subscribe All Emails
+              Step 2: Resend to First 580
             </Heading>
             <Text mb={4} color="gray.700">
-              After verifying test emails, subscribe all emails from email_list.csv and send them welcome emails.
+              Subscribe the <strong>first 580</strong> emails from emailnew.csv and send them the updated subscription (welcome) template. Then run Step 1 to send test emails to the 3 test addresses.
             </Text>
             <Text fontSize="sm" color="gray.600" mb={4}>
-              This will read email_list.csv and subscribe all emails to the database.
+              Reads emailnew.csv from /public, takes first 580, subscribes each to the database, and sends the subscription template.
             </Text>
             <Button
               onClick={handleBulkSubscribe}
@@ -195,7 +208,7 @@ export default function SubscriptionTestPage() {
               width="full"
             >
               {isLoading ? <Spinner size="sm" mr={2} /> : null}
-              Subscribe All Emails from CSV
+              Resend to First 580 from CSV
             </Button>
 
             {bulkResults && (

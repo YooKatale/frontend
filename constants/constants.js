@@ -94,94 +94,81 @@ export const emailTemplate = `
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
 
-  <!-- Header with Logo -->
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: auto; background-color: #000000;">
     <tr>
-      <td style="padding: 40px 20px; text-align: center;">
-        <img src="https://www.yookatale.app/assets/icons/logo2.png" alt="YooKatale Logo" style="max-width: 180px; height: auto; margin-bottom: 20px;" />
-        <h1 style="font-size: 36px; color: #ffffff; margin: 0; font-weight: bold;">Welcome to Yookatale</h1>
-        <p style="font-size: 18px; color: #e0f2fe; margin: 10px 0 0 0;">Yoo mobile food market</p>
+      <td style="padding: 36px 20px; text-align: center;">
+        <img src="https://www.yookatale.app/assets/icons/logo2.png" alt="YooKatale Logo" style="max-width: 160px; height: auto; margin-bottom: 16px;" />
+        <h1 style="font-size: 32px; color: #ffffff; margin: 0; font-weight: bold;">Welcome to Yookatale</h1>
+        <p style="font-size: 17px; color: #e0f2fe; margin: 10px 0 0 0;">Yoo mobile food market</p>
       </td>
     </tr>
   </table>
 
-  <!-- Main Content -->
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: auto; background-color: #ffffff;">
     <tr>
-      <td style="padding: 40px 30px;">
-        <p style="font-size: 18px; color: #374151; line-height: 1.8; margin: 0 0 20px 0;">
-          Forget about cooking or going to the market by subscribing for <strong>Premium</strong>, <strong>Family</strong> or <strong>Business Plan</strong>.
+      <td style="padding: 36px 28px;">
+        <p style="font-size: 16px; color: #374151; line-height: 1.7; margin: 0 0 16px 0;">
+          Switch to a new shopping style this new year. Forget about cooking or going to the market — subscribe for our <strong>Freemium</strong>, <strong>Premium</strong>, <strong>Family</strong> or <strong>Business</strong> Plan monthly or annually. Get everything delivered at your doorstep.
         </p>
-        
-        <p style="font-size: 16px; color: #4b5563; line-height: 1.8; margin: 0 0 25px 0;">
-          Discover and customize your meals, set your own time when to eat, where to eat from with friends, family and loved ones while earning loyalty rewards, gifts and discounts.
+        <p style="font-size: 15px; color: #4b5563; line-height: 1.7; margin: 0 0 24px 0;">
+          Discover and customize your meals, set when and where to eat with friends, family and loved ones. Earn loyalty points, credit points, gifts and discounts.
         </p>
-        
-        <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 25px 0; border-radius: 8px;">
-          <p style="font-size: 16px; color: #92400e; margin: 0; font-weight: 600;">
-            Earn upto 50,000 cash rewards & prizes when you refer a new friend to yookatale App.
-          </p>
-        </div>
-
-        <!-- Action Buttons -->
-        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
           <tr>
-            <td align="center" style="padding: 10px 0;">
-              <a href="https://www.yookatale.app/signup" style="display: inline-block; padding: 14px 28px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 5px;">
-                Freely Signup
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td align="center" style="padding: 10px 0;">
-              <a href="https://www.yookatale.app/subscription" style="display: inline-block; padding: 14px 28px; background-color: #185f2d; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 5px;">
-                Subscribe
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td align="center" style="padding: 10px 0;">
-              <a href="https://www.yookatale.app/partner" style="display: inline-block; padding: 14px 28px; background-color: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 5px;">
-                Partner with us
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td align="center" style="padding: 10px 0;">
-              <a href="https://www.yookatale.app/#refer" style="display: inline-block; padding: 14px 28px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 5px;">
-                Invite a friend
-              </a>
-            </td>
+            <td align="center" width="33%" style="padding: 0 8px;"><div style="background-color: #eef2ff; width: 56px; height: 56px; border-radius: 50%; line-height: 56px; margin: 0 auto 10px; text-align: center;"><img src="https://img.icons8.com/ios-filled/50/1f2937/delivery.png" alt="Fast delivery" width="28" height="28" style="vertical-align: middle; border: 0;" /></div><p style="color: #111827; font-size: 13px; font-weight: 600; margin: 0;">🚚 Fast Delivery</p></td>
+            <td align="center" width="33%" style="padding: 0 8px;"><div style="background-color: #ecfdf5; width: 56px; height: 56px; border-radius: 50%; line-height: 56px; margin: 0 auto 10px; text-align: center;"><img src="https://img.icons8.com/ios-filled/50/1f2937/leaf.png" alt="Organic" width="28" height="28" style="vertical-align: middle; border: 0;" /></div><p style="color: #111827; font-size: 13px; font-weight: 600; margin: 0;">🌿 100% Organic</p></td>
+            <td align="center" width="33%" style="padding: 0 8px;"><div style="background-color: #fff7ed; width: 56px; height: 56px; border-radius: 50%; line-height: 56px; margin: 0 auto 10px; text-align: center;"><img src="https://img.icons8.com/ios-filled/50/1f2937/meal.png" alt="Custom meals" width="28" height="28" style="vertical-align: middle; border: 0;" /></div><p style="color: #111827; font-size: 13px; font-weight: 600; margin: 0;">🍽️ Custom Meals</p></td>
           </tr>
         </table>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 28px;"><tr><td width="50%" style="padding: 0 6px 0 0; vertical-align: top;"><div style="background: linear-gradient(135deg, #0a5c36 0%, #1a7d46 100%); border-radius: 12px; padding: 18px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.15);"><p style="color: #ffffff; font-size: 15px; font-weight: 700; margin: 0; letter-spacing: 0.3px;">Get 10% off today</p><p style="color: rgba(255,255,255,0.95); font-size: 13px; margin: 8px 0 0; line-height: 1.5;">Test and activate Premium, Family or Business.</p><a href="https://www.yookatale.app/subscription" style="display: inline-block; margin-top: 12px; padding: 10px 20px; background-color: #ffffff; color: #0a5c36; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 13px;">Activate plan</a></div></td><td width="50%" style="padding: 0 0 0 6px; vertical-align: top;"><div style="background-color: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 18px 20px; text-align: center;"><p style="color: #92400e; font-size: 15px; font-weight: 700; margin: 0; letter-spacing: 0.3px;">Earn up to 50,000 in rewards</p><p style="color: #b45309; font-size: 13px; margin: 8px 0 0; line-height: 1.5;">Refer a friend to Yookatale — cash &amp; prizes.</p><a href="https://www.yookatale.app/#refer" style="display: inline-block; margin-top: 12px; padding: 10px 20px; background-color: #f59e0b; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 13px;">Invite a friend</a></div></td></tr></table>
+        <p style="color: #111827; font-size: 15px; font-weight: 700; margin: 24px 0 12px; text-align: center; letter-spacing: 0.2px;">Your next steps — choose one</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 28px;">
+          <tr>
+            <td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/signup" style="display: inline-block; padding: 8px 10px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/add-user-male.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Freely Signup</a></td>
+            <td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/subscription" style="display: inline-block; padding: 8px 10px; background-color: #185f2d; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shopping-cart.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Subscribe</a></td>
+            <td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/partner" style="display: inline-block; padding: 8px 10px; background-color: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/handshake.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Partner with us</a></td>
+            <td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/#refer" style="display: inline-block; padding: 8px 10px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/gift.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Invite a friend</a></td>
+            <td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app" style="display: inline-block; padding: 8px 10px; background-color: #4b5563; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shop.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Visit marketplace</a></td>
+          </tr>
+        </table>
+        <div style="background-color: #f9fafb; border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid #e5e7eb;">
+          <h3 style="color: #111827; font-size: 18px; font-weight: 700; margin: 0 0 10px; text-align: center;">🛒 Shop the Marketplace</h3>
+          <p style="color: #4b5563; font-size: 14px; margin: 0 0 16px; text-align: center;">Browse and order in minutes.</p>
+          <table width="100%" cellpadding="0" cellspacing="0"><tr><td width="50%" style="padding: 0 6px 12px 0; vertical-align: top;"><a href="https://www.yookatale.app/marketplace" style="text-decoration: none; color: inherit;"><div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;"><img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&h=240&q=80" alt="Fresh vegetables" style="display: block; width: 100%; height: auto; border: 0;" /><div style="padding: 10px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Fresh Vegetables</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Handpicked daily.</p></div></div></a></td><td width="50%" style="padding: 0 0 12px 6px; vertical-align: top;"><a href="https://www.yookatale.app/marketplace" style="text-decoration: none; color: inherit;"><div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&h=240&q=80" alt="Organic fruits" style="display: block; width: 100%; height: auto; border: 0;" /><div style="padding: 10px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Organic Fruits</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Always fresh.</p></div></div></a></td></tr><tr><td width="50%" style="padding: 0 6px 0 0; vertical-align: top;"><a href="https://www.yookatale.app/marketplace" style="text-decoration: none; color: inherit;"><div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&h=240&q=80" alt="Ready meals" style="display: block; width: 100%; height: auto; border: 0;" /><div style="padding: 10px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Ready Meals</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Chef-prepared.</p></div></div></a></td><td width="50%" style="padding: 0 0 0 6px; vertical-align: top;"><a href="https://www.yookatale.app/marketplace" style="text-decoration: none; color: inherit;"><div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;"><img src="https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=400&h=240&q=80" alt="Pantry essentials" style="display: block; width: 100%; height: auto; border: 0;" /><div style="padding: 10px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Pantry Essentials</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Kitchen staples.</p></div></div></a></td></tr></table>
+          <div style="text-align: center; margin-top: 14px;"><a href="https://www.yookatale.app/marketplace" style="display: inline-block; padding: 10px 20px; background-color: #0a5c36; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">Visit Marketplace</a></div>
+        </div>
+        <div style="margin-top: 28px; padding: 24px; background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 16px; border: 1px solid #e2e8f0; text-align: center;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding-bottom: 12px;"><img src="https://img.icons8.com/ios-filled/50/0a5c36/smartphone.png" alt="App" width="40" height="40" style="display: block; margin: 0 auto; border: 0;" /></td></tr><tr><td align="center"><p style="color: #0f172a; font-size: 17px; font-weight: 700; margin: 0 0 6px; letter-spacing: 0.2px;">Yookatale in your pocket</p><p style="color: #64748b; font-size: 14px; margin: 0 0 16px; line-height: 1.5;">Download the official app. Shop, subscribe, and track orders from your phone.</p><a href="https://play.google.com/store/apps/details?id=com.yookataleapp.app" style="text-decoration: none; display: inline-block;"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="180" style="display: block; border: 0; height: auto;" /></a></td></tr></table></div>
       </td>
     </tr>
   </table>
 
-  <!-- Footer - Black Background -->
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: auto; background-color: #000000;">
     <tr>
-      <td style="padding: 30px 20px; text-align: center; border-top: 2px solid #333333;">
+      <td style="padding: 28px 20px; text-align: center; border-top: 2px solid #333333;">
+        <p style="font-size: 12px; color: #9ca3af; margin: 0 0 12px 0;">
+          <a href="https://www.facebook.com/profile.php?id=100094194942669&mibextid=LQQJ4d" style="color: #ffffff; text-decoration: none; margin: 0 6px;">Facebook</a>
+          <span style="color: #6b7280;">|</span>
+          <a href="https://twitter.com/YooKatale?t=3Q96I9JR98HgA69gisdXdA&s=09" style="color: #ffffff; text-decoration: none; margin: 0 6px;">Twitter</a>
+          <span style="color: #6b7280;">|</span>
+          <a href="https://www.instagram.com/p/CuHdaksN5UW/?igshid=NTc4MTIwNjQ2YQ==" style="color: #ffffff; text-decoration: none; margin: 0 6px;">Instagram</a>
+          <span style="color: #6b7280;">|</span>
+          <a href="https://www.linkedin.com/company/96071915/admin/feed/posts/" style="color: #ffffff; text-decoration: none; margin: 0 6px;">LinkedIn</a>
+          <span style="color: #6b7280;">|</span>
+          <a href="https://wa.me/256786118137" style="color: #ffffff; text-decoration: none; margin: 0 6px;">WhatsApp</a>
+        </p>
         <p style="font-size: 13px; color: #9ca3af; margin: 0 0 8px 0; line-height: 1.6;">
-          P.O. Box 74940<br>
-          Clock-Tower Plot 6, 27 Kampala<br>
-          Entebbe, Uganda
+          P.O. Box 74940 · Clock-Tower Plot 6, 27 Kampala · Entebbe, Uganda
         </p>
-        <p style="font-size: 12px; color: #6b7280; margin: 15px 0 0 0;">
-          Copyright © ${new Date().getFullYear()} YooKatale. All rights reserved.
-        </p>
-        <p style="font-size: 11px; color: #6b7280; margin: 10px 0 0 0;">
-          You're receiving this because you signed up for Yookatale.
-        </p>
+        <p style="font-size: 12px; color: #6b7280; margin: 12px 0 0 0;">© ${new Date().getFullYear()} YooKatale. All rights reserved.</p>
+        <p style="font-size: 11px; color: #6b7280; margin: 14px 0 0 0;">You're receiving this because you signed up for Yookatale.</p>
       </td>
     </tr>
   </table>
-
 </body>
 </html>
 `;
 
-// Newsletter email template - subscription and news based
+// Newsletter email template - subscription and news based (website newsletter signup)
 export const newsletterEmailTemplate = `
 <html lang="en">
 <head>
@@ -190,219 +177,110 @@ export const newsletterEmailTemplate = `
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
 
-  <!-- Header with Logo -->
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: auto; background-color: #000000;">
     <tr>
-      <td style="padding: 40px 20px; text-align: center;">
-        <img src="https://www.yookatale.app/assets/icons/logo2.png" alt="YooKatale Logo" style="max-width: 180px; height: auto; margin-bottom: 20px;" />
-        <h1 style="font-size: 32px; color: #ffffff; margin: 0; font-weight: bold;">YooKatale Newsletter</h1>
-        <p style="font-size: 18px; color: #e0f2fe; margin: 10px 0 0 0;">Stay Updated with Our Latest News & Offers</p>
+      <td style="padding: 36px 20px; text-align: center;">
+        <img src="https://www.yookatale.app/assets/icons/logo2.png" alt="YooKatale Logo" style="max-width: 160px; height: auto; margin-bottom: 16px;" />
+        <h1 style="font-size: 32px; color: #ffffff; margin: 0; font-weight: bold;">YooKatale Newsletter 📬</h1>
+        <p style="font-size: 17px; color: #e0f2fe; margin: 10px 0 0 0;">Stay updated with news & offers</p>
       </td>
     </tr>
   </table>
 
-  <!-- Main Content -->
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: auto; background-color: #ffffff;">
     <tr>
-      <td style="padding: 40px 30px;">
-        <!-- Welcome Content Section -->
-        <h1 style="font-size: 28px; color: #1f2937; margin: 0 0 20px 0; font-weight: bold;">Welcome to Yookatale</h1>
-        <p style="font-size: 18px; color: #4b5563; margin: 0 0 20px 0; font-weight: 500;">Your mobile food market.</p>
-        
-        <p style="font-size: 16px; color: #374151; line-height: 1.8; margin: 0 0 20px 0;">
-          Forget about cooking or going to the market by subscribing for <strong>Premium</strong>, <strong>Family</strong> or <strong>Business Plan</strong>.
+      <td style="padding: 36px 28px;">
+        <p style="font-size: 16px; color: #374151; line-height: 1.7; margin: 0 0 24px 0;">
+          Welcome to Yookatale — Yoo mobile food market. Subscribe <strong>Freemium</strong>, <strong>Premium</strong>, <strong>Family</strong> or <strong>Business</strong> monthly or annually. Get everything delivered to your doorstep.
         </p>
-        
-        <p style="font-size: 16px; color: #4b5563; line-height: 1.8; margin: 0 0 20px 0;">
-          Discover and customize your meals, set your own time when to eat, where to eat from with friends, family and loved ones while earning loyalty rewards, gifts and discounts.
-        </p>
-        
-        <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 25px 0; border-radius: 8px;">
-          <p style="font-size: 16px; color: #92400e; margin: 0; font-weight: 600;">
-            Earn upto 50,000 cash rewards & prizes when you refer a new friend to yookatale App.
-          </p>
-        </div>
-
-        <!-- Quick Action Links -->
-        <div style="margin: 25px 0; padding: 15px; background-color: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
-          <p style="font-size: 14px; color: #6b7280; margin: 0 0 10px 0; font-weight: 600;">Quick Links:</p>
-          <p style="font-size: 14px; color: #4b5563; margin: 8px 0; line-height: 1.8;">
-            <a href="https://www.yookatale.app/signup" style="color: #185f2d; text-decoration: none; font-weight: 500;">Freely Signup</a> 
-            <span style="color: #d1d5db; margin: 0 8px;">|</span>
-            <a href="https://www.yookatale.app/subscription" style="color: #185f2d; text-decoration: none; font-weight: 500;">Subscribe</a> 
-            <span style="color: #d1d5db; margin: 0 8px;">|</span>
-            <a href="https://www.yookatale.app/partner" style="color: #185f2d; text-decoration: none; font-weight: 500;">Partner with us</a> 
-            <span style="color: #d1d5db; margin: 0 8px;">|</span>
-            <a href="https://www.yookatale.app/#refer" style="color: #185f2d; text-decoration: none; font-weight: 500;">Invite a friend</a>
-          </p>
-        </div>
-
-        <!-- Latest News Section -->
-        <div style="border-top: 2px solid #e5e7eb; margin: 30px 0; padding-top: 30px;">
-          <h3 style="font-size: 18px; color: #1f2937; margin: 0 0 15px 0; font-weight: bold;">Latest News</h3>
-          <p style="font-size: 15px; color: #4b5563; line-height: 1.7; margin: 0 0 15px 0;">
-            Stay informed about new meal options, special promotions, nutrition tips, and exciting updates from YooKatale.
-          </p>
-          <a href="https://www.yookatale.app/blog" style="display: inline-block; margin-top: 10px; color: #185f2d; text-decoration: underline; font-weight: bold;">Read Our Blog &gt;</a>
-        </div>
-
-        <!-- Action Buttons -->
-        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
-          <tr>
-            <td align="center" style="padding: 10px 0;">
-              <a href="https://www.yookatale.app/subscription" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #185f2d 0%, #1f793a 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 5px; box-shadow: 0 4px 6px rgba(24, 95, 45, 0.3);">
-                View Subscription Plans
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <td align="center" style="padding: 10px 0;">
-              <a href="https://www.yookatale.app/#refer" style="display: inline-block; padding: 14px 32px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 5px;">
-                Invite a Friend
-              </a>
-            </td>
-          </tr>
-        </table>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;"><tr><td align="center" width="33%" style="padding: 0 8px;"><div style="background-color: #eef2ff; width: 56px; height: 56px; border-radius: 50%; line-height: 56px; margin: 0 auto 10px; text-align: center;"><img src="https://img.icons8.com/ios-filled/50/1f2937/delivery.png" alt="Fast delivery" width="28" height="28" style="vertical-align: middle; border: 0;" /></div><p style="color: #111827; font-size: 13px; font-weight: 600; margin: 0;">🚚 Fast Delivery</p></td><td align="center" width="33%" style="padding: 0 8px;"><div style="background-color: #ecfdf5; width: 56px; height: 56px; border-radius: 50%; line-height: 56px; margin: 0 auto 10px; text-align: center;"><img src="https://img.icons8.com/ios-filled/50/1f2937/leaf.png" alt="Organic" width="28" height="28" style="vertical-align: middle; border: 0;" /></div><p style="color: #111827; font-size: 13px; font-weight: 600; margin: 0;">🌿 100% Organic</p></td><td align="center" width="33%" style="padding: 0 8px;"><div style="background-color: #fff7ed; width: 56px; height: 56px; border-radius: 50%; line-height: 56px; margin: 0 auto 10px; text-align: center;"><img src="https://img.icons8.com/ios-filled/50/1f2937/meal.png" alt="Custom meals" width="28" height="28" style="vertical-align: middle; border: 0;" /></div><p style="color: #111827; font-size: 13px; font-weight: 600; margin: 0;">🍽️ Custom Meals</p></td></tr></table>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 28px;"><tr><td width="50%" style="padding: 0 6px 0 0; vertical-align: top;"><div style="background: linear-gradient(135deg, #0a5c36 0%, #1a7d46 100%); border-radius: 12px; padding: 18px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.15);"><p style="color: #ffffff; font-size: 15px; font-weight: 700; margin: 0; letter-spacing: 0.3px;">Get 10% off today</p><p style="color: rgba(255,255,255,0.95); font-size: 13px; margin: 8px 0 0; line-height: 1.5;">Test and activate Premium, Family or Business.</p><a href="https://www.yookatale.app/subscription" style="display: inline-block; margin-top: 12px; padding: 10px 20px; background-color: #ffffff; color: #0a5c36; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 13px;">Activate plan</a></div></td><td width="50%" style="padding: 0 0 0 6px; vertical-align: top;"><div style="background-color: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 18px 20px; text-align: center;"><p style="color: #92400e; font-size: 15px; font-weight: 700; margin: 0; letter-spacing: 0.3px;">Earn up to 50,000 in rewards</p><p style="color: #b45309; font-size: 13px; margin: 8px 0 0; line-height: 1.5;">Refer a friend to Yookatale — cash &amp; prizes.</p><a href="https://www.yookatale.app/#refer" style="display: inline-block; margin-top: 12px; padding: 10px 20px; background-color: #f59e0b; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 13px;">Invite a friend</a></div></td></tr></table>
+        <p style="color: #111827; font-size: 15px; font-weight: 700; margin: 24px 0 12px; text-align: center; letter-spacing: 0.2px;">Your next steps — choose one</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 28px;"><tr><td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/signup" style="display: inline-block; padding: 8px 10px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/add-user-male.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Freely Signup</a></td><td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/subscription" style="display: inline-block; padding: 8px 10px; background-color: #185f2d; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shopping-cart.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Subscribe</a></td><td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/partner" style="display: inline-block; padding: 8px 10px; background-color: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/handshake.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Partner with us</a></td><td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/#refer" style="display: inline-block; padding: 8px 10px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/gift.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Invite a friend</a></td><td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app" style="display: inline-block; padding: 8px 10px; background-color: #4b5563; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shop.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Visit marketplace</a></td></tr></table>
+        <div style="background-color: #f9fafb; border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid #e5e7eb;"><h3 style="color: #111827; font-size: 18px; font-weight: 700; margin: 0 0 10px; text-align: center;">🛒 Shop the Marketplace</h3><p style="color: #4b5563; font-size: 14px; margin: 0 0 16px; text-align: center;">Browse and order in minutes.</p><table width="100%" cellpadding="0" cellspacing="0"><tr><td width="50%" style="padding: 0 6px 12px 0; vertical-align: top;"><a href="https://www.yookatale.app/marketplace" style="text-decoration: none; color: inherit;"><div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;"><img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&h=240&q=80" alt="Fresh vegetables" style="display: block; width: 100%; height: auto; border: 0;" /><div style="padding: 10px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Fresh Vegetables</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Handpicked daily.</p></div></div></a></td><td width="50%" style="padding: 0 0 12px 6px; vertical-align: top;"><a href="https://www.yookatale.app/marketplace" style="text-decoration: none; color: inherit;"><div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&h=240&q=80" alt="Organic fruits" style="display: block; width: 100%; height: auto; border: 0;" /><div style="padding: 10px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Organic Fruits</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Always fresh.</p></div></div></a></td></tr><tr><td width="50%" style="padding: 0 6px 0 0; vertical-align: top;"><a href="https://www.yookatale.app/marketplace" style="text-decoration: none; color: inherit;"><div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&h=240&q=80" alt="Ready meals" style="display: block; width: 100%; height: auto; border: 0;" /><div style="padding: 10px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Ready Meals</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Chef-prepared.</p></div></div></a></td><td width="50%" style="padding: 0 0 0 6px; vertical-align: top;"><a href="https://www.yookatale.app/marketplace" style="text-decoration: none; color: inherit;"><div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;"><img src="https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=400&h=240&q=80" alt="Pantry essentials" style="display: block; width: 100%; height: auto; border: 0;" /><div style="padding: 10px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Pantry Essentials</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Kitchen staples.</p></div></div></a></td></tr></table><div style="text-align: center; margin-top: 14px;"><a href="https://www.yookatale.app/marketplace" style="display: inline-block; padding: 10px 20px; background-color: #0a5c36; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">Visit Marketplace</a></div></div>
+        <div style="margin-top: 28px; padding: 24px; background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 16px; border: 1px solid #e2e8f0; text-align: center;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding-bottom: 12px;"><img src="https://img.icons8.com/ios-filled/50/0a5c36/smartphone.png" alt="App" width="40" height="40" style="display: block; margin: 0 auto; border: 0;" /></td></tr><tr><td align="center"><p style="color: #0f172a; font-size: 17px; font-weight: 700; margin: 0 0 6px; letter-spacing: 0.2px;">Yookatale in your pocket</p><p style="color: #64748b; font-size: 14px; margin: 0 0 16px; line-height: 1.5;">Download the official app. Shop, subscribe, and track orders from your phone.</p><a href="https://play.google.com/store/apps/details?id=com.yookataleapp.app" style="text-decoration: none; display: inline-block;"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="180" style="display: block; border: 0; height: auto;" /></a></td></tr></table></div>
       </td>
     </tr>
   </table>
 
-  <!-- Footer with Black Background and Social Media -->
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: auto; background-color: #000000;">
     <tr>
-      <td style="padding: 40px 30px; text-align: center;">
-        <!-- Social Media Links -->
-        <div style="margin-bottom: 25px;">
-          <table align="center" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
-            <tr>
-              <td style="padding: 0 8px;">
-                <a href="https://www.facebook.com/profile.php?id=100094194942669&mibextid=LQQJ4d" style="color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500;">Facebook</a>
-              </td>
-              <td style="padding: 0 8px; color: #6b7280;">|</td>
-              <td style="padding: 0 8px;">
-                <a href="https://twitter.com/YooKatale?t=3Q96I9JR98HgA69gisdXdA&s=09" style="color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500;">Twitter</a>
-              </td>
-              <td style="padding: 0 8px; color: #6b7280;">|</td>
-              <td style="padding: 0 8px;">
-                <a href="https://www.instagram.com/p/CuHdaksN5UW/?igshid=NTc4MTIwNjQ2YQ==" style="color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500;">Instagram</a>
-              </td>
-              <td style="padding: 0 8px; color: #6b7280;">|</td>
-              <td style="padding: 0 8px;">
-                <a href="https://www.linkedin.com/company/96071915/admin/feed/posts/" style="color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500;">LinkedIn</a>
-              </td>
-              <td style="padding: 0 8px; color: #6b7280;">|</td>
-              <td style="padding: 0 8px;">
-                <a href="https://wa.me/256786118137" style="color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500;">WhatsApp</a>
-              </td>
-            </tr>
-          </table>
-        </div>
-        
-        <p style="font-size: 13px; color: #9ca3af; margin: 0 0 8px 0; line-height: 1.6;">
-          P.O. Box 74940<br>
-          Clock-Tower Plot 6, 27 Kampala<br>
-          Entebbe, Uganda
+      <td style="padding: 28px 20px; text-align: center; border-top: 2px solid #333333;">
+        <p style="font-size: 12px; color: #9ca3af; margin: 0 0 12px 0;">
+          <a href="https://www.facebook.com/profile.php?id=100094194942669&mibextid=LQQJ4d" style="color: #ffffff; text-decoration: none; margin: 0 6px;">Facebook</a>
+          <span style="color: #6b7280;">|</span>
+          <a href="https://twitter.com/YooKatale?t=3Q96I9JR98HgA69gisdXdA&s=09" style="color: #ffffff; text-decoration: none; margin: 0 6px;">Twitter</a>
+          <span style="color: #6b7280;">|</span>
+          <a href="https://www.instagram.com/p/CuHdaksN5UW/?igshid=NTc4MTIwNjQ2YQ==" style="color: #ffffff; text-decoration: none; margin: 0 6px;">Instagram</a>
+          <span style="color: #6b7280;">|</span>
+          <a href="https://www.linkedin.com/company/96071915/admin/feed/posts/" style="color: #ffffff; text-decoration: none; margin: 0 6px;">LinkedIn</a>
+          <span style="color: #6b7280;">|</span>
+          <a href="https://wa.me/256786118137" style="color: #ffffff; text-decoration: none; margin: 0 6px;">WhatsApp</a>
         </p>
-        <p style="font-size: 12px; color: #6b7280; margin: 20px 0 0 0;">
-          Copyright © ${new Date().getFullYear()} YooKatale. All rights reserved.
-        </p>
-        <p style="font-size: 11px; color: #6b7280; margin: 15px 0 0 0;">
-          You're receiving this because you subscribed to our newsletter.
-        </p>
+        <p style="font-size: 13px; color: #9ca3af; margin: 0 0 8px 0; line-height: 1.6;">P.O. Box 74940 · Clock-Tower Plot 6, 27 Kampala · Entebbe, Uganda</p>
+        <p style="font-size: 12px; color: #6b7280; margin: 12px 0 0 0;">© ${new Date().getFullYear()} YooKatale. All rights reserved.</p>
+        <p style="font-size: 11px; color: #6b7280; margin: 14px 0 0 0;">You're receiving this because you subscribed to our newsletter.</p>
       </td>
     </tr>
   </table>
-
 </body>
 </html>
 `;
 
 
-// Invitation email template
+// Invitation / Referral email template (invite a friend)
 export const invitationEmailTemplate = `
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
 
-  <!-- Header with Logo - Black Background -->
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: auto; background-color: #000000;">
     <tr>
-      <td style="padding: 30px 20px; text-align: center;">
-        <img src="https://www.yookatale.app/assets/icons/logo2.png" alt="YooKatale Logo" style="max-width: 180px; height: auto; margin-bottom: 15px;" />
-        <h1 style="font-size: 32px; color: #ffffff; margin: 0; font-weight: bold;">Invitation To YooKatale</h1>
+      <td style="padding: 36px 20px; text-align: center;">
+        <img src="https://www.yookatale.app/assets/icons/logo2.png" alt="YooKatale Logo" style="max-width: 160px; height: auto; margin-bottom: 16px;" />
+        <h1 style="font-size: 32px; color: #ffffff; margin: 0; font-weight: bold;">You're invited 🎉</h1>
+        <p style="font-size: 17px; color: #e0f2fe; margin: 10px 0 0 0;">Join Yookatale — Yoo mobile food market</p>
       </td>
     </tr>
   </table>
 
-  <!-- Main Content -->
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: auto; background-color: #ffffff;">
     <tr>
-      <td style="padding: 40px 30px;">
-        <p style="font-size: 18px; color: #374151; line-height: 1.8; margin: 0 0 25px 0;">
-          We are a digital mobile market providing food delivery services through our mobile platform so our customers don't have to go to the market.
-        </p>
-        
-        <p style="font-size: 16px; color: #4b5563; line-height: 1.8; margin: 0 0 25px 0;">
-          Our service packages are rich for domestic consumption, cooperate and commercial clients.
-        </p>
-
-        <div style="background-color: #f0f9ff; border-left: 4px solid #3b82f6; padding: 20px; margin: 25px 0; border-radius: 6px;">
-          <h2 style="font-size: 20px; color: #1e40af; margin: 0 0 15px 0; font-weight: bold;">Why choose us?</h2>
-          <p style="font-size: 16px; color: #1e3a8a; line-height: 1.8; margin: 0 0 15px 0;">
-            Choosing Yookatale means more than just using a platform; it's about connecting deeply with your nutritional needs. Experience a service designed to seamlessly integrate with your lifestyle, ensuring access to high-quality, fresh, affordable food options that truly cater to your well-being.
-          </p>
-        </div>
-
-        <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 25px 0; border-radius: 6px;">
-          <h3 style="font-size: 18px; color: #92400e; margin: 0 0 15px 0; font-weight: bold;">Digital Platform</h3>
-          <p style="font-size: 16px; color: #78350f; line-height: 1.8; margin: 0 0 15px 0;">
-            Access services at your convenience. Get your favorite meal by just a click!
-          </p>
-          
-          <h3 style="font-size: 18px; color: #92400e; margin: 20px 0 15px 0; font-weight: bold;">Diverse</h3>
-          <p style="font-size: 16px; color: #78350f; line-height: 1.8; margin: 0 0 15px 0;">
-            Discover a wide range of fresh and organic products, all in one place.
-          </p>
-          
-          <h3 style="font-size: 18px; color: #92400e; margin: 20px 0 15px 0; font-weight: bold;">Interactive</h3>
-          <p style="font-size: 16px; color: #78350f; line-height: 1.8; margin: 0;">
-            Engage with our platform easy-to-use features that enhance your shopping experience.
-          </p>
-        </div>
-
-        <!-- Action Button -->
-        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
-          <tr>
-            <td align="center" style="padding: 10px 0;">
-              <a href="https://www.yookatale.app/#refer" style="display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #185f2d 0%, #1f793a 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(24, 95, 45, 0.3);">
-                Signup Today
-              </a>
-            </td>
-          </tr>
-        </table>
+      <td style="padding: 36px 28px;">
+        <p style="font-size: 16px; color: #374151; line-height: 1.7; margin: 0 0 24px 0;">A friend invited you to Yookatale. Subscribe <strong>Freemium</strong>, <strong>Premium</strong>, <strong>Family</strong> or <strong>Business</strong> — monthly or annually. Get meals delivered to your doorstep.</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;"><tr><td align="center" width="33%" style="padding: 0 8px;"><div style="background-color: #eef2ff; width: 56px; height: 56px; border-radius: 50%; line-height: 56px; margin: 0 auto 10px; text-align: center;"><img src="https://img.icons8.com/ios-filled/50/1f2937/delivery.png" alt="Fast delivery" width="28" height="28" style="vertical-align: middle; border: 0;" /></div><p style="color: #111827; font-size: 13px; font-weight: 600; margin: 0;">🚚 Fast Delivery</p></td><td align="center" width="33%" style="padding: 0 8px;"><div style="background-color: #ecfdf5; width: 56px; height: 56px; border-radius: 50%; line-height: 56px; margin: 0 auto 10px; text-align: center;"><img src="https://img.icons8.com/ios-filled/50/1f2937/leaf.png" alt="Organic" width="28" height="28" style="vertical-align: middle; border: 0;" /></div><p style="color: #111827; font-size: 13px; font-weight: 600; margin: 0;">🌿 100% Organic</p></td><td align="center" width="33%" style="padding: 0 8px;"><div style="background-color: #fff7ed; width: 56px; height: 56px; border-radius: 50%; line-height: 56px; margin: 0 auto 10px; text-align: center;"><img src="https://img.icons8.com/ios-filled/50/1f2937/meal.png" alt="Custom meals" width="28" height="28" style="vertical-align: middle; border: 0;" /></div><p style="color: #111827; font-size: 13px; font-weight: 600; margin: 0;">🍽️ Custom Meals</p></td></tr></table>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 28px;"><tr><td width="50%" style="padding: 0 6px 0 0; vertical-align: top;"><div style="background: linear-gradient(135deg, #0a5c36 0%, #1a7d46 100%); border-radius: 12px; padding: 18px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.15);"><p style="color: #ffffff; font-size: 15px; font-weight: 700; margin: 0; letter-spacing: 0.3px;">Get 10% off today</p><p style="color: rgba(255,255,255,0.95); font-size: 13px; margin: 8px 0 0; line-height: 1.5;">Test and activate Premium, Family or Business.</p><a href="https://www.yookatale.app/subscription" style="display: inline-block; margin-top: 12px; padding: 10px 20px; background-color: #ffffff; color: #0a5c36; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 13px;">Activate plan</a></div></td><td width="50%" style="padding: 0 0 0 6px; vertical-align: top;"><div style="background-color: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 18px 20px; text-align: center;"><p style="color: #92400e; font-size: 15px; font-weight: 700; margin: 0; letter-spacing: 0.3px;">Earn up to 50,000 in rewards</p><p style="color: #b45309; font-size: 13px; margin: 8px 0 0; line-height: 1.5;">Refer a friend to Yookatale — cash &amp; prizes.</p><a href="https://www.yookatale.app/#refer" style="display: inline-block; margin-top: 12px; padding: 10px 20px; background-color: #f59e0b; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 13px;">Invite a friend</a></div></td></tr></table>
+        <p style="color: #111827; font-size: 15px; font-weight: 700; margin: 24px 0 12px; text-align: center; letter-spacing: 0.2px;">Your next steps — choose one</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 28px;"><tr><td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/signup" style="display: inline-block; padding: 8px 10px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/add-user-male.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Freely Signup</a></td><td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/subscription" style="display: inline-block; padding: 8px 10px; background-color: #185f2d; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shopping-cart.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Subscribe</a></td><td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/partner" style="display: inline-block; padding: 8px 10px; background-color: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/handshake.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Partner with us</a></td><td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/#refer" style="display: inline-block; padding: 8px 10px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/gift.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Invite a friend</a></td><td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app" style="display: inline-block; padding: 8px 10px; background-color: #4b5563; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shop.png" width="14" height="14" alt="" style="vertical-align: -2px; margin-right: 3px; border: 0;" />Visit marketplace</a></td></tr></table>
+        <div style="background-color: #f9fafb; border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid #e5e7eb;"><h3 style="color: #111827; font-size: 18px; font-weight: 700; margin: 0 0 10px; text-align: center;">🛒 Shop the Marketplace</h3><p style="color: #4b5563; font-size: 14px; margin: 0 0 16px; text-align: center;">Browse and order in minutes.</p><table width="100%" cellpadding="0" cellspacing="0"><tr><td width="50%" style="padding: 0 6px 12px 0; vertical-align: top;"><a href="https://www.yookatale.app/marketplace" style="text-decoration: none; color: inherit;"><div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;"><img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&h=240&q=80" alt="Fresh vegetables" style="display: block; width: 100%; height: auto; border: 0;" /><div style="padding: 10px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Fresh Vegetables</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Handpicked daily.</p></div></div></a></td><td width="50%" style="padding: 0 0 12px 6px; vertical-align: top;"><a href="https://www.yookatale.app/marketplace" style="text-decoration: none; color: inherit;"><div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&h=240&q=80" alt="Organic fruits" style="display: block; width: 100%; height: auto; border: 0;" /><div style="padding: 10px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Organic Fruits</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Always fresh.</p></div></div></a></td></tr><tr><td width="50%" style="padding: 0 6px 0 0; vertical-align: top;"><a href="https://www.yookatale.app/marketplace" style="text-decoration: none; color: inherit;"><div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&h=240&q=80" alt="Ready meals" style="display: block; width: 100%; height: auto; border: 0;" /><div style="padding: 10px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Ready Meals</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Chef-prepared.</p></div></div></a></td><td width="50%" style="padding: 0 0 0 6px; vertical-align: top;"><a href="https://www.yookatale.app/marketplace" style="text-decoration: none; color: inherit;"><div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;"><img src="https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=400&h=240&q=80" alt="Pantry essentials" style="display: block; width: 100%; height: auto; border: 0;" /><div style="padding: 10px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Pantry Essentials</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Kitchen staples.</p></div></div></a></td></tr></table><div style="text-align: center; margin-top: 14px;"><a href="https://www.yookatale.app/marketplace" style="display: inline-block; padding: 10px 20px; background-color: #0a5c36; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">Visit Marketplace</a></div></div>
+        <div style="margin-top: 28px; padding: 24px; background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 16px; border: 1px solid #e2e8f0; text-align: center;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding-bottom: 12px;"><img src="https://img.icons8.com/ios-filled/50/0a5c36/smartphone.png" alt="App" width="40" height="40" style="display: block; margin: 0 auto; border: 0;" /></td></tr><tr><td align="center"><p style="color: #0f172a; font-size: 17px; font-weight: 700; margin: 0 0 6px; letter-spacing: 0.2px;">Yookatale in your pocket</p><p style="color: #64748b; font-size: 14px; margin: 0 0 16px; line-height: 1.5;">Download the official app. Shop, subscribe, and track orders from your phone.</p><a href="https://play.google.com/store/apps/details?id=com.yookataleapp.app" style="text-decoration: none; display: inline-block;"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="180" style="display: block; border: 0; height: auto;" /></a></td></tr></table></div>
       </td>
     </tr>
   </table>
 
-  <!-- Footer - Black Background -->
   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: auto; background-color: #000000;">
     <tr>
-      <td style="padding: 30px 20px; text-align: center; border-top: 2px solid #333333;">
-        <p style="font-size: 13px; color: #9ca3af; margin: 0 0 8px 0; line-height: 1.6;">
-          P.O. Box 74940<br>
-          Clock-Tower Plot 6, 27 Kampala<br>
-          Entebbe, Uganda
+      <td style="padding: 28px 20px; text-align: center; border-top: 2px solid #333333;">
+        <p style="font-size: 12px; color: #9ca3af; margin: 0 0 12px 0;">
+          <a href="https://www.facebook.com/profile.php?id=100094194942669&mibextid=LQQJ4d" style="color: #ffffff; text-decoration: none; margin: 0 6px;">Facebook</a>
+          <span style="color: #6b7280;">|</span>
+          <a href="https://twitter.com/YooKatale?t=3Q96I9JR98HgA69gisdXdA&s=09" style="color: #ffffff; text-decoration: none; margin: 0 6px;">Twitter</a>
+          <span style="color: #6b7280;">|</span>
+          <a href="https://www.instagram.com/p/CuHdaksN5UW/?igshid=NTc4MTIwNjQ2YQ==" style="color: #ffffff; text-decoration: none; margin: 0 6px;">Instagram</a>
+          <span style="color: #6b7280;">|</span>
+          <a href="https://www.linkedin.com/company/96071915/admin/feed/posts/" style="color: #ffffff; text-decoration: none; margin: 0 6px;">LinkedIn</a>
+          <span style="color: #6b7280;">|</span>
+          <a href="https://wa.me/256786118137" style="color: #ffffff; text-decoration: none; margin: 0 6px;">WhatsApp</a>
         </p>
-        <p style="font-size: 12px; color: #6b7280; margin: 15px 0 0 0;">
-          Copyright © ${new Date().getFullYear()} YooKatale. All rights reserved.
-        </p>
+        <p style="font-size: 13px; color: #9ca3af; margin: 0 0 8px 0; line-height: 1.6;">P.O. Box 74940 · Clock-Tower Plot 6, 27 Kampala · Entebbe, Uganda</p>
+        <p style="font-size: 12px; color: #6b7280; margin: 12px 0 0 0;">© ${new Date().getFullYear()} YooKatale. All rights reserved.</p>
+        <p style="font-size: 11px; color: #6b7280; margin: 14px 0 0 0;">You're receiving this because a friend invited you to Yookatale.</p>
       </td>
     </tr>
   </table>
-
 </body>
 </html>
 `;

@@ -1,32 +1,37 @@
 /**
- * Test Subscription Email API
- * 
- * Sends test subscription emails to 3 test addresses
- * Use this to verify email template before bulk subscription
- * 
- * Usage:
- *   POST /api/subscription/test
- *   No body required
+ * Test Email API
+ *
+ * Sends test emails to 3 addresses: arihotimothy89@gmail.com, timothy.arhoz@protonmail.com, yookatale256@gmail.com
+ * Use to verify templates before bulk subscription.
+ *
+ * POST /api/subscription/test
+ * Body (optional): { type: 'subscription' | 'welcome' } — default: 'subscription'
  */
 
 import { NextResponse } from "next/server";
 
 const testEmails = [
   'arihotimothy89@gmail.com',
-  'timothy.arihoz@protonmail.com',
+  'timothy.arhoz@protonmail.com',
   'yookatale256@gmail.com'
 ];
 
 export const POST = async (req) => {
   try {
-    console.log('🧪 Starting test email sending...');
-    
+    let type = 'subscription';
+    try {
+      const body = await req.json().catch(() => ({}));
+      if (body.type === 'welcome' || body.type === 'subscription') type = body.type;
+    } catch (_) {}
+
+    console.log(`🧪 Starting test email sending (type: ${type})...`);
+
     const baseUrl = req.nextUrl.origin;
     const results = [];
 
     for (const email of testEmails) {
       try {
-        console.log(`📧 Sending test email to: ${email}...`);
+        console.log(`📧 Sending ${type} to: ${email}...`);
 
         const response = await fetch(`${baseUrl}/api/mail`, {
           method: 'POST',
@@ -34,8 +39,8 @@ export const POST = async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            email: email,
-            type: 'subscription'
+            email,
+            type,
           }),
         });
 
@@ -65,6 +70,7 @@ export const POST = async (req) => {
     return new NextResponse(
       JSON.stringify({
         success: true,
+        type,
         total: testEmails.length,
         successCount,
         errorCount,

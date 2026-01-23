@@ -1,7 +1,7 @@
 /**
  * Bulk Subscription Script
  * 
- * Reads emails from email_list.csv and subscribes them all
+ * Reads emails from emailnew.csv and subscribes them all
  * - Subscribes to database
  * - Sends subscription welcome email
  * 
@@ -20,11 +20,11 @@ async function bulkSubscribe() {
   console.log('📧 Starting bulk subscription process...\n');
 
   // Read CSV file
-  const csvPath = path.join(__dirname, '../../email_list.csv');
+  const csvPath = path.join(__dirname, '../../emailnew.csv');
   
   if (!fs.existsSync(csvPath)) {
     console.error(`❌ CSV file not found at: ${csvPath}`);
-    console.error('Please ensure email_list.csv exists in the project root.');
+    console.error('Please ensure emailnew.csv exists in the project root.');
     process.exit(1);
   }
 
