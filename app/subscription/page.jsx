@@ -33,7 +33,6 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Calendar } from "lucide-react";
 
 const Subscription = () => {
   const [subscriptionPackages, setSubscriptionPackages] = useState([]);
@@ -200,24 +199,16 @@ const Subscription = () => {
             >
               {/* Section Header */}
               <Box marginBottom={{ base: "1.5rem", sm: "2rem", md: "3rem" }} textAlign="center">
-                <Flex 
-                  alignItems="center" 
-                  justifyContent="center" 
-                  gap={{ base: "0.25rem", md: "0.5rem" }} 
+                <Heading
+                  as="h2"
+                  fontSize={{ base: "lg", sm: "xl", md: "2xl", lg: "3xl" }}
+                  fontWeight="bold"
+                  color={ThemeColors.darkColor}
+                  lineHeight={{ base: "1.3", md: "1.4" }}
                   marginBottom={{ base: "0.25rem", md: "0.5rem" }}
-                  flexWrap="wrap"
                 >
-                  <Calendar size={{ base: 16, md: 18 }} color={ThemeColors.darkColor} />
-                  <Heading
-                    as="h2"
-                    fontSize={{ base: "lg", sm: "xl", md: "2xl", lg: "3xl" }}
-                    fontWeight="bold"
-                    color={ThemeColors.darkColor}
-                    lineHeight={{ base: "1.3", md: "1.4" }}
-                  >
-                    Meal Subscription & Weekly Calendar
-                  </Heading>
-                </Flex>
+                  Meal Subscription & Weekly Calendar
+                </Heading>
                 <Text 
                   fontSize={{ base: "xs", sm: "sm", md: "md" }} 
                   color="gray.600"
