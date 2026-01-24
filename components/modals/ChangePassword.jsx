@@ -1,137 +1,108 @@
 "use client";
 
-import { Label } from "@components/ui/label";
-import { Input } from "@components/ui/input";
-import { Button } from "@components/ui/button";
-import { Loader2, X, Eye, EyeOff } from "lucide-react";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  InputGroup,
+  InputRightElement,
+  IconButton,
+  useToast,
+  VStack,
+  Text,
+  Box,
+} from "@chakra-ui/react";
 import { useSelector } from "react-redux";
-import { useToast } from "@components/ui/use-toast";
 import { useState } from "react";
 import { DB_URL } from "@config/config";
-import axios from "axios";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
-const ChangePassword = ({ closeModal }) => {
+const ChangePassword = ({ isOpen, onClose }) => {
   const { userInfo } = useSelector((state) => state.auth);
+  const toast = useToast();
   const [isLoading, setLoading] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [passwords, setPasswords] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
-  const { toast } = useToast();
-
-  const submitHandler = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validation
     if (!passwords.currentPassword) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter your current password",
-      });
+      toast({ title: "Enter current password", status: "error", duration: 4000, isClosable: true });
       return;
     }
-
     if (!passwords.newPassword) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter a new password",
-      });
+      toast({ title: "Enter new password", status: "error", duration: 4000, isClosable: true });
       return;
     }
-
     if (passwords.newPassword.length < 6) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "New password must be at least 6 characters long",
-      });
+      toast({ title: "New password must be at least 6 characters", status: "error", duration: 4000, isClosable: true });
       return;
     }
-
     if (passwords.newPassword !== passwords.confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "New passwords do not match",
-      });
+      toast({ title: "Passwords do not match", status: "error", duration: 4000, isClosable: true });
       return;
     }
-
     if (passwords.newPassword === passwords.currentPassword) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "New password must be different from current password",
-      });
+      toast({ title: "New password must differ from current", status: "error", duration: 4000, isClosable: true });
       return;
     }
 
     setLoading(true);
-
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Please login to change your password",
-        });
-        setLoading(false);
-        return;
-      }
-
-      const response = await axios.post(
-        `${DB_URL}/auth/change-password`,
-        {
+      const res = await fetch(`${DB_URL}/auth/change-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
           userId: userInfo?._id,
           currentPassword: passwords.currentPassword,
           newPassword: passwords.newPassword,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
 
-      if (response.data?.status === "Success") {
+      if (!res.ok) throw new Error(data?.message || "Change password failed");
+
+      if (data?.status === "Success") {
         toast({
-          title: "Success",
-          description: "Password changed successfully. Redirecting to login...",
+          title: "Password changed",
+          description: "Please sign in again with your new password.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
         });
-
-        // Clear form
-        setPasswords({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
-
-        closeModal(false);
-        
-        // Redirect to signin after password change
+        setPasswords({ currentPassword: "", newPassword: "", confirmPassword: "" });
+        onClose();
         setTimeout(() => {
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem("token");
-            localStorage.removeItem("userInfo");
-            window.location.href = '/signin';
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("yookatale-app");
+            window.location.href = "/signin";
           }
         }, 1500);
+      } else {
+        throw new Error(data?.message || "Change password failed");
       }
     } catch (err) {
       toast({
-        variant: "destructive",
-        title: "Error occurred",
-        description: err.response?.data?.message || err.message || "Failed to change password",
+        title: "Error",
+        description: err?.message || "Could not change password. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
       });
     } finally {
       setLoading(false);
@@ -139,130 +110,105 @@ const ChangePassword = ({ closeModal }) => {
   };
 
   return (
-    <>
-      <div className="p-8 flex bg-black bg-opacity-50 justify-center items-center fixed z-50 top-0 left-0 right-0 bottom-0">
-        <div className="m-auto w-full max-w-md p-6 bg-white overflow-y-auto rounded-lg shadow-xl relative">
-          <div
-            className="absolute top-4 right-4 cursor-pointer hover:bg-gray-100 rounded-full p-1 transition-colors"
-            onClick={() => closeModal(false)}
-          >
-            <X size={24} />
-          </div>
-          
-          <div className="pt-4 pb-6">
-            <h2 className="text-center text-2xl font-semibold text-gray-800">Change Password</h2>
-            <p className="text-center text-sm text-gray-500 mt-2">
-              Enter your current password and choose a new one
-            </p>
-          </div>
-
-          <form onSubmit={submitHandler} className="space-y-4">
-            <div>
-              <Label htmlFor="currentPassword" className="text-sm font-medium text-gray-700">
-                Current Password *
-              </Label>
-              <div className="relative mt-1">
-                <Input
-                  type={showCurrentPassword ? "text" : "password"}
-                  id="currentPassword"
-                  placeholder="Enter current password"
-                  value={passwords.currentPassword}
-                  onChange={(e) =>
-                    setPasswords({ ...passwords, currentPassword: e.target.value })
-                  }
-                  className="pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                >
-                  {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="newPassword" className="text-sm font-medium text-gray-700">
-                New Password *
-              </Label>
-              <div className="relative mt-1">
-                <Input
-                  type={showNewPassword ? "text" : "password"}
-                  id="newPassword"
-                  placeholder="Enter new password (min. 6 characters)"
-                  value={passwords.newPassword}
-                  onChange={(e) =>
-                    setPasswords({ ...passwords, newPassword: e.target.value })
-                  }
-                  className="pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                >
-                  {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-                Confirm New Password *
-              </Label>
-              <div className="relative mt-1">
-                <Input
-                  type={showConfirmPassword ? "text" : "password"}
-                  id="confirmPassword"
-                  placeholder="Re-enter new password"
-                  value={passwords.confirmPassword}
-                  onChange={(e) =>
-                    setPasswords({ ...passwords, confirmPassword: e.target.value })
-                  }
-                  className="pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            <div className="pt-4 flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1"
-                onClick={() => closeModal(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium"
-                disabled={isLoading}
-              >
-                {isLoading && <Loader2 className="animate-spin mr-2" size={18} />}
-                Change Password
-              </Button>
-            </div>
-          </form>
-
-          <div className="mt-4 p-3 bg-blue-50 rounded-md">
-            <p className="text-xs text-blue-800">
-              <strong>Note:</strong> After changing your password, you'll be logged out and need to sign in again with your new password.
-            </p>
-          </div>
-        </div>
-      </div>
-    </>
+    <Modal isOpen={!!isOpen} onClose={onClose} size="md" scrollBehavior="inside">
+      <ModalOverlay />
+      <ModalContent borderRadius="2xl" mx={4}>
+        <ModalHeader fontWeight="700" color="gray.800">
+          Change password
+        </ModalHeader>
+        <ModalCloseButton />
+        <form onSubmit={handleSubmit}>
+          <ModalBody pb={2}>
+            <VStack spacing={4} align="stretch">
+              <FormControl isRequired>
+                <FormLabel>Current password</FormLabel>
+                <InputGroup>
+                  <Input
+                    type={showCurrent ? "text" : "password"}
+                    value={passwords.currentPassword}
+                    onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })}
+                    placeholder="Current password"
+                    borderRadius="lg"
+                    pr="10"
+                  />
+                  <InputRightElement>
+                    <IconButton
+                      aria-label={showCurrent ? "Hide" : "Show"}
+                      size="sm"
+                      variant="ghost"
+                      icon={showCurrent ? <FiEyeOff /> : <FiEye />}
+                      onClick={() => setShowCurrent(!showCurrent)}
+                    />
+                  </InputRightElement>
+                </InputGroup>
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>New password</FormLabel>
+                <InputGroup>
+                  <Input
+                    type={showNew ? "text" : "password"}
+                    value={passwords.newPassword}
+                    onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+                    placeholder="Min. 6 characters"
+                    borderRadius="lg"
+                    pr="10"
+                  />
+                  <InputRightElement>
+                    <IconButton
+                      aria-label={showNew ? "Hide" : "Show"}
+                      size="sm"
+                      variant="ghost"
+                      icon={showNew ? <FiEyeOff /> : <FiEye />}
+                      onClick={() => setShowNew(!showNew)}
+                    />
+                  </InputRightElement>
+                </InputGroup>
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>Confirm new password</FormLabel>
+                <InputGroup>
+                  <Input
+                    type={showConfirm ? "text" : "password"}
+                    value={passwords.confirmPassword}
+                    onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
+                    placeholder="Re-enter new password"
+                    borderRadius="lg"
+                    pr="10"
+                  />
+                  <InputRightElement>
+                    <IconButton
+                      aria-label={showConfirm ? "Hide" : "Show"}
+                      size="sm"
+                      variant="ghost"
+                      icon={showConfirm ? <FiEyeOff /> : <FiEye />}
+                      onClick={() => setShowConfirm(!showConfirm)}
+                    />
+                  </InputRightElement>
+                </InputGroup>
+              </FormControl>
+              <Box p={3} bg="blue.50" borderRadius="lg">
+                <Text fontSize="sm" color="blue.800">
+                  After changing your password, you’ll be signed out and must sign in again with the new password.
+                </Text>
+              </Box>
+            </VStack>
+          </ModalBody>
+          <ModalFooter gap={3} pt={4}>
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              colorScheme="green"
+              isLoading={isLoading}
+              loadingText="Updating…"
+            >
+              Change password
+            </Button>
+          </ModalFooter>
+        </form>
+      </ModalContent>
+    </Modal>
   );
 };
 

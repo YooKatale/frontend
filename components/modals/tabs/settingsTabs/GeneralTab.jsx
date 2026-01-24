@@ -1,199 +1,146 @@
 "use client";
 
-import { Box, Flex, Grid, Text, useDisclosure, Button as ChakraButton } from "@chakra-ui/react";
-import ButtonComponent from "@components/Button";
-import React, { useState } from "react";
+import { useState } from "react";
+import {
+  Box,
+  Flex,
+  Text,
+  Button,
+  useDisclosure,
+  useToast,
+  VStack,
+  SimpleGrid,
+} from "@chakra-ui/react";
+import { ThemeColors } from "@constants/constants";
 import { useSelector } from "react-redux";
+import { FiUser, FiMail, FiPhone, FiMapPin, FiShield } from "react-icons/fi";
+import { RiCakeLine, RiLeafLine } from "react-icons/ri";
 import UpdateAccount from "@components/modals/UpdateAccount";
 import ChangePassword from "@components/modals/ChangePassword";
-import { useToast } from "@components/ui/use-toast";
-import axios from "axios";
 import { DB_URL } from "@config/config";
+
+const Field = ({ icon: IconComp, label, value, placeholder = "—" }) => (
+  <Flex align="flex-start" gap={3} p={4} borderRadius="xl" bg="white" borderWidth="1px" borderColor="gray.200" _hover={{ borderColor: "gray.300", shadow: "sm" }} transition="all 0.2s">
+    <Box p={2} borderRadius="lg" bg="green.50" color={ThemeColors.primaryColor}>
+      <IconComp size={20} />
+    </Box>
+    <VStack align="stretch" spacing={0} flex={1} minW={0}>
+      <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase" letterSpacing="wider">
+        {label}
+      </Text>
+      <Text fontSize="md" fontWeight="600" color="gray.800" noOfLines={2}>
+        {value && String(value).trim() ? value : placeholder}
+      </Text>
+    </VStack>
+  </Flex>
+);
 
 const GeneralTab = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const { isOpen: isUpdateOpen, onOpen: onUpdateOpen, onClose: onUpdateClose } = useDisclosure();
   const { isOpen: isPasswordOpen, onOpen: onPasswordOpen, onClose: onPasswordClose } = useDisclosure();
-  const { toast } = useToast();
+  const toast = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (!confirm("Are you sure you want to delete your account? This cannot be undone.")) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`${DB_URL}/users/${userInfo?._id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok || data?.status === "Success") {
+        toast({ title: "Account deleted", status: "success", duration: 4000, isClosable: true });
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("yookatale-app");
+          window.location.href = "/";
+        }
+      } else {
+        toast({
+          title: "Delete failed",
+          description: data?.message || "Could not delete account",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: e?.message || "Could not delete account",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <>
-      {/* Modals */}
-      {isUpdateOpen && <UpdateAccount closeModal={onUpdateClose} />}
-      {isPasswordOpen && <ChangePassword closeModal={onPasswordClose} />}
+      <UpdateAccount isOpen={isUpdateOpen} onClose={onUpdateClose} />
+      <ChangePassword isOpen={isPasswordOpen} onClose={onPasswordClose} />
 
-      <Box>
-        <Box padding={"1rem 0"} mb={4}>
-          <Flex 
-            justifyContent={{ base: "center", md: "end" }} 
-            gap={3}
-            flexWrap="wrap"
+      <VStack align="stretch" spacing={6}>
+        <Flex justify={{ base: "center", md: "flex-end" }} gap={3} flexWrap="wrap">
+          <Button
+            leftIcon={<FiShield />}
+            variant="outline"
+            colorScheme="green"
+            size="md"
+            onClick={onPasswordOpen}
+            borderRadius="xl"
           >
-            <ButtonComponent 
-              type={"button"} 
-              text={"Change Password"} 
-              onClick={onPasswordOpen}
-              size="regular"
-            />
-            <ButtonComponent 
-              type={"button"} 
-              text={"Update Details"} 
-              onClick={onUpdateOpen}
-              size="regular"
-            />
-            <ChakraButton
-              colorScheme="red"
-              onClick={async () => {
-                if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
-                try {
-                  setIsDeleting(true);
-                  const token = localStorage.getItem("token");
-                  if (!token) {
-                    toast({ variant: "destructive", title: "Not authenticated", description: "Please log in to delete your account." });
-                    setIsDeleting(false);
-                    return;
-                  }
-                  const res = await axios.delete(`${DB_URL}/users/${userInfo?._id}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                  });
-                  if (res.data?.status === "Success" || res.status === 200) {
-                    toast({ title: "Account deleted", description: "Your account has been deleted." });
-                    // clear local session
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("userInfo");
-                    // redirect to homepage
-                    window.location.href = "/";
-                  } else {
-                    toast({ variant: "destructive", title: "Delete failed", description: res.data?.message || "Failed to delete account" });
-                  }
-                } catch (err) {
-                  toast({ variant: "destructive", title: "Error", description: err.response?.data?.message || err.message || "Failed to delete account" });
-                } finally {
-                  setIsDeleting(false);
-                }
-              }}
-              isLoading={isDeleting}
-              size="md"
-            >
-              Delete Account
-            </ChakraButton>
-          </Flex>
-        </Box>
-        <Box 
-          padding={"1.5rem"} 
-          bg="gray.50" 
-          borderRadius="lg"
-          border="1px solid"
-          borderColor="gray.200"
-        >
-          <Text 
-            fontSize="xl" 
-            fontWeight="bold" 
-            mb={4}
-            color="gray.800"
+            Change password
+          </Button>
+          <Button
+            bg={ThemeColors.primaryColor}
+            color="white"
+            _hover={{ opacity: 0.9 }}
+            size="md"
+            onClick={onUpdateOpen}
+            borderRadius="xl"
           >
-            Personal Information
+            Update profile
+          </Button>
+          <Button
+            colorScheme="red"
+            variant="outline"
+            size="md"
+            onClick={handleDeleteAccount}
+            isLoading={isDeleting}
+            borderRadius="xl"
+          >
+            Delete account
+          </Button>
+        </Flex>
+
+        <Box>
+          <Text fontSize="lg" fontWeight="700" color="gray.800" mb={1}>
+            Personal information
           </Text>
-          <Grid
-            gridTemplateColumns={{
-              base: "repeat(1, 1fr)",
-              md: "repeat(2, 1fr)",
-              lg: "repeat(3, 1fr)",
-            }}
-            gridGap={"1.5rem"}
-          >
-            <Box
-              p={4}
-              bg="white"
-              borderRadius="md"
-              border="1px solid"
-              borderColor="gray.200"
-              _hover={{ boxShadow: "sm" }}
-            >
-              <Text fontSize={"sm"} color="gray.600" mb={1}>First Name</Text>
-              <Text
-                fontSize={"lg"}
-                fontWeight={"bold"}
-                color="gray.800"
-              >{`${userInfo?.firstname || 'N/A'}`}</Text>
-            </Box>
-            <Box
-              p={4}
-              bg="white"
-              borderRadius="md"
-              border="1px solid"
-              borderColor="gray.200"
-              _hover={{ boxShadow: "sm" }}
-            >
-              <Text fontSize={"sm"} color="gray.600" mb={1}>Last Name</Text>
-              <Text
-                fontSize={"lg"}
-                fontWeight={"bold"}
-                color="gray.800"
-              >{`${userInfo?.lastname || 'N/A'}`}</Text>
-            </Box>
-            <Box
-              p={4}
-              bg="white"
-              borderRadius="md"
-              border="1px solid"
-              borderColor="gray.200"
-              _hover={{ boxShadow: "sm" }}
-            >
-              <Text fontSize={"sm"} color="gray.600" mb={1}>Email</Text>
-              <Text
-                fontSize={"lg"}
-                fontWeight={"bold"}
-                color="gray.800"
-              >{`${userInfo?.email || 'N/A'}`}</Text>
-            </Box>
-            <Box
-              p={4}
-              bg="white"
-              borderRadius="md"
-              border="1px solid"
-              borderColor="gray.200"
-              _hover={{ boxShadow: "sm" }}
-            >
-              <Text fontSize={"sm"} color="gray.600" mb={1}>Phone Number</Text>
-              <Text
-                fontSize={"lg"}
-                fontWeight={"bold"}
-                color="gray.800"
-              >{`${userInfo?.phone || 'N/A'}`}</Text>
-            </Box>
-            <Box
-              p={4}
-              bg="white"
-              borderRadius="md"
-              border="1px solid"
-              borderColor="gray.200"
-              _hover={{ boxShadow: "sm" }}
-            >
-              <Text fontSize={"sm"} color="gray.600" mb={1}>Gender</Text>
-              <Text
-                fontSize={"lg"}
-                fontWeight={"bold"}
-                color="gray.800"
-              >{`${userInfo?.gender || 'N/A'}`}</Text>
-            </Box>
-            <Box
-              p={4}
-              bg="white"
-              borderRadius="md"
-              border="1px solid"
-              borderColor="gray.200"
-              _hover={{ boxShadow: "sm" }}
-            >
-              <Text fontSize={"sm"} color="gray.600" mb={1}>Vegan</Text>
-              <Text fontSize={"lg"} fontWeight={"bold"} color="gray.800">{`${
-                userInfo?.vegan ? "Vegan" : "Not Vegan"
-              }`}</Text>
-            </Box>
-          </Grid>
+          <Text fontSize="sm" color="gray.500" mb={4}>
+            View and manage your profile details
+          </Text>
+          <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={4}>
+            <Field icon={FiUser} label="First name" value={userInfo?.firstname} />
+            <Field icon={FiUser} label="Last name" value={userInfo?.lastname} />
+            <Field icon={FiMail} label="Email" value={userInfo?.email} />
+            <Field icon={FiPhone} label="Phone" value={userInfo?.phone} />
+            <Field icon={RiCakeLine} label="Gender" value={userInfo?.gender} />
+            <Field
+              icon={RiLeafLine}
+              label="Diet"
+              value={userInfo?.vegan ? "Vegan" : "Not Vegan"}
+              placeholder="Not set"
+            />
+            <Field icon={FiMapPin} label="Address" value={userInfo?.address} />
+          </SimpleGrid>
         </Box>
-      </Box>
+      </VStack>
     </>
   );
 };

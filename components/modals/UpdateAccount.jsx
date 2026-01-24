@@ -1,77 +1,104 @@
 "use client";
 
-import { Label } from "@components/ui/label";
-import { Input } from "@components/ui/input";
-import { Button } from "@components/ui/button";
-import { Loader2, X } from "lucide-react";
-import { useSelector } from "react-redux";
-import { useToast } from "@components/ui/use-toast";
-import { useState } from "react";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+  Grid,
+  useToast,
+  VStack,
+} from "@chakra-ui/react";
+import { useSelector, useDispatch } from "react-redux";
+import { useState, useEffect } from "react";
 import { DB_URL } from "@config/config";
-import axios from "axios";
+import { setCredentials } from "@slices/authSlice";
+import { ThemeColors } from "@constants/constants";
 
-const UpdateAccount = ({ closeModal }) => {
+const UpdateAccount = ({ isOpen, onClose }) => {
   const { userInfo } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const toast = useToast();
   const [isLoading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
-    firstname: userInfo?.firstname || "",
-    lastname: userInfo?.lastname || "",
-    email: userInfo?.email || "",
-    phone: userInfo?.phone || "",
-    address: userInfo?.address || "",
+    firstname: "",
+    lastname: "",
+    email: "",
+    phone: "",
+    address: "",
+    gender: "",
+    vegan: false,
   });
 
-  const { toast } = useToast();
+  useEffect(() => {
+    if (userInfo && isOpen) {
+      setUserData({
+        firstname: userInfo.firstname || "",
+        lastname: userInfo.lastname || "",
+        email: userInfo.email || "",
+        phone: userInfo.phone || "",
+        address: userInfo.address || "",
+        gender: userInfo.gender || "",
+        vegan: !!userInfo.vegan,
+      });
+    }
+  }, [userInfo, isOpen]);
 
-  const submitHandler = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Please login to update your profile",
-        });
-        setLoading(false);
-        return;
+      const res = await fetch(`${DB_URL}/users/${userInfo?._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          firstname: userData.firstname.trim(),
+          lastname: userData.lastname.trim(),
+          email: userData.email.trim(),
+          phone: userData.phone?.trim() || "",
+          address: userData.address?.trim() || "",
+          gender: userData.gender || undefined,
+          vegan: userData.vegan,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Update failed");
       }
 
-      const response = await axios.put(
-        `${DB_URL}/users/${userInfo?._id}`,
-        userData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.data?.status === "Success") {
+      if (data?.status === "Success" && data?.data) {
+        const updated = { ...userInfo, ...data.data };
+        dispatch(setCredentials(updated));
         toast({
-          title: "Success",
-          description: "Account updated successfully. Refreshing page...",
+          title: "Profile updated",
+          description: "Your details have been saved.",
+          status: "success",
+          duration: 4000,
+          isClosable: true,
         });
-        
-        // Update localStorage with new user data
-        const updatedUserInfo = { ...userInfo, ...userData };
-        localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
-        
-        closeModal(false);
-        
-        // Refresh page after 1 second
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+        onClose();
+      } else {
+        throw new Error(data?.message || "Update failed");
       }
     } catch (err) {
       toast({
-        variant: "destructive",
-        title: "Error occurred",
-        description: err.response?.data?.message || err.message || "Failed to update account",
+        title: "Update failed",
+        description: err?.message || "Could not update profile. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
       });
     } finally {
       setLoading(false);
@@ -79,127 +106,109 @@ const UpdateAccount = ({ closeModal }) => {
   };
 
   return (
-    <>
-      <div className="p-8 flex bg-black bg-opacity-50 justify-center items-center fixed z-50 top-0 left-0 right-0 bottom-0">
-        <div className="m-auto w-full max-w-2xl p-6 bg-white overflow-y-auto rounded-lg shadow-xl relative">
-          <div
-            className="absolute top-4 right-4 cursor-pointer hover:bg-gray-100 rounded-full p-1 transition-colors"
-            onClick={() => closeModal(false)}
-          >
-            <X size={24} />
-          </div>
-          
-          <div className="pt-4 pb-6">
-            <h2 className="text-center text-2xl font-semibold text-gray-800">Update Account Details</h2>
-            <p className="text-center text-sm text-gray-500 mt-2">
-              Update your personal information
-            </p>
-          </div>
-
-          <form onSubmit={submitHandler} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstname" className="text-sm font-medium text-gray-700">
-                  First Name *
-                </Label>
-                <Input
-                  type="text"
-                  id="firstname"
-                  placeholder="Enter first name"
-                  value={userData.firstname}
-                  onChange={(e) =>
-                    setUserData({ ...userData, firstname: e.target.value })
-                  }
-                  className="mt-1"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="lastname" className="text-sm font-medium text-gray-700">
-                  Last Name *
-                </Label>
-                <Input
-                  type="text"
-                  id="lastname"
-                  placeholder="Enter last name"
-                  value={userData.lastname}
-                  onChange={(e) =>
-                    setUserData({ ...userData, lastname: e.target.value })
-                  }
-                  className="mt-1"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                  Email *
-                </Label>
+    <Modal isOpen={!!isOpen} onClose={onClose} size="xl" scrollBehavior="inside">
+      <ModalOverlay />
+      <ModalContent borderRadius="2xl" mx={4}>
+        <ModalHeader color="gray.800" fontWeight="700">
+          Update profile
+        </ModalHeader>
+        <ModalCloseButton />
+        <form onSubmit={handleSubmit}>
+          <ModalBody pb={2}>
+            <VStack spacing={4} align="stretch">
+              <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={4}>
+                <FormControl isRequired>
+                  <FormLabel>First name</FormLabel>
+                  <Input
+                    value={userData.firstname}
+                    onChange={(e) => setUserData({ ...userData, firstname: e.target.value })}
+                    placeholder="First name"
+                    borderRadius="lg"
+                  />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Last name</FormLabel>
+                  <Input
+                    value={userData.lastname}
+                    onChange={(e) => setUserData({ ...userData, lastname: e.target.value })}
+                    placeholder="Last name"
+                    borderRadius="lg"
+                  />
+                </FormControl>
+              </Grid>
+              <FormControl isRequired>
+                <FormLabel>Email</FormLabel>
                 <Input
                   type="email"
-                  id="email"
-                  placeholder="Enter email"
                   value={userData.email}
-                  onChange={(e) =>
-                    setUserData({ ...userData, email: e.target.value })
-                  }
-                  className="mt-1"
-                  required
+                  onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                  placeholder="Email"
+                  borderRadius="lg"
                 />
-              </div>
-              <div>
-                <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
-                  Phone Number
-                </Label>
+              </FormControl>
+              <FormControl>
+                <FormLabel>Phone number</FormLabel>
                 <Input
                   type="tel"
-                  id="phone"
-                  placeholder="Enter phone number"
                   value={userData.phone}
-                  onChange={(e) =>
-                    setUserData({ ...userData, phone: e.target.value })
-                  }
-                  className="mt-1"
+                  onChange={(e) => setUserData({ ...userData, phone: e.target.value })}
+                  placeholder="+256760730254"
+                  borderRadius="lg"
                 />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="address" className="text-sm font-medium text-gray-700">
-                Address
-              </Label>
-              <Input
-                type="text"
-                id="address"
-                placeholder="Enter delivery address"
-                value={userData.address}
-                onChange={(e) =>
-                  setUserData({ ...userData, address: e.target.value })
-                }
-                className="mt-1"
-              />
-            </div>
-
-            <div className="pt-4 flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1"
-                onClick={() => closeModal(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium"
-                disabled={isLoading}
-              >
-                {isLoading && <Loader2 className="animate-spin mr-2" size={18} />}
-                Update Account
-              </Button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </>
+              </FormControl>
+              <FormControl>
+                <FormLabel>Gender</FormLabel>
+                <Select
+                  value={userData.gender}
+                  onChange={(e) => setUserData({ ...userData, gender: e.target.value })}
+                  placeholder="Select gender"
+                  borderRadius="lg"
+                >
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </Select>
+              </FormControl>
+              <FormControl>
+                <FormLabel>Diet</FormLabel>
+                <Select
+                  value={userData.vegan ? "vegan" : "not-vegan"}
+                  onChange={(e) => setUserData({ ...userData, vegan: e.target.value === "vegan" })}
+                  borderRadius="lg"
+                >
+                  <option value="not-vegan">Not Vegan</option>
+                  <option value="vegan">Vegan</option>
+                </Select>
+              </FormControl>
+              <FormControl>
+                <FormLabel>Address</FormLabel>
+                <Input
+                  value={userData.address}
+                  onChange={(e) => setUserData({ ...userData, address: e.target.value })}
+                  placeholder="Delivery address"
+                  borderRadius="lg"
+                />
+              </FormControl>
+            </VStack>
+          </ModalBody>
+          <ModalFooter gap={3} pt={4}>
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              bg={ThemeColors.primaryColor}
+              color="white"
+              _hover={{ opacity: 0.9 }}
+              isLoading={isLoading}
+              loadingText="Saving…"
+            >
+              Save changes
+            </Button>
+          </ModalFooter>
+        </form>
+      </ModalContent>
+    </Modal>
   );
 };
 
