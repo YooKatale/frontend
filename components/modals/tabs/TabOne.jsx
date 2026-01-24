@@ -2,7 +2,6 @@
 
 import {
   Box,
-  Checkbox,
   Flex,
   FormControl,
   FormLabel,
@@ -13,8 +12,10 @@ import {
   Text,
   Textarea,
   Input,
+  Button,
   useToast,
 } from "@chakra-ui/react";
+import { ThemeColors } from "@constants/constants";
 import ButtonComponent from "@components/Button";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -231,19 +232,19 @@ const TabOne = ({ updateTabIndex, fetchData }) => {
             <Box
               p={3}
               mb={4}
-              bg="green.50"
-              borderRadius="md"
+              bg={`${ThemeColors.primaryColor}15`}
+              borderRadius="lg"
               border="1px solid"
-              borderColor="green.200"
+              borderColor={`${ThemeColors.primaryColor}40`}
             >
-              <Text fontSize="xs" color="green.600" fontWeight="bold" mb={1}>
+              <Text fontSize="xs" color={ThemeColors.primaryColor} fontWeight="bold" mb={1}>
                 ✓ Location Selected
               </Text>
-              <Text fontSize="xs" color="green.700" noOfLines={2} mb={1}>
-                {deliveryAddress.address1 || 'Location selected'}
+              <Text fontSize="xs" color={ThemeColors.secondaryColor} noOfLines={2} mb={1}>
+                {deliveryAddress.address1 || "Location selected"}
               </Text>
-              <Text fontSize="xs" color="green.600">
-                Coordinates: {deliveryAddress.latitude?.toFixed(6) || '0'}, {deliveryAddress.longitude?.toFixed(6) || '0'}
+              <Text fontSize="xs" color={ThemeColors.primaryColor}>
+                Coordinates: {deliveryAddress.latitude?.toFixed(6) || "0"}, {deliveryAddress.longitude?.toFixed(6) || "0"}
               </Text>
             </Box>
           )}
@@ -330,15 +331,23 @@ const TabOne = ({ updateTabIndex, fetchData }) => {
         </Box>
         <Box padding={"0.5rem 0"}>
           <Flex>
-            <Box></Box>
+            <Box />
             <Spacer />
-            <Box
-              onClick={() => {
-                handleTabOneData();
+            <Button
+              bg={ThemeColors.primaryColor}
+              color="white"
+              size="md"
+              onClick={handleTabOneData}
+              _hover={{
+                bg: ThemeColors.secondaryColor,
+                transform: "translateY(-1px)",
+                shadow: "md",
               }}
+              transition="all 0.2s"
+              borderRadius="xl"
             >
-              <ButtonComponent type={"button"} text={"Continue to Checkout"} />
-            </Box>
+              Continue to Checkout
+            </Button>
           </Flex>
         </Box>
       </Box>

@@ -2,22 +2,24 @@
 
 import {
   Box,
+  Divider,
   Flex,
-  Grid,
   Heading,
-  Spacer,
   Text,
   useToast,
+  Button,
+  Grid,
+  Spacer,
 } from "@chakra-ui/react";
-import ButtonComponent from "@components/Button";
 import { ThemeColors } from "@constants/constants";
 import { useCartCheckoutMutation } from "@slices/productsApiSlice";
 import { FormatCurr } from "@utils/utils";
-import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Image from "next/image";
+
+const DELIVERY_COST = 3500;
 
 const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
   const [CartTotal, setCartTotal] = useState(0);
@@ -30,29 +32,24 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [receiptId, setReceiptId] = useState("");
 
-  // function to calculate the cart total
   const calcCartTotal = () => {
-    const newCartTotal = Cart.reduce((a, b) => {
-      return a + parseInt(b?.price) * parseInt(b?.quantity);
+    const total = Cart.reduce((a, b) => {
+      return a + parseInt(b?.price || 0) * parseInt(b?.quantity || 1);
     }, 0);
-
-    setCartTotal((prevState) => newCartTotal);
+    setCartTotal(total);
   };
 
   const getCurrentDateTime = () => {
     const now = new Date();
-    const date = now.toDateString();
-    const time = now.toLocaleTimeString();
-    return `${date}, ${time}`;
-  }
+    return `${now.toDateString()}, ${now.toLocaleTimeString()}`;
+  };
 
-  function generateReceiptNumber() {
-    
+  const generateReceiptNumber = () => {
     const date = new Date();
     const randomNum = Math.floor(Math.random() * 1000);
-    const receiptNum = `R${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}-${randomNum}`;
-    return receiptNum;
-  }
+    return `R${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}-${randomNum}`;
+  };
+
   useEffect(() => {
     calcCartTotal();
     setCurrentDateTime(getCurrentDateTime());
@@ -60,8 +57,7 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
   }, []);
 
   const handleSubmit = async () => {
-    setIsLoading((prevState) => (prevState ? false : true));
-
+    setIsLoading(true);
     try {
       const res = await createCartCheckout({
         user: userInfo,
@@ -76,191 +72,256 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
           receiptId: receiptId,
         },
       });
-
-      setIsLoading((prevState) => (prevState ? false : true));
       router.push(`/payment/${res.data.data.Order}`);
     } catch (err) {
-      setIsLoading((prevState) => (prevState ? false : true));
-
       chakraToast({
         title: "Error",
-        description: err.data?.message
-          ? err.data?.message
-          : err.data || err.error,
+        description: err.data?.message ?? err.data ?? err.error,
         status: "error",
         duration: 5000,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const orderTotal = CartTotal + DELIVERY_COST;
+
   return (
-    <>
-      <div>
-        <div className="flex">
-         <Image src="/assets/icons/logo.jpg" width={50} height={50} />
-         <h2>Yookatale</h2>
-        </div>
-        <p>
-          Authorized By: Seconds Tech Limited<br />
-          P.O. Box 74940, Clock Tower, Kampala, Naguru (U)
-        </p>
-        <div className="py-4">
-          <h3 className="text-lg text-center">Checkout summary</h3>
-        </div>
-         <div>
-            Customer Name: {userInfo.firstname} {userInfo.lastname}
-         </div>
-         <div>
-          Date and Time: {currentDateTime}
-         </div>
+    <Box>
+      {/* Brand & auth */}
+      <Flex align="center" gap={3} mb={4}>
+        <Box
+          rounded="xl"
+          overflow="hidden"
+          flexShrink={0}
+          border="2px solid"
+          borderColor={`${ThemeColors.primaryColor}30`}
+        >
+          <Image
+            src="/assets/icons/logo.jpg"
+            alt="YooKatale"
+            width={48}
+            height={48}
+            style={{ objectFit: "cover" }}
+          />
+        </Box>
+        <Box>
+          <Heading size="sm" color={ThemeColors.primaryColor} fontWeight="700">
+            YooKatale
+          </Heading>
+          <Text fontSize="xs" color="gray.500">
+            Authorized by Seconds Tech Limited · P.O. Box 74940, Kampala (U)
+          </Text>
+        </Box>
+      </Flex>
 
-        <div className="py-4 max-h-[300px] overflow-y-auto">
-          <h3 className="text-lg">Products</h3>
-          {Cart.length > 0
-            ? Cart.map((cart, index) => (
-                <div
-                  className="py-2 mb-[0.3rem] border-b-2 border-b-light"
-                  key={index}
-                >
-                  <div>
-                    <p className="text-lg">
-                      Product: {cart?.name ? cart.name : "__"}
-                    </p>
-                  </div>
+      <Divider borderColor={`${ThemeColors.primaryColor}20`} mb={5} />
 
-                  <div className="py-2">
-                    <div className="grid lg:grid-cols-4 grid-cols-1 gap-4">
-                      <div>
-                        <p className="text-lg">
-                          Quantity: {cart?.quantity ? cart.quantity : "__"}
-                        </p>
-                      </div>
+      <Heading
+        size="md"
+        textAlign="center"
+        color={ThemeColors.primaryColor}
+        mb={6}
+        fontWeight="700"
+      >
+        Checkout summary
+      </Heading>
 
-                      <div>
-                        <p className="text-lg">
-                          Total:{" "}
-                          {cart?.price
-                            ? `UGX ${FormatCurr(
-                                parseInt(cart.price) * parseInt(cart.quantity)
-                              )}`
-                            : "__"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            : ""}
-        </div>
+      <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={4} mb={6}>
+        <Box
+          p={4}
+          rounded="xl"
+          bg="gray.50"
+          border="1px solid"
+          borderColor="gray.100"
+        >
+          <Text fontSize="xs" color="gray.500" mb={1}>
+            Customer
+          </Text>
+          <Text fontWeight="600" color="gray.800">
+            {userInfo?.firstname} {userInfo?.lastname}
+          </Text>
+        </Box>
+        <Box
+          p={4}
+          rounded="xl"
+          bg="gray.50"
+          border="1px solid"
+          borderColor="gray.100"
+        >
+          <Text fontSize="xs" color="gray.500" mb={1}>
+            Date & time
+          </Text>
+          <Text fontWeight="600" color="gray.800" fontSize="sm">
+            {currentDateTime}
+          </Text>
+        </Box>
+      </Grid>
 
-        <div className="grid lg:grid-cols-2 grid-cols-1 gap-4">
-          <div className="py-4 border-b-2 border-b-light">
-            <div>
-              <h3 className="text-base font-bold">Delivery Addresses</h3>
-            </div>
-
-            <div>
-              <div className="py-4">
-                <p className="text-lg">
-                  Address 1:{" "}
-                  {tabOneData?.deliveryAddress?.address1
-                    ? tabOneData?.deliveryAddress?.address1
-                    : "__"}
-                </p>
-              </div>
-
-              <div className="py-4">
-                <p className="text-lg">
-                  Address 2:{" "}
-                  {tabOneData?.deliveryAddress?.address2
-                    ? tabOneData?.deliveryAddress?.address2
-                    : "__"}
-                </p>
-              </div>
-            </div>
-          </div>
-          <Box
-            padding={"1rem 0"}
-            borderBottom={"1.7px solid " + ThemeColors.lightColor}
-          >
-            <Box>
-              <Heading as={"h3"} size={"sm"}>
-                Special Requests
-              </Heading>
-            </Box>
-            <Box padding={""}>
-              <Box padding={"0.5rem 0"}>
-                <Text fontSize={"md"}>
-                  Peel Food:{" "}
-                  {tabOneData?.specialRequests?.peeledFood ? "Yes" : "No"}
+      {/* Products */}
+      <Heading as="h3" size="sm" color="gray.700" mb={3}>
+        Products
+      </Heading>
+      <Box
+        maxH="220px"
+        overflowY="auto"
+        mb={6}
+        rounded="xl"
+        border="1px solid"
+        borderColor="gray.100"
+        bg="white"
+        p={2}
+        sx={{
+          "&::-webkit-scrollbar": { width: "6px" },
+          "&::-webkit-scrollbar-track": { bg: "gray.50", borderRadius: "3px" },
+          "&::-webkit-scrollbar-thumb": {
+            bg: `${ThemeColors.primaryColor}40`,
+            borderRadius: "3px",
+          },
+        }}
+      >
+        {Cart.length > 0 ? (
+          Cart.map((item, index) => (
+            <Flex
+              key={index}
+              justify="space-between"
+              align="center"
+              py={3}
+              px={3}
+              rounded="lg"
+              bg={index % 2 === 0 ? "gray.50" : "white"}
+              mb={index < Cart.length - 1 ? 2 : 0}
+              borderBottom={index < Cart.length - 1 ? "1px solid" : "none"}
+              borderColor="gray.100"
+            >
+              <Box flex={1} minW={0}>
+                <Text fontWeight="600" color="gray.800" noOfLines={1}>
+                  {item?.name ?? "—"}
+                </Text>
+                <Text fontSize="sm" color="gray.500">
+                  Qty: {item?.quantity ?? "—"} · UGX {FormatCurr(parseInt(item?.price || 0) * parseInt(item?.quantity || 1))}
                 </Text>
               </Box>
-              {tabOneData?.specialRequests?.moreInfo ? (
-                tabOneData?.specialRequests?.moreInfo !== "" ? (
-                  <Box padding={"0.5rem 0"}>
-                    <Text fontSize={"md"}>
-                      More Information: {tabOneData?.specialRequests?.moreInfo}
-                    </Text>
-                  </Box>
-                ) : (
-                  ""
-                )
-              ) : (
-                ""
-              )}
-            </Box>
-          </Box>
-        </div>
+            </Flex>
+          ))
+        ) : (
+          <Text py={4} textAlign="center" color="gray.500">
+            No items
+          </Text>
+        )}
+      </Box>
+
+      {/* Delivery & special requests */}
+      <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={4} mb={6}>
         <Box
-          padding={"1rem 0"}
-          borderBottom={"1.7px solid " + ThemeColors.lightColor}
+          p={4}
+          rounded="xl"
+          border="1px solid"
+          borderColor={`${ThemeColors.primaryColor}25`}
+          bg={`${ThemeColors.primaryColor}08`}
         >
-          <Heading as={"h3"} size={"sm"} display={"flex"}>
-            Delivery Cost:{" "}
-            <Text
-              fontSize={"lg"}
-              className="secondary-light-font"
-              margin={"0 0.3rem"}
-            >
-              UGX 3500
+          <Text fontSize="xs" color={ThemeColors.primaryColor} fontWeight="600" mb={2}>
+            Delivery address
+          </Text>
+          <Text fontSize="sm" color="gray.700">
+            {tabOneData?.deliveryAddress?.address1 || "—"}
+          </Text>
+          {tabOneData?.deliveryAddress?.address2 && (
+            <Text fontSize="sm" color="gray.600" mt={1}>
+              {tabOneData.deliveryAddress.address2}
             </Text>
-          </Heading>
+          )}
         </Box>
         <Box
-          padding={"1rem 0"}
-          borderBottom={"1.7px solid " + ThemeColors.lightColor}
+          p={4}
+          rounded="xl"
+          border="1px solid"
+          borderColor={`${ThemeColors.primaryColor}25`}
+          bg={`${ThemeColors.primaryColor}08`}
         >
-          <Text margin={"1rem 0"} fontSize={"lg"}>
-            Cart SubTotal: UGX {FormatCurr(CartTotal)}
+          <Text fontSize="xs" color={ThemeColors.primaryColor} fontWeight="600" mb={2}>
+            Special requests
           </Text>
-          <Heading as={"h3"} size={"md"}>
-            Cart Total: UGX {FormatCurr(CartTotal + 3500)}
-          </Heading>
+          <Text fontSize="sm" color="gray.700">
+            Peel food: {tabOneData?.specialRequests?.peeledFood ? "Yes" : "No"}
+          </Text>
+          {tabOneData?.specialRequests?.moreInfo && (
+            <Text fontSize="sm" color="gray.600" mt={1} noOfLines={2}>
+              {tabOneData.specialRequests.moreInfo}
+            </Text>
+          )}
         </Box>
-        <Box
-          padding={"1rem 0"}
+      </Grid>
+
+      {/* Totals */}
+      <Box
+        p={5}
+        rounded="xl"
+        border="1px solid"
+        borderColor="gray.200"
+        bg="gray.50"
+        mb={6}
+      >
+        <Flex justify="space-between" mb={2}>
+          <Text color="gray.600">Delivery</Text>
+          <Text fontWeight="600">UGX {FormatCurr(DELIVERY_COST)}</Text>
+        </Flex>
+        <Flex justify="space-between" mb={2}>
+          <Text color="gray.600">Subtotal</Text>
+          <Text fontWeight="600">UGX {FormatCurr(CartTotal)}</Text>
+        </Flex>
+        <Divider my={3} borderColor="gray.200" />
+        <Flex justify="space-between" align="center">
+          <Text fontWeight="700" color="gray.800">
+            Total
+          </Text>
+          <Text fontSize="xl" fontWeight="700" color={ThemeColors.primaryColor}>
+            UGX {FormatCurr(orderTotal)}
+          </Text>
+        </Flex>
+        <Text fontSize="xs" color="gray.500" mt={2}>
+          Receipt: {receiptId}
+        </Text>
+      </Box>
+
+      {/* Actions */}
+      <Flex gap={4} flexWrap="wrap">
+        <Button
+          variant="outline"
+          size="md"
+          borderColor={ThemeColors.primaryColor}
+          color={ThemeColors.primaryColor}
+          onClick={() => updateTabIndex(0)}
+          _hover={{
+            bg: `${ThemeColors.primaryColor}12`,
+            borderColor: ThemeColors.secondaryColor,
+            color: ThemeColors.secondaryColor,
+          }}
+          borderRadius="xl"
         >
-          <Text margin={"1rem 0"} fontSize={"lg"} className="text-semibold">
-             Receipt Number:: {receiptId}          
-          </Text>
-        </Box>
-        <Box padding={"1rem 0"}>
-          <Flex>
-            <Box onClick={() => updateTabIndex(0)}>
-              <ButtonComponent type={"button"} text={"Back"} />
-            </Box>
-            <Spacer />
-            <Box onClick={handleSubmit}>
-              <ButtonComponent
-                type={"button"}
-                text={"Proceed to checkout"}
-                icon={isLoading && <Loader2 size={20} />}
-              />
-            </Box>
-          </Flex>
-        </Box>
-      </div>
-    </>
+          Back
+        </Button>
+        <Spacer />
+        <Button
+          bg={ThemeColors.primaryColor}
+          color="white"
+          size="md"
+          onClick={handleSubmit}
+          isLoading={isLoading}
+          loadingText="Processing..."
+          _hover={{
+            bg: ThemeColors.secondaryColor,
+            transform: "translateY(-1px)",
+            shadow: "md",
+          }}
+          transition="all 0.2s"
+          borderRadius="xl"
+        >
+          Proceed to Payment
+        </Button>
+      </Flex>
+    </Box>
   );
 };
 

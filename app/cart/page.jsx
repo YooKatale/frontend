@@ -57,6 +57,11 @@ const Cart = () => {
   const { onOpen, onClose, isOpen } = useDisclosure();
   const { userInfo } = useSelector((state) => state.auth);
 
+  const handleModalClose = () => {
+    setTabIndex(0);
+    onClose();
+  };
+
   const [fetchCart] = useCartMutation();
   const [deleteCartItem] = useCartDeleteMutation();
   const [updateCartItem] = useCartUpdateMutation();
@@ -314,8 +319,7 @@ const Cart = () => {
                 <Heading
                   as="h1"
                   size="xl"
-                  bgGradient="linear(to-r, blue.600, purple.600)"
-                  bgClip="text"
+                  color={ThemeColors.primaryColor}
                   fontWeight="bold"
                 >
                   Your Shopping Cart
@@ -472,9 +476,9 @@ const Cart = () => {
                     right={0}
                     w="120px"
                     h="120px"
-                    bgGradient="linear(45deg, blue.50, purple.50)"
+                    bg={`${ThemeColors.primaryColor}15`}
                     roundedBottomLeft="full"
-                    opacity={0.3}
+                    opacity={0.6}
                   />
 
                   <Heading size="lg" mb={6} position="relative">
@@ -497,9 +501,15 @@ const Cart = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        colorScheme="blue"
+                        borderColor={ThemeColors.primaryColor}
+                        color={ThemeColors.primaryColor}
                         onClick={applyCoupon}
                         isLoading={isApplyingCoupon}
+                        _hover={{
+                          bg: `${ThemeColors.primaryColor}15`,
+                          borderColor: ThemeColors.secondaryColor,
+                          color: ThemeColors.secondaryColor,
+                        }}
                       >
                         Apply
                       </Button>
@@ -515,7 +525,11 @@ const Cart = () => {
                     <Flex justify="space-between" mb={2}>
                       <Flex align="center" gap={1}>
                         <Text color="gray.600">Shipping</Text>
-                        <Badge colorScheme="green" size="sm">
+                        <Badge
+                          bg={ThemeColors.primaryColor}
+                          color="white"
+                          size="sm"
+                        >
                           FREE
                         </Badge>
                       </Flex>
@@ -528,8 +542,8 @@ const Cart = () => {
                         animate={{ opacity: 1, x: 0 }}
                       >
                         <Flex justify="space-between" mb={2}>
-                          <Text color="green.600">Discount</Text>
-                          <Text fontWeight="semibold" color="green.600">
+                          <Text color={ThemeColors.primaryColor}>Discount</Text>
+                          <Text fontWeight="semibold" color={ThemeColors.primaryColor}>
                             -UGX {FormatCurr(discountAmount)}
                           </Text>
                         </Flex>
@@ -543,7 +557,7 @@ const Cart = () => {
                         Total
                       </Text>
                       <Box textAlign="right">
-                        <Text fontSize="xl" fontWeight="bold" color="blue.600">
+                        <Text fontSize="xl" fontWeight="bold" color={ThemeColors.primaryColor}>
                           UGX {FormatCurr(finalTotal)}
                         </Text>
                         <Text fontSize="sm" color="gray.500">
@@ -557,10 +571,10 @@ const Cart = () => {
                     <Button
                       w="full"
                       size="lg"
-                      colorScheme="blue"
-                      bgGradient="linear(to-r, blue.500, purple.500)"
+                      bgGradient={`linear(to-r, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`}
+                      color="white"
                       _hover={{
-                        bgGradient: "linear(to-r, blue.600, purple.600)",
+                        bgGradient: `linear(to-r, ${ThemeColors.secondaryColor}, ${ThemeColors.primaryColor})`,
                         transform: "translateY(-2px)",
                         boxShadow: "lg",
                       }}
@@ -578,8 +592,8 @@ const Cart = () => {
                   <Box mt={4} textAlign="center">
                     <Link href="/">
                       <Text
-                        color="blue.500"
-                        _hover={{ color: "blue.600", textDecoration: "underline" }}
+                        color={ThemeColors.primaryColor}
+                        _hover={{ color: ThemeColors.secondaryColor, textDecoration: "underline" }}
                         transition="color 0.2s"
                         display="inline-flex"
                         alignItems="center"
@@ -597,39 +611,86 @@ const Cart = () => {
         </Flex>
       </Box>
 
-      {/* Checkout Modal */}
+      {/* Checkout Modal — Professional design, Yookatale theme only */}
       <Modal
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={handleModalClose}
         size="4xl"
         isCentered
         motionPreset="slideInBottom"
       >
-        <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(10px)" />
+        <ModalOverlay
+          bg="blackAlpha.600"
+          backdropFilter="blur(12px)"
+          _dark={{ bg: "blackAlpha.700" }}
+        />
         <ModalContent
-          rounded="2xl"
           overflow="hidden"
+          rounded="3xl"
           border="1px solid"
-          borderColor="gray.200"
+          borderColor={`${ThemeColors.primaryColor}20`}
           shadow="2xl"
+          mx={4}
+          maxH={{ base: "95vh", md: "90vh" }}
         >
           <ModalCloseButton
             size="lg"
             color="white"
-            bg="blackAlpha.300"
-            _hover={{ bg: "blackAlpha.400" }}
+            bg="blackAlpha.200"
+            borderRadius="full"
+            _hover={{ bg: "blackAlpha.300" }}
+            top={4}
+            right={4}
             zIndex={10}
           />
+          {/* Modal header — Yookatale gradient */}
           <Box
-            bgGradient="linear(to-r, blue.500, purple.600)"
-            p={4}
+            bgGradient={`linear(to-r, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`}
+            px={{ base: 6, md: 8 }}
+            py={6}
             color="white"
+            position="relative"
           >
-            <Heading size="md" textAlign="center">
+            <Box
+              position="absolute"
+              top={0}
+              right={0}
+              w="180px"
+              h="180px"
+              bg="whiteAlpha.100"
+              roundedBottomLeft="full"
+              opacity={0.4}
+            />
+            <Heading
+              size="lg"
+              textAlign="center"
+              fontWeight="700"
+              letterSpacing="tight"
+              position="relative"
+            >
               Complete Your Purchase
             </Heading>
+            <Text
+              fontSize="sm"
+              textAlign="center"
+              mt={1}
+              opacity={0.95}
+            >
+              {tabIndex === 0 ? "Delivery & details" : "Review & confirm"}
+            </Text>
           </Box>
-          <Box p={{ base: 4, md: 8 }}>
+          {/* Modal body */}
+          <Box
+            p={{ base: 5, md: 8 }}
+            bg="white"
+            overflowY="auto"
+            maxH={{ base: "calc(95vh - 140px)", md: "calc(90vh - 140px)" }}
+            sx={{
+              "&::-webkit-scrollbar": { width: "8px" },
+              "&::-webkit-scrollbar-track": { bg: "gray.50", borderRadius: "4px" },
+              "&::-webkit-scrollbar-thumb": { bg: `${ThemeColors.primaryColor}40`, borderRadius: "4px" },
+            }}
+          >
             <AnimatePresence mode="wait">
               {tabIndex === 0 && (
                 <motion.div
