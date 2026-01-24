@@ -159,12 +159,8 @@ const Subscription = () => {
   };
 
   return (
-    <Box
-      minHeight="100vh"
-      bgGradient="linear(to-b, orange.400, orange.100)"
-      py={{ base: 6, md: 10 }}
-    >
-      <Container maxW="container.xl" px={{ base: 4, md: 6 }}>
+    <Box minHeight="100vh" bg="white">
+      <Container maxW="container.xl" px={{ base: 4, md: 6 }} py={{ base: 6, md: 10 }}>
         {/* Discount banner — theme colors */}
         <MotionBox
           initial={{ opacity: 0, scale: 0.95 }}
