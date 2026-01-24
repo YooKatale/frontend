@@ -26,10 +26,15 @@ import {
   useToast,
   IconButton,
   HStack,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Checkbox,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import React, { useState, useEffect, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Eye, ArrowRight, Calendar, ShoppingCart, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, Eye, ArrowRight, Calendar, ShoppingCart, Check } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import Image from "next/image";
@@ -59,7 +64,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
   const [selectedMealsForSubscription, setSelectedMealsForSubscription] = useState([]); // Selected meals before subscribing
   const [isVegetarian, setIsVegetarian] = useState(false);
   const [selectedSauce, setSelectedSauce] = useState("");
-  const [algaeAddonByMeal, setAlgaeAddonByMeal] = useState({});
+  const [allergyByMeal, setAllergyByMeal] = useState({});
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isCustomizeOpen, onOpen: onCustomizeOpen, onClose: onCustomizeClose } = useDisclosure();
   const toast = useToast();
@@ -135,7 +140,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
     fetchPaidSubscriptions();
   }, [userInfo, planType, incomeLevel]);
 
-  // Build weekly menu based on income level
+  // Build weekly menu based on income level (full: both RTE and RTC per slot)
   const weeklyMenu = useMemo(() => {
     const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
     const mealTypes = ["breakfast", "lunch", "supper"];
@@ -172,13 +177,87 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
     return menu;
   }, [incomeLevel]);
 
-  const handleMealClick = (day, mealType) => {
+  // Ready-to-Eat only: one cluster, no RTC. Used for "Ready to Eat" section.
+  const weeklyMenuRTE = useMemo(() => {
+    const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+    const mealTypes = ["breakfast", "lunch", "supper"];
+    const menu = {};
+    days.forEach((day) => {
+      menu[day] = {};
+      mealTypes.forEach((mealType) => {
+        const m = getMealForDay(day, mealType, incomeLevel, "ready-to-eat");
+        if (m) {
+          const pricing = getMealPricing(mealType, "ready-to-eat", incomeLevel);
+          menu[day][mealType] = [{ ...m, type: "ready-to-eat", pricing }];
+        } else {
+          menu[day][mealType] = [];
+        }
+      });
+    });
+    return menu;
+  }, [incomeLevel]);
+
+  // Ready-to-Cook only: separate cluster. Used for "Ready to Cook" section.
+  const weeklyMenuRTC = useMemo(() => {
+    const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+    const mealTypes = ["breakfast", "lunch", "supper"];
+    const menu = {};
+    days.forEach((day) => {
+      menu[day] = {};
+      mealTypes.forEach((mealType) => {
+        const m = getMealForDay(day, mealType, incomeLevel, "ready-to-cook");
+        if (m) {
+          const pricing = getMealPricing(mealType, "ready-to-cook", incomeLevel);
+          menu[day][mealType] = [{ ...m, type: "ready-to-cook", pricing }];
+        } else {
+          menu[day][mealType] = [];
+        }
+      });
+    });
+    return menu;
+  }, [incomeLevel]);
+
+  const [selectedPreparType, setSelectedPreparType] = useState("ready-to-eat");
+  const [planRating, setPlanRating] = useState(0);
+  const [ratingSubmitted, setRatingSubmitted] = useState(false);
+  const [ratingHover, setRatingHover] = useState(0);
+
+  const handleSharePlan = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share({
+          title: `${planName} Meal Plan – Yookatale`,
+          url,
+          text: `Check out the ${planName} meal plan on Yookatale.`,
+        });
+        toast({ title: "Shared!", status: "success", duration: 2000, isClosable: true });
+      } else {
+        await navigator.clipboard?.writeText(url);
+        toast({ title: "Link copied to clipboard!", status: "success", duration: 2000, isClosable: true });
+      }
+    } catch (e) {
+      if (e?.name !== "AbortError") {
+        toast({ title: "Could not share", description: e?.message, status: "error", duration: 3000, isClosable: true });
+      }
+    }
+  };
+
+  const handleSubmitRating = () => {
+    if (planRating < 1) return;
+    setRatingSubmitted(true);
+    toast({ title: "Thanks for your rating!", status: "success", duration: 2000, isClosable: true });
+  };
+
+  const handleMealClick = (day, mealType, preparType) => {
     setSelectedDay(day);
     setSelectedMealType(mealType);
+    setSelectedPreparType(preparType || "ready-to-eat");
     onOpen();
   };
 
-  const selectedMeals = selectedDay && selectedMealType ? weeklyMenu[selectedDay]?.[selectedMealType] || [] : [];
+  const menuForModal = selectedPreparType === "ready-to-cook" ? weeklyMenuRTC : weeklyMenuRTE;
+  const selectedMeals = selectedDay && selectedMealType ? (menuForModal[selectedDay]?.[selectedMealType] || []) : [];
 
   // Check if a specific meal is subscribed (paid)
   const isMealSubscribed = (mealType, prepType, duration) => {
@@ -271,7 +350,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
     try {
       const totalPrice = selectedMealsForSubscription.reduce((sum, meal) => sum + meal.price, 0);
       
-      // Build special requests with vegetarian, sauce, and algae/food add-ons
+      // Build special requests with vegetarian, sauce, and allergies
       let specialRequests = `Meal subscription for ${selectedMealsForSubscription.length} meal(s).`;
       if (isVegetarian) {
         specialRequests += " Vegetarian option requested.";
@@ -279,13 +358,9 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
       if (selectedSauce) {
         specialRequests += ` Preferred sauce: ${selectedSauce}.`;
       }
-      const algaeEntries = Object.entries(algaeAddonByMeal).filter(
-        ([_, v]) => v && v !== "none"
-      );
-      if (algaeEntries.length) {
-        specialRequests += ` Algae/food add-ons: ${algaeEntries
-          .map(([k, v]) => `${k}: ${v}`)
-          .join("; ")}.`;
+      const allergyMeals = Object.entries(allergyByMeal).filter(([, v]) => v);
+      if (allergyMeals.length) {
+        specialRequests += ` Allergies/dietary restrictions noted for: ${allergyMeals.map(([k]) => k).join("; ")}.`;
       }
 
       // Create order for selected meals
@@ -322,26 +397,6 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
         const orderId = res.data?.Order || res.data?.order || res.Order || res.order;
         
         if (orderId) {
-          // Save to Food Algy (allergies)
-          if (typeof window !== "undefined" && userInfo?._id) {
-            const foodAlgaeBoxData = {
-              userId: userInfo._id,
-              planType: planType,
-              meals: selectedMealsForSubscription,
-              isVegetarian: isVegetarian,
-              selectedSauce: selectedSauce,
-              lastUpdated: new Date().toISOString(),
-            };
-            localStorage.setItem(`foodAlgaeBox_${userInfo._id}`, JSON.stringify(foodAlgaeBoxData));
-            
-            // Dispatch event for Food Algy to update
-            window.dispatchEvent(
-              new CustomEvent("menuUpdated", {
-                detail: { menuData: foodAlgaeBoxData },
-              })
-            );
-          }
-
           toast({
             title: "Subscription Created",
             description: `Created subscription for ${selectedMealsForSubscription.length} meal(s). Redirecting to payment...`,
@@ -354,7 +409,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
           setSelectedMealsForSubscription([]);
           setIsVegetarian(false);
           setSelectedSauce("");
-          setAlgaeAddonByMeal({});
+          setAllergyByMeal({});
           onClose();
           router.push(`/payment/${orderId}`);
         } else {
@@ -420,40 +475,85 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
             alignItems="flex-start"
             flexDirection={{ base: "column", md: "row" }}
             gap={{ base: "1rem", md: "2rem" }}
+            flexWrap="wrap"
           >
-            {/* Quick Action Button */}
             <Box>
               <MealSubscriptionSelector planType={planType} incomeLevel="middle" />
             </Box>
+            <Flex align="center" gap={4} flexWrap="wrap">
+              <Button
+                size="sm"
+                variant="outline"
+                leftIcon={<Share2 size={16} />}
+                onClick={handleSharePlan}
+                borderColor="gray.300"
+                _hover={{ borderColor: ThemeColors.primaryColor, color: ThemeColors.primaryColor }}
+              >
+                Share plan
+              </Button>
+              <HStack spacing={1} align="center">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <IconButton
+                    key={s}
+                    aria-label={`Rate ${s} star${s > 1 ? "s" : ""}`}
+                    icon={<Star size={18} />}
+                    variant="ghost"
+                    size="sm"
+                    color={s <= (ratingHover || planRating) ? "yellow.400" : "gray.300"}
+                    fill={s <= (ratingHover || planRating) ? "currentColor" : "none"}
+                    onClick={() => setPlanRating(s)}
+                    onMouseEnter={() => setRatingHover(s)}
+                    onMouseLeave={() => setRatingHover(0)}
+                    isDisabled={ratingSubmitted}
+                  />
+                ))}
+                <Button
+                  size="sm"
+                  colorScheme="green"
+                  isDisabled={planRating < 1 || ratingSubmitted}
+                  onClick={handleSubmitRating}
+                >
+                  {ratingSubmitted ? "Rated" : "Rate"}
+                </Button>
+              </HStack>
+            </Flex>
           </Flex>
         </Box>
 
         <Divider marginBottom={{ base: "1.5rem", md: "2rem" }} />
 
-        {/* Weekly Calendar Slider */}
-        <Box position="relative" marginBottom={{ base: "1.5rem", md: "2rem" }}>
-          <Swiper
-            modules={[Navigation, Pagination]}
-            spaceBetween={20}
-            slidesPerView={1}
-            navigation={{
-              nextEl: ".swiper-button-next-custom",
-              prevEl: ".swiper-button-prev-custom",
-            }}
-            pagination={{
-              clickable: true,
-              dynamicBullets: true,
-            }}
-            onSlideChange={(swiper) => setCurrentSlide(swiper.activeIndex)}
-            breakpoints={{
-              640: { slidesPerView: 1 },
-              768: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
-            }}
-          >
-            {daysOfWeek.map((day) => {
-              const dayKey = day.toLowerCase();
-              const dayMenu = weeklyMenu[dayKey];
+        {/* Ready to Eat — only RTE meals; no RTC */}
+        {/* Ready to Cook — only RTC meals; separate section */}
+        {[
+          { menu: weeklyMenuRTE, preparType: "ready-to-eat", title: "Ready to Eat", id: "rte" },
+          { menu: weeklyMenuRTC, preparType: "ready-to-cook", title: "Ready to Cook", id: "rtc" },
+        ].map((cluster) => (
+          <Box key={cluster.id} position="relative" marginBottom={{ base: "1.5rem", md: "2rem" }}>
+            <Heading size="md" color={ThemeColors.darkColor} mb={4}>
+              {cluster.title}
+            </Heading>
+            <Swiper
+              modules={[Navigation, Pagination]}
+              spaceBetween={20}
+              slidesPerView={1}
+              navigation={{
+                nextEl: `.swiper-button-next-${cluster.id}`,
+                prevEl: `.swiper-button-prev-${cluster.id}`,
+              }}
+              pagination={{
+                clickable: true,
+                dynamicBullets: true,
+              }}
+              onSlideChange={(swiper) => setCurrentSlide(swiper.activeIndex)}
+              breakpoints={{
+                640: { slidesPerView: 1 },
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+              }}
+            >
+              {daysOfWeek.map((day) => {
+                const dayKey = day.toLowerCase();
+                const dayMenu = cluster.menu[dayKey];
               
               return (
                 <SwiperSlide key={day}>
@@ -480,17 +580,16 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                       {day}
                     </Heading>
 
-                    {/* Meal Types - All Plans: Show all meal types with default options */}
+                    {/* Meal types: all same prep (RTE or RTC) per cluster */}
                     <Stack spacing={3}>
-                      {/* Breakfast - Ready-to-Eat (Default) */}
+                      {/* Breakfast */}
                       {(() => {
                         const mealType = "breakfast";
                         const meals = dayMenu[mealType] || [];
-                        // Show ready-to-eat as default for breakfast
-                        const readyToEatMeals = meals.filter(m => m.type === "ready-to-eat");
-                        const defaultMeal = readyToEatMeals[0] || meals[0];
+                        const defaultMeal = meals[0];
                         const timeRange = "6:00 AM - 10:00 AM";
                         const isSubscribed = defaultMeal && (isMealSubscribed(mealType, defaultMeal.type, "weekly") || isMealSubscribed(mealType, defaultMeal?.type, "monthly"));
+                        const isRTE = cluster.preparType === "ready-to-eat";
 
                         return defaultMeal ? (
                           <Box
@@ -521,8 +620,8 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                 <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" marginBottom="0.5rem" color="gray.700">
                                 {defaultMeal.meal}
                                 </Text>
-                              <Badge colorScheme="green" fontSize={{ base: "2xs", md: "xs" }} paddingX="0.5rem" paddingY="0.125rem" marginBottom="0.5rem">
-                                READY-TO-EAT
+                              <Badge colorScheme={isRTE ? "green" : "blue"} fontSize={{ base: "2xs", md: "xs" }} paddingX="0.5rem" paddingY="0.125rem" marginBottom="0.5rem">
+                                {isRTE ? "READY-TO-EAT" : "READY-TO-COOK"}
                                   </Badge>
                               {defaultMeal.pricing && (
                                 <Flex gap={2} alignItems="center" flexWrap="wrap" marginBottom="0.75rem">
@@ -689,7 +788,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                     variant="outline"
                                     colorScheme="blue"
                                     leftIcon={<Eye size={14} />}
-                                    onClick={() => handleMealClick(dayKey, mealType)}
+                                    onClick={() => handleMealClick(dayKey, mealType, cluster.preparType)}
                                     width="100%"
                                     fontSize={{ base: "xs", md: "sm" }}
                                   >
@@ -702,15 +801,14 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                         ) : null;
                       })()}
 
-                      {/* Lunch - Ready-to-Cook (Default) */}
+                      {/* Lunch */}
                       {(() => {
                         const mealType = "lunch";
                         const meals = dayMenu[mealType] || [];
-                        // Show ready-to-cook as default for lunch
-                        const readyToCookMeals = meals.filter(m => m.type === "ready-to-cook");
-                        const defaultMeal = readyToCookMeals[0] || meals[0];
+                        const defaultMeal = meals[0];
                         const timeRange = "12:00 PM - 3:00 PM";
                         const isSubscribed = defaultMeal && (isMealSubscribed(mealType, defaultMeal.type, "weekly") || isMealSubscribed(mealType, defaultMeal?.type, "monthly"));
+                        const isRTE = cluster.preparType === "ready-to-eat";
 
                         return defaultMeal ? (
                           <Box
@@ -728,8 +826,8 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                 </Text>
                                 <Text fontSize={{ base: "2xs", md: "xs" }} color="gray.500" marginTop="0.125rem">
                                   {timeRange}
-                                          </Text>
-                                        </Box>
+                                </Text>
+                              </Box>
                               {isSubscribed && (
                                 <Badge colorScheme="green" fontSize="xs">
                                   Subscribed
@@ -741,8 +839,8 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                               <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" marginBottom="0.5rem" color="gray.700">
                                 {defaultMeal.meal}
                               </Text>
-                              <Badge colorScheme="blue" fontSize={{ base: "2xs", md: "xs" }} paddingX="0.5rem" paddingY="0.125rem" marginBottom="0.5rem">
-                                READY-TO-COOK
+                              <Badge colorScheme={isRTE ? "green" : "blue"} fontSize={{ base: "2xs", md: "xs" }} paddingX="0.5rem" paddingY="0.125rem" marginBottom="0.5rem">
+                                {isRTE ? "READY-TO-EAT" : "READY-TO-COOK"}
                               </Badge>
                               {defaultMeal.pricing && (
                                 <Flex gap={2} alignItems="center" flexWrap="wrap" marginBottom="0.75rem">
@@ -909,7 +1007,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                     variant="outline"
                                     colorScheme="blue"
                                     leftIcon={<Eye size={14} />}
-                                    onClick={() => handleMealClick(dayKey, mealType)}
+                                    onClick={() => handleMealClick(dayKey, mealType, cluster.preparType)}
                                     width="100%"
                                     fontSize={{ base: "xs", md: "sm" }}
                                   >
@@ -922,15 +1020,14 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                         ) : null;
                       })()}
 
-                      {/* Supper - Ready-to-Eat (Default) */}
+                      {/* Supper */}
                       {(() => {
                         const mealType = "supper";
                         const meals = dayMenu[mealType] || [];
-                        // Show ready-to-eat as default for supper
-                        const readyToEatMeals = meals.filter(m => m.type === "ready-to-eat");
-                        const defaultMeal = readyToEatMeals[0] || meals[0];
+                        const defaultMeal = meals[0];
                         const timeRange = "5:00 PM - 10:00 PM";
                         const isSubscribed = defaultMeal && (isMealSubscribed(mealType, defaultMeal.type, "weekly") || isMealSubscribed(mealType, defaultMeal?.type, "monthly"));
+                        const isRTE = cluster.preparType === "ready-to-eat";
 
                         return defaultMeal ? (
                           <Box
@@ -961,8 +1058,8 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                               <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" marginBottom="0.5rem" color="gray.700">
                                 {defaultMeal.meal}
                               </Text>
-                              <Badge colorScheme="green" fontSize={{ base: "2xs", md: "xs" }} paddingX="0.5rem" paddingY="0.125rem" marginBottom="0.5rem">
-                                READY-TO-EAT
+                              <Badge colorScheme={isRTE ? "green" : "blue"} fontSize={{ base: "2xs", md: "xs" }} paddingX="0.5rem" paddingY="0.125rem" marginBottom="0.5rem">
+                                {isRTE ? "READY-TO-EAT" : "READY-TO-COOK"}
                               </Badge>
                               {defaultMeal.pricing && (
                                 <Flex gap={2} alignItems="center" flexWrap="wrap" marginBottom="0.75rem">
@@ -1129,7 +1226,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                     variant="outline"
                                     colorScheme="blue"
                                     leftIcon={<Eye size={14} />}
-                                    onClick={() => handleMealClick(dayKey, mealType)}
+                                    onClick={() => handleMealClick(dayKey, mealType, cluster.preparType)}
                                     width="100%"
                                     fontSize={{ base: "xs", md: "sm" }}
                                   >
@@ -1160,7 +1257,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
             background="white"
             boxShadow="md"
             borderRadius="full"
-            className="swiper-button-prev-custom"
+            className={`swiper-button-prev-${cluster.id}`}
             size={{ base: "sm", md: "md" }}
           />
           <IconButton
@@ -1174,10 +1271,11 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
             background="white"
             boxShadow="md"
             borderRadius="full"
-            className="swiper-button-next-custom"
+            className={`swiper-button-next-${cluster.id}`}
             size={{ base: "sm", md: "md" }}
           />
         </Box>
+        ))}
 
         {/* Delivery Disclaimer */}
         <Box
@@ -1387,30 +1485,38 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                           </Text>
                         </Flex>
 
-                        {/* Algae / Food add-on dropdown per meal */}
+                        {/* Allergy dropdown per meal */}
                         <Box marginBottom="1rem">
-                          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" marginBottom="0.5rem">
-                            Algae / Food add-on
-                          </Text>
-                          <Select
-                            size="sm"
-                            borderRadius="md"
-                            borderColor="gray.300"
-                            _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}` }}
-                            value={algaeAddonByMeal[`${selectedMealType}-${meal.type}-${idx}`] || "none"}
-                            onChange={(e) =>
-                              setAlgaeAddonByMeal((prev) => ({
-                                ...prev,
-                                [`${selectedMealType}-${meal.type}-${idx}`]: e.target.value,
-                              }))
-                            }
-                          >
-                            {ALGAE_FOOD_OPTIONS.map((opt) => (
-                              <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </option>
-                            ))}
-                          </Select>
+                          <Menu closeOnSelect={false}>
+                            <MenuButton
+                              as={Button}
+                              size="sm"
+                              variant="outline"
+                              rightIcon={<ChevronDown size={14} />}
+                              borderColor="gray.300"
+                              _hover={{ borderColor: ThemeColors.primaryColor }}
+                              _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}` }}
+                            >
+                              Allergies & options
+                            </MenuButton>
+                            <MenuList minW="240px" p={3} borderColor="gray.200">
+                              <MenuItem closeOnSelect={false} onClick={(e) => e.preventDefault()}>
+                                <Checkbox
+                                  isChecked={!!allergyByMeal[`${selectedMealType}-${meal.type}-${idx}`]}
+                                  onChange={(e) =>
+                                    setAllergyByMeal((prev) => ({
+                                      ...prev,
+                                      [`${selectedMealType}-${meal.type}-${idx}`]: e.target.checked,
+                                    }))
+                                  }
+                                  colorScheme="green"
+                                  size="sm"
+                                >
+                                  <Text fontSize="sm" ml={2}>I have allergies / foods I don&apos;t eat</Text>
+                                </Checkbox>
+                              </MenuItem>
+                            </MenuList>
+                          </Menu>
                         </Box>
 
                         {/* Pricing - Enhanced with Selection Checkboxes */}
