@@ -25,12 +25,11 @@ import SubscriptionCard from "@components/SubscriptionCard";
 import UnifiedMealSubscriptionCard from "@components/UnifiedMealSubscriptionCard";
 import FoodAlgaeBoxModal from "@components/FoodAlgaeBoxModal";
 
-import { Images, ThemeColors } from "@constants/constants";
+import { ThemeColors } from "@constants/constants";
 import {
   useSubscriptionPackageGetMutation,
   useSubscriptionPostMutation,
 } from "@slices/usersApiSlice";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -143,7 +142,7 @@ const Subscription = () => {
                   textAlign={"center"}
                   fontSize={{ base: "lg", sm: "xl", md: "2xl", lg: "3xl", xl: "4xl" }}
                   fontWeight={"semibold"}
-                  marginBottom={{ base: "1.5rem", sm: "2rem", md: "2.5rem", lg: "3rem" }}
+                  marginBottom={{ base: "1rem", sm: "1.25rem", md: "1.5rem", lg: "2rem" }}
                   lineHeight={{ base: "1.3", md: "1.4" }}
                   paddingX={{ base: "0.5rem", md: "0" }}
                 >
@@ -158,36 +157,6 @@ const Subscription = () => {
                   </Text>{" "}
                   subscription discount
                 </Text>
-
-                {/* Image Section - Compact and Responsive */}
-                <Box
-                  display={"flex"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                  paddingY={{ base: "0.5rem", md: "0.75rem" }}
-                  marginBottom={{ base: "1rem", md: "1.5rem" }}
-                  maxHeight={{ base: "120px", md: "150px", lg: "180px" }}
-                  overflow="hidden"
-                >
-                  <Box
-                    position="relative"
-                    width={{ base: "200px", md: "250px", lg: "280px" }}
-                    height={{ base: "120px", md: "150px", lg: "180px" }}
-                    flexShrink={0}
-                  >
-                    <Image
-                      src={Images.img5}
-                      alt="subscription icon"
-                      fill
-                      sizes="(max-width: 768px) 200px, (max-width: 1200px) 250px, 280px"
-                      style={{
-                        objectFit: "contain",
-                        objectPosition: "center",
-                      }}
-                      priority
-                    />
-                  </Box>
-                </Box>
               </Box>
 
               {/* Subscription Cards Grid */}
