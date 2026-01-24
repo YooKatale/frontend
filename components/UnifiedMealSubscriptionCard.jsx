@@ -34,7 +34,7 @@ import {
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import React, { useState, useEffect, useMemo } from "react";
-import { ChevronLeft, ChevronRight, ChevronDown, Eye, ArrowRight, Calendar, ShoppingCart, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, Eye, ArrowRight, Calendar, ShoppingCart, Check, Share2, Star } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import Image from "next/image";
