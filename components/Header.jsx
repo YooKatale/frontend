@@ -10,7 +10,6 @@ import {
   Stack,
   useToast,
 } from "@chakra-ui/react";
-import { BellIcon, Loader2, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -133,31 +132,27 @@ const Header = () => {
               </InputGroup>
             </form>
           </Box>
-        {/* Navigation Links */}
+        {/* Navigation Links - Desktop */}
           <Stack
-            direction={{ base: "row", md: "row" }} // Stack items in a column on mobile and row on larger screens
-            spacing={4} 
-            display={{ base: mobileNavOpen ? "flex" : "none", md: "flex" }} // Toggle display based on mobile nav state
-            listStyleType="none" 
-            pl={0} 
-            pr={6} 
-            alignItems={{ base: "flex-start", md: "center" }} // Align items vertically on mobile and horizontally on larger screens
+            direction="row"
+            spacing={4}
+            display={{ base: "none", md: "flex" }}
+            listStyleType="none"
+            pl={0}
+            pr={6}
+            alignItems="center"
+            flexWrap="wrap"
           >
-            <Box as="li" fontSize={{ base: "sm", md: "md" }}> 
-              <Link href="/">Home</Link>
-            </Box>
-            <Box as="li" fontSize={{ base: "sm", md: "md" }}>
-              <Link href="/about">About</Link>
-            </Box>
-            <Box as="li" fontSize={{ base: "sm", md: "md" }}>
-              <Link href="/news">Blog</Link>
-            </Box>
-            <Box as="li" fontSize={{ base: "sm", md: "md" }}>
-              <Link href="/careers">Careers</Link>
-            </Box>
-            <Box as="li" fontSize={{ base: "sm", md: "md" }}>
-              <Link href="/contact">Contact</Link>
-            </Box>
+            <Box as="li" fontSize="md"><Link href="/">Home</Link></Box>
+            <Box as="li" fontSize="md"><Link href="/about">About</Link></Box>
+            <Box as="li" fontSize="md"><Link href="/news">Blog</Link></Box>
+            <Box as="li" fontSize="md"><Link href="/careers">Careers</Link></Box>
+            <Box as="li" fontSize="md"><Link href="/contact">Contact</Link></Box>
+            <Box as="li" fontSize="md"><Link href="/signup">Signup</Link></Box>
+            <Box as="li" fontSize="md"><Link href="/subscription">Subscribe</Link></Box>
+            <Box as="li" fontSize="md"><Link href="/partner">Partner</Link></Box>
+            <Box as="li" fontSize="md"><Link href="/#refer">Invite a friend</Link></Box>
+            <Box as="li" fontSize="md"><Link href="/marketplace">Marketplace</Link></Box>
           </Stack>
           {/* Mobile Menu Icon */}
             <Button variant="outline" onClick={toggleMobileNav} display={{ base: "block", md: "none" }} style={{marginLeft:'auto'}} >
@@ -230,11 +225,11 @@ const Header = () => {
           </Flex>
         </Flex>
 
-      {/* Mobile Search Bar */}
+      {/* Mobile menu: search + nav links */}
         {mobileNavOpen && (
-          <Box px={4} pb={4} display={{ base: "block", md: "none" }}>
+          <Box px={4} pb={4} display={{ base: "block", md: "none" }} borderTopWidth="1px" borderColor="gray.200">
             <form onSubmit={handleSearchFormSubmit}>
-              <InputGroup size="md">
+              <InputGroup size="md" mb={4}>
                 <InputLeftElement pointerEvents="none">
                   <FaSearch color="gray.300" />
                 </InputLeftElement>
@@ -244,11 +239,32 @@ const Header = () => {
                   _placeholder={{ px: 7 }}
                   value={searchParam}
                   onChange={(e) => setSearchParam(e.target.value)}
-                  fontSize="0.875rem" // Small font size for mobile input
-                  padding="0.75rem" // Consistent padding
+                  fontSize="0.875rem"
+                  padding="0.75rem"
                 />
               </InputGroup>
             </form>
+            <Stack as="nav" spacing={3} listStyleType="none" pl={0}>
+              <Box as="li"><Link href="/" onClick={toggleMobileNav}>Home</Link></Box>
+              <Box as="li"><Link href="/products" onClick={toggleMobileNav}>All Categories</Link></Box>
+              <Box as="li"><Link href="/about" onClick={toggleMobileNav}>About</Link></Box>
+              <Box as="li"><Link href="/news" onClick={toggleMobileNav}>Blog</Link></Box>
+              <Box as="li"><Link href="/careers" onClick={toggleMobileNav}>Careers</Link></Box>
+              <Box as="li"><Link href="/contact" onClick={toggleMobileNav}>Contact</Link></Box>
+              <Box as="li"><Link href="/signup" onClick={toggleMobileNav}>Signup</Link></Box>
+              <Box as="li"><Link href="/subscription" onClick={toggleMobileNav}>Subscribe</Link></Box>
+              <Box as="li"><Link href="/partner" onClick={toggleMobileNav}>Partner</Link></Box>
+              <Box as="li"><Link href="/#refer" onClick={toggleMobileNav}>Invite a friend</Link></Box>
+              <Box as="li"><Link href="/marketplace" onClick={toggleMobileNav}>Marketplace</Link></Box>
+              <Box as="li"><Link href="/cart" onClick={toggleMobileNav}>Cart</Link></Box>
+              <Box as="li">
+                {userInfo ? (
+                  <Link href="/account" onClick={toggleMobileNav}>Account</Link>
+                ) : (
+                  <Link href="/signin" onClick={toggleMobileNav}>Sign In</Link>
+                )}
+              </Box>
+            </Stack>
           </Box>
         )}
       </Box>
