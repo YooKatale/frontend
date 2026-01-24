@@ -63,6 +63,21 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    planRatingCreate: builder.mutation({
+      query: (data) => ({
+        url: `${DB_URL}/ratings/plan`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    getPlanRatings: builder.query({
+      query: ({ planType, context }) => {
+        const params = new URLSearchParams();
+        if (planType) params.set("planType", planType);
+        if (context) params.set("context", context);
+        return { url: `${DB_URL}/ratings/plan?${params.toString()}` };
+      },
+    }),
     subscriptionPackageGet: builder.mutation({
       query: () => ({
         url: `${DB_URL}/subscription/package/get`,
@@ -221,6 +236,8 @@ export const {
   useRatingCreateMutation,
   useAppRatingCreateMutation,
   usePlatformFeedbackCreateMutation,
+  usePlanRatingCreateMutation,
+  useGetPlanRatingsQuery,
   useSubscriptionPackageGetMutation,
   useSubscriptionPostMutation,
   useMessagePostMutation,
