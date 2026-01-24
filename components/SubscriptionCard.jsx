@@ -5,13 +5,14 @@ import { FormatCurr } from "@utils/utils";
 import SubscriptionTerms from "./SubscriptionTerms";
 import { UserPlus, Star, ArrowRight } from "lucide-react";
 
-const SubscriptionCard = ({ card, handleClick }) => {
+const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  
+
   const isFamilyPlan = card?.type?.toLowerCase() === "family";
   const isPremiumPlan = card?.type?.toLowerCase() === "premium";
   const isBusinessPlan = card?.type?.toLowerCase() === "business";
+  const highlight = isSelected || isFamilyPlan;
 
   return (
     <>
@@ -21,15 +22,23 @@ const SubscriptionCard = ({ card, handleClick }) => {
         borderRadius={"lg"}
         background={"white"}
         className={"card__design"}
-        shadow={isFamilyPlan ? "xl" : "md"}
+        shadow={highlight ? "xl" : "md"}
         padding={{ base: "1.5rem 0", md: "2rem 0" }}
         display={"flex"}
         flexDirection={"column"}
         transition={"all 0.3s ease"}
-        border={isFamilyPlan ? "2px solid" : "1px solid"}
-        borderColor={isFamilyPlan ? ThemeColors.darkColor : "gray.200"}
+        border={highlight ? "2px solid" : "1px solid"}
+        borderColor={
+          isSelected
+            ? ThemeColors.primaryColor
+            : isFamilyPlan
+            ? ThemeColors.darkColor
+            : "gray.200"
+        }
         position={"relative"}
         _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
+        onClick={() => onPlanSelect?.(card?.type)}
+        cursor={onPlanSelect ? "pointer" : undefined}
       >
         {/* Popular Badge for Family Plan */}
         {isFamilyPlan && (
@@ -520,14 +529,7 @@ const SubscriptionCard = ({ card, handleClick }) => {
                 maxWidth={{ base: "100%", md: "90%" }}
                 display={"flex"}
                 justifyContent={"center"}
-                onClick={() => {
-                  setIsLoading((prev) => (prev ? false : true));
-                  handleClick(card?._id);
-
-                  setTimeout(() => {
-                    setIsLoading((prev) => (prev ? false : true));
-                  }, 1500);
-                }}
+                onClick={(e) => e.stopPropagation()}
               >
                 <Button
                   width={"100%"}
@@ -555,7 +557,8 @@ const SubscriptionCard = ({ card, handleClick }) => {
                   }}
                   transition={"all 0.3s ease"}
                   boxShadow={"0 4px 6px rgba(0,0,0,0.1)"}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setIsLoading((prev) => (prev ? false : true));
                     handleClick(card?._id);
                     setTimeout(() => {
@@ -588,7 +591,8 @@ const SubscriptionCard = ({ card, handleClick }) => {
                   transform: "translateX(4px)",
                 }}
                 transition={"all 0.2s ease"}
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   const inviteSection = document.getElementById("refer");
                   if (inviteSection) {
                     inviteSection.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -618,7 +622,10 @@ const SubscriptionCard = ({ card, handleClick }) => {
                   color: ThemeColors.darkColor,
                   textDecoration: "underline",
                 }}
-                onClick={onOpen}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpen();
+                }}
                 marginBottom={"0.75rem"}
               >
                 Terms and Conditions Apply

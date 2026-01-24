@@ -59,6 +59,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
   const [selectedMealsForSubscription, setSelectedMealsForSubscription] = useState([]); // Selected meals before subscribing
   const [isVegetarian, setIsVegetarian] = useState(false);
   const [selectedSauce, setSelectedSauce] = useState("");
+  const [algaeAddonByMeal, setAlgaeAddonByMeal] = useState({});
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isCustomizeOpen, onOpen: onCustomizeOpen, onClose: onCustomizeClose } = useDisclosure();
   const toast = useToast();
@@ -68,6 +69,17 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
 
   const planName = planType.charAt(0).toUpperCase() + planType.slice(1);
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+  /** Algae / food add-on options per meal. Edit this list to add or remove options. */
+  const ALGAE_FOOD_OPTIONS = [
+    { value: "none", label: "None" },
+    { value: "spirulina", label: "Spirulina" },
+    { value: "chlorella", label: "Chlorella" },
+    { value: "seaweed", label: "Seaweed" },
+    { value: "kelp", label: "Kelp" },
+    { value: "nori", label: "Nori" },
+    { value: "wakame", label: "Wakame" },
+  ];
 
   // Fetch paid meal subscriptions from backend
   useEffect(() => {
@@ -259,13 +271,21 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
     try {
       const totalPrice = selectedMealsForSubscription.reduce((sum, meal) => sum + meal.price, 0);
       
-      // Build special requests with vegetarian and sauce preferences
+      // Build special requests with vegetarian, sauce, and algae/food add-ons
       let specialRequests = `Meal subscription for ${selectedMealsForSubscription.length} meal(s).`;
       if (isVegetarian) {
         specialRequests += " Vegetarian option requested.";
       }
       if (selectedSauce) {
         specialRequests += ` Preferred sauce: ${selectedSauce}.`;
+      }
+      const algaeEntries = Object.entries(algaeAddonByMeal).filter(
+        ([_, v]) => v && v !== "none"
+      );
+      if (algaeEntries.length) {
+        specialRequests += ` Algae/food add-ons: ${algaeEntries
+          .map(([k, v]) => `${k}: ${v}`)
+          .join("; ")}.`;
       }
 
       // Create order for selected meals
@@ -334,6 +354,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
           setSelectedMealsForSubscription([]);
           setIsVegetarian(false);
           setSelectedSauce("");
+          setAlgaeAddonByMeal({});
           onClose();
           router.push(`/payment/${orderId}`);
         } else {
@@ -1365,6 +1386,32 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                             Quantity: {meal.quantity}
                           </Text>
                         </Flex>
+
+                        {/* Algae / Food add-on dropdown per meal */}
+                        <Box marginBottom="1rem">
+                          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" marginBottom="0.5rem">
+                            Algae / Food add-on
+                          </Text>
+                          <Select
+                            size="sm"
+                            borderRadius="md"
+                            borderColor="gray.300"
+                            _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}` }}
+                            value={algaeAddonByMeal[`${selectedMealType}-${meal.type}-${idx}`] || "none"}
+                            onChange={(e) =>
+                              setAlgaeAddonByMeal((prev) => ({
+                                ...prev,
+                                [`${selectedMealType}-${meal.type}-${idx}`]: e.target.value,
+                              }))
+                            }
+                          >
+                            {ALGAE_FOOD_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </Select>
+                        </Box>
 
                         {/* Pricing - Enhanced with Selection Checkboxes */}
                         {meal.pricing && (

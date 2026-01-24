@@ -1,30 +1,36 @@
-// import React from 'react'
 "use client";
+
+/**
+ * Subscription page — plan selection, meal calendar, dietary preferences.
+ * Modify layout here. Key components:
+ * - SubscriptionCard: @components/SubscriptionCard
+ * - UnifiedMealSubscriptionCard: @components/UnifiedMealSubscriptionCard (meal grid + algae/foods dropdown per meal)
+ * - FoodAlgaeBoxModal: @components/FoodAlgaeBoxModal (dietary preferences & allergies)
+ */
 
 import {
   Box,
   Flex,
-  FormControl,
-  FormLabel,
-  Grid,
   Heading,
-  Input,
-  Modal,
-  ModalCloseButton,
-  ModalContent,
-  Select,
-  Stack,
   Text,
-  Textarea,
-  useDisclosure,
+  Stack,
   useToast,
-  Divider,
-  Badge,
+  Container,
+  Card,
+  CardBody,
+  Button,
+  Icon,
+  Spinner,
+  ScaleFade,
+  SlideFade,
+  VStack,
+  HStack,
+  SimpleGrid,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import SubscriptionCard from "@components/SubscriptionCard";
 import UnifiedMealSubscriptionCard from "@components/UnifiedMealSubscriptionCard";
 import FoodAlgaeBoxModal from "@components/FoodAlgaeBoxModal";
-
 import { ThemeColors } from "@constants/constants";
 import {
   useSubscriptionPackageGetMutation,
@@ -33,10 +39,33 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import {
+  FaPercent,
+  FaCalendarAlt,
+  FaHeart,
+  FaSeedling,
+  FaAppleAlt,
+  FaCheckCircle,
+  FaShieldAlt,
+  FaTruck,
+  FaClock,
+  FaUsers,
+  FaChartLine,
+  FaLeaf,
+  FaAllergies,
+} from "react-icons/fa";
+import { motion } from "framer-motion";
+
+const MotionBox = motion(Box);
+const MotionCard = motion(Card);
+
+const themeBg = `${ThemeColors.primaryColor}12`;
+const themeBorder = `${ThemeColors.primaryColor}25`;
 
 const Subscription = () => {
   const [subscriptionPackages, setSubscriptionPackages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
 
   const chakraToast = useToast();
   const router = useRouter();
@@ -45,19 +74,19 @@ const Subscription = () => {
   const [createSubscription] = useSubscriptionPostMutation();
 
   const { userInfo } = useSelector((state) => state.auth);
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
-  // check if user logged in
-  if (!userInfo || userInfo == {} || userInfo == "") {
-    router.push("/signin");
-  }
+  useEffect(() => {
+    if (!userInfo || Object.keys(userInfo).length === 0) {
+      router.push("/signin");
+    }
+  }, [userInfo, router]);
 
-  const handleSubscriptionCardFetch = async (req, res) => {
+  const handleSubscriptionCardFetch = async () => {
     try {
       const res = await fetchPackages().unwrap();
-
-      if (res?.status == "Success") {
-        // Only show login message if user is NOT logged in
-        if (!userInfo || !userInfo._id) {
+      if (res?.status === "Success") {
+        if (!userInfo?._id) {
           chakraToast({
             title: "Login Required",
             description: "Please login to continue",
@@ -66,11 +95,20 @@ const Subscription = () => {
             isClosable: true,
           });
         }
-
-        setSubscriptionPackages(res?.data);
+        setSubscriptionPackages(res?.data || []);
+        if (res?.data?.[0]) {
+          setSelectedPlan(res.data[0].type);
+        }
       }
     } catch (error) {
       console.error("Error fetching subscription packages:", error);
+      chakraToast({
+        title: "Error",
+        description: "Failed to load subscription packages",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -79,211 +117,481 @@ const Subscription = () => {
   }, []);
 
   const handleSubmit = async (ID) => {
-    setIsLoading((prev) => (prev ? false : true));
-
+    if (!userInfo?._id) {
+      router.push("/signin");
+      return;
+    }
+    setIsLoading(true);
     try {
       const res = await createSubscription({
         user: userInfo._id,
         packageId: ID,
       }).unwrap();
-
-      setIsLoading((prev) => (prev ? false : true));
-
-      if (res.status == "Success") router.push(`/payment/${res.data.Order}`);
+      if (res.status === "Success") {
+        router.push(`/payment/${res.data.Order}`);
+      }
     } catch (err) {
       chakraToast({
-        title: "Error",
-        description: err.data?.message
-          ? err.data?.message
-          : err.data || err.error,
+        title: "Subscription Error",
+        description: err.data?.message || "Failed to create subscription",
         status: "error",
         duration: 5000,
-        isClosable: false,
+        isClosable: true,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handlePlanSelect = (planType) => {
+    setSelectedPlan(planType);
+  };
+
+  const planIcons = {
+    veg: FaLeaf,
+    "non-veg": FaAppleAlt,
+    egg: FaAppleAlt,
+    mixed: FaSeedling,
+    standard: FaAppleAlt,
+    premium: FaHeart,
+    basic: FaSeedling,
+    family: FaUsers,
+    business: FaChartLine,
+  };
+
   return (
-    <>
-      <Box minHeight="100vh" bg="white">
-        <Box 
-          padding={{ base: "1.5rem 0 2rem 0", sm: "2rem 0 3rem 0", md: "3rem 0 4rem 0", lg: "3rem 0 5rem 0" }}
-          width="100%"
-        >
-          <Box width="100%">
-            <Box
-              margin={"auto"}
-              width={{ base: "100%", sm: "95%", md: "90%", lg: "85%", xl: "80%", "2xl": "75%" }}
-              maxWidth={"1400px"}
-              paddingX={{ base: "1rem", sm: "1.5rem", md: "2rem" }}
+    <Box minHeight="100vh" bg="white">
+      {/* Hero */}
+      <MotionBox
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        bgGradient={`linear(to-r, ${ThemeColors.lightColor}, ${ThemeColors.primaryColor})`}
+        py={{ base: 8, md: 12 }}
+        mb={{ base: 8, md: 12 }}
+      >
+        <Container maxW="container.xl">
+          <VStack spacing={6} textAlign="center" color="white">
+            <Icon as={FaHeart} boxSize={12} opacity={0.9} />
+            <Heading
+              fontSize={{ base: "2xl", md: "4xl", lg: "5xl" }}
+              fontWeight="bold"
+              lineHeight="shorter"
             >
-              {/* Header Section */}
-              <Box
-                padding={{
-                  base: "0.5rem 0 1rem 0",
-                  sm: "1rem 0",
-                  md: "1.5rem 0",
-                  lg: "2rem 0",
-                }}
-                textAlign={"center"}
+              Nourish Your Body, <br />
+              Simplify Your Life
+            </Heading>
+            <Text fontSize={{ base: "lg", md: "xl" }} maxW="800px" opacity={0.9}>
+              Healthy meals delivered to your door. Choose from our carefully
+              curated subscription plans.
+            </Text>
+            <HStack spacing={4} flexWrap="wrap" justify="center">
+              <HStack
+                bg="whiteAlpha.200"
+                px={4}
+                py={2}
+                rounded="full"
+                spacing={2}
               >
-                <Text
-                  textAlign={"center"}
-                  fontSize={{ base: "lg", sm: "xl", md: "2xl", lg: "3xl" }}
-                  className="secondary-light-font"
-                  marginBottom={{ base: "0.75rem", md: "1rem" }}
-                  lineHeight={{ base: "1.4", md: "1.5" }}
-                >
-                  Subscribe to our payment plan
+                <Icon as={FaCheckCircle} boxSize={4} />
+                <Text fontSize="sm" fontWeight="medium">
+                  Fresh Ingredients
                 </Text>
+              </HStack>
+              <HStack
+                bg="whiteAlpha.200"
+                px={4}
+                py={2}
+                rounded="full"
+                spacing={2}
+              >
+                <Icon as={FaShieldAlt} boxSize={4} />
+                <Text fontSize="sm" fontWeight="medium">
+                  Quality Guarantee
+                </Text>
+              </HStack>
+              <HStack
+                bg="whiteAlpha.200"
+                px={4}
+                py={2}
+                rounded="full"
+                spacing={2}
+              >
+                <Icon as={FaTruck} boxSize={4} />
+                <Text fontSize="sm" fontWeight="medium">
+                  Free Delivery
+                </Text>
+              </HStack>
+            </HStack>
+          </VStack>
+        </Container>
+      </MotionBox>
 
-                <Text
-                  textAlign={"center"}
-                  fontSize={{ base: "lg", sm: "xl", md: "2xl", lg: "3xl", xl: "4xl" }}
-                  fontWeight={"semibold"}
-                  marginBottom={{ base: "1rem", sm: "1.25rem", md: "1.5rem", lg: "2rem" }}
-                  lineHeight={{ base: "1.3", md: "1.4" }}
-                  paddingX={{ base: "0.5rem", md: "0" }}
-                >
-                  Get{" "}
-                  <Text
-                    as={"span"}
-                    fontWeight={"bold"}
-                    color={ThemeColors.darkColor}
-                    fontSize={{ base: "lg", sm: "xl", md: "2xl", lg: "3xl", xl: "4xl" }}
+      <Container maxW="container.xl" px={{ base: 4, md: 6 }}>
+        {/* Discount banner — theme colors */}
+        <MotionBox
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          mb={{ base: 8, md: 12 }}
+        >
+          <Card
+            bg={themeBg}
+            borderWidth="1px"
+            borderColor={themeBorder}
+            borderRadius="xl"
+            overflow="hidden"
+          >
+            <CardBody>
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                align="center"
+                justify="space-between"
+                gap={4}
+              >
+                <HStack spacing={4}>
+                  <Box
+                    p={3}
+                    bg={ThemeColors.primaryColor}
+                    borderRadius="full"
+                    color="white"
                   >
-                    25%
-                  </Text>{" "}
-                  subscription discount
-                </Text>
-              </Box>
+                    <Icon as={FaPercent} boxSize={6} />
+                  </Box>
+                  <Box>
+                    <Text fontWeight="bold" fontSize="lg" color={ThemeColors.primaryColor}>
+                      Limited Time Offer
+                    </Text>
+                    <Text fontSize="sm" color="gray.600">
+                      Subscribe today and save big!
+                    </Text>
+                  </Box>
+                </HStack>
+                <Box textAlign={{ base: "center", md: "right" }}>
+                  <Heading size="xl" color={ThemeColors.primaryColor}>
+                    25% OFF
+                  </Heading>
+                  <Text fontSize="sm" color="gray.600">
+                    On all subscription plans
+                  </Text>
+                </Box>
+              </Flex>
+            </CardBody>
+          </Card>
+        </MotionBox>
 
-              {/* Subscription Cards Grid */}
-              <Grid
-                gridTemplateColumns={{
-                  base: "1fr",
-                  sm: "1fr",
-                  md: "repeat(2, 1fr)",
-                  lg: "repeat(3, 1fr)",
-                }}
-                gap={{ base: "1.25rem", sm: "1.5rem", md: "2rem", lg: "2.5rem" }}
-                marginBottom={{ base: "1.5rem", sm: "2rem", md: "3rem" }}
-                alignItems={"stretch"}
-                width="100%"
-              >
-                {subscriptionPackages.length > 0 &&
-                  subscriptionPackages.map((card, index) => (
-                    <SubscriptionCard
-                      card={card}
-                      key={index}
-                      handleClick={handleSubmit}
-                    />
-                  ))}
-              </Grid>
+        {/* Subscription plans */}
+        <Box mb={{ base: 12, md: 16 }}>
+          <VStack spacing={8} align="stretch">
+            <Box textAlign="center">
+              <Heading size="xl" mb={3} color={ThemeColors.primaryColor}>
+                Choose Your Perfect Plan
+              </Heading>
+              <Text color="gray.600" maxW="2xl" mx="auto">
+                Select from our carefully crafted meal plans designed to fit your
+                lifestyle and dietary preferences.
+              </Text>
             </Box>
-          </Box>
+
+            {subscriptionPackages.length > 0 ? (
+              <ScaleFade in={subscriptionPackages.length > 0}>
+                <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+                  {subscriptionPackages.map((card, index) => (
+                    <MotionBox
+                      key={card._id || index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      whileHover={{
+                        scale: 1.02,
+                        transition: { duration: 0.2 },
+                      }}
+                    >
+                      <SubscriptionCard
+                        card={card}
+                        handleClick={handleSubmit}
+                        onPlanSelect={handlePlanSelect}
+                        isSelected={selectedPlan === card.type}
+                      />
+                    </MotionBox>
+                  ))}
+                </SimpleGrid>
+              </ScaleFade>
+            ) : (
+              <Flex justify="center" align="center" minH="200px">
+                <Spinner size="xl" color={ThemeColors.primaryColor} />
+              </Flex>
+            )}
+          </VStack>
         </Box>
 
-        {/* Unified Meal Subscription & Calendar Section - Organized by Plan Type */}
-        {subscriptionPackages.length > 0 && (
-          <Box 
-            padding={{ base: "2rem 0", sm: "2.5rem 0", md: "3rem 0", lg: "4rem 0", xl: "5rem 0" }} 
-            background="gray.50"
-            width="100%"
-          >
-            <Box
-              margin={"auto"}
-              width={{ base: "100%", sm: "95%", md: "90%", lg: "85%", xl: "80%", "2xl": "75%" }}
-              maxWidth={"1400px"}
-              paddingX={{ base: "1rem", sm: "1.5rem", md: "2rem" }}
-            >
-              {/* Section Header */}
-              <Box marginBottom={{ base: "1.5rem", sm: "2rem", md: "3rem" }} textAlign="center">
-                <Heading
-                  as="h2"
-                  fontSize={{ base: "lg", sm: "xl", md: "2xl", lg: "3xl" }}
-                  fontWeight="bold"
-                  color={ThemeColors.darkColor}
-                  lineHeight={{ base: "1.3", md: "1.4" }}
-                  marginBottom={{ base: "0.25rem", md: "0.5rem" }}
-                >
-                  Meal Subscription & Weekly Calendar
-                </Heading>
-                <Text 
-                  fontSize={{ base: "xs", sm: "sm", md: "md" }} 
-                  color="gray.600"
-                  paddingX={{ base: "0.5rem", md: "0" }}
-                  lineHeight={{ base: "1.5", md: "1.6" }}
-                >
-                  Choose your meals, view pricing, and see the weekly meal calendar for each plan
-                </Text>
-              </Box>
+        {/* Meal calendar + Food Algae */}
+        {subscriptionPackages.length > 0 && selectedPlan && (
+          <SlideFade in={!!selectedPlan} offsetY="20px">
+            <Box mb={{ base: 12, md: 16 }}>
+              <VStack spacing={8} align="stretch">
+                <Box textAlign="center">
+                  <HStack justify="center" spacing={3} mb={3}>
+                    <Icon
+                      as={FaCalendarAlt}
+                      boxSize={8}
+                      color={ThemeColors.primaryColor}
+                    />
+                    <Heading size="xl" color={ThemeColors.primaryColor}>
+                      Meal Planning & Calendar
+                    </Heading>
+                  </HStack>
+                  <Text color="gray.600" maxW="2xl" mx="auto">
+                    View your selected plan&apos;s weekly meal calendar, pricing,
+                    and add algae/food options per meal.
+                  </Text>
+                </Box>
 
+                <Flex wrap="wrap" gap={3} justify="center" mb={6}>
+                  {subscriptionPackages.map((plan) => {
+                    const PlanIcon =
+                      planIcons[plan.type?.toLowerCase()] || FaAppleAlt;
+                    return (
+                      <Button
+                        key={plan.type}
+                        variant={selectedPlan === plan.type ? "solid" : "outline"}
+                        bg={
+                          selectedPlan === plan.type
+                            ? ThemeColors.primaryColor
+                            : undefined
+                        }
+                        colorScheme={
+                          selectedPlan === plan.type ? undefined : "gray"
+                        }
+                        color={selectedPlan === plan.type ? "white" : undefined}
+                        borderColor={
+                          selectedPlan === plan.type
+                            ? ThemeColors.primaryColor
+                            : "gray.300"
+                        }
+                        leftIcon={<Icon as={PlanIcon} />}
+                        onClick={() => handlePlanSelect(plan.type)}
+                        size={isMobile ? "sm" : "md"}
+                        borderRadius="full"
+                        _hover={{
+                          bg:
+                            selectedPlan === plan.type
+                              ? ThemeColors.secondaryColor
+                              : themeBg,
+                          borderColor: ThemeColors.primaryColor,
+                        }}
+                      >
+                        {plan.type?.charAt(0).toUpperCase()}
+                        {plan.type?.slice(1)}
+                      </Button>
+                    );
+                  })}
+                </Flex>
 
-              <Stack spacing={{ base: "2rem", sm: "2.5rem", md: "3rem", lg: "4rem", xl: "5rem" }}>
-                {subscriptionPackages.map((card, index) => {
-                  const planType = card.type;
-                  
-                  return (
-                    <Box key={index} width="100%">
-                      {/* Unified Meal Subscription & Calendar Card */}
-                      <UnifiedMealSubscriptionCard planType={planType} />
+                <Box>
+                  <MotionBox
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <UnifiedMealSubscriptionCard
+                      planType={selectedPlan}
+                      key={selectedPlan}
+                    />
+                  </MotionBox>
 
-                      {/* Food Algy Section - Allergies */}
-                      {userInfo && (
-                        <Box
-                          marginTop={{ base: "1.5rem", sm: "2rem", md: "2.5rem" }}
-                          padding={{ base: "1rem", sm: "1.25rem", md: "1.5rem", lg: "2rem" }}
-                          background="orange.50"
-                          borderRadius={{ base: "md", md: "lg" }}
-                          border="1px solid"
-                          borderColor="orange.200"
-                          width="100%"
-                        >
+                  {userInfo && (
+                    <MotionBox
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.2 }}
+                      mt={6}
+                    >
+                      <Card
+                        borderWidth="1px"
+                        borderColor={themeBorder}
+                        bg={themeBg}
+                        borderRadius="xl"
+                        overflow="hidden"
+                      >
+                        <CardBody>
                           <Flex
-                            justifyContent="space-between"
-                            alignItems={{ base: "flex-start", md: "center" }}
-                            flexDirection={{ base: "column", md: "row" }}
-                            gap={{ base: "1rem", sm: "1.25rem", md: "2rem" }}
+                            direction={{ base: "column", md: "row" }}
+                            align={{ base: "stretch", md: "center" }}
+                            justify="space-between"
+                            gap={6}
                           >
-                            <Box flex="1" width={{ base: "100%", md: "auto" }}>
-                              <Heading
-                                as="h3"
-                                fontSize={{ base: "md", sm: "lg", md: "xl" }}
-                                fontWeight="bold"
-                                color={ThemeColors.darkColor}
-                                marginBottom={{ base: "0.25rem", md: "0.5rem" }}
-                                lineHeight={{ base: "1.3", md: "1.4" }}
-                              >
-                                Food Algy
-                              </Heading>
-                              <Text 
-                                fontSize={{ base: "xs", sm: "sm", md: "sm" }} 
-                                color="gray.600"
-                                lineHeight={{ base: "1.5", md: "1.6" }}
-                              >
-                                Select foods you don't eat (allergies and dietary restrictions)
+                            <Box flex={1}>
+                              <HStack spacing={3} mb={2}>
+                                <Icon
+                                  as={FaAllergies}
+                                  color={ThemeColors.primaryColor}
+                                  boxSize={6}
+                                />
+                                <Heading size="md" color={ThemeColors.primaryColor}>
+                                  Dietary Preferences & Allergies
+                                </Heading>
+                              </HStack>
+                              <Text color="gray.600">
+                                Customize your meal plan: foods you don&apos;t
+                                eat (allergies, restrictions) and algae/add-on
+                                options per meal.
                               </Text>
                             </Box>
-                            <Box width={{ base: "100%", md: "auto" }}>
+                            <Box>
                               <FoodAlgaeBoxModal
                                 userId={userInfo._id}
-                                planType={planType}
+                                planType={selectedPlan}
                               />
                             </Box>
                           </Flex>
-                        </Box>
-                      )}
-                    </Box>
-                  );
-                })}
-              </Stack>
+                        </CardBody>
+                      </Card>
+                    </MotionBox>
+                  )}
+                </Box>
+              </VStack>
             </Box>
-          </Box>
+          </SlideFade>
         )}
 
-      </Box>
-    </>
+        {/* Benefits */}
+        <MotionBox
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          mb={{ base: 12, md: 16 }}
+        >
+          <VStack spacing={8} align="stretch">
+            <Box textAlign="center">
+              <Heading size="xl" mb={3} color={ThemeColors.primaryColor}>
+                Why Choose Our Meal Plans?
+              </Heading>
+              <Text color="gray.600" maxW="2xl" mx="auto">
+                Experience the difference with our premium meal subscription
+                service.
+              </Text>
+            </Box>
+
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
+              {[
+                {
+                  icon: FaLeaf,
+                  title: "Fresh & Organic",
+                  description:
+                    "Locally sourced, organic ingredients for maximum nutrition",
+                },
+                {
+                  icon: FaClock,
+                  title: "Time Saving",
+                  description:
+                    "No meal planning, grocery shopping, or cooking hassle",
+                },
+                {
+                  icon: FaUsers,
+                  title: "Expert Nutritionists",
+                  description:
+                    "Plans designed by certified nutrition professionals",
+                },
+                {
+                  icon: FaChartLine,
+                  title: "Flexible Plans",
+                  description:
+                    "Easily modify, pause, or cancel your subscription",
+                },
+              ].map((benefit, index) => (
+                <MotionCard
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  whileHover={{
+                    y: -5,
+                    transition: { duration: 0.2 },
+                  }}
+                  variant="outline"
+                  borderColor="gray.200"
+                  borderRadius="xl"
+                  _hover={{ borderColor: themeBorder }}
+                >
+                  <CardBody>
+                    <VStack spacing={4} align="center" textAlign="center">
+                      <Box
+                        p={3}
+                        bg={themeBg}
+                        borderRadius="full"
+                        color={ThemeColors.primaryColor}
+                        border="1px solid"
+                        borderColor={themeBorder}
+                      >
+                        <Icon as={benefit.icon} boxSize={6} />
+                      </Box>
+                      <Heading size="sm" color="gray.700">
+                        {benefit.title}
+                      </Heading>
+                      <Text fontSize="sm" color="gray.600">
+                        {benefit.description}
+                      </Text>
+                    </VStack>
+                  </CardBody>
+                </MotionCard>
+              ))}
+            </SimpleGrid>
+          </VStack>
+        </MotionBox>
+
+        {/* CTA */}
+        <MotionBox
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          textAlign="center"
+          py={8}
+        >
+          <Card
+            bgGradient={`linear(to-r, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`}
+            color="white"
+            borderRadius="xl"
+            overflow="hidden"
+          >
+            <CardBody py={10}>
+              <VStack spacing={6}>
+                <Heading size="xl">
+                  Ready to Transform Your Eating Habits?
+                </Heading>
+                <Text fontSize="lg" opacity={0.9}>
+                  Join thousands of satisfied customers enjoying healthy,
+                  delicious meals.
+                </Text>
+                <Button
+                  size="lg"
+                  bg="white"
+                  color={ThemeColors.primaryColor}
+                  leftIcon={<Icon as={FaHeart} />}
+                  _hover={{
+                    bg: "whiteAlpha.900",
+                    transform: "scale(1.05)",
+                  }}
+                  transition="all 0.2s"
+                  onClick={() => {
+                    const first = subscriptionPackages[0];
+                    if (first) handleSubmit(first._id);
+                  }}
+                  isLoading={isLoading}
+                  loadingText="Processing..."
+                >
+                  Start Your Journey
+                </Button>
+                <Text fontSize="sm" opacity={0.8}>
+                  No commitment required. Cancel anytime.
+                </Text>
+              </VStack>
+            </CardBody>
+          </Card>
+        </MotionBox>
+      </Container>
+    </Box>
   );
 };
 

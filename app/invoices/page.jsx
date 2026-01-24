@@ -359,7 +359,7 @@ const Invoice = () => {
                                               border: "none",
                                             }}
                                           >
-                                            {invoice.productItems}
+                                            {parseInt(invoice.productItems, 10) || 0}
                                           </Tag>
                                         </div>
                                         <div className="flex items-center gap-2">
@@ -543,96 +543,37 @@ const Invoice = () => {
                   </div>
                 ))}
 
-                {/* Grand Total */}
+                {/* Compact Summary: Grand Total + Stats */}
                 <div
-                  className="rounded-xl p-6"
+                  className="rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3"
                   style={{
                     background: `linear-gradient(to right, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`,
                   }}
                 >
-                  <div className="flex flex-col md:flex-row justify-between items-center text-white">
-                    <div>
-                      <Title level={3} className="m-0 text-white">
-                        Total Amount Payable
-                      </Title>
-                      <Text
-                        className="opacity-90"
-                        style={{ color: "rgba(255,255,255,0.9)" }}
-                      >
-                        For all {orderData.length} invoices
-                      </Text>
-                    </div>
-                    <Title level={2} className="m-0 text-white">
-                      UGX{" "}
-                      {numeral(
-                        orderData.reduce(
-                          (sum, inv) => sum + inv.total,
-                          0
-                        )
-                      ).format(",")}
-                    </Title>
-                  </div>
-                </div>
-
-                {/* Summary Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                  <Card
-                    className="text-center border-0 shadow-sm"
-                    style={{
-                      borderLeft: `4px solid ${ThemeColors.primaryColor}`,
-                    }}
-                  >
-                    <Title level={4} className="text-gray-600">
-                      Total Invoices
-                    </Title>
-                    <Title
-                      level={2}
-                      style={{ color: ThemeColors.primaryColor }}
-                    >
-                      {orderData.length}
-                    </Title>
-                  </Card>
-                  <Card
-                    className="text-center border-0 shadow-sm"
-                    style={{
-                      borderLeft: `4px solid ${ThemeColors.secondaryColor}`,
-                    }}
-                  >
-                    <Title level={4} className="text-gray-600">
-                      Total Items
-                    </Title>
-                    <Title
-                      level={2}
-                      style={{ color: ThemeColors.secondaryColor }}
-                    >
+                  <div className="flex flex-wrap items-center gap-4 md:gap-6">
+                    <span className="text-white font-semibold text-base">
+                      Total Payable:{" "}
+                      <span className="font-bold text-lg">
+                        UGX{" "}
+                        {numeral(
+                          orderData.reduce((sum, inv) => sum + inv.total, 0)
+                        ).format(",")}
+                      </span>
+                    </span>
+                    <span className="text-white/90 text-sm">
+                      {orderData.length} invoices ·{" "}
                       {orderData.reduce(
-                        (sum, inv) => sum + inv.productItems,
+                        (sum, inv) =>
+                          sum + (parseInt(inv.productItems, 10) || 0),
                         0
-                      )}
-                    </Title>
-                  </Card>
-                  <Card
-                    className="text-center border-0 shadow-sm"
-                    style={{
-                      borderLeft: `4px solid ${ThemeColors.primaryColor}`,
-                    }}
-                  >
-                    <Title level={4} className="text-gray-600">
-                      Average Invoice Value
-                    </Title>
-                    <Title
-                      level={2}
-                      style={{ color: ThemeColors.primaryColor }}
-                    >
-                      UGX{" "}
+                      )}{" "}
+                      items · Avg UGX{" "}
                       {numeral(
-                        orderData.reduce(
-                          (sum, inv) => sum + inv.total,
-                          0
-                        ) / orderData.length
+                        orderData.reduce((sum, inv) => sum + inv.total, 0) /
+                          orderData.length
                       ).format("0,0")}
-                    </Title>
-                  </Card>
+                    </span>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -653,15 +594,11 @@ const Invoice = () => {
               </div>
             )}
 
-            {/* Footer */}
-            <Divider />
-            <div className="text-center">
-              <Text className="text-gray-500">
-                Thank you for choosing Yookatale
-              </Text>
-              <br />
-              <Text type="secondary" className="text-sm">
-                This is a computer-generated invoice. No signature required.
+            {/* Footer — compact */}
+            <Divider className="my-2" />
+            <div className="text-center py-2">
+              <Text className="text-gray-500 text-sm">
+                Thank you for choosing Yookatale · Computer-generated invoice. No signature required.
               </Text>
             </div>
           </Card>
