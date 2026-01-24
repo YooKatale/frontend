@@ -160,8 +160,12 @@ const Header = () => {
     { label: "Partner", href: "/partner", icon: FaHandshake },
     { label: "Subscribe", href: "/subscription", icon: AiOutlineCreditCard },
     { label: "Invite a friend", href: "/#refer", icon: FaGift, isInvite: true },
-    { label: "Sign Up", href: "/signup", icon: AiOutlineLogin },
+    { label: "Sign Up", href: "/signup", icon: AiOutlineLogin, hideWhenLoggedIn: true },
   ];
+
+  const visibleNavLinks = navLinks.filter(
+    (link) => !link.hideWhenLoggedIn || !userInfo
+  );
 
   const openInviteModal = () => {
     closeMobileNav();
@@ -180,34 +184,32 @@ const Header = () => {
         zIndex="1000"
         boxShadow="sm"
       >
-        {/* Top nav links — large devices only */}
+        {/* Top nav links — large devices only, Jumia-style bold, no icons */}
         <Flex
           display={{ base: "none", lg: "flex" }}
           as="nav"
           align="center"
           justify="center"
-          gap={{ lg: 1, xl: 3 }}
+          gap={{ lg: 3, xl: 5 }}
           maxW="1400px"
           mx="auto"
           px={{ lg: 4, xl: 6 }}
-          py={2.5}
+          py={3}
           bg="gray.50"
           borderBottomWidth="1px"
           borderColor="gray.200"
           flexWrap="wrap"
         >
-          {navLinks.map((link) => {
-            const Icon = link.icon;
+          {visibleNavLinks.map((link) => {
             if (link.isInvite) {
               return (
                 <Button
                   key="invite"
                   variant="ghost"
                   size="sm"
-                  leftIcon={<Icon size={14} />}
-                  fontSize="0.8125rem"
-                  fontWeight="500"
-                  color="gray.700"
+                  fontSize="0.9375rem"
+                  fontWeight="700"
+                  color="gray.800"
                   _hover={{ bg: "white", color: ThemeColors.darkColor }}
                   onClick={openReferral}
                 >
@@ -220,16 +222,14 @@ const Header = () => {
                 <Flex
                   as="span"
                   align="center"
-                  gap={1.5}
                   px={2}
                   py={1.5}
                   borderRadius="md"
-                  fontSize="0.8125rem"
-                  fontWeight="500"
-                  color="gray.700"
+                  fontSize="0.9375rem"
+                  fontWeight="700"
+                  color="gray.800"
                   _hover={{ bg: "white", color: ThemeColors.darkColor }}
                 >
-                  <Icon size={14} />
                   {link.label}
                 </Flex>
               </Link>
@@ -242,7 +242,7 @@ const Header = () => {
           align="center"
           justify="space-between"
           maxW="1400px"
-          px={{ base: 3, md: 6 }}
+          px={{ base: 3, md: 0, lg: 0 }}
           mx="auto"
           minH="64px"
           py={2}
@@ -272,10 +272,10 @@ const Header = () => {
           </Flex>
 
           {/* Desktop Search Bar - Center */}
-          <Box 
-            mx={{ base: 2, md: 4 }} 
-            flex="1" 
-            maxW="600px" 
+          <Box
+            mx={{ base: 2, md: 3, lg: 4 }}
+            flex="1"
+            maxW="600px"
             display={{ base: "none", md: "block" }}
           >
             <form onSubmit={handleSearchFormSubmit}>
@@ -307,28 +307,27 @@ const Header = () => {
           </Box>
 
           {/* Desktop Navigation Right Section */}
-          <Flex align="center" display={{ base: "none", md: "flex" }} gap={3}>
+          <Flex align="center" display={{ base: "none", md: "flex" }} gap={2}>
             {/* Call Button */}
             <Button
               as={Link}
               href="tel:+256786118137"
-              leftIcon={<AiOutlinePhone />}
+              leftIcon={<AiOutlinePhone size={16} />}
               bg="#F6AD55"
               color="white"
-              size="md"
-              fontSize="0.875rem"
+              size="sm"
+              fontSize="0.8125rem"
               fontWeight="600"
-              px={4}
+              px={3}
               py={2}
               borderRadius="lg"
               _hover={{
                 bg: "#ED8936",
-                transform: "translateY(-2px)",
-                boxShadow: "md"
+                color: "white",
+                transform: "translateY(-1px)",
+                boxShadow: "sm",
               }}
-              _active={{
-                transform: "translateY(0)"
-              }}
+              _active={{ transform: "translateY(0)" }}
               transition="all 0.2s"
             >
               Call Us
@@ -512,7 +511,7 @@ const Header = () => {
 
             <DrawerBody px={0}>
               <VStack align="stretch" spacing={0}>
-                {navLinks.map((link) => {
+                {visibleNavLinks.map((link) => {
                   const Icon = link.icon;
                   if (link.isInvite) {
                     return (
