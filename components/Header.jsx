@@ -7,16 +7,53 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Stack,
   useToast,
+  Badge,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  IconButton,
+  Text,
+  Drawer,
+  DrawerBody,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  VStack,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
-import { FaSearch, FaShoppingCart, FaUser } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useState, useRef } from "react";
+import { 
+  AiOutlineClose, 
+  AiOutlineMenu,
+  AiOutlineShoppingCart,
+  AiOutlineUser,
+  AiOutlinePhone,
+  AiOutlineSearch,
+  AiOutlineHome,
+  AiOutlineTeam,
+  AiOutlineContacts,
+  AiOutlineLogin,
+  AiOutlineAppstore,
+  AiOutlineCreditCard,
+} from "react-icons/ai";
+import {
+  FaShoppingBag,
+  FaChevronDown,
+  FaStore,
+  FaBlog,
+  FaHandshake,
+  FaBriefcase,
+  FaGift,
+} from "react-icons/fa";
+import { useSelector, useDispatch } from "react-redux";
+import { useLogoutMutation } from "@slices/usersApiSlice";
+import { logout } from "@slices/authSlice";
+import { ThemeColors } from "@constants/constants";
 
 const Header = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -24,6 +61,12 @@ const Header = () => {
   const [searchParam, setSearchParam] = useState("");
   const { push } = useRouter();
   const chakraToast = useToast();
+  const btnRef = useRef();
+  const dispatch = useDispatch();
+  const [logoutUser] = useLogoutMutation();
+
+  const cartItemsCount = useSelector((state) => state.cart?.items?.length ?? state.cart?.cart?.length) || 0;
+  const userDisplayName = userInfo?.name || userInfo?.firstname || userInfo?.email || "Account";
 
   const handleSearchFormSubmit = (e) => {
     e.preventDefault();
@@ -41,45 +84,90 @@ const Header = () => {
   const toggleMobileNav = () => {
     setMobileNavOpen(!mobileNavOpen);
   };
+
+  const handleLogout = async () => {
+    try {
+      try {
+        await logoutUser().unwrap();
+      } catch (e) {
+        console.warn("Logout API error:", e);
+      }
+      dispatch(logout());
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("yookatale-app");
+        sessionStorage.clear();
+      }
+      chakraToast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      push("/");
+    } catch (err) {
+      console.error("Logout error:", err);
+      chakraToast({
+        title: "Error",
+        description: "Could not log out. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const navLinks = [
+    { label: "Home", href: "/", icon: AiOutlineHome },
+    { label: "Categories", href: "/products", icon: AiOutlineAppstore },
+    { label: "Marketplace", href: "/marketplace", icon: FaStore },
+    { label: "About", href: "/about", icon: AiOutlineTeam },
+    { label: "Blog", href: "/news", icon: FaBlog },
+    { label: "Careers", href: "/careers", icon: FaBriefcase },
+    { label: "Contact", href: "/contact", icon: AiOutlineContacts },
+    { label: "Partner", href: "/partner", icon: FaHandshake },
+    { label: "Subscribe", href: "/subscription", icon: AiOutlineCreditCard },
+    { label: "Invite a friend", href: "/#refer", icon: FaGift },
+    { label: "Sign Up", href: "/signup", icon: AiOutlineLogin },
+  ];
+
   return (
-    <> 
+    <>
       <Box
         as="header"
         bg="white"
         borderBottomWidth="1px"
-        borderColor="gray.200"
+        borderColor="gray.100"
         position="sticky"
         top={0}
-        zIndex="sticky"
-        transition="background-color 0.2s"
-        fontSize="1rem" // Set a base font size to maintain consistency
-        py={1}
+        zIndex="1000"
+        boxShadow="sm"
+        py={2}
       >
         <Flex
           as="nav"
           align="center"
           justify="space-between"
-          //maxW="1920px"
-          px={4}
+          maxW="1400px"
+          px={{ base: 3, md: 6 }}
           mx="auto"
-          height="4rem" // Height of 4rem for the nav bar
-          justifyContent={'center'}
+          height="64px"
         >
-          {/* Left Section - Logo and Categories Dropdown */}
-          <Flex align="center">
+          {/* Logo */}
+          <Flex align="center" flexShrink={0}>
             <Link href="/">
               <Box
                 as="span"
                 display="flex"
                 alignItems="center"
-                _hover={{ transform: 'scale(1.05)' }}
-                transition="transform 0.2s"
+                _hover={{ opacity: 0.9 }}
+                transition="opacity 0.2s"
               >
                 <Image
                   src="/assets/icons/logo2.png"
                   alt="YooKatale Logo"
-                  height={90}
-                  width={90}
+                  height={60}
+                  width={120}
                   priority
                   style={{
                     objectFit: 'contain',
@@ -87,186 +175,344 @@ const Header = () => {
                 />
               </Box>
             </Link>
-            <Box display={{ base: "none", md: "block" }}>
-              <Button
-                as={Link}
-                href="/products"
-                variant="outline"
-                fontSize="0.875rem"
-                leftIcon={<AiOutlineMenu />}
-              >
-                All Categories
-              </Button>
-            </Box>
           </Flex>
 
-          {/* Search Bar - Glovo Style */}
-          <Box mx={4} display={{ base: "none", md: "block" }} w={"16rem"} >
+          {/* Desktop Search Bar - Center */}
+          <Box 
+            mx={{ base: 2, md: 4 }} 
+            flex="1" 
+            maxW="600px" 
+            display={{ base: "none", md: "block" }}
+          >
             <form onSubmit={handleSearchFormSubmit}>
-              <InputGroup size="md" w={'16rem'}>
-                <InputLeftElement pointerEvents="none" pl={3}>
-                  <FaSearch color="gray.400" size={18} />
+              <InputGroup size="md">
+                <InputLeftElement pointerEvents="none">
+                  <AiOutlineSearch color="#718096" size={20} />
                 </InputLeftElement>
                 <Input
                   type="text"
-                  placeholder="Search for products..."
+                  placeholder="Search for fresh produce, groceries..."
                   value={searchParam}
                   onChange={(e) => setSearchParam(e.target.value)}
                   fontSize="0.9375rem"
-                  h="42px"
-                  borderRadius="xl"
+                  h="44px"
+                  borderRadius="lg"
                   bg="gray.50"
-                  borderColor="gray.300"
-                  paddingLeft="3rem"
+                  borderColor="gray.200"
+                  paddingLeft="2.8rem"
                   _focus={{
-                    bg: 'white',
-                    borderColor: '#185F2D',
-                    boxShadow: '0 0 0 2px rgba(24, 95, 45, 0.1)',
+                    bg: "white",
+                    borderColor: ThemeColors.darkColor,
+                    boxShadow: `0 0 0 3px ${ThemeColors.darkColor}20`,
                   }}
-                  _hover={{
-                    borderColor: 'gray.400',
-                    bg: 'white',
-                  }}
+                  _hover={{ borderColor: "gray.300" }}
                   transition="all 0.2s"
                 />
               </InputGroup>
             </form>
           </Box>
-        {/* Navigation Links - Desktop */}
-          <Stack
-            direction="row"
-            spacing={4}
-            display={{ base: "none", md: "flex" }}
-            listStyleType="none"
-            pl={0}
-            pr={6}
-            alignItems="center"
-            flexWrap="wrap"
-          >
-            <Box as="li" fontSize="md"><Link href="/">Home</Link></Box>
-            <Box as="li" fontSize="md"><Link href="/about">About</Link></Box>
-            <Box as="li" fontSize="md"><Link href="/news">Blog</Link></Box>
-            <Box as="li" fontSize="md"><Link href="/careers">Careers</Link></Box>
-            <Box as="li" fontSize="md"><Link href="/contact">Contact</Link></Box>
-            <Box as="li" fontSize="md"><Link href="/signup">Signup</Link></Box>
-            <Box as="li" fontSize="md"><Link href="/subscription">Subscribe</Link></Box>
-            <Box as="li" fontSize="md"><Link href="/partner">Partner</Link></Box>
-            <Box as="li" fontSize="md"><Link href="/#refer">Invite a friend</Link></Box>
-            <Box as="li" fontSize="md"><Link href="/marketplace">Marketplace</Link></Box>
-          </Stack>
-          {/* Mobile Menu Icon */}
-            <Button variant="outline" onClick={toggleMobileNav} display={{ base: "block", md: "none" }} style={{marginLeft:'auto'}} >
-              {mobileNavOpen ? <AiOutlineClose size="20px"/> : <AiOutlineMenu size="24px" />}
-            </Button>
-        
-          {/* Right Section */}
-          <Flex align="center" display={{ base: "none", md: "flex" }}>
-            {/* Account and Cart */}
-            <Flex align="center">
-              {/* Cart Button */}
-              <Button
-                as={Link}
-                href="/cart"
-                variant="outline"
-                sx={{
-                  mr: 2,
-                  background: "green",
-                  color: "white",
-                  fontSize: "0.875rem",
-                  _hover: {
-                    backgroundColor: "gray.100",
-                    color: "green",
-                  },
-                }}
-                leftIcon={<FaShoppingCart />}
-              >
-                Cart
-              </Button>
-              {/* Sign In or Account Button */}
-              {userInfo ? (
-                <Box as={Link} href="/account" ml={4} display="flex" alignItems="center">
-                  <FaUser size="20px" />
-                </Box>
-              ) : (
-                <Button
-                  as={Link}
-                  href="/signin"
-                  ml={4}
-                  variant="outline"
-                  sx={{
-                    mr: 2,
-                    background: "green",
-                    color: "white",
-                    fontSize: "0.875rem",
-                    _hover: {
-                      backgroundColor: "gray.100",
-                      color: "green",
-                    },
-                  }}
-                  leftIcon={<FaUser />}
-                >
-                  Sign In
-                </Button>
-              )}
-            </Flex>
-            {/* Call to Action Button */}
-            <Box mx={4}>
-              <Button
-                bg="orange.400"
-                color="white"
-                size="lg"
-                fontSize="0.875rem" // Make sure the CTA button has a smaller font
-                padding="0.75rem 1.5rem" // Consistent padding
-                _hover={{ bg: "orange.500" }}
-              >
-                Call: +256 786 118137
-              </Button>
-            </Box>
-          </Flex>
-        </Flex>
 
-      {/* Mobile menu: search + nav links */}
-        {mobileNavOpen && (
-          <Box px={4} pb={4} display={{ base: "block", md: "none" }} borderTopWidth="1px" borderColor="gray.200">
-            <form onSubmit={handleSearchFormSubmit}>
-              <InputGroup size="md" mb={4}>
-                <InputLeftElement pointerEvents="none">
-                  <FaSearch color="gray.300" />
-                </InputLeftElement>
-                <Input
-                  type="text"
-                  placeholder="Search for products"
-                  _placeholder={{ px: 7 }}
-                  value={searchParam}
-                  onChange={(e) => setSearchParam(e.target.value)}
-                  fontSize="0.875rem"
-                  padding="0.75rem"
+          {/* Mobile Search Icon */}
+          <IconButton
+            aria-label="Search"
+            icon={<AiOutlineSearch size={20} />}
+            variant="ghost"
+            size="lg"
+            display={{ base: "flex", md: "none" }}
+            onClick={() => push("/search")}
+          />
+
+          {/* Desktop Navigation Right Section */}
+          <Flex align="center" display={{ base: "none", md: "flex" }} gap={3}>
+            {/* Call Button */}
+            <Button
+              as={Link}
+              href="tel:+256786118137"
+              leftIcon={<AiOutlinePhone />}
+              bg="#F6AD55"
+              color="white"
+              size="md"
+              fontSize="0.875rem"
+              fontWeight="600"
+              px={4}
+              py={2}
+              borderRadius="lg"
+              _hover={{
+                bg: "#ED8936",
+                transform: "translateY(-2px)",
+                boxShadow: "md"
+              }}
+              _active={{
+                transform: "translateY(0)"
+              }}
+              transition="all 0.2s"
+            >
+              Call Us
+            </Button>
+
+            {/* Cart with Badge */}
+            <Link href="/cart">
+              <Box position="relative" as="span" display="inline-block">
+                <IconButton
+                  aria-label="Shopping Cart"
+                  icon={<AiOutlineShoppingCart size={22} />}
+                  variant="ghost"
+                  size="lg"
+                  color="gray.700"
+                  _hover={{
+                    bg: "green.50",
+                    color: ThemeColors.darkColor,
+                  }}
                 />
-              </InputGroup>
-            </form>
-            <Stack as="nav" spacing={3} listStyleType="none" pl={0}>
-              <Box as="li"><Link href="/" onClick={toggleMobileNav}>Home</Link></Box>
-              <Box as="li"><Link href="/products" onClick={toggleMobileNav}>All Categories</Link></Box>
-              <Box as="li"><Link href="/about" onClick={toggleMobileNav}>About</Link></Box>
-              <Box as="li"><Link href="/news" onClick={toggleMobileNav}>Blog</Link></Box>
-              <Box as="li"><Link href="/careers" onClick={toggleMobileNav}>Careers</Link></Box>
-              <Box as="li"><Link href="/contact" onClick={toggleMobileNav}>Contact</Link></Box>
-              <Box as="li"><Link href="/signup" onClick={toggleMobileNav}>Signup</Link></Box>
-              <Box as="li"><Link href="/subscription" onClick={toggleMobileNav}>Subscribe</Link></Box>
-              <Box as="li"><Link href="/partner" onClick={toggleMobileNav}>Partner</Link></Box>
-              <Box as="li"><Link href="/#refer" onClick={toggleMobileNav}>Invite a friend</Link></Box>
-              <Box as="li"><Link href="/marketplace" onClick={toggleMobileNav}>Marketplace</Link></Box>
-              <Box as="li"><Link href="/cart" onClick={toggleMobileNav}>Cart</Link></Box>
-              <Box as="li">
-                {userInfo ? (
-                  <Link href="/account" onClick={toggleMobileNav}>Account</Link>
-                ) : (
-                  <Link href="/signin" onClick={toggleMobileNav}>Sign In</Link>
+                {cartItemsCount > 0 && (
+                  <Badge
+                    position="absolute"
+                    top="2px"
+                    right="2px"
+                    bg="red.500"
+                    color="white"
+                    borderRadius="full"
+                    fontSize="0.6rem"
+                    minW="4"
+                    height="4"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    {cartItemsCount}
+                  </Badge>
                 )}
               </Box>
-            </Stack>
-          </Box>
-        )}
+            </Link>
+
+            {/* User Profile Menu */}
+            <Menu>
+              <MenuButton
+                as={Button}
+                variant="ghost"
+                size="lg"
+                px={2}
+                color="gray.700"
+                _hover={{ bg: "green.50" }}
+                _active={{ bg: "green.50" }}
+                rightIcon={<FaChevronDown size={12} />}
+              >
+                <Flex align="center" gap={2}>
+                  <AiOutlineUser size={20} />
+                  <Text fontSize="0.875rem" fontWeight="500">
+                    {userDisplayName}
+                  </Text>
+                </Flex>
+              </MenuButton>
+              <MenuList py={0} borderRadius="lg" borderColor="gray.200" boxShadow="lg">
+                {userInfo ? (
+                  <>
+                    <MenuItem 
+                      as={Link} 
+                      href="/account"
+                      py={3}
+                      _hover={{ bg: "green.50" }}
+                    >
+                      <AiOutlineUser size={16} />
+                      <Text ml={2}>My Account</Text>
+                    </MenuItem>
+                    <MenuItem 
+                      as={Link} 
+                      href="/invoices"
+                      py={3}
+                      _hover={{ bg: "green.50" }}
+                    >
+                      <FaShoppingBag size={14} />
+                      <Text ml={2}>My Orders</Text>
+                    </MenuItem>
+                    <MenuItem
+                      py={3}
+                      _hover={{ bg: "red.50", color: "red.600" }}
+                      onClick={handleLogout}
+                    >
+                      <Text ml={2}>Logout</Text>
+                    </MenuItem>
+                  </>
+                ) : (
+                  <>
+                    <MenuItem 
+                      as={Link} 
+                      href="/signin"
+                      py={3}
+                      _hover={{ bg: "green.50" }}
+                    >
+                      <AiOutlineLogin size={16} />
+                      <Text ml={2}>Sign In</Text>
+                    </MenuItem>
+                    <MenuItem 
+                      as={Link} 
+                      href="/signup"
+                      py={3}
+                      _hover={{ bg: "green.50" }}
+                    >
+                      <Text ml={2}>Create Account</Text>
+                    </MenuItem>
+                  </>
+                )}
+              </MenuList>
+            </Menu>
+          </Flex>
+
+          {/* Mobile Menu Button */}
+          <IconButton
+            ref={btnRef}
+            aria-label="Menu"
+            icon={mobileNavOpen ? <AiOutlineClose size={22} /> : <AiOutlineMenu size={22} />}
+            variant="ghost"
+            size="lg"
+            display={{ base: "flex", md: "none" }}
+            onClick={toggleMobileNav}
+            ml={2}
+          />
+        </Flex>
+
+        {/* Mobile Search Bar - Shows below main nav on scroll */}
+        <Box
+          display={{ base: "block", md: "none" }}
+          px={4}
+          py={3}
+          bg="gray.50"
+          borderY="1px"
+          borderColor="gray.100"
+        >
+          <form onSubmit={handleSearchFormSubmit}>
+            <InputGroup size="md">
+              <InputLeftElement pointerEvents="none">
+                <AiOutlineSearch color="#718096" size={18} />
+              </InputLeftElement>
+              <Input
+                type="text"
+                placeholder="Search products..."
+                value={searchParam}
+                onChange={(e) => setSearchParam(e.target.value)}
+                fontSize="0.9375rem"
+                h="40px"
+                borderRadius="lg"
+                bg="white"
+                borderColor="gray.200"
+                paddingLeft="2.8rem"
+                _focus={{
+                  borderColor: ThemeColors.darkColor,
+                  boxShadow: `0 0 0 2px ${ThemeColors.darkColor}20`,
+                }}
+              />
+            </InputGroup>
+          </form>
+        </Box>
+
+        {/* Mobile Drawer Menu */}
+        <Drawer
+          isOpen={mobileNavOpen}
+          placement="right"
+          onClose={toggleMobileNav}
+          finalFocusRef={btnRef}
+          size="xs"
+        >
+          <DrawerOverlay />
+          <DrawerContent>
+            <DrawerCloseButton size="lg" />
+            <DrawerHeader borderBottomWidth="1px">
+              <Flex align="center" gap={3}>
+                <AiOutlineUser size={22} />
+                <Text fontSize="md" fontWeight="600">
+                  {userInfo ? userDisplayName : "Welcome"}
+                </Text>
+              </Flex>
+            </DrawerHeader>
+
+            <DrawerBody px={0}>
+              <VStack align="stretch" spacing={0}>
+                {navLinks.map((link) => {
+                  const Icon = link.icon;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={toggleMobileNav}
+                    >
+                      <Flex
+                        align="center"
+                        px={6}
+                        py={4}
+                        _hover={{ bg: "green.50" }}
+                        borderBottomWidth="1px"
+                        borderColor="gray.100"
+                      >
+                        <Icon size={18} color="#4A5568" />
+                        <Text ml={4} fontSize="md" fontWeight="500">
+                          {link.label}
+                        </Text>
+                      </Flex>
+                    </Link>
+                  );
+                })}
+                
+                {/* Cart in Mobile Menu */}
+                <Link href="/cart" onClick={toggleMobileNav}>
+                  <Flex
+                    align="center"
+                    px={6}
+                    py={4}
+                    _hover={{ bg: "green.50" }}
+                    borderBottomWidth="1px"
+                    borderColor="gray.100"
+                  >
+                    <AiOutlineShoppingCart size={18} color="#4A5568" />
+                    <Text ml={4} fontSize="md" fontWeight="500">
+                      Cart
+                    </Text>
+                    {cartItemsCount > 0 && (
+                      <Badge
+                        ml="auto"
+                        bg="red.500"
+                        color="white"
+                        borderRadius="full"
+                        fontSize="0.7rem"
+                        minW="5"
+                        height="5"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        {cartItemsCount}
+                      </Badge>
+                    )}
+                  </Flex>
+                </Link>
+
+                {/* Call Button in Mobile Menu */}
+                <Box px={6} py={4}>
+                  <Button
+                    as="a"
+                    href="tel:+256786118137"
+                    w="full"
+                    leftIcon={<AiOutlinePhone />}
+                    bg="#F6AD55"
+                    color="white"
+                    size="lg"
+                    fontSize="md"
+                    fontWeight="600"
+                    py={3}
+                    borderRadius="lg"
+                    _hover={{
+                      bg: "#ED8936",
+                      transform: "translateY(-2px)",
+                      boxShadow: "md"
+                    }}
+                    onClick={toggleMobileNav}
+                  >
+                    Call +256 786 118137
+                  </Button>
+                </Box>
+              </VStack>
+            </DrawerBody>
+          </DrawerContent>
+        </Drawer>
       </Box>
     </>
   );
