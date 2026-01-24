@@ -43,7 +43,7 @@ import {
   RiGlobalLine,
 } from "react-icons/ri";
 import { HiOutlineDeviceMobile } from "react-icons/hi";
-import { TbBrandGooglePlay, TbBrandAppstore } from "react-icons/tb";
+import Image from "next/image";
 import { useSelector } from "react-redux";
 import NewsletterForm from "./NewsletterForm";
 import ReferralModal from "./ReferralModal";
@@ -182,7 +182,7 @@ const Footer = () => {
     { icon: RiShieldCheckFill, label: "Secure Payments", color: "green.500" },
     { icon: FiCheck, label: "Quality Guaranteed", color: "blue.500" },
     { icon: HiOutlineDeviceMobile, label: "Mobile First", color: "purple.500" },
-    { icon: RiGlobalLine, label: "Nationwide Delivery", color: "orange.500" },
+    { icon: RiGlobalLine, label: "Free delivery within 3km", color: "orange.500" },
   ];
 
   return (
@@ -251,8 +251,9 @@ const Footer = () => {
           >
             <VStack align="start" spacing={6}>
               <VStack align="start" spacing={3}>
-                <Heading size="lg" bgGradient="linear(to-r, #38A169, #68D391)" bgClip="text" fontWeight="800">
-                  YooKatale
+                <Heading size="lg" as="span" fontWeight="800" display="flex">
+                  <Text as="span" color="yellow.400">Yoo</Text>
+                  <Text as="span" color="green.400">Katale</Text>
                 </Heading>
                 <Text fontSize="sm" color="gray.400" lineHeight="tall">
                   Uganda's premium fresh produce marketplace. Farm to table, delivered fresh.
@@ -419,17 +420,25 @@ const Footer = () => {
                   href="https://play.google.com/store/apps/details?id=com.yookataleapp.app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  leftIcon={<TbBrandGooglePlay size={24} />}
-                  colorScheme="green"
                   size="lg"
-                  px={6}
+                  px={4}
+                  py={2}
+                  h="auto"
+                  minH="48px"
                   borderRadius="xl"
-                  _hover={{ transform: "translateY(-2px)", boxShadow: "0 10px 25px rgba(56, 161, 105, 0.3)" }}
+                  bg="gray.900"
+                  border="1px solid"
+                  borderColor="gray.600"
+                  _hover={{ bg: "gray.800", transform: "translateY(-2px)", boxShadow: "0 10px 25px rgba(0,0,0,0.3)", borderColor: "gray.500" }}
                   transition="all 0.3s"
+                  gap={2}
                 >
+                  <Box position="relative" w="28px" h="28px" flexShrink={0}>
+                    <Image src="/assets/images/google.svg" alt="" width={28} height={28} style={{ objectFit: "contain" }} />
+                  </Box>
                   <VStack align="start" spacing={0}>
-                    <Text fontSize="xs" opacity={0.9}>Get it on</Text>
-                    <Text fontSize="md" fontWeight="700">Google Play</Text>
+                    <Text fontSize="10px" opacity={0.9}>Get it on</Text>
+                    <Text fontSize="sm" fontWeight="700">Google Play</Text>
                   </VStack>
                 </Button>
 
@@ -437,20 +446,25 @@ const Footer = () => {
                   <Link _hover={{ textDecoration: "none" }}>
                     <Button
                       as="span"
-                      leftIcon={<TbBrandAppstore size={24} />}
-                      colorScheme="gray"
                       size="lg"
-                      px={6}
+                      px={4}
+                      py={2}
+                      h="auto"
+                      minH="48px"
                       borderRadius="xl"
-                      bg="gray.800"
+                      bg="gray.900"
                       border="1px solid"
-                      borderColor="gray.700"
-                      _hover={{ bg: "gray.700", transform: "translateY(-2px)", boxShadow: "0 10px 25px rgba(0, 0, 0, 0.3)" }}
+                      borderColor="gray.600"
+                      _hover={{ bg: "gray.800", transform: "translateY(-2px)", boxShadow: "0 10px 25px rgba(0,0,0,0.3)", borderColor: "gray.500" }}
                       transition="all 0.3s"
+                      gap={2}
                     >
+                      <Box position="relative" w="24px" h="24px" flexShrink={0}>
+                        <Image src="/assets/images/apple.svg" alt="" width={24} height={24} style={{ objectFit: "contain" }} />
+                      </Box>
                       <VStack align="start" spacing={0}>
-                        <Text fontSize="xs" opacity={0.9}>Download on the</Text>
-                        <Text fontSize="md" fontWeight="700">App Store</Text>
+                        <Text fontSize="10px" opacity={0.9}>Download on the</Text>
+                        <Text fontSize="sm" fontWeight="700">App Store</Text>
                       </VStack>
                     </Button>
                   </Link>

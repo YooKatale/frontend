@@ -184,16 +184,15 @@ const Header = () => {
         zIndex="1000"
         boxShadow="sm"
       >
-        {/* Top nav links — large devices only, Jumia-style bold, no icons */}
+        {/* Top nav links — large devices only, full width 100%, no side margins */}
         <Flex
           display={{ base: "none", lg: "flex" }}
           as="nav"
           align="center"
           justify="center"
           gap={{ lg: 3, xl: 5 }}
-          maxW="1400px"
-          mx="auto"
-          px={{ lg: 4, xl: 6 }}
+          w="100%"
+          px={0}
           py={3}
           bg="gray.50"
           borderBottomWidth="1px"
