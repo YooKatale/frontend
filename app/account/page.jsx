@@ -14,10 +14,7 @@ import {
   useColorModeValue,
   Card,
   CardBody,
-  Progress,
-  SimpleGrid,
   Heading,
-  Button,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import { useState, useEffect } from "react";
@@ -26,22 +23,13 @@ import {
   RiShoppingBag3Line,
   RiWallet3Line,
   RiUserSettingsLine,
-  RiNotification3Line,
-  RiHeartLine,
-  RiMapPinLine,
-  RiShieldKeyholeLine,
-  RiHistoryLine,
-  RiStarLine,
   RiShareLine,
-  RiQrCodeLine,
-  RiGiftLine,
   RiTruckLine,
   RiBox3Line,
-  RiStore2Line,
-  RiLeafLine,
 } from "react-icons/ri";
 import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
+import { useOrdersMutation } from "@slices/productsApiSlice";
 import GeneralTab from "@components/modals/tabs/settingsTabs/GeneralTab";
 import OrdersTab from "@components/modals/tabs/settingsTabs/OrdersTab";
 import SettingsTab from "@components/modals/tabs/settingsTabs/SettingsTab";
@@ -52,16 +40,98 @@ const Account = () => {
   const [activeTab, setActiveTab] = useState("general");
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
-    orders: 12,
-    spent: 2450000,
-    loyaltyPoints: 1250,
-    subscription: "Premium",
+    orders: 0,
+    spent: 0,
+    subscription: "Free",
   });
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [fetchOrders] = useOrdersMutation();
+
+  function timeAgo(date) {
+    if (!date) return "Recently";
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "Recently";
+    const now = new Date();
+    const s = Math.floor((now - d) / 1000);
+    if (s < 60) return "Just now";
+    if (s < 3600) return `${Math.floor(s / 60)} minutes ago`;
+    if (s < 86400) return `${Math.floor(s / 3600)} hours ago`;
+    if (s < 172800) return "Yesterday";
+    if (s < 604800) return `${Math.floor(s / 86400)} days ago`;
+    if (s < 2592000) return `${Math.floor(s / 604800)} weeks ago`;
+    return d.toLocaleDateString();
+  }
+
+  function orderShortId(id) {
+    if (!id || typeof id !== "string") return "YK-—";
+    const s = id.replace(/^.*?([a-f0-9]{8,})$/, "$1").slice(-8);
+    return `YK-${s.toUpperCase()}`;
+  }
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+    let cancelled = false;
+
+    async function loadAccountData() {
+      if (!userInfo?._id) {
+        if (!cancelled) {
+          setStats((s) => ({ ...s, subscription: "Free" }));
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      try {
+        const res = await fetchOrders(userInfo._id).unwrap();
+        if (cancelled) return;
+
+        if (res?.status === "Success" && res?.data) {
+          const { CompletedOrders = [], AllOrders = [] } = res.data;
+          const ordersCount = Array.isArray(AllOrders) ? AllOrders.length : 0;
+          const totalSpent = Array.isArray(CompletedOrders)
+            ? CompletedOrders.reduce((sum, o) => sum + (Number(o?.total) || 0), 0)
+            : 0;
+
+          setStats((s) => ({
+            ...s,
+            orders: ordersCount,
+            spent: totalSpent,
+            subscription: userInfo?.subscription || userInfo?.plan || "Free",
+          }));
+
+          const activity = [];
+          const completed = Array.isArray(CompletedOrders) ? CompletedOrders : [];
+          const active = Array.isArray(AllOrders) ? AllOrders.filter((o) => o?.status !== "completed") : [];
+          completed.forEach((o) => {
+            activity.push({
+              icon: RiTruckLine,
+              text: `Order #${orderShortId(o?._id)} delivered`,
+              time: timeAgo(o?.createdAt),
+              color: "green.500",
+              sortAt: o?.createdAt ? new Date(o.createdAt).getTime() : 0,
+            });
+          });
+          active.forEach((o) => {
+            activity.push({
+              icon: RiBox3Line,
+              text: "Package shipped",
+              time: timeAgo(o?.createdAt),
+              color: "blue.500",
+              sortAt: o?.createdAt ? new Date(o.createdAt).getTime() : 0,
+            });
+          });
+          activity.sort((a, b) => (b.sortAt || 0) - (a.sortAt || 0));
+          setRecentActivity(activity.slice(0, 6));
+        }
+      } catch {
+        if (!cancelled) setStats((s) => ({ ...s, subscription: userInfo?.subscription || userInfo?.plan || "Free" }));
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+
+    loadAccountData();
+    return () => { cancelled = true; };
+  }, [userInfo?._id, userInfo?.subscription, userInfo?.plan, fetchOrders]);
 
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
@@ -96,17 +166,6 @@ const Account = () => {
     { id: "orders", label: "Orders", icon: RiShoppingBag3Line, iconSize: 20, color: "green.500", badge: stats.orders },
     { id: "subscriptions", label: "Subscriptions", icon: RiWallet3Line, iconSize: 20, color: "purple.500" },
     { id: "settings", label: "Settings", icon: RiUserSettingsLine, iconSize: 20, color: "orange.500" },
-  ];
-
-  const quickActions = [
-    { icon: RiNotification3Line, label: "Notifications", color: "blue.500" },
-    { icon: RiHeartLine, label: "Wishlist", color: "red.500", badge: 5 },
-    { icon: RiMapPinLine, label: "Addresses", color: "teal.500" },
-    { icon: RiShieldKeyholeLine, label: "Security", color: "yellow.500" },
-    { icon: RiHistoryLine, label: "History", color: "purple.500" },
-    { icon: RiStarLine, label: "Reviews", color: "orange.500", badge: 12 },
-    { icon: RiShareLine, label: "Referrals", color: "cyan.500" },
-    { icon: RiQrCodeLine, label: "QR Code", color: "gray.600" },
   ];
 
   const renderTabContent = () => {
@@ -202,10 +261,6 @@ const Account = () => {
                         <Text fontSize="2xl" fontWeight="800">UGX {stats.spent.toLocaleString()}</Text>
                         <Text fontSize="xs" opacity={0.8}>Total Spent</Text>
                       </VStack>
-                      <VStack align={{ base: "center", md: "flex-start" }} spacing={0}>
-                        <Text fontSize="2xl" fontWeight="800">{stats.loyaltyPoints}</Text>
-                        <Text fontSize="xs" opacity={0.8}>Loyalty Points</Text>
-                      </VStack>
                     </HStack>
                   </VStack>
 
@@ -228,52 +283,6 @@ const Account = () => {
           <Flex direction={{ base: "column", lg: "row" }} gap={6}>
             <Box width={{ base: "100%", lg: "280px" }} position={{ lg: "sticky" }} top={{ lg: 6 }} alignSelf="flex-start">
               <motion.div variants={itemVariants}>
-                <Card bg={cardBg} borderRadius="2xl" boxShadow="sm" mb={4}>
-                  <CardBody p={4}>
-                    <Text fontSize="sm" fontWeight="600" mb={3} color="gray.700">
-                      Quick Actions
-                    </Text>
-                    <SimpleGrid columns={4} spacing={2}>
-                      {quickActions.map((action) => {
-                        const ActionIcon = action.icon;
-                        return (
-                          <motion.div key={action.label} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                            <VStack
-                              spacing={1}
-                              p={2}
-                              borderRadius="lg"
-                              bg="gray.50"
-                              cursor="pointer"
-                              _hover={{ bg: "gray.100" }}
-                              transition="background 0.2s"
-                              position="relative"
-                            >
-                              <ActionIcon size={20} color={action.color} />
-                              <Text fontSize="10px" fontWeight="500" textAlign="center">
-                                {action.label}
-                              </Text>
-                              {action.badge && (
-                                <Badge
-                                  position="absolute"
-                                  top="-2px"
-                                  right="-2px"
-                                  colorScheme="red"
-                                  fontSize="8px"
-                                  borderRadius="full"
-                                  px={1}
-                                  py={0}
-                                >
-                                  {action.badge}
-                                </Badge>
-                              )}
-                            </VStack>
-                          </motion.div>
-                        );
-                      })}
-                    </SimpleGrid>
-                  </CardBody>
-                </Card>
-
                 <Card bg={cardBg} borderRadius="2xl" boxShadow="sm">
                   <CardBody p={0}>
                     <VStack spacing={0} align="stretch">
@@ -317,34 +326,6 @@ const Account = () => {
                           </motion.div>
                         );
                       })}
-                    </VStack>
-                  </CardBody>
-                </Card>
-
-                <Card bg={cardBg} borderRadius="2xl" boxShadow="sm" mt={4}>
-                  <CardBody p={4}>
-                    <VStack spacing={3} align="stretch">
-                      <HStack justify="space-between">
-                        <Text fontSize="sm" fontWeight="600" color="gray.700">
-                          Loyalty Progress
-                        </Text>
-                        <Badge colorScheme="green" variant="subtle">
-                          {stats.loyaltyPoints}/2000
-                        </Badge>
-                      </HStack>
-                      <Progress
-                        value={(stats.loyaltyPoints / 2000) * 100}
-                        size="sm"
-                        borderRadius="full"
-                        colorScheme="green"
-                        bg="gray.100"
-                      />
-                      <Text fontSize="xs" color="gray.500">
-                        {2000 - stats.loyaltyPoints} points to Gold Tier
-                      </Text>
-                      <Button size="sm" colorScheme="green" variant="ghost" leftIcon={<RiGiftLine />} borderRadius="full">
-                        Redeem Rewards
-                      </Button>
                     </VStack>
                   </CardBody>
                 </Card>
@@ -405,12 +386,10 @@ const Account = () => {
                         Recent Activity
                       </Text>
                       <VStack spacing={3} align="stretch">
-                        {[
-                          { icon: RiTruckLine, text: "Order #YK-2024-0012 delivered", time: "2 hours ago", color: "green.500" },
-                          { icon: RiBox3Line, text: "Package shipped", time: "Yesterday", color: "blue.500" },
-                          { icon: RiStore2Line, text: "New farm joined YooKatale", time: "2 days ago", color: "purple.500" },
-                          { icon: RiLeafLine, text: "Earned 50 eco-points", time: "3 days ago", color: "teal.500" },
-                        ].map((activity, index) => {
+                        {recentActivity.length === 0 ? (
+                          <Text fontSize="sm" color="gray.500">No recent activity</Text>
+                        ) : (
+                          recentActivity.map((activity, index) => {
                           const ActivityIcon = activity.icon;
                           return (
                             <motion.div
@@ -430,7 +409,8 @@ const Account = () => {
                               </HStack>
                             </motion.div>
                           );
-                        })}
+                          })
+                        )}
                       </VStack>
                     </CardBody>
                   </Card>

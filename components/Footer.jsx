@@ -437,8 +437,8 @@ const Footer = () => {
                     <Image src="/assets/images/google.svg" alt="" width={28} height={28} style={{ objectFit: "contain" }} />
                   </Box>
                   <VStack align="start" spacing={0}>
-                    <Text fontSize="10px" opacity={0.9}>Get it on</Text>
-                    <Text fontSize="sm" fontWeight="700">Google Play</Text>
+                    <Text fontSize="10px" color="white" opacity={0.9}>Get it on</Text>
+                    <Text fontSize="sm" fontWeight="700" color="white">Google Play</Text>
                   </VStack>
                 </Button>
 
@@ -463,8 +463,8 @@ const Footer = () => {
                         <Image src="/assets/images/apple.svg" alt="" width={24} height={24} style={{ objectFit: "contain" }} />
                       </Box>
                       <VStack align="start" spacing={0}>
-                        <Text fontSize="10px" opacity={0.9}>Download on the</Text>
-                        <Text fontSize="sm" fontWeight="700">App Store</Text>
+                        <Text fontSize="10px" color="white" opacity={0.9}>Download on the</Text>
+                        <Text fontSize="sm" fontWeight="700" color="white">App Store</Text>
                       </VStack>
                     </Button>
                   </Link>

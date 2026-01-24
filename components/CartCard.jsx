@@ -2,6 +2,7 @@ import { Loader, Minus, Plus, Trash } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import ButtonComponent from "./Button";
+import { Box } from "@chakra-ui/react";
 
 const CartCard = ({
   cart,
@@ -10,22 +11,57 @@ const CartCard = ({
   handleDeleteCartItem,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  const imgSrc =
+    typeof cart?.images === "string"
+      ? cart.images
+      : Array.isArray(cart?.images) && cart.images.length
+      ? cart.images[0]
+      : null;
+  const showImage = imgSrc && !imgError;
 
   return (
     <div className="py-4 border-[1.9px] border-light lg:my-0 my-4 rounded-md">
       <div className="flex justify-between lg:flex-row flex-col">
         <div className="lg:w-[60%] w-full">
           <div className="flex">
-            <div className="w-1/5 relative">
-              <Image
-                src={cart?.images}
-                alt={cart?.images}
-                fill
-                className="object-contain"
-              />
-            </div>
+            <Box
+              className="w-1/5 flex-shrink-0"
+              position="relative"
+              aspectRatio={1}
+              minW="80px"
+              maxW="120px"
+              bg="gray.100"
+              borderRadius="md"
+              overflow="hidden"
+            >
+              {showImage ? (
+                <Image
+                  src={imgSrc}
+                  alt={cart?.name || "Product"}
+                  fill
+                  className="object-contain"
+                  sizes="120px"
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <Box
+                  w="full"
+                  h="full"
+                  bg="gray.200"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  fontSize="xs"
+                  color="gray.500"
+                >
+                  No image
+                </Box>
+              )}
+            </Box>
 
-            <div className="w-4/5">
+            <div className="w-4/5 pl-4">
               <div className="">
                 <h3 className="text-2xl font-medium">{cart?.name}</h3>
               </div>

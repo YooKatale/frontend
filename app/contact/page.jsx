@@ -13,53 +13,19 @@ import {
   Textarea,
   useToast,
   Button,
-  Skeleton,
-  Link,
-  VStack,
-  HStack,
-  Icon,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import { useMessagePostMutation } from "@slices/usersApiSlice";
-import { useState, useEffect } from "react";
-import { FaPhone, FaEnvelope, FaWhatsapp, FaMapMarkerAlt, FaClock } from "react-icons/fa";
+import { useState } from "react";
 
 const Contact = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [contactInfo, setContactInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [formErrors, setFormErrors] = useState({});
 
   const [sendMessage, { isLoading: isSending }] = useMessagePostMutation();
   const chakraToast = useToast();
-
-  useEffect(() => {
-    let cancelled = false;
-    async function fetchContactInfo() {
-      try {
-        const res = await fetch("/api/contact-info");
-        if (!res.ok) throw new Error("Failed to fetch");
-        const data = await res.json();
-        if (!cancelled) setContactInfo(data);
-      } catch (e) {
-        if (!cancelled) {
-          setContactInfo({
-            phone: "+256786118137",
-            email: "info@yookatale.app",
-            whatsapp: "256786118137",
-            address: "Kampala, Uganda",
-            businessHours: "Mon–Sat 8am–8pm EAT",
-          });
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    fetchContactInfo();
-    return () => { cancelled = true; };
-  }, []);
 
   const validate = () => {
     const err = {};
@@ -102,11 +68,6 @@ const Contact = () => {
     }
   };
 
-  const info = contactInfo || {};
-  const phone = info.phone || "+256786118137";
-  const emailSupport = info.email || "info@yookatale.app";
-  const whatsapp = (info.whatsapp || "256786118137").replace(/^\+/, "");
-
   return (
     <Box>
       <Box padding={{ base: "3rem 2rem", md: "3rem", xl: "3rem" }}>
@@ -122,119 +83,7 @@ const Contact = () => {
           </Flex>
         </Box>
 
-        {/* Dynamic contact info & action buttons */}
         <Box padding="2rem 0">
-          {loading ? (
-            <Grid
-              templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", xl: "repeat(4, 1fr)" }}
-              gap={4}
-              mb={8}
-              maxW="900px"
-              mx="auto"
-            >
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} height="80px" borderRadius="lg" />
-              ))}
-            </Grid>
-          ) : (
-            <Grid
-              templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", xl: "repeat(4, 1fr)" }}
-              gap={4}
-              mb={8}
-              maxW="900px"
-              mx="auto"
-            >
-              <Button
-                as={Link}
-                href={`tel:${phone}`}
-                size="lg"
-                variant="outline"
-                colorScheme="green"
-                leftIcon={<FaPhone />}
-                textAlign="left"
-                justifyContent="flex-start"
-                h="auto"
-                py={4}
-                px={4}
-                borderRadius="xl"
-                _hover={{ bg: "green.50", borderColor: "green.400" }}
-              >
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="xs" color="gray.500">Call us</Text>
-                  <Text fontWeight="600" fontSize="md">{phone}</Text>
-                </VStack>
-              </Button>
-
-              <Button
-                as={Link}
-                href={`mailto:${emailSupport}`}
-                size="lg"
-                variant="outline"
-                colorScheme="green"
-                leftIcon={<FaEnvelope />}
-                textAlign="left"
-                justifyContent="flex-start"
-                h="auto"
-                py={4}
-                px={4}
-                borderRadius="xl"
-                _hover={{ bg: "green.50", borderColor: "green.400" }}
-              >
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="xs" color="gray.500">Email</Text>
-                  <Text fontWeight="600" fontSize="sm" noOfLines={1}>{emailSupport}</Text>
-                </VStack>
-              </Button>
-
-              <Button
-                as={Link}
-                href={`https://wa.me/${whatsapp}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                size="lg"
-                variant="outline"
-                colorScheme="whatsapp"
-                leftIcon={<FaWhatsapp />}
-                textAlign="left"
-                justifyContent="flex-start"
-                h="auto"
-                py={4}
-                px={4}
-                borderRadius="xl"
-                _hover={{ bg: "whatsapp.50", borderColor: "whatsapp.400" }}
-              >
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="xs" color="gray.500">WhatsApp</Text>
-                  <Text fontWeight="600" fontSize="md">Chat with us</Text>
-                </VStack>
-              </Button>
-
-              <Box
-                p={4}
-                borderRadius="xl"
-                borderWidth="1px"
-                borderColor="gray.200"
-                bg="gray.50"
-              >
-                <HStack spacing={3} align="flex-start">
-                  <Icon as={FaMapMarkerAlt} color="green.500" mt={0.5} />
-                  <VStack align="start" spacing={0}>
-                    <Text fontSize="xs" color="gray.500">Address</Text>
-                    <Text fontWeight="600" fontSize="sm">{info.address || "Kampala, Uganda"}</Text>
-                    {info.businessHours && (
-                      <>
-                        <HStack mt={2} spacing={2}>
-                          <Icon as={FaClock} boxSize={3} color="gray.500" />
-                          <Text fontSize="xs" color="gray.600">{info.businessHours}</Text>
-                        </HStack>
-                      </>
-                    )}
-                  </VStack>
-                </HStack>
-              </Box>
-            </Grid>
-          )}
-
           <Flex>
             <Box margin="auto" width={{ base: "100%", md: "100%", xl: "60%" }}>
               <Box padding="1rem 0">
