@@ -30,7 +30,6 @@ import {
 import { ThemeColors } from "@constants/constants";
 import React, { useState } from "react";
 import { ShoppingCart, Check, Calendar, Clock, X, Share2, Star } from "lucide-react";
-import Image from "next/image";
 import { getMealForDay } from "@lib/mealMenuConfig";
 import { getMealPricing, formatPrice } from "@lib/mealPricingConfig";
 import { useNewScheduleMutation } from "@slices/productsApiSlice";
@@ -167,7 +166,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
     try {
       await createPlanRating({
         userId: userInfo._id,
-        planType,
+        planType: safePlanType,
         context: "meal_plan",
         rating: planRating,
         userEmail: userInfo?.email || null,
@@ -485,8 +484,10 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                           overflow="hidden"
                           mb={3}
                           position="relative"
+                          bg="gray.100"
                         >
-                          <Image
+                          <Box
+                            as="img"
                             src={
                               failedImages.has(
                                 `${meal.meal}-${mealType.id}-${prepType.id}`
@@ -494,10 +495,10 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                 ? "/assets/images/img5.png"
                                 : getMealImageUrl(meal)
                             }
-                            alt={meal.meal}
-                            fill
-                            style={{ objectFit: "cover" }}
-                            sizes="(max-width: 768px) 100vw, 33vw"
+                            alt={meal.meal || "Meal"}
+                            w="100%"
+                            h="100%"
+                            objectFit="cover"
                             onError={() =>
                               setFailedImages((s) =>
                                 new Set(s).add(

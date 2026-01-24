@@ -130,6 +130,8 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
     setTimeout(() => setIsLoading(false), 1500);
   };
 
+  if (!card || typeof card !== "object") return null;
+
   return (
     <>
       <MotionBox
@@ -263,7 +265,7 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
                 UGX {FormatCurr(card.previousPrice)}
               </Text>
               <Badge colorScheme="green" fontSize="xs" borderRadius="md">
-                Save {FormatCurr(card.previousPrice - card.price)}
+                Save {FormatCurr((card.previousPrice ?? 0) - (card.price ?? 0))}
               </Badge>
             </Flex>
           )}

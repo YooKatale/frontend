@@ -74,7 +74,11 @@ const Subscription = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   useEffect(() => {
-    if (!userInfo || Object.keys(userInfo).length === 0) {
+    try {
+      if (!userInfo || typeof userInfo !== "object" || Object.keys(userInfo).length === 0) {
+        router.push("/signin");
+      }
+    } catch (_) {
       router.push("/signin");
     }
   }, [userInfo, router]);

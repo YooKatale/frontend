@@ -1,2 +1,2 @@
 export const FormatCurr = (curr) =>
-  new Intl.NumberFormat().format(parseInt(curr));
+  new Intl.NumberFormat().format(Number(curr) || 0);
