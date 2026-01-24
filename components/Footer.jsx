@@ -4,76 +4,42 @@ import {
   Box,
   Button,
   Flex,
-  FormControl,
-  FormLabel,
   Grid,
   Input,
-  InputGroup,
-  InputRightElement,
-  List,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Spacer,
   Spinner,
   Stack,
   Text,
   Textarea,
-  useClipboard,
   useDisclosure,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
-import { useCreateReferralCodeMutation, useNewsletterPostMutation } from "@slices/usersApiSlice";
+import { useNewsletterPostMutation } from "@slices/usersApiSlice";
 import { Loader } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   FaEnvelope,
   FaFacebook,
   FaInstagram,
   FaLinkedin,
   FaPhone,
-  FaTwitter
+  FaTwitter,
 } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import ButtonComponent from "./Button";
 import NewsletterForm from "./NewsletterForm";
-//import PopupAd from "./PopupAd";
+import ReferralModal from "./ReferralModal";
 import Image from "next/image";
 import { FaWhatsapp } from "react-icons/fa";
-import {
-  FacebookShareButton,
-  FacebookIcon,
-  WhatsappShareButton,
-  WhatsappIcon,
-  TwitterShareButton,
-  TwitterIcon,
-  LinkedinIcon,
-  TelegramShareButton,
-  TelegramIcon,
-} from 'next-share'
-import { LinkedinShareButton } from "react-share";
-const crypto = require('crypto');
 const Footer = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const [NewsletterEmail, setNewsletterEmail] = useState("");
-  const [referralCode, setreferralCode] = useState("");
   const [isLoading, setLoading] = useState(false);
-  const [isReferralLoading, setIsReferralLoading] = useState(false);
   const [createNewsletter] = useNewsletterPostMutation();
-  const [createReferralCode]=useCreateReferralCodeMutation();
   const chakraToast = useToast();
-  const[invitee, setInvitee]=useState("")
-  const { isOpen: isReferralOpen, onOpen: openRefferal, onClose: closeReferral } = useDisclosure();
-  const shareUrl = "https://www.yookatale.app"; // URL to be shared
-  const defaultMessage =
-    "Hey, I am using YooKatale. Forget about cooking or going to the market. Enjoy a variety of customizable meals for breakfast, lunch & supper at discounted prices with access to credit, never miss a meal by using our premium, family & business subscription plans with friends and family!:: https://www.yookatale.app\n\nSign up for free today & invite friends & loved ones www.yookatale.app/signup\n\nEarn 20,000UGX to 50,000UGX & other Gifts for every member you invite.\n\nwww.yookatale.app/subscription"; // Default message
+  const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = useDisclosure();
 
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
@@ -125,97 +91,7 @@ const Footer = () => {
       setLoading(false); // Stop loading
     }
   };
-  
-  function generateReferralCode(userId) {
-    const hash = crypto.createHash('sha256').update(userId).digest('hex');
-    return hash.substring(0, 8);  // Return first 8 characters
-  } 
-  const [referralUrl, setreferralUrl] = useState("")
-  
-  useEffect(() => {
-    if (userInfo?._id) {  // Ensure that userInfo and _id are defined
-      const referralCodetemp = generateReferralCode(userInfo._id);
-      setreferralCode(referralCodetemp)
-      setreferralUrl(`https://yookatale.app/signup?ref=${referralCodetemp}`);
-    }
-  }, [userInfo]);  // Dependency array to run this when userInfo changes  
 
-  const { hasCopied, onCopy } = useClipboard(referralUrl); 
-  
- const handleOncopy=async()=>{
-  onCopy()
-  const toPayload={
-    referralCode: referralCode,
-    userId: userInfo?._id
-  }
-  try {
-    const res = await createReferralCode(toPayload).unwrap()
-  if (res.status === "Success") {
-    chakraToast({
-      title: "Success",
-      description: "Your Referral link has been saved",
-      status: "success",
-      duration: 6000,
-      isClosable: false,
-      position:'top'
-    });
-  }
-  } catch (error) {
-    //alert(JSON.stringify(error))
-    chakraToast({
-      title: "Error",
-      description: error.data.message,
-      status: "error",
-      duration: 6000,
-      isClosable: false,
-      position:'top'
-    });
-  }
-  
-}
-
-const handleMailInvitation = async () => {
-  setIsReferralLoading(true)
-  
-  try {
-    // Send invitation email using direct SMTP (NOT backend invitation endpoint)
-    const response = await fetch("/api/mail", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ 
-        email: invitee, 
-        type: 'invitation',
-        referralCode: referralCode // Include referral code for tracking
-      }),
-    });
-    
-    if (response.ok) {
-      const result = await response.json();
-      setIsReferralLoading(false);
-      return chakraToast({
-        title: "Success",
-        description: "Successfully sent Invitation",
-        status: "success",
-        duration: 5000,
-        isClosable: false,
-      });
-    } else {
-      throw new Error("Failed to send invitation");
-    }
-  } catch (error) {
-    console.error("Error sending invitation:", error);
-    setIsReferralLoading(false);
-    return chakraToast({
-      title: "Error",
-      description: "Sending Invitation failed",
-      status: "error",
-      duration: 5000,
-      isClosable: false,
-    });
-  }
-}
   return (
     <>
       {/* // modal newsletter form  */}
@@ -524,7 +400,9 @@ const handleMailInvitation = async () => {
                 </div>
               </Link>
               <Link
-                 href="/subscription"
+                 href="https://play.google.com/store/apps/details?id=com.yookataleapp.app"
+                 target="_blank"
+                 rel="noopener noreferrer"
                  className="mt-4 md:mt-0 md:ml-4 flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
               >
                  <Image 
@@ -586,7 +464,7 @@ const handleMailInvitation = async () => {
                 fontSize="lg"
                 textTransform={"uppercase"}
                 textAlign={"center"}
-                onClick={()=>openRefferal()}
+                onClick={openReferral}
               >
                 Invite A Friend
               </Button>
@@ -676,103 +554,7 @@ const handleMailInvitation = async () => {
         </Flex>
       </Box>
 
-      <Modal isOpen={isReferralOpen} onClose={closeReferral} closeOnOverlayClick={false}>
-      <ModalOverlay />
-      <ModalContent pt={3} pb={2}>
-        <ModalHeader textAlign={'center'} textDecoration={'underline'}>Share Your Referral Link</ModalHeader>
-        <ModalCloseButton />
-        {userInfo?._id !==undefined ?
-        <ModalBody>
-          <Box mt={-4} mb={2} fontWeight={'400'}>
-            <Text fontSize={15} mt={0}>Refer others and earn some extra cash. Simply share your referral link with your associates or businesses</Text>
-              <List fontSize={14} styleType="disc" pl={8}>
-                <ListItem>Make sure they signup using your referral link</ListItem>
-                <ListItem>Confirm and claim your payout</ListItem>
-              </List>
-          </Box>
-          <Box mb={6} fontWeight={'400'}>
-          <FormControl>
-            <FormLabel>Invite By Mail</FormLabel>
-            <InputGroup>
-            <Input 
-              placeholder="Input email to invite" 
-              type="email"
-              disabled={isReferralLoading}
-              value={invitee}
-              onChange={(e)=>setInvitee(e.target.value)}
-              _hover={{}}
-            />
-                <InputRightElement width={isReferralLoading?"6rem":"4.5rem"} mr={isReferralLoading &&1}>
-                  <Button h="2rem" size="sm" style={{backgroundColor:'orange', color:'white', fontWeight:'500'}}
-                  onClick={()=>{ handleMailInvitation()}}  isLoading={isReferralLoading} loadingText="Sending"
-                  >
-                    Invite
-                  </Button>
-                  {/*  */}
-                </InputRightElement>
-              </InputGroup>
-          </FormControl>
-          </Box>
-          <Box mb={6}>
-        <FormControl>
-            <FormLabel>Referral URL</FormLabel>
-            <InputGroup>
-              <Input value={referralUrl} isDisabled _hover={{}}/>
-              <InputRightElement width="4.5rem">
-                <Button h="2rem" size="sm" style={{backgroundColor:'black', color:'white', fontWeight:'500'}}
-                //onClick={onCopy}
-                onClick={handleOncopy} 
-                mr={hasCopied && 1} >
-                  {hasCopied ? "Copied" : "Copy"}
-                </Button>
-              </InputRightElement>
-            </InputGroup>
-          </FormControl>
-          </Box>
-          <Box justifyContent={'center'} textAlign={'center'}>
-            <FacebookShareButton
-              url={shareUrl}
-              quote={defaultMessage}
-              hashtag={'#yookatale'}
-              style={{ padding: 3 }}
-            >
-              <FacebookIcon size={40} round />
-            </FacebookShareButton>
-            <WhatsappShareButton url={shareUrl} title={defaultMessage} style={{ padding: 3 }} separator=":: ">
-              <WhatsappIcon size={40} round />
-            </WhatsappShareButton>
-            <TwitterShareButton url={shareUrl} title={defaultMessage} style={{ padding: 3 }}>
-              <TwitterIcon size={40} round />
-            </TwitterShareButton>
-            <LinkedinShareButton url={shareUrl} style={{ padding: 3 }} >
-              <LinkedinIcon size={40} round />
-            </LinkedinShareButton>
-            <TelegramShareButton url={shareUrl} title={defaultMessage} style={{ padding: 3 }}>
-              <TelegramIcon size={40} round />
-            </TelegramShareButton>
-            </Box>
-        </ModalBody>
-        :<ModalBody>
-          <Box mt={-4} mb={2} fontWeight={'400'} textAlign={'center'} marginTop={3}>
-            <Text fontSize={17} mt={0}>You need to Signin to be able to refer</Text>
-          </Box>
-        </ModalBody>
-
-}
-        <ModalFooter justifyContent={'center'} textAlign={'center'}>
-         
-            <Button colorScheme="gray" 
-            onClick={()=>
-              {closeReferral(); 
-            setIsReferralLoading(false)
-          }}>
-              Close
-            </Button>
-            
-          
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+      <ReferralModal isOpen={isReferralOpen} onClose={closeReferral} />
     </>
   );
 };

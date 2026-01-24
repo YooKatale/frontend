@@ -264,7 +264,9 @@ const SignUp = () => {
                   </Text>
                 </Link>
                 <Link
-                  href="/subscription"
+                  href="https://play.google.com/store/apps/details?id=com.yookataleapp.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
                 >
                   <Image 

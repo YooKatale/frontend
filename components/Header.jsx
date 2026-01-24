@@ -22,13 +22,14 @@ import {
   DrawerContent,
   DrawerCloseButton,
   VStack,
+  useDisclosure,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
-import { 
-  AiOutlineClose, 
+import { useState, useRef, useEffect, useCallback } from "react";
+import {
+  AiOutlineClose,
   AiOutlineMenu,
   AiOutlineShoppingCart,
   AiOutlineUser,
@@ -52,21 +53,51 @@ import {
 } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "@slices/usersApiSlice";
+import { useCartMutation } from "@slices/productsApiSlice";
 import { logout } from "@slices/authSlice";
 import { ThemeColors } from "@constants/constants";
+import ReferralModal from "@components/ReferralModal";
 
 const Header = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchParam, setSearchParam] = useState("");
+  const [cartItemsCount, setCartItemsCount] = useState(0);
   const { push } = useRouter();
   const chakraToast = useToast();
   const btnRef = useRef();
   const dispatch = useDispatch();
   const [logoutUser] = useLogoutMutation();
+  const [fetchCart] = useCartMutation();
+  const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = useDisclosure();
 
-  const cartItemsCount = useSelector((state) => state.cart?.items?.length ?? state.cart?.cart?.length) || 0;
   const userDisplayName = userInfo?.name || userInfo?.firstname || userInfo?.email || "Account";
+
+  const loadCartCount = useCallback(async () => {
+    if (!userInfo?._id) {
+      setCartItemsCount(0);
+      return;
+    }
+    try {
+      const res = await fetchCart(userInfo._id).unwrap();
+      const items = res?.data?.CartItems ?? [];
+      setCartItemsCount(Array.isArray(items) ? items.length : 0);
+    } catch {
+      setCartItemsCount(0);
+    }
+  }, [userInfo?._id, fetchCart]);
+
+  useEffect(() => {
+    loadCartCount();
+  }, [loadCartCount]);
+
+  useEffect(() => {
+    const onFocus = () => loadCartCount();
+    if (typeof window !== "undefined") {
+      window.addEventListener("focus", onFocus);
+      return () => window.removeEventListener("focus", onFocus);
+    }
+  }, [loadCartCount]);
 
   const handleSearchFormSubmit = (e) => {
     e.preventDefault();
@@ -82,8 +113,9 @@ const Header = () => {
   };
 
   const toggleMobileNav = () => {
-    setMobileNavOpen(!mobileNavOpen);
+    setMobileNavOpen((prev) => !prev);
   };
+  const closeMobileNav = () => setMobileNavOpen(false);
 
   const handleLogout = async () => {
     try {
@@ -127,9 +159,14 @@ const Header = () => {
     { label: "Contact", href: "/contact", icon: AiOutlineContacts },
     { label: "Partner", href: "/partner", icon: FaHandshake },
     { label: "Subscribe", href: "/subscription", icon: AiOutlineCreditCard },
-    { label: "Invite a friend", href: "/#refer", icon: FaGift },
+    { label: "Invite a friend", href: "/#refer", icon: FaGift, isInvite: true },
     { label: "Sign Up", href: "/signup", icon: AiOutlineLogin },
   ];
+
+  const openInviteModal = () => {
+    closeMobileNav();
+    openReferral();
+  };
 
   return (
     <>
@@ -142,8 +179,64 @@ const Header = () => {
         top={0}
         zIndex="1000"
         boxShadow="sm"
-        py={2}
       >
+        {/* Top nav links — large devices only */}
+        <Flex
+          display={{ base: "none", lg: "flex" }}
+          as="nav"
+          align="center"
+          justify="center"
+          gap={{ lg: 1, xl: 3 }}
+          maxW="1400px"
+          mx="auto"
+          px={{ lg: 4, xl: 6 }}
+          py={2.5}
+          bg="gray.50"
+          borderBottomWidth="1px"
+          borderColor="gray.200"
+          flexWrap="wrap"
+        >
+          {navLinks.map((link) => {
+            const Icon = link.icon;
+            if (link.isInvite) {
+              return (
+                <Button
+                  key="invite"
+                  variant="ghost"
+                  size="sm"
+                  leftIcon={<Icon size={14} />}
+                  fontSize="0.8125rem"
+                  fontWeight="500"
+                  color="gray.700"
+                  _hover={{ bg: "white", color: ThemeColors.darkColor }}
+                  onClick={openReferral}
+                >
+                  {link.label}
+                </Button>
+              );
+            }
+            return (
+              <Link key={link.href} href={link.href}>
+                <Flex
+                  as="span"
+                  align="center"
+                  gap={1.5}
+                  px={2}
+                  py={1.5}
+                  borderRadius="md"
+                  fontSize="0.8125rem"
+                  fontWeight="500"
+                  color="gray.700"
+                  _hover={{ bg: "white", color: ThemeColors.darkColor }}
+                >
+                  <Icon size={14} />
+                  {link.label}
+                </Flex>
+              </Link>
+            );
+          })}
+        </Flex>
+
         <Flex
           as="nav"
           align="center"
@@ -151,7 +244,8 @@ const Header = () => {
           maxW="1400px"
           px={{ base: 3, md: 6 }}
           mx="auto"
-          height="64px"
+          minH="64px"
+          py={2}
         >
           {/* Logo */}
           <Flex align="center" flexShrink={0}>
@@ -212,16 +306,6 @@ const Header = () => {
             </form>
           </Box>
 
-          {/* Mobile Search Icon */}
-          <IconButton
-            aria-label="Search"
-            icon={<AiOutlineSearch size={20} />}
-            variant="ghost"
-            size="lg"
-            display={{ base: "flex", md: "none" }}
-            onClick={() => push("/search")}
-          />
-
           {/* Desktop Navigation Right Section */}
           <Flex align="center" display={{ base: "none", md: "flex" }} gap={3}>
             {/* Call Button */}
@@ -267,19 +351,20 @@ const Header = () => {
                 {cartItemsCount > 0 && (
                   <Badge
                     position="absolute"
-                    top="2px"
-                    right="2px"
+                    top="-2px"
+                    right="-2px"
                     bg="red.500"
                     color="white"
                     borderRadius="full"
-                    fontSize="0.6rem"
-                    minW="4"
-                    height="4"
+                    fontSize="0.65rem"
+                    minW="5"
+                    h="5"
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
+                    fontWeight="700"
                   >
-                    {cartItemsCount}
+                    {cartItemsCount > 99 ? "99+" : cartItemsCount}
                   </Badge>
                 )}
               </Box>
@@ -409,7 +494,7 @@ const Header = () => {
         <Drawer
           isOpen={mobileNavOpen}
           placement="right"
-          onClose={toggleMobileNav}
+          onClose={closeMobileNav}
           finalFocusRef={btnRef}
           size="xs"
         >
@@ -429,11 +514,34 @@ const Header = () => {
               <VStack align="stretch" spacing={0}>
                 {navLinks.map((link) => {
                   const Icon = link.icon;
+                  if (link.isInvite) {
+                    return (
+                      <Flex
+                        key="invite"
+                        as="button"
+                        type="button"
+                        align="center"
+                        px={6}
+                        py={4}
+                        w="full"
+                        textAlign="left"
+                        _hover={{ bg: "green.50" }}
+                        borderBottomWidth="1px"
+                        borderColor="gray.100"
+                        onClick={openInviteModal}
+                      >
+                        <Icon size={18} color="#4A5568" />
+                        <Text ml={4} fontSize="md" fontWeight="500">
+                          {link.label}
+                        </Text>
+                      </Flex>
+                    );
+                  }
                   return (
                     <Link
                       key={link.href}
                       href={link.href}
-                      onClick={toggleMobileNav}
+                      onClick={closeMobileNav}
                     >
                       <Flex
                         align="center"
@@ -453,7 +561,7 @@ const Header = () => {
                 })}
                 
                 {/* Cart in Mobile Menu */}
-                <Link href="/cart" onClick={toggleMobileNav}>
+                <Link href="/cart" onClick={closeMobileNav}>
                   <Flex
                     align="center"
                     px={6}
@@ -474,12 +582,13 @@ const Header = () => {
                         borderRadius="full"
                         fontSize="0.7rem"
                         minW="5"
-                        height="5"
+                        h="5"
                         display="flex"
                         alignItems="center"
                         justifyContent="center"
+                        fontWeight="700"
                       >
-                        {cartItemsCount}
+                        {cartItemsCount > 99 ? "99+" : cartItemsCount}
                       </Badge>
                     )}
                   </Flex>
@@ -504,7 +613,7 @@ const Header = () => {
                       transform: "translateY(-2px)",
                       boxShadow: "md"
                     }}
-                    onClick={toggleMobileNav}
+                    onClick={closeMobileNav}
                   >
                     Call +256 786 118137
                   </Button>
@@ -513,6 +622,8 @@ const Header = () => {
             </DrawerBody>
           </DrawerContent>
         </Drawer>
+
+        <ReferralModal isOpen={isReferralOpen} onClose={closeReferral} />
       </Box>
     </>
   );

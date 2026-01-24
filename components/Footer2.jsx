@@ -53,8 +53,9 @@ const Footer2 = () => {
               {/* Add Google Play and App Store icons with links */}
               <Box padding={{ base: "1rem", md: "1rem", xl: "0 1rem" }}>
                 <Link
-                  href="https://play.google.com/store/apps/details?id=com.yookatale"
-                  isExternal
+                  href="https://play.google.com/store/apps/details?id=com.yookataleapp.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <FaGooglePlay size={32} color="green" />
                 </Link>

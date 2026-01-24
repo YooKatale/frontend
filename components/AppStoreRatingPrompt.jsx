@@ -116,7 +116,7 @@ const AppStoreRatingPrompt = () => {
     } else if (isAndroid()) {
       // Play Store URL - Update this with your actual Play Store link once published
       // Format: https://play.google.com/store/apps/details?id=[YOUR_PACKAGE_NAME]
-      return process.env.NEXT_PUBLIC_PLAY_STORE_URL || "https://play.google.com/store/apps/details?id=com.yookatale.app";
+      return process.env.NEXT_PUBLIC_PLAY_STORE_URL || "https://play.google.com/store/apps/details?id=com.yookataleapp.app";
     }
     return null;
   };
