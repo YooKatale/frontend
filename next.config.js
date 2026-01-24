@@ -39,6 +39,12 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
     // Disable image optimization to avoid 402 errors (Payment Required)
     // This allows images to load directly without Next.js Image Optimization API

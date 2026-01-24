@@ -57,6 +57,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const [ratingHover, setRatingHover] = useState(0);
   const [ratingEffect, setRatingEffect] = useState(false);
+  const [failedImages, setFailedImages] = useState(() => new Set());
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const { userInfo } = useSelector((state) => state.auth);
@@ -486,11 +487,24 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                           position="relative"
                         >
                           <Image
-                            src={meal.image || "/assets/images/img5.png"}
+                            src={
+                              failedImages.has(
+                                `${meal.meal}-${mealType.id}-${prepType.id}`
+                              )
+                                ? "/assets/images/img5.png"
+                                : getMealImageUrl(meal)
+                            }
                             alt={meal.meal}
                             fill
                             style={{ objectFit: "cover" }}
                             sizes="(max-width: 768px) 100vw, 33vw"
+                            onError={() =>
+                              setFailedImages((s) =>
+                                new Set(s).add(
+                                  `${meal.meal}-${mealType.id}-${prepType.id}`
+                                )
+                              )
+                            }
                           />
                         </Box>
 
