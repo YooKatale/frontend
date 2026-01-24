@@ -32,6 +32,7 @@ import {
   TwitterShareButton,
   TwitterIcon,
   LinkedinShareButton,
+  LinkedinIcon,
   TelegramShareButton,
   TelegramIcon,
 } from "next-share";
