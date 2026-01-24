@@ -32,6 +32,7 @@ import React, { useState } from "react";
 import { ShoppingCart, Check, Calendar, Clock, X, Share2, Star } from "lucide-react";
 import { getMealForDay } from "@lib/mealMenuConfig";
 import { getMealPricing, formatPrice } from "@lib/mealPricingConfig";
+import { getMealImageUrl } from "@lib/mealImageMap";
 import { useNewScheduleMutation } from "@slices/productsApiSlice";
 import { usePlanRatingCreateMutation, useGetPlanRatingsQuery } from "@slices/usersApiSlice";
 import { useSelector } from "react-redux";
