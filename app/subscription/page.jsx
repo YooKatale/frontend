@@ -1,11 +1,13 @@
 "use client";
 
 /**
- * Subscription page — plan selection, meal calendar, dietary preferences.
- * Modify layout here. Key components:
- * - SubscriptionCard: @components/SubscriptionCard
- * - UnifiedMealSubscriptionCard: @components/UnifiedMealSubscriptionCard (meal grid + algae/foods dropdown per meal)
- * - FoodAlgaeBoxModal: @components/FoodAlgaeBoxModal (dietary preferences & allergies)
+ * Subscription page — plan selection, meal calendar.
+ * Layout: app/subscription/page.jsx
+ * Plans UI: components/SubscriptionCard.jsx
+ * Meal calendar UI: components/UnifiedMealSubscriptionCard.jsx
+ * Meal data: lib/mealMenuConfig.js (getMealForDay)
+ * Meal pricing: lib/mealPricingConfig.js (getMealPricing, formatPrice)
+ * Plans from API: slices/usersApiSlice.js → subscriptionPackageGet → DB_URL/subscription/package/get
  */
 
 import {
@@ -30,7 +32,6 @@ import {
 } from "@chakra-ui/react";
 import SubscriptionCard from "@components/SubscriptionCard";
 import UnifiedMealSubscriptionCard from "@components/UnifiedMealSubscriptionCard";
-import FoodAlgaeBoxModal from "@components/FoodAlgaeBoxModal";
 import { ThemeColors } from "@constants/constants";
 import {
   useSubscriptionPackageGetMutation,
@@ -46,13 +47,11 @@ import {
   FaSeedling,
   FaAppleAlt,
   FaCheckCircle,
-  FaShieldAlt,
   FaTruck,
   FaClock,
   FaUsers,
   FaChartLine,
   FaLeaf,
-  FaAllergies,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 
@@ -160,73 +159,11 @@ const Subscription = () => {
   };
 
   return (
-    <Box minHeight="100vh" bg="white">
-      {/* Hero */}
-      <MotionBox
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        bgGradient={`linear(to-r, ${ThemeColors.lightColor}, ${ThemeColors.primaryColor})`}
-        py={{ base: 8, md: 12 }}
-        mb={{ base: 8, md: 12 }}
-      >
-        <Container maxW="container.xl">
-          <VStack spacing={6} textAlign="center" color="white">
-            <Icon as={FaHeart} boxSize={12} opacity={0.9} />
-            <Heading
-              fontSize={{ base: "2xl", md: "4xl", lg: "5xl" }}
-              fontWeight="bold"
-              lineHeight="shorter"
-            >
-              Nourish Your Body, <br />
-              Simplify Your Life
-            </Heading>
-            <Text fontSize={{ base: "lg", md: "xl" }} maxW="800px" opacity={0.9}>
-              Healthy meals delivered to your door. Choose from our carefully
-              curated subscription plans.
-            </Text>
-            <HStack spacing={4} flexWrap="wrap" justify="center">
-              <HStack
-                bg="whiteAlpha.200"
-                px={4}
-                py={2}
-                rounded="full"
-                spacing={2}
-              >
-                <Icon as={FaCheckCircle} boxSize={4} />
-                <Text fontSize="sm" fontWeight="medium">
-                  Fresh Ingredients
-                </Text>
-              </HStack>
-              <HStack
-                bg="whiteAlpha.200"
-                px={4}
-                py={2}
-                rounded="full"
-                spacing={2}
-              >
-                <Icon as={FaShieldAlt} boxSize={4} />
-                <Text fontSize="sm" fontWeight="medium">
-                  Quality Guarantee
-                </Text>
-              </HStack>
-              <HStack
-                bg="whiteAlpha.200"
-                px={4}
-                py={2}
-                rounded="full"
-                spacing={2}
-              >
-                <Icon as={FaTruck} boxSize={4} />
-                <Text fontSize="sm" fontWeight="medium">
-                  Free Delivery
-                </Text>
-              </HStack>
-            </HStack>
-          </VStack>
-        </Container>
-      </MotionBox>
-
+    <Box
+      minHeight="100vh"
+      bgGradient="linear(to-b, orange.400, orange.100)"
+      py={{ base: 6, md: 10 }}
+    >
       <Container maxW="container.xl" px={{ base: 4, md: 6 }}>
         {/* Discount banner — theme colors */}
         <MotionBox
@@ -342,8 +279,8 @@ const Subscription = () => {
                     </Heading>
                   </HStack>
                   <Text color="gray.600" maxW="2xl" mx="auto">
-                    View your selected plan&apos;s weekly meal calendar, pricing,
-                    and add algae/food options per meal.
+                    View your selected plan&apos;s weekly meal calendar and
+                    pricing.
                   </Text>
                 </Box>
 
@@ -399,56 +336,6 @@ const Subscription = () => {
                       key={selectedPlan}
                     />
                   </MotionBox>
-
-                  {userInfo && (
-                    <MotionBox
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.2 }}
-                      mt={6}
-                    >
-                      <Card
-                        borderWidth="1px"
-                        borderColor={themeBorder}
-                        bg={themeBg}
-                        borderRadius="xl"
-                        overflow="hidden"
-                      >
-                        <CardBody>
-                          <Flex
-                            direction={{ base: "column", md: "row" }}
-                            align={{ base: "stretch", md: "center" }}
-                            justify="space-between"
-                            gap={6}
-                          >
-                            <Box flex={1}>
-                              <HStack spacing={3} mb={2}>
-                                <Icon
-                                  as={FaAllergies}
-                                  color={ThemeColors.primaryColor}
-                                  boxSize={6}
-                                />
-                                <Heading size="md" color={ThemeColors.primaryColor}>
-                                  Dietary Preferences & Allergies
-                                </Heading>
-                              </HStack>
-                              <Text color="gray.600">
-                                Customize your meal plan: foods you don&apos;t
-                                eat (allergies, restrictions) and algae/add-on
-                                options per meal.
-                              </Text>
-                            </Box>
-                            <Box>
-                              <FoodAlgaeBoxModal
-                                userId={userInfo._id}
-                                planType={selectedPlan}
-                              />
-                            </Box>
-                          </Flex>
-                        </CardBody>
-                      </Card>
-                    </MotionBox>
-                  )}
                 </Box>
               </VStack>
             </Box>
