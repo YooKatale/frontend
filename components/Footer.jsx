@@ -142,9 +142,9 @@ const Footer = () => {
                       <Flex>
                         <Box margin={"0 0.7rem 0 0"}>
                           <Link
-                            href={
-                              "https://www.linkedin.com/company/96071915/admin/feed/posts/"
-                            }
+                            href="https://www.linkedin.com/company/96071915/admin/feed/posts/"
+                            target="_blank"
+                            rel="noopener noreferrer"
                           >
                             <FaLinkedin
                               size={23}
@@ -155,9 +155,9 @@ const Footer = () => {
                         </Box>
                         <Box margin={"0 0.7rem 0 0"}>
                           <Link
-                            href={
-                              "https://twitter.com/YooKatale?t=3Q96I9JR98HgA69gisdXdA&s=09"
-                            }
+                            href="https://twitter.com/YooKatale?t=3Q96I9JR98HgA69gisdXdA&s=09"
+                            target="_blank"
+                            rel="noopener noreferrer"
                           >
                             <FaTwitter
                               size={23}
@@ -167,7 +167,11 @@ const Footer = () => {
                           </Link>
                         </Box>
                         <Box margin={"0 0.7rem 0 0"}>
-                          <Link href={"https://wa.me/256786118137"}>
+                          <Link
+                            href="https://wa.me/256786118137"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             <FaWhatsapp
                               size={23}
                               color={ThemeColors.lightColor}
@@ -177,9 +181,9 @@ const Footer = () => {
                         </Box>
                         <Box margin={"0 0.7rem 0 0"}>
                           <Link
-                            href={
-                              "https://www.facebook.com/profile.php?id=100094194942669&mibextid=LQQJ4d"
-                            }
+                            href="https://www.facebook.com/profile.php?id=100094194942669&mibextid=LQQJ4d"
+                            target="_blank"
+                            rel="noopener noreferrer"
                           >
                             <FaFacebook
                               size={23}
@@ -190,9 +194,9 @@ const Footer = () => {
                         </Box>
                         <Box margin={"0 0.7rem 0 0"}>
                           <Link
-                            href={
-                              "https://www.instagram.com/p/CuHdaksN5UW/?igshid=NTc4MTIwNjQ2YQ=="
-                            }
+                            href="https://www.instagram.com/p/CuHdaksN5UW/?igshid=NTc4MTIwNjQ2YQ=="
+                            target="_blank"
+                            rel="noopener noreferrer"
                           >
                             <FaInstagram
                               size={23}
@@ -295,7 +299,7 @@ const Footer = () => {
                       </Link>
                     </Box>
                     <Box margin={"0.3rem 0"}>
-                      <Link href={"http://yookatale.com/news"}>
+                      <Link href="/news">
                         <Text
                           color={ThemeColors.lightColor}
                           _hover={{ color: ThemeColors.darkColor }}
