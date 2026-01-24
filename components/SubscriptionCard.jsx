@@ -15,9 +15,6 @@ import {
   Badge,
   Divider,
   useColorModeValue,
-  Tooltip,
-  IconButton,
-  useToast,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import React, { useState } from "react";
@@ -25,6 +22,7 @@ import { FormatCurr } from "@utils/utils";
 import SubscriptionTerms from "./SubscriptionTerms";
 import {
   UserPlus,
+  Star,
   CheckCircle,
   Clock,
   Truck,
@@ -40,12 +38,8 @@ import {
   Info,
   Calendar,
   Heart,
-  Star,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
-import { usePlanRatingCreateMutation, useGetPlanRatingsQuery } from "@slices/usersApiSlice";
 
 const MotionBox = motion(Box);
 const MotionButton = motion(Button);
@@ -53,55 +47,7 @@ const MotionButton = motion(Button);
 const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [planRating, setPlanRating] = useState(0);
-  const [ratingSubmitted, setRatingSubmitted] = useState(false);
-  const [ratingHover, setRatingHover] = useState(0);
-  const [ratingEffect, setRatingEffect] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
-  const { userInfo } = useSelector((state) => state.auth);
-  const router = useRouter();
-  const planType = card?.type?.toLowerCase() || "standard";
-  const [createPlanRating] = usePlanRatingCreateMutation();
-  const { data: ratingsData, refetch: refetchRatings } = useGetPlanRatingsQuery(
-    { planType, context: "test_plan" },
-    { skip: !planType }
-  );
-  const avgRating = ratingsData?.data?.average ?? 0;
-  const totalRatings = ratingsData?.data?.total ?? 0;
-
-  const handleSubmitRating = async (e) => {
-    e?.stopPropagation();
-    if (planRating < 1) return;
-    if (!userInfo?._id) {
-      toast({ title: "Login required to rate", status: "warning", duration: 3000, isClosable: true });
-      router.push("/signin");
-      return;
-    }
-    try {
-      await createPlanRating({
-        userId: userInfo._id,
-        planType,
-        context: "test_plan",
-        rating: planRating,
-        userEmail: userInfo?.email || null,
-        userName: userInfo?.name || null,
-      }).unwrap();
-      setRatingSubmitted(true);
-      setRatingEffect(true);
-      refetchRatings();
-      setTimeout(() => setRatingEffect(false), 600);
-      toast({ title: "Thanks for your rating!", status: "success", duration: 2000, isClosable: true });
-    } catch (err) {
-      toast({
-        title: "Could not submit rating",
-        description: err?.data?.message || err?.message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  };
 
   const isFamilyPlan = card?.type?.toLowerCase() === "family";
   const isPremiumPlan = card?.type?.toLowerCase() === "premium";
@@ -119,8 +65,16 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
     "rgba(0, 0, 0, 0.5)"
   );
 
-  const themeBg = `${ThemeColors.primaryColor}12`;
-  const themeBorder = `${ThemeColors.primaryColor}30`;
+  const getPlanColor = () => {
+    if (isPremiumPlan) return "purple";
+    if (isFamilyPlan) return "orange";
+    if (isBusinessPlan) return "blue";
+    if (isStandardPlan) return "green";
+    return "green";
+  };
+
+  const planColor = getPlanColor();
+  const rating = card?.rating ?? 4.5;
 
   const planIcons = {
     premium: Crown,
@@ -133,36 +87,36 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
 
   const planBenefits = {
     premium: [
-      { icon: Clock, text: "Priority customer support 24/7" },
-      { icon: Truck, text: "Express delivery within 15-45 min" },
-      { icon: Gift, text: "Exclusive promotional offers" },
-      { icon: CreditCard, text: "Micro-credit pay-later option" },
-      { icon: Zap, text: "Diet insights & nutrition planning" },
-      { icon: Heart, text: "Unlimited food varieties" },
+      { icon: Clock, text: "Priority customer support 24/7", color: "purple.500" },
+      { icon: Truck, text: "Express delivery within 15-45 min", color: "purple.500" },
+      { icon: Gift, text: "Exclusive promotional offers", color: "purple.500" },
+      { icon: CreditCard, text: "Micro-credit pay-later option", color: "purple.500" },
+      { icon: Zap, text: "Diet insights & nutrition planning", color: "purple.500" },
+      { icon: Heart, text: "Unlimited food varieties", color: "purple.500" },
     ],
     family: [
-      { icon: Users, text: "2-6 family member accounts" },
-      { icon: Truck, text: "Express delivery 24/7" },
-      { icon: Flame, text: "Gas credit for cooking fuel" },
-      { icon: Gift, text: "Family-exclusive discounts" },
-      { icon: CreditCard, text: "Family micro-credit option" },
-      { icon: Shield, text: "Personalized diet insights" },
+      { icon: Users, text: "2-6 family member accounts", color: "orange.500" },
+      { icon: Truck, text: "Express delivery 24/7", color: "orange.500" },
+      { icon: Flame, text: "Gas credit for cooking fuel", color: "orange.500" },
+      { icon: Gift, text: "Family-exclusive discounts", color: "orange.500" },
+      { icon: CreditCard, text: "Family micro-credit option", color: "orange.500" },
+      { icon: Shield, text: "Personalized diet insights", color: "orange.500" },
     ],
     business: [
-      { icon: Users, text: "10+ employee accounts" },
-      { icon: Award, text: "Employee meal & wellness cards" },
-      { icon: Truck, text: "Priority delivery for businesses" },
-      { icon: Flame, text: "Business gas credit" },
-      { icon: CreditCard, text: "Flexible business credit line" },
-      { icon: Calendar, text: "Custom delivery scheduling" },
+      { icon: Users, text: "10+ employee accounts", color: "blue.500" },
+      { icon: Award, text: "Employee meal & wellness cards", color: "blue.500" },
+      { icon: Truck, text: "Priority delivery for businesses", color: "blue.500" },
+      { icon: Flame, text: "Business gas credit", color: "blue.500" },
+      { icon: CreditCard, text: "Flexible business credit line", color: "blue.500" },
+      { icon: Calendar, text: "Custom delivery scheduling", color: "blue.500" },
     ],
     standard: [
-      { icon: CheckCircle, text: "Standard delivery 1-3 hours" },
-      { icon: Shield, text: "Account activation guarantee" },
-      { icon: Truck, text: "Basic delivery service" },
-      { icon: Gift, text: "Occasional promotions" },
-      { icon: Clock, text: "Standard customer support" },
-      { icon: Heart, text: "Essential food varieties" },
+      { icon: CheckCircle, text: "Standard delivery 1-3 hours", color: "green.500" },
+      { icon: Shield, text: "Account activation guarantee", color: "green.500" },
+      { icon: Truck, text: "Basic delivery service", color: "green.500" },
+      { icon: Gift, text: "Occasional promotions", color: "green.500" },
+      { icon: Clock, text: "Standard customer support", color: "green.500" },
+      { icon: Heart, text: "Essential food varieties", color: "green.500" },
     ],
   };
 
@@ -198,7 +152,7 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
         display="flex"
         flexDirection="column"
         border="2px solid"
-        borderColor={isSelected ? ThemeColors.primaryColor : "transparent"}
+        borderColor={isSelected ? `${planColor}.500` : "transparent"}
         position="relative"
         overflow="hidden"
         cursor={onPlanSelect ? "pointer" : "default"}
@@ -210,7 +164,7 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
           left: 0,
           right: 0,
           height: "4px",
-          bg: isSelected || isFamilyPlan ? ThemeColors.primaryColor : "gray.300",
+          bg: isSelected || isFamilyPlan ? `${planColor}.500` : "gray.300",
           opacity: isSelected || isFamilyPlan ? 1 : 0.7,
         }}
       >
@@ -242,17 +196,15 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
             <Box
               p={2}
               borderRadius="lg"
-              bg={themeBg}
-              color={ThemeColors.primaryColor}
-              border="1px solid"
-              borderColor={themeBorder}
+              bg={`${planColor}.50`}
+              color={`${planColor}.600`}
             >
               <Icon as={PlanIcon} boxSize={6} />
             </Box>
             <Heading
               fontSize={{ base: "xl", md: "2xl" }}
               fontWeight="bold"
-              color={ThemeColors.primaryColor}
+              color={`${planColor}.700`}
               textTransform="capitalize"
             >
               {card?.type} Plan
@@ -260,9 +212,8 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
           </Flex>
 
           <Badge
-            bg={ThemeColors.primaryColor}
-            color="white"
-            variant="solid"
+            colorScheme={planColor}
+            variant="subtle"
             fontSize="xs"
             fontWeight="semibold"
             px={3}
@@ -281,14 +232,24 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
         </Flex>
 
         <Box
-          bg={themeBg}
-          border="1px solid"
-          borderColor={themeBorder}
+          bgGradient={`linear(to-r, ${planColor}.50, ${planColor}.100)`}
           borderRadius="xl"
           p={{ base: 4, md: 6 }}
           mb={6}
           position="relative"
           overflow="hidden"
+          _before={{
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              "linear-gradient(45deg, transparent 25%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 50%, transparent 50%, transparent 75%, rgba(255,255,255,0.1) 75%)",
+            backgroundSize: "20px 20px",
+            opacity: 0.3,
+          }}
         >
           {card?.previousPrice && (
             <Flex justify="center" align="center" mb={2}>
@@ -301,7 +262,7 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
               >
                 UGX {FormatCurr(card.previousPrice)}
               </Text>
-              <Badge bg={ThemeColors.secondaryColor} color="white" fontSize="xs" borderRadius="md">
+              <Badge colorScheme="green" fontSize="xs" borderRadius="md">
                 Save {FormatCurr(card.previousPrice - card.price)}
               </Badge>
             </Flex>
@@ -311,7 +272,7 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
             <Text
               fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}
               fontWeight="extrabold"
-              color={ThemeColors.primaryColor}
+              color={`${planColor}.700`}
               lineHeight="1"
               mb={1}
             >
@@ -331,8 +292,7 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
               transition={{ duration: 0.3 }}
             >
               <Badge
-                bg={ThemeColors.primaryColor}
-                color="white"
+                colorScheme="green"
                 fontSize="xs"
                 fontWeight="bold"
                 px={3}
@@ -369,9 +329,9 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
                 gap={3}
                 p={2}
                 borderRadius="lg"
-                _hover={{ bg: themeBg }}
+                _hover={{ bg: `${planColor}.50` }}
               >
-                <Icon as={benefit.icon} boxSize={4} color={ThemeColors.primaryColor} />
+                <Icon as={benefit.icon} boxSize={4} color={benefit.color} />
                 <Text fontSize="sm" color="gray.700" flex="1">
                   {benefit.text}
                 </Text>
@@ -382,12 +342,34 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
 
         <Divider my={4} borderColor="gray.200" />
 
+        <Flex justify="space-between" align="center" mb={6}>
+          <Flex align="center" gap={2}>
+            <HStack spacing={0.5}>
+              {[1, 2, 3, 4, 5].map((star) => {
+                const isFilled = star <= Math.round(rating);
+                return (
+                  <Icon
+                    key={star}
+                    as={Star}
+                    boxSize={4}
+                    color={isFilled ? "yellow.400" : "gray.300"}
+                    fill={isFilled ? "currentColor" : "none"}
+                  />
+                );
+              })}
+            </HStack>
+            <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+              {Number(rating).toFixed(1)}
+            </Text>
+          </Flex>
+          <Text fontSize="xs" color="gray.500">
+            {card?.ratingCount ?? 128} reviews
+          </Text>
+        </Flex>
+
         <MotionButton
           size="lg"
-          bg={ThemeColors.primaryColor}
-          color="white"
-          _hover={{ bg: ThemeColors.secondaryColor, boxShadow: "lg", transform: "translateY(-2px)" }}
-          _active={{ transform: "translateY(0)" }}
+          colorScheme={planColor}
           borderRadius="xl"
           height="52px"
           fontWeight="bold"
@@ -400,6 +382,11 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
           whileTap={{ scale: 0.98 }}
           boxShadow="md"
           mb={4}
+          _hover={{
+            boxShadow: "lg",
+            transform: "translateY(-2px)",
+          }}
+          _active={{ transform: "translateY(0)" }}
         >
           Subscribe to {card?.type}
         </MotionButton>
@@ -407,11 +394,11 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
         <Flex justify="center" mb={4}>
           <Button
             variant="link"
-            color={ThemeColors.primaryColor}
+            color={`${planColor}.600`}
             fontSize="sm"
             fontWeight="medium"
             leftIcon={<UserPlus size={16} />}
-            _hover={{ color: ThemeColors.secondaryColor, textDecoration: "none" }}
+            _hover={{ color: `${planColor}.700`, textDecoration: "none" }}
             onClick={(e) => {
               e.stopPropagation();
               const inviteSection = document.getElementById("refer");
@@ -422,77 +409,34 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
           </Button>
         </Flex>
 
-        {/* Rate plan — backend-backed, viewable by others */}
-        <MotionBox
-          as={Flex}
-          justify="center"
-          align="center"
-          gap={2}
-          mb={4}
-          py={2}
-          px={3}
-          borderRadius="md"
-          bg={themeBg}
+        <Box
+          p={3}
+          bg="blue.50"
+          borderRadius="lg"
           border="1px solid"
-          borderColor={themeBorder}
-          onClick={(e) => e.stopPropagation()}
-          wrap="wrap"
-          animate={ratingEffect ? { scale: [1, 1.05, 1] } : {}}
-          transition={{ duration: 0.5 }}
+          borderColor="blue.200"
+          position="relative"
         >
-          <HStack spacing={0} align="center">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <IconButton
-                key={s}
-                aria-label={`Rate ${s} stars`}
-                icon={<Star size={16} />}
-                variant="ghost"
-                size="xs"
-                color={s <= (ratingHover || planRating) ? "yellow.400" : "gray.300"}
-                fill={s <= (ratingHover || planRating) ? "currentColor" : "none"}
-                onClick={(e) => { e.stopPropagation(); setPlanRating(s); }}
-                onMouseEnter={() => setRatingHover(s)}
-                onMouseLeave={() => setRatingHover(0)}
-                isDisabled={ratingSubmitted}
-              />
-            ))}
-          </HStack>
-          <Button
-            size="xs"
-            bg={ThemeColors.primaryColor}
-            color="white"
-            _hover={{ bg: ThemeColors.secondaryColor }}
-            isDisabled={planRating < 1 || ratingSubmitted}
-            onClick={handleSubmitRating}
-          >
-            {ratingSubmitted ? "Rated" : "Rate"}
-          </Button>
-          {totalRatings > 0 && (
-            <Text fontSize="xs" color="gray.600">
-              {avgRating.toFixed(1)} ({totalRatings})
-            </Text>
-          )}
-        </MotionBox>
-
-        <Tooltip label="Free delivery within 3km. 950 UGX per km beyond 3km." hasArrow placement="top">
-          <Flex
-            justify="center"
-            align="center"
-            gap={2}
-            py={2}
-            px={3}
-            borderRadius="md"
-            bg={themeBg}
-            border="1px solid"
-            borderColor={themeBorder}
-            cursor="help"
-          >
-            <Icon as={Truck} boxSize={4} color={ThemeColors.primaryColor} />
-            <Text fontSize="xs" color="gray.600">
-              Free ≤3km · 950 UGX/km extra
+          <Flex align="center" gap={2} mb={1}>
+            <Icon as={Truck} boxSize={4} color="blue.500" />
+            <Text fontSize="xs" fontWeight="bold" color="blue.700">
+              Delivery Terms:
             </Text>
           </Flex>
-        </Tooltip>
+          <Flex wrap="wrap" gap={1} fontSize="xs" color="blue.600">
+            <Text as="span" fontWeight="medium">
+              Free:
+            </Text>
+            <Text as="span">Within 3km</Text>
+            <Text as="span" mx={1}>
+              •
+            </Text>
+            <Text as="span" fontWeight="medium">
+              Extra:
+            </Text>
+            <Text as="span">950 UGX/km beyond 3km</Text>
+          </Flex>
+        </Box>
 
         <Flex justify="center" mt={4}>
           <Button
@@ -500,7 +444,7 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
             size="sm"
             fontSize="xs"
             color="gray.500"
-            _hover={{ color: ThemeColors.primaryColor, bg: themeBg }}
+            _hover={{ color: `${planColor}.600`, bg: `${planColor}.50` }}
             onClick={(e) => {
               e.stopPropagation();
               onOpen();
