@@ -15,7 +15,6 @@ import {
   Flex,
   Heading,
   Text,
-  Stack,
   useToast,
   Container,
   Card,
@@ -56,7 +55,6 @@ import {
 import { motion } from "framer-motion";
 
 const MotionBox = motion(Box);
-const MotionCard = motion(Card);
 
 const themeBg = `${ThemeColors.primaryColor}12`;
 const themeBorder = `${ThemeColors.primaryColor}25`;
@@ -258,7 +256,7 @@ const Subscription = () => {
           </VStack>
         </Box>
 
-        {/* Meal calendar + Food Algae */}
+        {/* Meal calendar */}
         {subscriptionPackages.length > 0 && selectedPlan && (
           <SlideFade in={!!selectedPlan} offsetY="20px">
             <Box mb={{ base: 12, md: 16 }}>
@@ -337,142 +335,6 @@ const Subscription = () => {
             </Box>
           </SlideFade>
         )}
-
-        {/* Benefits */}
-        <MotionBox
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          mb={{ base: 12, md: 16 }}
-        >
-          <VStack spacing={8} align="stretch">
-            <Box textAlign="center">
-              <Heading size="xl" mb={3} color={ThemeColors.primaryColor}>
-                Why Choose Our Meal Plans?
-              </Heading>
-              <Text color="gray.600" maxW="2xl" mx="auto">
-                Experience the difference with our premium meal subscription
-                service.
-              </Text>
-            </Box>
-
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
-              {[
-                {
-                  icon: FaLeaf,
-                  title: "Fresh & Organic",
-                  description:
-                    "Locally sourced, organic ingredients for maximum nutrition",
-                },
-                {
-                  icon: FaClock,
-                  title: "Time Saving",
-                  description:
-                    "No meal planning, grocery shopping, or cooking hassle",
-                },
-                {
-                  icon: FaUsers,
-                  title: "Expert Nutritionists",
-                  description:
-                    "Plans designed by certified nutrition professionals",
-                },
-                {
-                  icon: FaChartLine,
-                  title: "Flexible Plans",
-                  description:
-                    "Easily modify, pause, or cancel your subscription",
-                },
-              ].map((benefit, index) => (
-                <MotionCard
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  whileHover={{
-                    y: -5,
-                    transition: { duration: 0.2 },
-                  }}
-                  variant="outline"
-                  borderColor="gray.200"
-                  borderRadius="xl"
-                  _hover={{ borderColor: themeBorder }}
-                >
-                  <CardBody>
-                    <VStack spacing={4} align="center" textAlign="center">
-                      <Box
-                        p={3}
-                        bg={themeBg}
-                        borderRadius="full"
-                        color={ThemeColors.primaryColor}
-                        border="1px solid"
-                        borderColor={themeBorder}
-                      >
-                        <Icon as={benefit.icon} boxSize={6} />
-                      </Box>
-                      <Heading size="sm" color="gray.700">
-                        {benefit.title}
-                      </Heading>
-                      <Text fontSize="sm" color="gray.600">
-                        {benefit.description}
-                      </Text>
-                    </VStack>
-                  </CardBody>
-                </MotionCard>
-              ))}
-            </SimpleGrid>
-          </VStack>
-        </MotionBox>
-
-        {/* CTA */}
-        <MotionBox
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          textAlign="center"
-          py={8}
-        >
-          <Card
-            bgGradient={`linear(to-r, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`}
-            color="white"
-            borderRadius="xl"
-            overflow="hidden"
-          >
-            <CardBody py={10}>
-              <VStack spacing={6}>
-                <Heading size="xl">
-                  Ready to Transform Your Eating Habits?
-                </Heading>
-                <Text fontSize="lg" opacity={0.9}>
-                  Join thousands of satisfied customers enjoying healthy,
-                  delicious meals.
-                </Text>
-                <Button
-                  size="lg"
-                  bg="white"
-                  color={ThemeColors.primaryColor}
-                  leftIcon={<Icon as={FaHeart} />}
-                  _hover={{
-                    bg: "whiteAlpha.900",
-                    transform: "scale(1.05)",
-                  }}
-                  transition="all 0.2s"
-                  onClick={() => {
-                    const first = subscriptionPackages[0];
-                    if (first) handleSubmit(first._id);
-                  }}
-                  isLoading={isLoading}
-                  loadingText="Processing..."
-                >
-                  Start Your Journey
-                </Button>
-                <Text fontSize="sm" opacity={0.8}>
-                  No commitment required. Cancel anytime.
-                </Text>
-              </VStack>
-            </CardBody>
-          </Card>
-        </MotionBox>
       </Container>
     </Box>
   );
