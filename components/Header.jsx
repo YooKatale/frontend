@@ -50,6 +50,7 @@ import {
   FaHandshake,
   FaBriefcase,
   FaGift,
+  FaWallet,
 } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "@slices/usersApiSlice";
@@ -159,6 +160,7 @@ const Header = () => {
     { label: "Contact", href: "/contact", icon: AiOutlineContacts },
     { label: "Partner", href: "/partner", icon: FaHandshake },
     { label: "Subscribe", href: "/subscription", icon: AiOutlineCreditCard },
+    { label: "Cashout", href: "/cashout", icon: FaWallet },
     { label: "Invite a friend", href: "/#refer", icon: FaGift, isInvite: true },
     { label: "Sign Up", href: "/signup", icon: AiOutlineLogin, hideWhenLoggedIn: true },
   ];
