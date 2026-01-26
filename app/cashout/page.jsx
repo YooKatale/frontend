@@ -119,7 +119,10 @@ export default function CashoutPage() {
   // Define constants and motion components inside component to avoid initialization issues
   const MotionBox = motion(Box);
   const MotionCard = motion(Card);
-  const themeBg = `${ThemeColors?.primaryColor || "#185f2d"}12`;
+  // Safe theme color access with fallbacks
+  const primaryColor = ThemeColors?.primaryColor || "#185f2d";
+  const secondaryColor = ThemeColors?.secondaryColor || "#2d8659";
+  const themeBg = `${primaryColor}12`;
   const statCards = [
     { key: "cash", label: "Cash Earned", sub: "Available to withdraw", icon: FaCoins, gradient: "linear(to-br, green.400, green.700)" },
     { key: "invites", label: "Total Invites", sub: "Friends referred", icon: FaUsers, gradient: "linear(to-br, blue.400, blue.700)" },
@@ -326,10 +329,10 @@ export default function CashoutPage() {
     const safeSize = typeof size === "number" ? size : 6;
     const boxSize = `${safeSize * 4}px`;
     const fontSize = safeSize === 6 ? "12px" : safeSize === 5 ? "10px" : "14px";
-    const primaryColor = ThemeColors?.primaryColor || "#185f2d";
+    const iconPrimaryColor = ThemeColors?.primaryColor || "#185f2d";
     
     if (!provider) {
-      return <Icon as={FaMobileAlt} boxSize={safeSize} color={primaryColor} />;
+      return <Icon as={FaMobileAlt} boxSize={safeSize} color={iconPrimaryColor} />;
     }
     
     if (provider === "MTN") {
@@ -374,7 +377,7 @@ export default function CashoutPage() {
       );
     }
     
-    return <Icon as={FaMobileAlt} boxSize={safeSize} color={primaryColor} />;
+    return <Icon as={FaMobileAlt} boxSize={safeSize} color={iconPrimaryColor} />;
   };
 
   // Show loading state while checking authentication
@@ -395,7 +398,7 @@ export default function CashoutPage() {
 
       {/* Hero */}
       <Box
-        bgGradient={`linear(135deg, ${ThemeColors.primaryColor} 0%, ${ThemeColors.secondaryColor} 100%)`}
+        bgGradient={`linear(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`}
         color="white"
         py={{ base: 8, md: 10 }}
         position="relative"
@@ -439,8 +442,8 @@ export default function CashoutPage() {
                             size="xs"
                             leftIcon={<FaArrowDown />}
                             colorScheme="green"
-                            bg={ThemeColors.primaryColor}
-                            _hover={{ bg: ThemeColors.secondaryColor }}
+                            bg={primaryColor}
+                            _hover={{ bg: secondaryColor }}
                             onClick={handleWithdraw}
                             variant="solid"
                           >
@@ -462,24 +465,24 @@ export default function CashoutPage() {
             <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
               <CardBody>
                 <HStack mb={4}>
-                  <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={FaGift} color={ThemeColors.primaryColor} boxSize={5} /></Box>
+                  <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={FaGift} color={primaryColor} boxSize={5} /></Box>
                   <Heading size="md" color="gray.800">Rewards</Heading>
                 </HStack>
                 <Text color="gray.600" fontSize="sm" mb={4}>Redeem loyalty points for discounts, free delivery, or exclusive offers.</Text>
                 <Link href="/rewards">
-                  <Button size="sm" colorScheme="green" bg={ThemeColors.primaryColor} _hover={{ bg: ThemeColors.secondaryColor }} leftIcon={<FaGift />} w="full">View Rewards</Button>
+                  <Button size="sm" colorScheme="green" bg={primaryColor} _hover={{ bg: secondaryColor }} leftIcon={<FaGift />} w="full">View Rewards</Button>
                 </Link>
               </CardBody>
             </MotionCard>
             <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
               <CardBody>
                 <HStack mb={4}>
-                  <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={FaTicketAlt} color={ThemeColors.primaryColor} boxSize={5} /></Box>
+                  <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={FaTicketAlt} color={primaryColor} boxSize={5} /></Box>
                   <Heading size="md" color="gray.800">Gift Cards</Heading>
                 </HStack>
                 <Text color="gray.600" fontSize="sm" mb={4}>Use or purchase gift cards for yourself or to send to friends.</Text>
                 <Link href="/gift-cards">
-                  <Button size="sm" variant="outline" colorScheme="green" borderColor={ThemeColors.primaryColor} leftIcon={<FaTicketAlt />} w="full">My Gift Cards</Button>
+                  <Button size="sm" variant="outline" colorScheme="green" borderColor={primaryColor} leftIcon={<FaTicketAlt />} w="full">My Gift Cards</Button>
                 </Link>
               </CardBody>
             </MotionCard>
@@ -489,11 +492,11 @@ export default function CashoutPage() {
             <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
               <CardBody>
                 <HStack mb={4}>
-                  <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={FaShareAlt} color={ThemeColors.primaryColor} boxSize={5} /></Box>
+                  <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={FaShareAlt} color={primaryColor} boxSize={5} /></Box>
                   <Heading size="md" color="gray.800">Invite a Friend</Heading>
                 </HStack>
                 <Text color="gray.600" fontSize="sm" mb={4}>Earn up to UGX 50,000 for every friend who signs up with your link.</Text>
-                <Button size="sm" colorScheme="green" bg={ThemeColors.primaryColor} _hover={{ bg: ThemeColors.secondaryColor }} leftIcon={<FaShareAlt />} onClick={openReferral}>Get Referral Link</Button>
+                <Button size="sm" colorScheme="green" bg={primaryColor} _hover={{ bg: secondaryColor }} leftIcon={<FaShareAlt />} onClick={openReferral}>Get Referral Link</Button>
               </CardBody>
             </MotionCard>
             <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
@@ -512,7 +515,7 @@ export default function CashoutPage() {
           <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
             <CardBody>
               <HStack mb={2}>
-                <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={RiSecurePaymentLine} color={ThemeColors.primaryColor} boxSize={5} /></Box>
+                <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={RiSecurePaymentLine} color={primaryColor} boxSize={5} /></Box>
                 <Heading size="md" color="gray.800">Where to receive payouts</Heading>
               </HStack>
               <HStack spacing={4} mb={6} color="gray.500" fontSize="sm">
@@ -532,8 +535,8 @@ export default function CashoutPage() {
                         p={4}
                         borderRadius="lg"
                         borderWidth="1px"
-                        borderColor={m.isDefault ? ThemeColors.primaryColor : "gray.200"}
-                        bg={m.isDefault ? `${ThemeColors.primaryColor}08` : "gray.50"}
+                        borderColor={m.isDefault ? primaryColor : "gray.200"}
+                        bg={m.isDefault ? `${primaryColor}08` : "gray.50"}
                         align="center"
                         justify="space-between"
                         flexWrap="wrap"
@@ -543,7 +546,7 @@ export default function CashoutPage() {
                           <Box
                             p={2}
                             borderRadius="lg"
-                            bg={`${ThemeColors.primaryColor}10`}
+                            bg={`${primaryColor}10`}
                             display="flex"
                             alignItems="center"
                             justifyContent="center"
@@ -551,9 +554,9 @@ export default function CashoutPage() {
                             {m.type === "mobile_money" && m.provider ? (
                               <MobileMoneyIcon provider={m.provider} size={6} />
                             ) : m.type === "card" ? (
-                              <Icon as={getPaymentIcon(m)} boxSize={6} color={ThemeColors.primaryColor} />
+                              <Icon as={getPaymentIcon(m)} boxSize={6} color={primaryColor} />
                             ) : (
-                              <Icon as={FaMobileAlt} boxSize={6} color={ThemeColors.primaryColor} />
+                              <Icon as={FaMobileAlt} boxSize={6} color={primaryColor} />
                             )}
                           </Box>
                           <Box>
@@ -592,10 +595,10 @@ export default function CashoutPage() {
 
               <Tabs variant="soft-rounded" colorScheme="green">
                 <TabList flexWrap="wrap" gap={2} borderBottomWidth="1px" borderColor="gray.200" pb={4} mb={4}>
-                  <Tab fontWeight="600" _selected={{ color: "white", bg: ThemeColors.primaryColor }}>
+                  <Tab fontWeight="600" _selected={{ color: "white", bg: primaryColor }}>
                     <HStack><Icon as={FaMobileAlt} /><Text>Mobile Money</Text></HStack>
                   </Tab>
-                  <Tab fontWeight="600" _selected={{ color: "white", bg: ThemeColors.primaryColor }}>
+                  <Tab fontWeight="600" _selected={{ color: "white", bg: primaryColor }}>
                     <HStack><Icon as={FaCreditCard} /><Text>Card (last 4)</Text></HStack>
                   </Tab>
                 </TabList>
@@ -609,7 +612,7 @@ export default function CashoutPage() {
                           value={mmProvider}
                           onChange={(e) => { setMmProvider(e.target.value); setMmError(""); }}
                           borderColor="gray.300"
-                          _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}` }}
+                          _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
                         >
                           <option value="MTN">MTN Mobile Money</option>
                           <option value="AIRTEL">Airtel Money</option>
@@ -633,7 +636,7 @@ export default function CashoutPage() {
                             value={mmPhone}
                             onChange={(e) => { setMmPhone(e.target.value); setMmError(""); }}
                             borderColor="gray.300"
-                            _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}` }}
+                            _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
                           />
                         </InputGroup>
                         <FormErrorMessage>{mmError}</FormErrorMessage>
@@ -641,8 +644,8 @@ export default function CashoutPage() {
                       <Button
                         leftIcon={<FaMobileAlt />}
                         colorScheme="green"
-                        bg={ThemeColors.primaryColor}
-                        _hover={{ bg: ThemeColors.secondaryColor }}
+                        bg={primaryColor}
+                        _hover={{ bg: secondaryColor }}
                         onClick={handleSaveMobileMoney}
                         isLoading={adding}
                       >
@@ -660,7 +663,7 @@ export default function CashoutPage() {
                           value={cardLast4}
                           onChange={(e) => { setCardLast4(e.target.value.replace(/\D/g, "").slice(0, 4)); setCardError(""); }}
                           borderColor="gray.300"
-                          _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}` }}
+                          _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
                         />
                         <FormHelperText>For display and admin payouts. Full card is never stored.</FormHelperText>
                         <FormErrorMessage>{cardError}</FormErrorMessage>
@@ -672,7 +675,7 @@ export default function CashoutPage() {
                           value={cardBrand}
                           onChange={(e) => setCardBrand(e.target.value)}
                           borderColor="gray.300"
-                          _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}` }}
+                          _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
                         >
                           <option value="Visa">Visa</option>
                           <option value="Mastercard">Mastercard</option>
@@ -685,7 +688,7 @@ export default function CashoutPage() {
                           value={cardName}
                           onChange={(e) => setCardName(e.target.value)}
                           borderColor="gray.300"
-                          _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}` }}
+                          _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
                         />
                       </FormControl>
                       <FormControl>
@@ -695,14 +698,14 @@ export default function CashoutPage() {
                           value={cardExpiry}
                           onChange={(e) => setCardExpiry(e.target.value)}
                           borderColor="gray.300"
-                          _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}` }}
+                          _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
                         />
                       </FormControl>
                       <Button
                         leftIcon={<FaCreditCard />}
                         colorScheme="green"
-                        bg={ThemeColors.primaryColor}
-                        _hover={{ bg: ThemeColors.secondaryColor }}
+                        bg={primaryColor}
+                        _hover={{ bg: secondaryColor }}
                         onClick={handleSaveCard}
                         isLoading={adding}
                       >
@@ -721,7 +724,7 @@ export default function CashoutPage() {
               <HStack mb={4} justify="space-between">
                 <HStack>
                   <Box p={2} bg={themeBg} borderRadius="lg">
-                    <Icon as={FaArrowDown} color={ThemeColors.primaryColor} boxSize={5} />
+                    <Icon as={FaArrowDown} color={primaryColor} boxSize={5} />
                   </Box>
                   <Heading size="md" color="gray.800">Withdrawal History</Heading>
                 </HStack>
@@ -767,7 +770,7 @@ export default function CashoutPage() {
             <VStack spacing={4}>
               <Box w="full">
                 <Text fontSize="sm" color="gray.600" mb={2}>Available Balance</Text>
-                <Heading size="lg" color={ThemeColors.primaryColor}>UGX {(stats.cash || 0).toLocaleString()}</Heading>
+                <Heading size="lg" color={primaryColor}>UGX {(stats.cash || 0).toLocaleString()}</Heading>
               </Box>
               {selectedPayoutMethod && (
                 <Box w="full" p={3} bg="gray.50" borderRadius="md">
@@ -776,9 +779,9 @@ export default function CashoutPage() {
                     {selectedPayoutMethod.type === "mobile_money" && selectedPayoutMethod.provider ? (
                       <MobileMoneyIcon provider={selectedPayoutMethod.provider} size={5} />
                     ) : selectedPayoutMethod.type === "card" ? (
-                      <Icon as={getPaymentIcon(selectedPayoutMethod)} boxSize={5} color={ThemeColors.primaryColor} />
+                      <Icon as={getPaymentIcon(selectedPayoutMethod)} boxSize={5} color={primaryColor} />
                     ) : (
-                      <Icon as={FaMobileAlt} boxSize={5} color={ThemeColors.primaryColor} />
+                      <Icon as={FaMobileAlt} boxSize={5} color={primaryColor} />
                     )}
                     <Text fontWeight="600">
                       {selectedPayoutMethod.type === "mobile_money" 
@@ -808,8 +811,8 @@ export default function CashoutPage() {
             <Button variant="ghost" onClick={closeWithdraw}>Cancel</Button>
             <Button
               colorScheme="green"
-              bg={ThemeColors.primaryColor}
-              _hover={{ bg: ThemeColors.secondaryColor }}
+              bg={primaryColor}
+              _hover={{ bg: secondaryColor }}
               onClick={confirmWithdraw}
               isLoading={withdrawing}
               isDisabled={!selectedPayoutMethod || !withdrawAmount || Number(withdrawAmount) < 1000}
