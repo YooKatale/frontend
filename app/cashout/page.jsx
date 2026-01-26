@@ -731,13 +731,13 @@ export default function CashoutPage() {
                   <Text fontSize="xs" color="gray.600" mb={1}>Withdrawing to:</Text>
                   <HStack>
                     {selectedPayoutMethod.type === "mobile_money" && selectedPayoutMethod.provider ? (
-                      {selectedPayoutMethod.provider === "MTN" ? (
+                      selectedPayoutMethod.provider === "MTN" ? (
                         <Box w="20px" h="20px" minW="20px" minH="20px" bg="#FFCC00" borderRadius="sm" display="flex" alignItems="center" justifyContent="center" color="black" fontWeight="bold" fontSize="10px">MTN</Box>
                       ) : selectedPayoutMethod.provider === "AIRTEL" ? (
                         <Box w="20px" h="20px" minW="20px" minH="20px" bg="#E60012" borderRadius="sm" display="flex" alignItems="center" justifyContent="center" color="white" fontWeight="bold" fontSize="10px">A</Box>
                       ) : (
                         <Icon as={FaMobileAlt} boxSize={5} color={primaryColor} />
-                      )}
+                      )
                     ) : selectedPayoutMethod.type === "card" ? (
                       <Icon as={getPaymentIcon(selectedPayoutMethod)} boxSize={5} color={primaryColor} />
                     ) : (
