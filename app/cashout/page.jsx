@@ -49,6 +49,7 @@ import {
 } from "@slices/usersApiSlice";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -286,7 +287,9 @@ export default function CashoutPage() {
                   <Heading size="md" color="gray.800">Rewards</Heading>
                 </HStack>
                 <Text color="gray.600" fontSize="sm" mb={4}>Redeem loyalty points for discounts, free delivery, or exclusive offers.</Text>
-                <Button size="sm" colorScheme="green" bg={ThemeColors.primaryColor} _hover={{ bg: ThemeColors.secondaryColor }} leftIcon={<FaGift />}>View Rewards</Button>
+                <Link href="/rewards">
+                  <Button size="sm" colorScheme="green" bg={ThemeColors.primaryColor} _hover={{ bg: ThemeColors.secondaryColor }} leftIcon={<FaGift />} w="full">View Rewards</Button>
+                </Link>
               </CardBody>
             </MotionCard>
             <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
@@ -296,7 +299,9 @@ export default function CashoutPage() {
                   <Heading size="md" color="gray.800">Gift Cards</Heading>
                 </HStack>
                 <Text color="gray.600" fontSize="sm" mb={4}>Use or purchase gift cards for yourself or to send to friends.</Text>
-                <Button size="sm" variant="outline" colorScheme="green" borderColor={ThemeColors.primaryColor} leftIcon={<FaTicketAlt />}>My Gift Cards</Button>
+                <Link href="/gift-cards">
+                  <Button size="sm" variant="outline" colorScheme="green" borderColor={ThemeColors.primaryColor} leftIcon={<FaTicketAlt />} w="full">My Gift Cards</Button>
+                </Link>
               </CardBody>
             </MotionCard>
           </SimpleGrid>

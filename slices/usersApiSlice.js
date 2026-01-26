@@ -239,6 +239,29 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     setDefaultPayoutMethod: builder.mutation({
       query: (id) => ({ url: `${DB_URL}/payout-methods/${id}/default`, method: "PUT" }),
     }),
+    // Rewards
+    getRewards: builder.mutation({
+      query: () => ({ url: `${DB_URL}/rewards`, method: "GET" }),
+    }),
+    getMyRewards: builder.mutation({
+      query: () => ({ url: `${DB_URL}/rewards/my`, method: "GET" }),
+    }),
+    redeemReward: builder.mutation({
+      query: (body) => ({ url: `${DB_URL}/rewards/redeem`, method: "POST", body }),
+    }),
+    // Gift Cards
+    getGiftCards: builder.mutation({
+      query: () => ({ url: `${DB_URL}/gift-cards`, method: "GET" }),
+    }),
+    purchaseGiftCard: builder.mutation({
+      query: (body) => ({ url: `${DB_URL}/gift-cards/purchase`, method: "POST", body }),
+    }),
+    useGiftCard: builder.mutation({
+      query: (body) => ({ url: `${DB_URL}/gift-cards/use`, method: "POST", body }),
+    }),
+    validateGiftCard: builder.mutation({
+      query: (code) => ({ url: `${DB_URL}/gift-cards/validate/${code}`, method: "GET" }),
+    }),
   }),
 });
 
@@ -276,4 +299,11 @@ export const {
   useAddPayoutMethodMutation,
   useDeletePayoutMethodMutation,
   useSetDefaultPayoutMethodMutation,
+  useGetRewardsMutation,
+  useGetMyRewardsMutation,
+  useRedeemRewardMutation,
+  useGetGiftCardsMutation,
+  usePurchaseGiftCardMutation,
+  useUseGiftCardMutation,
+  useValidateGiftCardMutation,
 } = usersApiSlice;
