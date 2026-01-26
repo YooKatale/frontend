@@ -152,6 +152,18 @@ export default function CashoutPage() {
     }
   }, [getPayoutMethods]);
 
+  const loadWithdrawals = useCallback(async () => {
+    try {
+      setLoadingWithdrawals(true);
+      const res = await getWithdrawals().unwrap();
+      setWithdrawals(Array.isArray(res?.data) ? res.data : []);
+    } catch {
+      setWithdrawals([]);
+    } finally {
+      setLoadingWithdrawals(false);
+    }
+  }, [getWithdrawals]);
+
   useEffect(() => {
     setIsCheckingAuth(true);
     // Check if userInfo is available
@@ -247,18 +259,6 @@ export default function CashoutPage() {
       toast({ title: "Error", description: e?.data?.message || "Could not update.", status: "error", duration: 4000, isClosable: true });
     }
   };
-
-  const loadWithdrawals = useCallback(async () => {
-    try {
-      setLoadingWithdrawals(true);
-      const res = await getWithdrawals().unwrap();
-      setWithdrawals(Array.isArray(res?.data) ? res.data : []);
-    } catch {
-      setWithdrawals([]);
-    } finally {
-      setLoadingWithdrawals(false);
-    }
-  }, [getWithdrawals]);
 
   const handleWithdraw = () => {
     const defaultMethod = payoutMethods.find((m) => m.isDefault && m.type === "mobile_money");
