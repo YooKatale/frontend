@@ -99,9 +99,10 @@ const MobileMoneyIcon = ({ provider, size = 6 }) => {
   const safeSize = typeof size === "number" ? size : 6;
   const boxSize = `${safeSize * 4}px`;
   const fontSize = safeSize === 6 ? "12px" : safeSize === 5 ? "10px" : "14px";
+  const primaryColor = ThemeColors?.primaryColor || "#185f2d";
   
   if (!provider) {
-    return <Icon as={FaMobileAlt} boxSize={safeSize} color={ThemeColors.primaryColor} />;
+    return <Icon as={FaMobileAlt} boxSize={safeSize} color={primaryColor} />;
   }
   
   if (provider === "MTN") {
@@ -146,7 +147,7 @@ const MobileMoneyIcon = ({ provider, size = 6 }) => {
     );
   }
   
-  return <Icon as={FaMobileAlt} boxSize={safeSize} color={ThemeColors.primaryColor} />;
+  return <Icon as={FaMobileAlt} boxSize={safeSize} color={primaryColor} />;
 };
 
 export default function CashoutPage() {
