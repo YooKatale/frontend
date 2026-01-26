@@ -12,10 +12,21 @@ import {
   Grid,
   Select,
   Checkbox,
-  Spinner,
   Stack,
   Icon,
   Container,
+  Divider,
+  VStack,
+  HStack,
+  Badge,
+  Card,
+  CardBody,
+  SimpleGrid,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  Link as ChakraLink,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import Link from "next/link";
@@ -25,15 +36,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRegisterMutation } from "@slices/usersApiSlice";
 import { setCredentials } from "@slices/authSlice";
 import { useRouter } from "next/navigation";
-import ButtonComponent from "@components/Button";
-import { Loader } from "lucide-react";
+import { motion } from "framer-motion";
+import { CheckCircle, Truck, Award, Gift, Star } from "lucide-react";
 import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
-import { motion } from "framer-motion";
+import { FaApple, FaGooglePlay, FaPhoneAlt, FaWhatsapp, FaEnvelope } from "react-icons/fa";
 import { API_ORIGIN } from "@config/config";
 
+const MotionBox = motion(Box);
+const MotionButton = motion(Button);
+
 const SignUp = () => {
-  // states
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
@@ -45,52 +58,54 @@ const SignUp = () => {
   const [address, setAddress] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [referralCode, setReferralCode] = useState(null);
-  // Notification preferences
+  const [activeStep, setActiveStep] = useState(1);
   const [notifyViaCall, setNotifyViaCall] = useState(false);
   const [notifyViaWhatsApp, setNotifyViaWhatsApp] = useState(false);
-  const [notifyViaEmail, setNotifyViaEmail] = useState(true); // Default
+  const [notifyViaEmail, setNotifyViaEmail] = useState(true);
+
   const { push } = useRouter();
-
   const chakraToast = useToast();
-
   const dispatch = useDispatch();
-
   const [register] = useRegisterMutation();
   const [isGoogleLoading, setGoogleLoading] = useState(false);
-
   const { userInfo } = useSelector((state) => state.auth);
+
+  const features = [
+    { icon: Truck, label: "Free Delivery", color: "green.500" },
+    { icon: Award, label: "Premium Quality", color: "yellow.500" },
+    { icon: Gift, label: "Loyalty Rewards", color: "purple.500" },
+    { icon: Star, label: "Customizable Meals", color: "blue.500" },
+  ];
 
   useEffect(() => {
     if (userInfo) return push("/");
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const urlpath = new URLSearchParams(window.location.search);
-      const refCode = urlpath.get('ref');
-      if (refCode !== null && refCode !== undefined) {
-        setReferralCode(refCode);
-      }
+      const refCode = urlpath.get("ref");
+      if (refCode != null) setReferralCode(refCode);
     }
   }, [userInfo, push]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      // set loading to be true
       setLoading(true);
-
       if (!e.target.terms.checked) {
         chakraToast({
-          title: "Notice",
-          description: "Please agree to the terms and conditions to proceed",
+          title: "Agreement Required",
+          description: "Please agree to the terms and conditions.",
           status: "error",
           duration: 5000,
-          isClosable: false,
+          isClosable: true,
+          position: "top-right",
         });
-
         setLoading(false);
         return;
       }
-      const referenceCode = referralCode !== null && referralCode !== undefined && referralCode.toString().trim() !== ""? referralCode:undefined;
+      const referenceCode =
+        referralCode != null && referralCode.toString().trim() !== ""
+          ? referralCode
+          : undefined;
 
       const res = await register({
         firstname,
@@ -112,47 +127,36 @@ const SignUp = () => {
 
       dispatch(setCredentials({ ...res }));
 
-      // Send welcome email using direct SMTP (NOT backend invitation endpoint)
       try {
-        const emailRes = await fetch("/api/mail", {
+        await fetch("/api/mail", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: email, type: 'welcome' }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, type: "welcome" }),
         });
-        if (emailRes.ok) {
-          console.log("✅ Welcome email sent to:", email);
-        }
       } catch (emailError) {
-        console.error("⚠️ Failed to send welcome email:", emailError);
-        // Don't show error to user - signup was successful
+        console.error("Welcome email error:", emailError);
       }
 
       chakraToast({
-        title: "Account Created Successfully! 🎉",
-        description: `Welcome to Yookatale, ${res?.firstname || res?.lastname || 'User'}! Your account has been created. Please sign in to continue.`,
+        title: "Welcome to YooKatale!",
+        description: "Account created. Redirecting to sign in…",
         status: "success",
-        duration: 5000,
-        isClosable: false,
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
       });
 
-      // Redirect to login page after a brief delay
-      setTimeout(() => {
-        push("/signin");
-      }, 1500);
+      setTimeout(() => push("/signin"), 1500);
     } catch (err) {
-      // set loading to be false
       setLoading(false);
-
       chakraToast({
-        title: "Error",
-        description: err.data?.message
-          ? err.data?.message
-          : err.data || err.error,
+        title: "Registration Failed",
+        description:
+          err.data?.message || err.data || err.error || "Check your details and try again.",
         status: "error",
         duration: 5000,
-        isClosable: false,
+        isClosable: true,
+        position: "top-right",
       });
     }
   };
@@ -163,459 +167,651 @@ const SignUp = () => {
     window.location.href = `${API_ORIGIN}/api/auth/google?${params.toString()}`;
   };
 
-  const teal = "#319795";
+  const steps = [
+    { number: 1, label: "Account" },
+    { number: 2, label: "Profile" },
+    { number: 3, label: "Preferences" },
+  ];
+
+  const gradient = `linear-gradient(135deg, #0d2d14 0%, ${ThemeColors.primaryColor} 50%, ${ThemeColors.secondaryColor} 100%)`;
 
   return (
-    <>
-      <Box>
-        <Box paddingBottom={"3rem"}>
-          <Box padding={"1rem 0"}>
-            <Heading as={"h2"} fontSize={"2xl"} textAlign={"center"} mb={4}>
-              Welcome to Yookatale.
-            </Heading>
-            <Text fontSize={"xl"} textAlign={"center"} mb={2} fontWeight={"bold"}>
-              Yoo mobile food market.
-            </Text>
-            <Flex>
-              <Box
-                height={"0.2rem"}
-                width={"8rem"}
-                margin={"0.5rem auto"}
-                background={ThemeColors.primaryColor}
-              ></Box>
-            </Flex>
-            <Box padding={"1.5rem 0"} textAlign={"center"}>
-              <Text fontSize={"md"} mb={3} lineHeight={"1.8"}>
-                Forget about cooking or going to the market by subscribing for Premium, Family or Business Plan.
-              </Text>
-              <Text fontSize={"md"} mb={3} lineHeight={"1.8"}>
-                Discover and customize your meals, set your own time when to eat, where to eat from with friends, family and loved ones while earning loyalty rewards, gifts and discounts.
-              </Text>
-            </Box>
-            <Box padding={"1rem 0"} textAlign={"center"}>
-              <Text fontSize={"md"} mb={2}>
-                <Link href="/signup" style={{ color: ThemeColors.darkColor, textDecoration: "underline" }}>
-                  Freely Signup www.yookatale.app/signup
-                </Link>
-              </Text>
-              <Text fontSize={"md"} mb={2}>
-                <Link href="/subscription" style={{ color: ThemeColors.darkColor, textDecoration: "underline" }}>
-                  Subscribe www.yookatale.app/subscription
-                </Link>
-              </Text>
-              <Text fontSize={"md"} mb={3}>
-                <Link href="/partner" style={{ color: ThemeColors.darkColor, textDecoration: "underline" }}>
-                  Partner with us www.yookatale.app/partner
-                </Link>
-              </Text>
-            </Box>
-            
-            {/* Payment Options */}
-            <Box padding={"1.5rem 0"} textAlign={"center"}>
-              <Heading as={"h3"} fontSize={"lg"} mb={3}>
-                Payment Options
+    <Container maxW="container.xl" p={0}>
+      <Flex minH="100vh" direction={{ base: "column", lg: "row" }} bg="white">
+        {/* Left – Brand */}
+        <Box
+          flex={{ base: "0 0 auto", lg: "1" }}
+          bg={gradient}
+          color="white"
+          p={{ base: 6, lg: 12 }}
+          position="relative"
+          overflow="hidden"
+        >
+          <Flex direction="column" h="full" position="relative" zIndex={1}>
+            <Link href="/">
+              <MotionBox
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                bg="white"
+                borderRadius="2xl"
+                p={4}
+                w="fit-content"
+                boxShadow="0 10px 40px rgba(0,0,0,0.2)"
+                mb={8}
+              >
+                <Box
+                  as="img"
+                  src="/assets/icons/logo2.png"
+                  alt="YooKatale Logo"
+                  w="160px"
+                  h="80px"
+                  objectFit="contain"
+                />
+              </MotionBox>
+            </Link>
+
+            <Box flex="1" mt={{ base: 4, lg: 12 }}>
+              <Heading
+                as="h1"
+                fontSize={{ base: "2xl", lg: "3xl" }}
+                fontWeight="bold"
+                lineHeight="1.2"
+                mb={4}
+              >
+                Welcome to YooKatale
               </Heading>
-              <Flex justifyContent={"center"} flexWrap={"wrap"} gap={3}>
-                <Box
-                  padding={"1rem 1.5rem"}
-                  border={"1.7px solid " + ThemeColors.darkColor}
-                  borderRadius={"0.5rem"}
-                  minWidth={"150px"}
-                >
-                  <Text fontSize={"md"} textAlign={"center"}>
-                    Mobile Money
-                  </Text>
-                </Box>
-                <Box
-                  padding={"1rem 1.5rem"}
-                  border={"1.7px solid " + ThemeColors.darkColor}
-                  borderRadius={"0.5rem"}
-                  minWidth={"150px"}
-                >
-                  <Text fontSize={"md"} textAlign={"center"}>
-                    Credit/Debit Card
-                  </Text>
-                </Box>
-                <Box
-                  padding={"1rem 1.5rem"}
-                  border={"1.7px solid " + ThemeColors.darkColor}
-                  borderRadius={"0.5rem"}
-                  minWidth={"150px"}
-                >
-                  <Text fontSize={"md"} textAlign={"center"}>
-                    Cash on Delivery
-                  </Text>
-                </Box>
-                <Box
-                  padding={"1rem 1.5rem"}
-                  border={"1.7px solid " + ThemeColors.darkColor}
-                  borderRadius={"0.5rem"}
-                  minWidth={"150px"}
-                >
-                  <Text fontSize={"md"} textAlign={"center"}>
-                    Pay Later
-                  </Text>
-                </Box>
-              </Flex>
+              <Text fontSize="md" opacity={0.9} mb={8}>
+                Fresh meals, customizable plans, and rewards. Join thousands who trust us.
+              </Text>
+
+              <SimpleGrid columns={2} spacing={4} mb={8}>
+                {features.map((f, i) => (
+                  <MotionBox
+                    key={f.label}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08 }}
+                  >
+                    <Flex align="center" gap={3}>
+                      <Box
+                        p={2}
+                        bg="whiteAlpha.200"
+                        borderRadius="lg"
+                        border="1px solid"
+                        borderColor="whiteAlpha.300"
+                      >
+                        <Icon as={f.icon} boxSize={5} color={f.color} />
+                      </Box>
+                      <Text fontSize="sm" fontWeight="medium">
+                        {f.label}
+                      </Text>
+                    </Flex>
+                  </MotionBox>
+                ))}
+              </SimpleGrid>
+
+              <Box
+                bg="whiteAlpha.100"
+                p={5}
+                borderRadius="2xl"
+                backdropFilter="blur(10px)"
+              >
+                <Text fontSize="sm" fontWeight="semibold" mb={3} opacity={0.9}>
+                  Why join?
+                </Text>
+                <Stack spacing={2}>
+                  {[
+                    "Earn loyalty points with every order",
+                    "Customize meals to your preference",
+                    "Free delivery on premium plans",
+                    "Secure payments",
+                  ].map((item, idx) => (
+                    <Flex key={idx} align="center" gap={3}>
+                      <CheckCircle size={14} opacity={0.8} />
+                      <Text fontSize="sm" opacity={0.9}>
+                        {item}
+                      </Text>
+                    </Flex>
+                  ))}
+                </Stack>
+              </Box>
             </Box>
 
-            {/* Android & iOS Icons */}
-            <Box padding={"1.5rem 0"} textAlign={"center"}>
-              <Flex justifyContent={"center"} gap={4} flexWrap={"wrap"}>
-                <Link
-                  href="/subscription"
-                  className="flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
+            <Box mt={8}>
+              <Text fontSize="sm" opacity={0.7} mb={4}>
+                Already have an account?{" "}
+                <ChakraLink
+                  as={Link}
+                  href="/signin"
+                  color="white"
+                  fontWeight="semibold"
+                  textDecoration="underline"
+                  _hover={{ opacity: 0.9 }}
                 >
-                  <Image 
-                    src="/assets/images/apple.svg" 
-                    width={30} 
-                    height={30} 
-                    alt="appstore_img"
-                    style={{ width: "30px", height: "auto" }}
+                  Sign In
+                </ChakraLink>
+              </Text>
+              <Flex gap={3} mt={4}>
+                <ChakraLink
+                  href="/subscription"
+                  target="_blank"
+                  _hover={{ transform: "translateY(-2px)" }}
+                  transition="transform 0.2s"
+                >
+                  <Image
+                    src="/assets/images/apple.svg"
+                    width={120}
+                    height={36}
+                    alt="App Store"
                   />
-                  <Text color={ThemeColors.darkColor} fontSize="sm" ml={2}>
-                    App Store
-                  </Text>
-                </Link>
-                <Link
+                </ChakraLink>
+                <ChakraLink
                   href="https://play.google.com/store/apps/details?id=com.yookataleapp.app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center p-2 border border-gray-300 border-opacity-50 rounded-md shadow-md"
+                  _hover={{ transform: "translateY(-2px)" }}
+                  transition="transform 0.2s"
                 >
-                  <Image 
-                    src="/assets/images/google.svg" 
-                    width={30} 
-                    height={30} 
-                    alt="playstore_img"
-                    style={{ width: "30px", height: "auto" }}
+                  <Image
+                    src="/assets/images/google.svg"
+                    width={120}
+                    height={36}
+                    alt="Google Play"
                   />
-                  <Text color={ThemeColors.darkColor} fontSize="sm" ml={2}>
-                    Google Play
-                  </Text>
-                </Link>
+                </ChakraLink>
               </Flex>
             </Box>
-          </Box>
-          <Flex>
-            <Box
-              margin={"auto"}
-              width={{ base: "90%", md: "80%", xl: "60%" }}
-              padding={"1rem"}
-            >
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                style={{ marginBottom: "1.5rem" }}
-              >
-                <Box
-                  bg="white"
-                  borderRadius="xl"
-                  boxShadow="0 4px 20px rgba(0,0,0,0.08)"
-                  p={6}
-                  border="1px solid"
-                  borderColor="gray.100"
-                >
-                  <Heading size="md" mb={2} color="gray.800">
-                    Create Account
-                  </Heading>
-                  <Text fontSize="sm" color="gray.500" mb={4}>
-                    Sign up with Google or use the form below.
+          </Flex>
+        </Box>
+
+        {/* Right – Form */}
+        <Box
+          flex="1"
+          p={{ base: 6, lg: 12 }}
+          bg="gray.50"
+          overflowY="auto"
+          maxH={{ base: "auto", lg: "100vh" }}
+        >
+          <Box maxW="xl" mx="auto">
+            <Flex justify="center" mb={8} gap={2}>
+              {steps.map((s) => (
+                <Flex key={s.number} align="center" gap={2}>
+                  <Box
+                    w={8}
+                    h={8}
+                    borderRadius="full"
+                    bg={activeStep >= s.number ? ThemeColors.primaryColor : "gray.200"}
+                    color={activeStep >= s.number ? "white" : "gray.500"}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    fontSize="sm"
+                    fontWeight="semibold"
+                    transition="all 0.3s"
+                  >
+                    {s.number}
+                  </Box>
+                  <Text
+                    fontSize="sm"
+                    fontWeight="medium"
+                    color={activeStep >= s.number ? "gray.800" : "gray.500"}
+                    display={{ base: "none", md: "block" }}
+                  >
+                    {s.label}
                   </Text>
-                  <Button
+                  {s.number < steps.length && (
+                    <Box w={6} h="1px" bg="gray.300" mx={2} />
+                  )}
+                </Flex>
+              ))}
+            </Flex>
+
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card
+                borderRadius="2xl"
+                boxShadow="0 10px 40px rgba(0,0,0,0.08)"
+                border="1px solid"
+                borderColor="gray.100"
+                overflow="hidden"
+              >
+                <CardBody p={{ base: 6, md: 8 }}>
+                  <Box mb={6}>
+                    <Heading size="lg" color="gray.800" mb={1}>
+                      Create account
+                    </Heading>
+                    <Text color="gray.600" fontSize="sm">
+                      Google or email
+                    </Text>
+                  </Box>
+
+                  <MotionButton
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     size="lg"
                     variant="outline"
                     onClick={handleGoogleSignup}
                     isLoading={isGoogleLoading}
                     loadingText="Connecting..."
                     leftIcon={<Icon as={FcGoogle} boxSize={5} />}
-                    w="100%"
-                    height="48px"
+                    w="full"
+                    h="52px"
                     borderRadius="xl"
                     borderColor="gray.200"
-                    color={teal}
+                    bg="white"
                     _hover={{
                       bg: "gray.50",
-                      borderColor: teal,
-                      transform: "translateY(-2px)",
-                      boxShadow: "0 4px 12px rgba(49, 151, 149, 0.2)",
+                      borderColor: ThemeColors.primaryColor,
+                      boxShadow: `0 4px 12px ${ThemeColors.primaryColor}26`,
                     }}
-                    _active={{ transform: "translateY(0)" }}
-                    transition="all 0.2s"
-                    fontWeight="600"
+                    fontWeight="semibold"
+                    mb={6}
                   >
                     Continue with Google
-                  </Button>
-                  <Flex align="center" my={4}>
-                    <Box flex="1" height="1px" bg="gray.200" />
-                    <Text px={4} color="gray.400" fontSize="sm" fontWeight="600">
+                  </MotionButton>
+
+                  <Flex align="center" my={6}>
+                    <Divider flex="1" />
+                    <Text px={4} color="gray.400" fontSize="sm" fontWeight="semibold">
                       OR SIGN UP WITH EMAIL
                     </Text>
-                    <Box flex="1" height="1px" bg="gray.200" />
+                    <Divider flex="1" />
                   </Flex>
-                </Box>
-              </motion.div>
 
-              <form onSubmit={handleSubmit}>
-                <Grid
-                  gridTemplateColumns={{
-                    base: "repeat(1, 1fr)",
-                    md: "repeat(1, 1fr)",
-                    xl: "repeat(2, 1fr)",
-                  }}
-                  gridGap={"1rem"}
-                >
-                  <Box padding={"0.5rem 0"}>
-                    <FormControl>
-                      <FormLabel htmlFor="firstname">Firstname</FormLabel>
-                      <Input
-                        type="text"
-                        id="firstname"
-                        placeholder="firstname is required"
-                        name="firstname"
-                        value={firstname}
-                        onChange={(e) => setFirstname(e.target.value)}
-                      />
-                    </FormControl>
-                  </Box>
-                  <Box padding={"0.5rem 0"}>
-                    <FormControl>
-                      <FormLabel htmlFor="lastname">Lastname</FormLabel>
-                      <Input
-                        type="text"
-                        id="lastname"
-                        placeholder="lastname is required"
-                        name="lastname"
-                        value={lastname}
-                        onChange={(e) => setLastname(e.target.value)}
-                      />
-                    </FormControl>
-                  </Box>
-                </Grid>
-                <Grid
-                  gridTemplateColumns={{
-                    base: "repeat(1, 1fr)",
-                    md: "repeat(1, 1fr)",
-                    xl: "repeat(2, 1fr)",
-                  }}
-                  gridGap={"1rem"}
-                >
-                  <Box padding={"0.5rem 0"}>
-                    <FormControl>
-                      <FormLabel htmlFor="phone">Phone Number</FormLabel>
-                      <Input
-                        type="text"
-                        placeholder="Include country code [+256.....]"
-                        name="phone"
-                        id="phone"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                      />
-                    </FormControl>
-                  </Box>
-                  <Box padding={"0.5rem 0"}>
-                    <FormControl>
-                      <FormLabel htmlFor="gender">Gender</FormLabel>
-                      <Select
-                        placeholder="Select gender"
-                        name="gender"
-                        id="gender"
-                        value={gender}
-                        onChange={(e) => setGender(e.target.value)}
+                  <form onSubmit={handleSubmit}>
+                    <VStack spacing={5}>
+                      <Grid
+                        templateColumns={{ base: "1fr", md: "1fr 1fr" }}
+                        gap={4}
+                        w="full"
                       >
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </Grid>
-                <Grid
-                  gridTemplateColumns={{
-                    base: "repeat(1, 1fr)",
-                    md: "repeat(1, 1fr)",
-                    xl: "repeat(2, 1fr)",
+                        <FormControl isRequired>
+                          <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                            First name
+                          </FormLabel>
+                          <Input
+                            size="lg"
+                            borderRadius="lg"
+                            value={firstname}
+                            onChange={(e) => setFirstname(e.target.value)}
+                            placeholder="First name"
+                            borderColor="gray.300"
+                            _hover={{ borderColor: ThemeColors.primaryColor }}
+                            _focus={{
+                              borderColor: ThemeColors.primaryColor,
+                              boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                            }}
+                          />
+                        </FormControl>
+                        <FormControl isRequired>
+                          <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                            Last name
+                          </FormLabel>
+                          <Input
+                            size="lg"
+                            borderRadius="lg"
+                            value={lastname}
+                            onChange={(e) => setLastname(e.target.value)}
+                            placeholder="Last name"
+                            borderColor="gray.300"
+                            _hover={{ borderColor: ThemeColors.primaryColor }}
+                            _focus={{
+                              borderColor: ThemeColors.primaryColor,
+                              boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                            }}
+                          />
+                        </FormControl>
+                      </Grid>
+
+                      <Grid
+                        templateColumns={{ base: "1fr", md: "1fr 1fr" }}
+                        gap={4}
+                        w="full"
+                      >
+                        <FormControl isRequired>
+                          <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                            Email
+                          </FormLabel>
+                          <Input
+                            size="lg"
+                            borderRadius="lg"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@example.com"
+                            borderColor="gray.300"
+                            _hover={{ borderColor: ThemeColors.primaryColor }}
+                            _focus={{
+                              borderColor: ThemeColors.primaryColor,
+                              boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                            }}
+                          />
+                        </FormControl>
+                        <FormControl>
+                          <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                            Phone
+                          </FormLabel>
+                          <Input
+                            size="lg"
+                            borderRadius="lg"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="+256 XXX XXX XXX"
+                            borderColor="gray.300"
+                            _hover={{ borderColor: ThemeColors.primaryColor }}
+                            _focus={{
+                              borderColor: ThemeColors.primaryColor,
+                              boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                            }}
+                          />
+                        </FormControl>
+                      </Grid>
+
+                      <Grid
+                        templateColumns={{ base: "1fr", md: "1fr 1fr" }}
+                        gap={4}
+                        w="full"
+                      >
+                        <FormControl>
+                          <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                            Gender
+                          </FormLabel>
+                          <Select
+                            size="lg"
+                            borderRadius="lg"
+                            value={gender}
+                            onChange={(e) => setGender(e.target.value)}
+                            placeholder="Select"
+                            borderColor="gray.300"
+                            _hover={{ borderColor: ThemeColors.primaryColor }}
+                            _focus={{
+                              borderColor: ThemeColors.primaryColor,
+                              boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                            }}
+                          >
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                          </Select>
+                        </FormControl>
+                        <FormControl>
+                          <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                            Date of birth
+                          </FormLabel>
+                          <Input
+                            size="lg"
+                            borderRadius="lg"
+                            type="date"
+                            value={dob}
+                            onChange={(e) => setDob(e.target.value)}
+                            borderColor="gray.300"
+                            _hover={{ borderColor: ThemeColors.primaryColor }}
+                            _focus={{
+                              borderColor: ThemeColors.primaryColor,
+                              boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                            }}
+                          />
+                        </FormControl>
+                      </Grid>
+
+                      <FormControl>
+                        <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                          Delivery address
+                        </FormLabel>
+                        <Input
+                          size="lg"
+                          borderRadius="lg"
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          placeholder="Address"
+                          borderColor="gray.300"
+                          _hover={{ borderColor: ThemeColors.primaryColor }}
+                          _focus={{
+                            borderColor: ThemeColors.primaryColor,
+                            boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                          }}
+                        />
+                      </FormControl>
+
+                      <FormControl isRequired>
+                        <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                          Password
+                        </FormLabel>
+                        <Input
+                          size="lg"
+                          borderRadius="lg"
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Strong password"
+                          borderColor="gray.300"
+                          _hover={{ borderColor: ThemeColors.primaryColor }}
+                          _focus={{
+                            borderColor: ThemeColors.primaryColor,
+                            boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                          }}
+                        />
+                      </FormControl>
+
+                      {referralCode && (
+                        <FormControl w="full">
+                          <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                            Referral code
+                            <Badge ml={2} colorScheme="green">
+                              Applied
+                            </Badge>
+                          </FormLabel>
+                          <Input
+                            size="lg"
+                            borderRadius="lg"
+                            value={referralCode}
+                            isReadOnly
+                            bg="green.50"
+                            borderColor="green.200"
+                            color="green.700"
+                          />
+                        </FormControl>
+                      )}
+
+                      <Box w="full" pt={4} borderTop="1px solid" borderColor="gray.200">
+                        <Text fontSize="md" fontWeight="semibold" color="gray.800" mb={4}>
+                          Preferences
+                        </Text>
+                        <Stack spacing={4}>
+                          <Checkbox
+                            size="lg"
+                            isChecked={vegan}
+                            onChange={(e) => setVegan(e.target.checked)}
+                            colorScheme="green"
+                            spacing={3}
+                          >
+                            <Box>
+                              <Text fontWeight="medium">Vegetarian / Vegan</Text>
+                              <Text fontSize="sm" color="gray.600">
+                                Customized meal recommendations
+                              </Text>
+                            </Box>
+                          </Checkbox>
+                          <Box>
+                            <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>
+                              Notifications
+                            </Text>
+                            <Stack spacing={3} pl={1}>
+                              <Checkbox
+                                isChecked={notifyViaEmail}
+                                onChange={(e) => setNotifyViaEmail(e.target.checked)}
+                                colorScheme="blue"
+                              >
+                                <Flex align="center" gap={2}>
+                                  <Icon as={FaEnvelope} color="blue.500" />
+                                  <Text>Email</Text>
+                                </Flex>
+                              </Checkbox>
+                              <Checkbox
+                                isChecked={notifyViaCall}
+                                onChange={(e) => setNotifyViaCall(e.target.checked)}
+                                colorScheme="green"
+                              >
+                                <Flex align="center" gap={2}>
+                                  <Icon as={FaPhoneAlt} color="green.500" />
+                                  <Text>Phone</Text>
+                                </Flex>
+                              </Checkbox>
+                              <Checkbox
+                                isChecked={notifyViaWhatsApp}
+                                onChange={(e) => setNotifyViaWhatsApp(e.target.checked)}
+                                colorScheme="whatsapp"
+                              >
+                                <Flex align="center" gap={2}>
+                                  <Icon as={FaWhatsapp} color="whatsapp.600" />
+                                  <Text>WhatsApp</Text>
+                                </Flex>
+                              </Checkbox>
+                            </Stack>
+                          </Box>
+                        </Stack>
+                      </Box>
+
+                      <Box w="full">
+                        <Checkbox
+                          size="lg"
+                          name="terms"
+                          colorScheme="green"
+                          isRequired
+                          spacing={3}
+                        >
+                          <Box>
+                            <Text fontWeight="medium">
+                              I agree to the{" "}
+                              <ChakraLink
+                                as={Link}
+                                href="/terms"
+                                color={ThemeColors.primaryColor}
+                                fontWeight="semibold"
+                                _hover={{ textDecoration: "underline" }}
+                              >
+                                Terms
+                              </ChakraLink>{" "}
+                              and{" "}
+                              <ChakraLink
+                                as={Link}
+                                href="/privacy"
+                                color={ThemeColors.primaryColor}
+                                fontWeight="semibold"
+                                _hover={{ textDecoration: "underline" }}
+                              >
+                                Privacy Policy
+                              </ChakraLink>
+                            </Text>
+                          </Box>
+                        </Checkbox>
+                      </Box>
+
+                      <MotionButton
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="submit"
+                        size="lg"
+                        w="full"
+                        h="56px"
+                        bg={ThemeColors.primaryColor}
+                        color="white"
+                        borderRadius="xl"
+                        isLoading={isLoading}
+                        loadingText="Creating…"
+                        _hover={{
+                          bg: ThemeColors.darkColor,
+                          transform: "translateY(-2px)",
+                          boxShadow: `0 10px 25px ${ThemeColors.primaryColor}4D`,
+                        }}
+                        _active={{ transform: "translateY(0)" }}
+                        fontWeight="semibold"
+                        fontSize="md"
+                      >
+                        Create account
+                      </MotionButton>
+                    </VStack>
+                  </form>
+
+                  <Alert status="info" borderRadius="lg" mt={6} variant="subtle" size="sm">
+                    <AlertIcon />
+                    <Box>
+                      <AlertTitle fontSize="sm">Secure</AlertTitle>
+                      <AlertDescription fontSize="xs">
+                        Encrypted registration
+                      </AlertDescription>
+                    </Box>
+                  </Alert>
+                </CardBody>
+              </Card>
+
+              <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={4} mt={8}>
+                <ChakraLink
+                  as={Link}
+                  href="/subscription"
+                  bg="white"
+                  p={4}
+                  borderRadius="xl"
+                  textAlign="center"
+                  border="1px solid"
+                  borderColor="gray.200"
+                  _hover={{
+                    borderColor: ThemeColors.primaryColor,
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
                   }}
-                  gridGap={"1rem"}
+                  transition="all 0.3s"
                 >
-                  <Box padding={"0.5rem 0"}>
-                    <FormControl isRequired>
-                      <FormLabel htmlFor="email">Email *</FormLabel>
-                      <Input
-                        type="email"
-                        id="email"
-                        placeholder="email is required"
-                        name="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </FormControl>
-                  </Box>
-                  <Box padding={"0.5rem 0"}>
-                    <FormControl>
-                      <FormLabel htmlFor="dob">Date of Birth *</FormLabel>
-                      <Input
-                        type="date"
-                        id="dob"
-                        placeholder=""
-                        name="dob"
-                        value={dob}
-                        onChange={(e) => setDob(e.target.value)}
-                      />
-                    </FormControl>
-                  </Box>
-                </Grid>
-
-                <Grid
-                  gridTemplateColumns={{
-                    base: "repeat(1, 1fr)",
-                    md: "repeat(1, 1fr)",
-                    xl: "repeat(2, 1fr)",
+                  <Text fontWeight="semibold" color="gray.800">Plans</Text>
+                  <Text fontSize="sm" color="gray.600">Subscribe</Text>
+                </ChakraLink>
+                <ChakraLink
+                  as={Link}
+                  href="/partner"
+                  bg="white"
+                  p={4}
+                  borderRadius="xl"
+                  textAlign="center"
+                  border="1px solid"
+                  borderColor="gray.200"
+                  _hover={{
+                    borderColor: ThemeColors.primaryColor,
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
                   }}
-                  gridGap={"1rem"}
+                  transition="all 0.3s"
                 >
-                  <Box padding={"0.5rem 0"}>
-                    <FormControl>
-                      <FormLabel htmlFor="address">Address</FormLabel>
-                      <Input
-                        type="text"
-                        id="address"
-                        placeholder=""
-                        name="address"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                      />
-                    </FormControl>
-                  </Box>
-                  {referralCode!==null && referralCode.toString()!==""?
-                  <Box padding={"0.5rem 0"}>
-                  <FormControl>
-                      <FormLabel htmlFor="email">Referral Code</FormLabel>
-                      <Input
-                      disabled
-                      _hover={{}}
-                        type="text"
-                        id="referralCode"
-                        placeholder=""
-                        name="referralCode"
-                        value={referralCode}
-                        onChange={(e) => setReferralCode(e.target.value)}
-                      />
-                    </FormControl>
-                  </Box>:null}
-                </Grid>
-
-               
-                <Box padding={"0.5rem 0"}>
-                  <FormControl>
-                    <FormLabel htmlFor="password">Password</FormLabel>
-                    <Input
-                      type="password"
-                      placeholder="password is required"
-                      name="password"
-                      id="signup-password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </FormControl>
-                </Box>
-                <Box padding="1rem 0">
-                  <Text display="flex">
-                    Access your account{" "}
-                    <Link
-                      href={"/signin"}
-                      style={{
-                        color: ThemeColors.darkColor,
-                        margin: "0 0.5rem",
-                      }}
-                    >
-                      Sign In
-                    </Link>
-                  </Text>
-                </Box>
-
-                {/* Notification Preferences */}
-                <Box padding={"1rem 0"} borderTop={"1px solid"} borderColor={"gray.200"} marginTop={"1rem"}>
-                  <Text fontSize={"md"} fontWeight={"bold"} marginBottom={"0.75rem"} color={ThemeColors.darkColor}>
-                    Notification Preferences
-                  </Text>
-                  <Text fontSize={"sm"} color={"gray.600"} marginBottom={"1rem"}>
-                    Choose how you'd like to receive notifications (Email is default)
-                  </Text>
-                  <Stack spacing={3}>
-                    <Checkbox
-                      isChecked={notifyViaEmail}
-                      onChange={(e) => setNotifyViaEmail(e.target.checked)}
-                      colorScheme="blue"
-                    >
-                      <Text fontSize={"sm"}>Email Notifications (Default)</Text>
-                    </Checkbox>
-                    <Checkbox
-                      isChecked={notifyViaCall}
-                      onChange={(e) => setNotifyViaCall(e.target.checked)}
-                      colorScheme="green"
-                    >
-                      <Text fontSize={"sm"}>Phone Call Notifications</Text>
-                    </Checkbox>
-                    <Checkbox
-                      isChecked={notifyViaWhatsApp}
-                      onChange={(e) => setNotifyViaWhatsApp(e.target.checked)}
-                      colorScheme="green"
-                    >
-                      <Text fontSize={"sm"}>WhatsApp Notifications</Text>
-                    </Checkbox>
-                  </Stack>
-                </Box>
-
-                <Box padding={"0.5rem 0"}>
-                  <div className="flex">
-                    <input
-                      type="checkbox"
-                      name="vegan"
-                      checked={vegan}
-                      onChange={(e) => setVegan(e.target.checked)}
-                      className="mr-4"
-                    />
-                    <p className="">Are you vegetarian ?</p>
-                  </div>
-                </Box>
-
-                <Box padding={"0.5rem 0"}>
-                  <input type="checkbox" name="terms" className="mr-4" />I agree
-                  to the{" "}
-                  <Link href={"/usage"}>
-                    <span style={{ color: ThemeColors.darkColor }}>
-                      terms and conditions
-                    </span>
-                  </Link>
-                </Box>
-
-                <Box padding={"0.5rem 0"}>
-                  <ButtonComponent
-                    type={"submit"}
-                    text={"Sign Up"}
-                    icon={isLoading && <Loader />}
-                    size={"regular"}
-                  />
-                </Box>
-              </form>
-
-              <Text fontSize="3xl" textAlign="center">
-                <Link href="/subscription">
-                   <ButtonComponent
-                    size="regular"
-                    type="button"
-                    text="View Our Subscription Packages"
-                    icon={false} 
-                     />
-                </Link>
-             </Text>
-            </Box>
-          </Flex>
+                  <Text fontWeight="semibold" color="gray.800">Partner</Text>
+                  <Text fontSize="sm" color="gray.600">Join us</Text>
+                </ChakraLink>
+                <ChakraLink
+                  as={Link}
+                  href="/contact"
+                  bg="white"
+                  p={4}
+                  borderRadius="xl"
+                  textAlign="center"
+                  border="1px solid"
+                  borderColor="gray.200"
+                  _hover={{
+                    borderColor: ThemeColors.primaryColor,
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
+                  }}
+                  transition="all 0.3s"
+                >
+                  <Text fontWeight="semibold" color="gray.800">Help</Text>
+                  <Text fontSize="sm" color="gray.600">Contact</Text>
+                </ChakraLink>
+              </SimpleGrid>
+            </MotionBox>
+          </Box>
         </Box>
-      </Box>
-    </>
+      </Flex>
+    </Container>
   );
 };
 

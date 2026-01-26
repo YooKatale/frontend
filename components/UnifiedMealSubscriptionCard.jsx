@@ -79,8 +79,8 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
     { planType, context: "meal_plan" },
     { skip: !planType }
   );
-  const avgRating = ratingsData?.data?.average ?? 0;
-  const totalRatings = ratingsData?.data?.total ?? 0;
+  const avgRating = ratingsData?.stats?.average ?? ratingsData?.data?.average ?? 0;
+  const totalRatings = ratingsData?.stats?.total ?? ratingsData?.data?.total ?? 0;
 
   const planName = planType.charAt(0).toUpperCase() + planType.slice(1);
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];

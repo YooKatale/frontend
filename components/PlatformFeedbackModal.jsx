@@ -18,6 +18,7 @@ import {
   Textarea,
   FormControl,
   FormLabel,
+  Select,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import React, { useState, useEffect } from "react";
@@ -30,6 +31,7 @@ const PlatformFeedbackModal = () => {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [feedback, setFeedback] = useState("");
+  const [category, setCategory] = useState("general");
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [userAgent, setUserAgent] = useState("");
 
@@ -114,8 +116,9 @@ const PlatformFeedbackModal = () => {
     try {
       const feedbackData = {
         userId: userInfo?._id || null,
-        rating: rating,
+        rating,
         feedback: feedback.trim() || null,
+        category: category || "general",
         platform: /iPad|iPhone|iPod/.test(userAgent) ? "ios" : /android/i.test(userAgent) ? "android" : "web",
         userEmail: userInfo?.email || null,
         userName: userInfo?.firstname || userInfo?.email?.split("@")[0] || "Anonymous",
@@ -141,6 +144,7 @@ const PlatformFeedbackModal = () => {
         setHasSubmitted(false);
         setRating(0);
         setFeedback("");
+        setCategory("general");
       }, 2000);
     } catch (error) {
       console.error("Error submitting feedback:", error);
@@ -257,6 +261,27 @@ const PlatformFeedbackModal = () => {
               </Box>
 
               <Box w="100%">
+                <FormControl>
+                  <FormLabel fontSize={{ base: "sm", md: "md" }} mb={2}>
+                    Category (optional)
+                  </FormLabel>
+                  <Select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    size="md"
+                    borderRadius="lg"
+                    borderColor="gray.300"
+                    _focus={{ borderColor: ThemeColors.darkColor, boxShadow: `0 0 0 1px ${ThemeColors.darkColor}` }}
+                    mb={4}
+                  >
+                    <option value="general">General experience</option>
+                    <option value="service">Service</option>
+                    <option value="delivery">Delivery</option>
+                    <option value="product">Products</option>
+                    <option value="app">App</option>
+                    <option value="other">Other</option>
+                  </Select>
+                </FormControl>
                 <FormControl>
                   <FormLabel fontSize={{ base: "sm", md: "md" }} mb={2}>
                     Tell Us More (Optional)
