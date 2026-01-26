@@ -14,6 +14,8 @@ import {
   Checkbox,
   Spinner,
   Stack,
+  Icon,
+  Container,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import Link from "next/link";
@@ -22,10 +24,13 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRegisterMutation } from "@slices/usersApiSlice";
 import { setCredentials } from "@slices/authSlice";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import ButtonComponent from "@components/Button";
 import { Loader } from "lucide-react";
 import Image from "next/image";
+import { FcGoogle } from "react-icons/fc";
+import { motion } from "framer-motion";
+import { API_ORIGIN } from "@config/config";
 
 const SignUp = () => {
   // states
@@ -51,6 +56,7 @@ const SignUp = () => {
   const dispatch = useDispatch();
 
   const [register] = useRegisterMutation();
+  const [isGoogleLoading, setGoogleLoading] = useState(false);
 
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -150,6 +156,14 @@ const SignUp = () => {
       });
     }
   };
+
+  const handleGoogleSignup = () => {
+    setGoogleLoading(true);
+    const params = new URLSearchParams({ redirect: "/", mode: "signup" });
+    window.location.href = `${API_ORIGIN}/api/auth/google?${params.toString()}`;
+  };
+
+  const teal = "#319795";
 
   return (
     <>
@@ -289,6 +303,60 @@ const SignUp = () => {
               width={{ base: "90%", md: "80%", xl: "60%" }}
               padding={"1rem"}
             >
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                style={{ marginBottom: "1.5rem" }}
+              >
+                <Box
+                  bg="white"
+                  borderRadius="xl"
+                  boxShadow="0 4px 20px rgba(0,0,0,0.08)"
+                  p={6}
+                  border="1px solid"
+                  borderColor="gray.100"
+                >
+                  <Heading size="md" mb={2} color="gray.800">
+                    Create Account
+                  </Heading>
+                  <Text fontSize="sm" color="gray.500" mb={4}>
+                    Sign up with Google or use the form below.
+                  </Text>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={handleGoogleSignup}
+                    isLoading={isGoogleLoading}
+                    loadingText="Connecting..."
+                    leftIcon={<Icon as={FcGoogle} boxSize={5} />}
+                    w="100%"
+                    height="48px"
+                    borderRadius="xl"
+                    borderColor="gray.200"
+                    color={teal}
+                    _hover={{
+                      bg: "gray.50",
+                      borderColor: teal,
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(49, 151, 149, 0.2)",
+                    }}
+                    _active={{ transform: "translateY(0)" }}
+                    transition="all 0.2s"
+                    fontWeight="600"
+                  >
+                    Continue with Google
+                  </Button>
+                  <Flex align="center" my={4}>
+                    <Box flex="1" height="1px" bg="gray.200" />
+                    <Text px={4} color="gray.400" fontSize="sm" fontWeight="600">
+                      OR SIGN UP WITH EMAIL
+                    </Text>
+                    <Box flex="1" height="1px" bg="gray.200" />
+                  </Flex>
+                </Box>
+              </motion.div>
+
               <form onSubmit={handleSubmit}>
                 <Grid
                   gridTemplateColumns={{
@@ -446,7 +514,7 @@ const SignUp = () => {
                       type="password"
                       placeholder="password is required"
                       name="password"
-                      id={`password${Math.random(0,10000)}`}
+                      id="signup-password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />

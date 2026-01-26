@@ -10,6 +10,9 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    authMe: builder.query({
+      query: () => ({ url: `${DB_URL}/auth/me` }),
+    }),
     register: builder.mutation({
       query: (data) => ({
         url: `${DB_URL}/auth/register`,
@@ -280,6 +283,8 @@ export const usersApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useLoginMutation,
+  useAuthMeQuery,
+  useLazyAuthMeQuery,
   useRegisterMutation,
   useLogoutMutation,
   useCommentsGetMutation,
