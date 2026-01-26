@@ -28,13 +28,13 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ShoppingCart, Check, Calendar, Clock, X, Share2, Star } from "lucide-react";
 import { getMealForDay } from "@lib/mealMenuConfig";
 import { getMealPricing, formatPrice } from "@lib/mealPricingConfig";
 import { getMealImageUrl } from "@lib/mealImageMap";
 import { useNewScheduleMutation } from "@slices/productsApiSlice";
-import { usePlanRatingCreateMutation, useGetPlanRatingsQuery } from "@slices/usersApiSlice";
+import { usePlanRatingCreateMutation, useGetPlanRatingsQuery, useMealCalendarOverridesGetMutation } from "@slices/usersApiSlice";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -58,12 +58,23 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
   const [ratingHover, setRatingHover] = useState(0);
   const [ratingEffect, setRatingEffect] = useState(false);
   const [failedImages, setFailedImages] = useState(() => new Set());
+  const [mealOverrides, setMealOverrides] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const { userInfo } = useSelector((state) => state.auth);
   const router = useRouter();
   const [createSchedule] = useNewScheduleMutation();
   const [createPlanRating] = usePlanRatingCreateMutation();
+  const [fetchOverrides] = useMealCalendarOverridesGetMutation();
+
+  useEffect(() => {
+    fetchOverrides()
+      .unwrap()
+      .then((res) => {
+        if (res?.status === "Success" && Array.isArray(res?.data)) setMealOverrides(res.data);
+      })
+      .catch(() => {});
+  }, [fetchOverrides]);
   const { data: ratingsData, refetch: refetchRatings } = useGetPlanRatingsQuery(
     { planType, context: "meal_plan" },
     { skip: !planType }
@@ -95,6 +106,18 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
       };
     }
     return null;
+  };
+
+  const getMealImage = (meal, day, mealTypeId, prepTypeId) => {
+    const override = mealOverrides.find(
+      (o) =>
+        o.incomeLevel === incomeLevel &&
+        o.prepType === prepTypeId &&
+        o.day === day &&
+        o.mealType === mealTypeId
+    );
+    if (override?.imageUrl) return override.imageUrl;
+    return getMealImageUrl(meal);
   };
 
   const handleMealSelect = (meal) => {
@@ -167,7 +190,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
     try {
       await createPlanRating({
         userId: userInfo._id,
-        planType: safePlanType,
+        planType,
         context: "meal_plan",
         rating: planRating,
         userEmail: userInfo?.email || null,
@@ -494,7 +517,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                                 `${meal.meal}-${mealType.id}-${prepType.id}`
                               )
                                 ? "/assets/images/img5.png"
-                                : getMealImageUrl(meal)
+                                : getMealImage(meal, selectedDay, mealType.id, prepType.id)
                             }
                             alt={meal.meal || "Meal"}
                             w="100%"

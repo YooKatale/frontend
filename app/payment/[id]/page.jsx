@@ -1,10 +1,10 @@
 "use client";
 
-import { useToast } from "@chakra-ui/react";
+import { useToast, Box, Flex, Text, SimpleGrid, useBreakpointValue } from "@chakra-ui/react";
 import ButtonComponent from "@components/Button";
 import FlutterwavePayment from "@components/FlutterwavePayment";
-import PaymentCard from "@components/PaymentCard";
 import { Input } from "@components/ui/input";
+import { PaymentLogos, ThemeColors } from "@constants/constants";
 import {
   useOrderMutation,
   useOrderUpdateMutation,
@@ -340,26 +340,48 @@ const Payment = ({ params }) => {
                   </h3>
                 </div>
 
-                <div className="py-2 flex justify-center">
-                  <select
-                    name="paymentOption"
-                    id=""
-                    className="border-2 border-light py-2 px-4 rounded-md cursor-pointer"
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  >
-                    <option value="">Select payment method</option>
-                    <option value="mobileMoney">Mobile Money</option>
-                    <option value="card">Debit/Credit Card</option>
-                    <option value="cash_on_delivery">Cash on Delivery</option>
-                    {isSubscribed ? (
-                      <option value="payLater">Pay Later</option>
-                    ) : null}
-                  </select>
-                </div>
+                <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={3} maxW="500px" mx="auto" mt={4}>
+                  {[
+                    {
+                      value: "mobileMoney",
+                      label: "Mobile Money",
+                      logos: (
+                        <Flex gap={2} align="center" justify="center">
+                          <Box as="img" src={PaymentLogos.mtn} alt="MTN" w="36px" h="36px" objectFit="contain" />
+                          <Box as="img" src={PaymentLogos.airtel} alt="Airtel" w="36px" h="36px" objectFit="contain" />
+                        </Flex>
+                      ),
+                    },
+                    { value: "card", label: "Debit/Credit Card", logos: <Text fontSize="sm" color="gray.600">Visa • Mastercard</Text> },
+                    { value: "cash_on_delivery", label: "Cash on Delivery", logos: <Text fontSize="sm" color="gray.600">Pay when you receive</Text> },
+                    ...(isSubscribed ? [{ value: "payLater", label: "Pay Later", logos: <Text fontSize="sm" color="gray.600">For subscribers</Text> }] : []),
+                  ].map((opt) => (
+                    <Box
+                      key={opt.value}
+                      as="button"
+                      type="button"
+                      onClick={() => setPaymentMethod(opt.value)}
+                      p={4}
+                      borderRadius="lg"
+                      borderWidth="2px"
+                      borderColor={paymentMethod === opt.value ? ThemeColors.primaryColor : "gray.200"}
+                      bg={paymentMethod === opt.value ? `${ThemeColors.primaryColor}08` : "white"}
+                      textAlign="center"
+                      _hover={{ borderColor: ThemeColors.primaryColor, bg: `${ThemeColors.primaryColor}08` }}
+                      transition="all 0.2s"
+                    >
+                      <Box mb={1}>{opt.logos}</Box>
+                      <Text fontWeight="600" color="gray.800">{opt.label}</Text>
+                    </Box>
+                  ))}
+                </SimpleGrid>
               </div>
 
               <div className="py-2 flex justify-center items-center">
-                <div onClick={handlePayment}>
+                <div
+                  onClick={() => paymentMethod && !isLoading && handlePayment()}
+                  className={!paymentMethod || isLoading ? "opacity-60 cursor-not-allowed pointer-events-none" : "cursor-pointer"}
+                >
                   <ButtonComponent
                     text={"Make Payment"}
                     size={"lg"}

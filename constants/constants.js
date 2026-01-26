@@ -18,6 +18,12 @@ export const ThemeColors = {
   lightColor: "#F0F0F0",
 };
 
+/** MTN & Airtel payment logos — use on cashout, payment page, and all payment UIs */
+export const PaymentLogos = {
+  mtn: "/assets/images/payment/mtn-mobile-money.png",
+  airtel: "/assets/images/payment/airtel-money.png",
+};
+
 export const Images = {
   logo,
   logo1,

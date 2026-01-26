@@ -91,6 +91,12 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    mealCalendarOverridesGet: builder.mutation({
+      query: () => ({
+        url: `${DB_URL}/meal-calendar/overrides`,
+        method: "GET",
+      }),
+    }),
     messagePost: builder.mutation({
       query: (data) => ({
         url: `${DB_URL}/message`,
@@ -286,6 +292,7 @@ export const {
   useGetPlanRatingsQuery,
   useSubscriptionPackageGetMutation,
   useSubscriptionPostMutation,
+  useMealCalendarOverridesGetMutation,
   useMessagePostMutation,
   useBlogFetchMutation,
   useBlogsFetchMutation,
