@@ -106,6 +106,7 @@ export default function CashoutPage() {
   const [selectedPayoutMethod, setSelectedPayoutMethod] = useState(null);
   const [withdrawals, setWithdrawals] = useState([]);
   const [loadingWithdrawals, setLoadingWithdrawals] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   const [stats, setStats] = useState({ cash: 0, invites: 0, loyalty: 0 });
   const [payoutMethods, setPayoutMethods] = useState([]);
@@ -154,10 +155,14 @@ export default function CashoutPage() {
   }, [getPayoutMethods]);
 
   useEffect(() => {
+    setIsCheckingAuth(true);
+    // Check if userInfo is available
     if (!userInfo || typeof userInfo !== "object" || Object.keys(userInfo).length === 0) {
+      setIsCheckingAuth(false);
       router.push("/signin");
       return;
     }
+    setIsCheckingAuth(false);
     // Load data - errors are handled in individual load functions
     loadStats().catch(console.error);
     loadMethods().catch(console.error);
@@ -372,8 +377,16 @@ export default function CashoutPage() {
     return <Icon as={FaMobileAlt} boxSize={safeSize} color={ThemeColors.primaryColor} />;
   };
 
-  if (!userInfo) {
-    return null;
+  // Show loading state while checking authentication
+  if (isCheckingAuth || !userInfo || typeof userInfo !== "object" || Object.keys(userInfo).length === 0) {
+    return (
+      <Box minH="100vh" bg="gray.50" display="flex" alignItems="center" justifyContent="center">
+        <VStack spacing={4}>
+          <Skeleton h="40px" w="200px" />
+          <Skeleton h="20px" w="150px" />
+        </VStack>
+      </Box>
+    );
   }
 
   return (
@@ -419,7 +432,22 @@ export default function CashoutPage() {
                           {s.key === "loyalty" && String(stats.loyalty || 0)}
                         </Heading>
                       )}
-                      <Text fontSize="xs" color="gray.500">{s.sub}</Text>
+                      <HStack spacing={2}>
+                        <Text fontSize="xs" color="gray.500">{s.sub}</Text>
+                        {s.key === "cash" && (stats.cash || 0) > 0 && (
+                          <Button
+                            size="xs"
+                            leftIcon={<FaArrowDown />}
+                            colorScheme="green"
+                            bg={ThemeColors.primaryColor}
+                            _hover={{ bg: ThemeColors.secondaryColor }}
+                            onClick={handleWithdraw}
+                            variant="solid"
+                          >
+                            Withdraw
+                          </Button>
+                        )}
+                      </HStack>
                     </VStack>
                     <Box p={3} borderRadius="xl" bgGradient={s.gradient} color="white">
                       <Icon as={s.icon} boxSize={6} />
