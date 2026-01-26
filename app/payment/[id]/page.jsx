@@ -1,6 +1,6 @@
 "use client";
 
-import { useToast, Box, Flex, Text, SimpleGrid, useBreakpointValue } from "@chakra-ui/react";
+import { useToast, Box, Flex, Text, SimpleGrid } from "@chakra-ui/react";
 import ButtonComponent from "@components/Button";
 import FlutterwavePayment from "@components/FlutterwavePayment";
 import { Input } from "@components/ui/input";
@@ -279,29 +279,6 @@ const Payment = ({ params }) => {
                     UGX {FormatCurr(Order?.total)}
                   </span>
                 </h3>
-              </div>
-
-              <div className="py-6 hidden">
-                <div className="py-1">
-                  <h3 className="text-center text-[1.3rem]">
-                    Select payment option
-                  </h3>
-                </div>
-
-                <div className="py-2">
-                  <div className="flex justify-center items-center gap-4">
-                    <PaymentCard
-                      text={"Mobile Money"}
-                      type={""}
-                      paymentMethod={"mobileMoney"}
-                    />
-                    <PaymentCard
-                      text={"Credit/Debit Card"}
-                      type={""}
-                      paymentMethod={"card"}
-                    />
-                  </div>
-                </div>
               </div>
 
               <div className="flex">
