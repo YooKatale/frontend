@@ -59,7 +59,7 @@ import {
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   FaWallet,
   FaUsers,
@@ -78,6 +78,61 @@ import {
 } from "react-icons/fa";
 import { RiSecurePaymentLine } from "react-icons/ri";
 import { SiVisa, SiMastercard } from "react-icons/si";
+
+// MobileMoneyIcon component defined outside to avoid initialization issues
+const MobileMoneyIcon = ({ provider, size = 6, primaryColor = "#185f2d" }) => {
+  const safeSize = typeof size === "number" ? size : 6;
+  const boxSize = `${safeSize * 4}px`;
+  const fontSize = safeSize === 6 ? "12px" : safeSize === 5 ? "10px" : "14px";
+  
+  if (!provider) {
+    return <Icon as={FaMobileAlt} boxSize={safeSize} color={primaryColor} />;
+  }
+  
+  if (provider === "MTN") {
+    return (
+      <Box
+        w={boxSize}
+        h={boxSize}
+        minW={boxSize}
+        minH={boxSize}
+        bg="#FFCC00"
+        borderRadius="sm"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        color="black"
+        fontWeight="bold"
+        fontSize={fontSize}
+      >
+        MTN
+      </Box>
+    );
+  }
+  
+  if (provider === "AIRTEL") {
+    return (
+      <Box
+        w={boxSize}
+        h={boxSize}
+        minW={boxSize}
+        minH={boxSize}
+        bg="#E60012"
+        borderRadius="sm"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        color="white"
+        fontWeight="bold"
+        fontSize={fontSize}
+      >
+        A
+      </Box>
+    );
+  }
+  
+  return <Icon as={FaMobileAlt} boxSize={safeSize} color={primaryColor} />;
+};
 
 export default function CashoutPage() {
   const { userInfo } = useSelector((state) => state.auth);
@@ -115,17 +170,17 @@ export default function CashoutPage() {
   const [withdrawFunds, { isLoading: withdrawing }] = useWithdrawFundsMutation();
   const [getWithdrawals] = useGetWithdrawalsMutation();
 
-  // Safe theme color access with fallbacks - memoized to prevent re-initialization
-  const primaryColor = useMemo(() => ThemeColors?.primaryColor || "#185f2d", []);
-  const secondaryColor = useMemo(() => ThemeColors?.secondaryColor || "#2d8659", []);
-  const themeBg = useMemo(() => `${primaryColor}12`, [primaryColor]);
+  // Safe theme color access with fallbacks - simple constants to avoid initialization issues
+  const primaryColor = ThemeColors?.primaryColor || "#185f2d";
+  const secondaryColor = ThemeColors?.secondaryColor || "#2d8659";
+  const themeBg = `${primaryColor}12`;
   
-  // Memoize stat cards array to prevent re-creation
-  const statCards = useMemo(() => [
+  // Stat cards array
+  const statCards = [
     { key: "cash", label: "Cash Earned", sub: "Available to withdraw", icon: FaCoins, gradient: "linear(to-br, green.400, green.700)" },
     { key: "invites", label: "Total Invites", sub: "Friends referred", icon: FaUsers, gradient: "linear(to-br, blue.400, blue.700)" },
     { key: "loyalty", label: "Loyalty Points", sub: "Points to redeem", icon: FaStar, gradient: "linear(to-br, yellow.400, orange.500)" },
-  ], []);
+  ];
   
 
   const loadStats = useCallback(async () => {
@@ -321,61 +376,6 @@ export default function CashoutPage() {
     return FaCreditCard;
   };
 
-  // Custom icon component for MTN/Airtel with text/color - use primaryColor from parent scope
-  const MobileMoneyIcon = ({ provider, size = 6 }) => {
-    const safeSize = typeof size === "number" ? size : 6;
-    const boxSize = `${safeSize * 4}px`;
-    const fontSize = safeSize === 6 ? "12px" : safeSize === 5 ? "10px" : "14px";
-    const iconPrimaryColor = primaryColor;
-    
-    if (!provider) {
-      return <Icon as={FaMobileAlt} boxSize={safeSize} color={iconPrimaryColor} />;
-    }
-    
-    if (provider === "MTN") {
-      return (
-        <Box
-          w={boxSize}
-          h={boxSize}
-          minW={boxSize}
-          minH={boxSize}
-          bg="#FFCC00"
-          borderRadius="sm"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          color="black"
-          fontWeight="bold"
-          fontSize={fontSize}
-        >
-          MTN
-        </Box>
-      );
-    }
-    
-    if (provider === "AIRTEL") {
-      return (
-        <Box
-          w={boxSize}
-          h={boxSize}
-          minW={boxSize}
-          minH={boxSize}
-          bg="#E60012"
-          borderRadius="sm"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          color="white"
-          fontWeight="bold"
-          fontSize={fontSize}
-        >
-          A
-        </Box>
-      );
-    }
-    
-    return <Icon as={FaMobileAlt} boxSize={safeSize} color={iconPrimaryColor} />;
-  };
 
   // Show loading state while checking authentication
   if (isCheckingAuth || !userInfo || typeof userInfo !== "object" || Object.keys(userInfo).length === 0) {
@@ -549,7 +549,7 @@ export default function CashoutPage() {
                             justifyContent="center"
                           >
                             {m.type === "mobile_money" && m.provider ? (
-                              <MobileMoneyIcon provider={m.provider} size={6} />
+                              <MobileMoneyIcon provider={m.provider} size={6} primaryColor={primaryColor} />
                             ) : m.type === "card" ? (
                               <Icon as={getPaymentIcon(m)} boxSize={6} color={primaryColor} />
                             ) : (
@@ -616,7 +616,7 @@ export default function CashoutPage() {
                         </Select>
                         {mmProvider && (
                           <HStack mt={2} spacing={2} p={2} bg="gray.50" borderRadius="md">
-                            <MobileMoneyIcon provider={mmProvider} size={6} />
+                            <MobileMoneyIcon provider={mmProvider} size={6} primaryColor={primaryColor} />
                             <Text fontSize="sm" fontWeight="500" color="gray.700">{mmProvider === "MTN" ? "MTN Mobile Money" : "Airtel Money"} selected</Text>
                           </HStack>
                         )}
@@ -774,7 +774,7 @@ export default function CashoutPage() {
                   <Text fontSize="xs" color="gray.600" mb={1}>Withdrawing to:</Text>
                   <HStack>
                     {selectedPayoutMethod.type === "mobile_money" && selectedPayoutMethod.provider ? (
-                      <MobileMoneyIcon provider={selectedPayoutMethod.provider} size={5} />
+                      <MobileMoneyIcon provider={selectedPayoutMethod.provider} size={5} primaryColor={primaryColor} />
                     ) : selectedPayoutMethod.type === "card" ? (
                       <Icon as={getPaymentIcon(selectedPayoutMethod)} boxSize={5} color={primaryColor} />
                     ) : (
