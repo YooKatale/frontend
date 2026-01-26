@@ -94,6 +94,61 @@ const statCards = [
 const container = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } } };
 const item = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } };
 
+// Custom icon component for MTN/Airtel with text/color - moved outside to prevent re-creation
+const MobileMoneyIcon = ({ provider, size = 6 }) => {
+  const safeSize = typeof size === "number" ? size : 6;
+  const boxSize = `${safeSize * 4}px`;
+  const fontSize = safeSize === 6 ? "12px" : safeSize === 5 ? "10px" : "14px";
+  
+  if (!provider) {
+    return <Icon as={FaMobileAlt} boxSize={safeSize} color={ThemeColors.primaryColor} />;
+  }
+  
+  if (provider === "MTN") {
+    return (
+      <Box
+        w={boxSize}
+        h={boxSize}
+        minW={boxSize}
+        minH={boxSize}
+        bg="#FFCC00"
+        borderRadius="sm"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        color="black"
+        fontWeight="bold"
+        fontSize={fontSize}
+      >
+        MTN
+      </Box>
+    );
+  }
+  
+  if (provider === "AIRTEL") {
+    return (
+      <Box
+        w={boxSize}
+        h={boxSize}
+        minW={boxSize}
+        minH={boxSize}
+        bg="#E60012"
+        borderRadius="sm"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        color="white"
+        fontWeight="bold"
+        fontSize={fontSize}
+      >
+        A
+      </Box>
+    );
+  }
+  
+  return <Icon as={FaMobileAlt} boxSize={safeSize} color={ThemeColors.primaryColor} />;
+};
+
 export default function CashoutPage() {
   const { userInfo } = useSelector((state) => state.auth);
   const router = useRouter();
@@ -310,6 +365,7 @@ export default function CashoutPage() {
   };
 
   const getPaymentIcon = (method) => {
+    if (!method || !method.type) return FaCreditCard;
     if (method.type === "mobile_money") {
       // MTN and Airtel icons don't exist in react-icons, using FaMobileAlt with custom styling
       return FaMobileAlt;
@@ -320,61 +376,6 @@ export default function CashoutPage() {
       return FaCreditCard;
     }
     return FaCreditCard;
-  };
-
-  // Custom icon component for MTN/Airtel with text/color
-  const MobileMoneyIcon = ({ provider, size = 6 }) => {
-    const safeSize = typeof size === "number" ? size : 6;
-    const boxSize = `${safeSize * 4}px`;
-    const fontSize = safeSize === 6 ? "12px" : safeSize === 5 ? "10px" : "14px";
-    
-    if (!provider) {
-      return <Icon as={FaMobileAlt} boxSize={safeSize} color={ThemeColors.primaryColor} />;
-    }
-    
-    if (provider === "MTN") {
-      return (
-        <Box
-          w={boxSize}
-          h={boxSize}
-          minW={boxSize}
-          minH={boxSize}
-          bg="#FFCC00"
-          borderRadius="sm"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          color="black"
-          fontWeight="bold"
-          fontSize={fontSize}
-        >
-          MTN
-        </Box>
-      );
-    }
-    
-    if (provider === "AIRTEL") {
-      return (
-        <Box
-          w={boxSize}
-          h={boxSize}
-          minW={boxSize}
-          minH={boxSize}
-          bg="#E60012"
-          borderRadius="sm"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          color="white"
-          fontWeight="bold"
-          fontSize={fontSize}
-        >
-          A
-        </Box>
-      );
-    }
-    
-    return <Icon as={FaMobileAlt} boxSize={safeSize} color={ThemeColors.primaryColor} />;
   };
 
   // Show loading state while checking authentication
@@ -389,9 +390,10 @@ export default function CashoutPage() {
     );
   }
 
-  return (
-    <Box minH="100vh" bg="gray.50" fontFamily="body" pb={16}>
-      <ReferralModal isOpen={isReferralOpen} onClose={closeReferral} />
+  try {
+    return (
+      <Box minH="100vh" bg="gray.50" fontFamily="body" pb={16}>
+        <ReferralModal isOpen={isReferralOpen} onClose={closeReferral} />
 
       {/* Hero */}
       <Box
@@ -875,6 +877,18 @@ export default function CashoutPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </Box>
-  );
+      </Box>
+    );
+  } catch (error) {
+    console.error("CashoutPage error:", error);
+    return (
+      <Box minH="100vh" bg="gray.50" display="flex" alignItems="center" justifyContent="center" p={8}>
+        <VStack spacing={4}>
+          <Heading size="lg" color="red.500">Something went wrong</Heading>
+          <Text color="gray.600">Please refresh the page or contact support.</Text>
+          <Button onClick={() => window.location.reload()}>Refresh Page</Button>
+        </VStack>
+      </Box>
+    );
+  }
 }
