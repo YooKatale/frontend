@@ -83,17 +83,6 @@ import { SiVisa, SiMastercard } from "react-icons/si";
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
 
-const themeBg = `${ThemeColors.primaryColor}12`;
-
-const statCards = [
-  { key: "cash", label: "Cash Earned", sub: "Available to withdraw", icon: FaCoins, gradient: "linear(to-br, green.400, green.700)" },
-  { key: "invites", label: "Total Invites", sub: "Friends referred", icon: FaUsers, gradient: "linear(to-br, blue.400, blue.700)" },
-  { key: "loyalty", label: "Loyalty Points", sub: "Points to redeem", icon: FaStar, gradient: "linear(to-br, yellow.400, orange.500)" },
-];
-
-const container = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } } };
-const item = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } };
-
 export default function CashoutPage() {
   const { userInfo } = useSelector((state) => state.auth);
   const router = useRouter();
@@ -129,6 +118,16 @@ export default function CashoutPage() {
   const [setDefaultPayoutMethod, { isLoading: settingDefault }] = useSetDefaultPayoutMethodMutation();
   const [withdrawFunds, { isLoading: withdrawing }] = useWithdrawFundsMutation();
   const [getWithdrawals] = useGetWithdrawalsMutation();
+
+  // Define constants inside component to avoid initialization issues
+  const themeBg = `${ThemeColors?.primaryColor || "#185f2d"}12`;
+  const statCards = [
+    { key: "cash", label: "Cash Earned", sub: "Available to withdraw", icon: FaCoins, gradient: "linear(to-br, green.400, green.700)" },
+    { key: "invites", label: "Total Invites", sub: "Friends referred", icon: FaUsers, gradient: "linear(to-br, blue.400, blue.700)" },
+    { key: "loyalty", label: "Loyalty Points", sub: "Points to redeem", icon: FaStar, gradient: "linear(to-br, yellow.400, orange.500)" },
+  ];
+  const container = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } } };
+  const item = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } };
 
   const loadStats = useCallback(async () => {
     try {
@@ -391,8 +390,7 @@ export default function CashoutPage() {
     );
   }
 
-  try {
-    return (
+  return (
       <Box minH="100vh" bg="gray.50" fontFamily="body" pb={16}>
         <ReferralModal isOpen={isReferralOpen} onClose={closeReferral} />
 
@@ -880,16 +878,4 @@ export default function CashoutPage() {
       </Modal>
       </Box>
     );
-  } catch (error) {
-    console.error("CashoutPage error:", error);
-    return (
-      <Box minH="100vh" bg="gray.50" display="flex" alignItems="center" justifyContent="center" p={8}>
-        <VStack spacing={4}>
-          <Heading size="lg" color="red.500">Something went wrong</Heading>
-          <Text color="gray.600">Please refresh the page or contact support.</Text>
-          <Button onClick={() => window.location.reload()}>Refresh Page</Button>
-        </VStack>
-      </Box>
-    );
-  }
 }
