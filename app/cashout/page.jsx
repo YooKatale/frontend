@@ -46,6 +46,8 @@ import {
   useAddPayoutMethodMutation,
   useDeletePayoutMethodMutation,
   useSetDefaultPayoutMethodMutation,
+  useWithdrawFundsMutation,
+  useGetWithdrawalsMutation,
 } from "@slices/usersApiSlice";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
@@ -66,8 +68,11 @@ import {
   FaTrash,
   FaCheck,
   FaLock,
+  FaArrowDown,
 } from "react-icons/fa";
 import { RiSecurePaymentLine } from "react-icons/ri";
+import { SiMtn, SiVisa, SiMastercard } from "react-icons/si";
+import { TbBrandAirtel } from "react-icons/tb";
 
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
@@ -88,6 +93,13 @@ export default function CashoutPage() {
   const router = useRouter();
   const toast = useToast();
   const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = useDisclosure();
+  const { isOpen: isWithdrawOpen, onOpen: openWithdraw, onClose: closeWithdraw } = useDisclosure();
+  const { isOpen: isHistoryOpen, onOpen: openHistory, onClose: closeHistory } = useDisclosure();
+
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [selectedPayoutMethod, setSelectedPayoutMethod] = useState(null);
+  const [withdrawals, setWithdrawals] = useState([]);
+  const [loadingWithdrawals, setLoadingWithdrawals] = useState(false);
 
   const [stats, setStats] = useState({ cash: 0, invites: 0, loyalty: 0 });
   const [payoutMethods, setPayoutMethods] = useState([]);
@@ -108,6 +120,8 @@ export default function CashoutPage() {
   const [addPayoutMethod, { isLoading: adding }] = useAddPayoutMethodMutation();
   const [deletePayoutMethod, { isLoading: deleting }] = useDeletePayoutMethodMutation();
   const [setDefaultPayoutMethod, { isLoading: settingDefault }] = useSetDefaultPayoutMethodMutation();
+  const [withdrawFunds, { isLoading: withdrawing }] = useWithdrawFundsMutation();
+  const [getWithdrawals] = useGetWithdrawalsMutation();
 
   const loadStats = useCallback(async () => {
     try {
@@ -140,7 +154,8 @@ export default function CashoutPage() {
     }
     loadStats();
     loadMethods();
-  }, [userInfo, router, loadStats, loadMethods]);
+    loadWithdrawals();
+  }, [userInfo, router, loadStats, loadMethods, loadWithdrawals]);
 
   const handleSaveMobileMoney = async () => {
     setMmError("");
@@ -221,6 +236,79 @@ export default function CashoutPage() {
     } catch (e) {
       toast({ title: "Error", description: e?.data?.message || "Could not update.", status: "error", duration: 4000, isClosable: true });
     }
+  };
+
+  const loadWithdrawals = useCallback(async () => {
+    try {
+      setLoadingWithdrawals(true);
+      const res = await getWithdrawals().unwrap();
+      setWithdrawals(Array.isArray(res?.data) ? res.data : []);
+    } catch {
+      setWithdrawals([]);
+    } finally {
+      setLoadingWithdrawals(false);
+    }
+  }, [getWithdrawals]);
+
+  const handleWithdraw = () => {
+    const defaultMethod = payoutMethods.find((m) => m.isDefault && m.type === "mobile_money");
+    if (!defaultMethod && payoutMethods.length > 0) {
+      const firstMobile = payoutMethods.find((m) => m.type === "mobile_money");
+      if (firstMobile) {
+        setSelectedPayoutMethod(firstMobile);
+      } else {
+        toast({ title: "No Mobile Money", description: "Add a mobile money payout method first.", status: "warning", duration: 4000, isClosable: true });
+        return;
+      }
+    } else if (!defaultMethod) {
+      toast({ title: "No Payout Method", description: "Add a mobile money payout method to withdraw.", status: "warning", duration: 4000, isClosable: true });
+      return;
+    } else {
+      setSelectedPayoutMethod(defaultMethod);
+    }
+    setWithdrawAmount("");
+    openWithdraw();
+  };
+
+  const confirmWithdraw = async () => {
+    if (!selectedPayoutMethod) {
+      toast({ title: "Error", description: "Select a payout method.", status: "error", duration: 4000, isClosable: true });
+      return;
+    }
+    const amt = Number(withdrawAmount);
+    if (!Number.isFinite(amt) || amt < 1000) {
+      toast({ title: "Invalid Amount", description: "Minimum withdrawal is UGX 1,000.", status: "error", duration: 4000, isClosable: true });
+      return;
+    }
+    if (amt > (stats.cash || 0)) {
+      toast({ title: "Insufficient Balance", description: `Available: UGX ${(stats.cash || 0).toLocaleString()}`, status: "error", duration: 4000, isClosable: true });
+      return;
+    }
+    try {
+      const res = await withdrawFunds({ amount: amt, payoutMethodId: selectedPayoutMethod._id }).unwrap();
+      toast({ title: "Withdrawal Initiated", description: res?.message || `UGX ${amt.toLocaleString()} withdrawal processing...`, status: "success", duration: 5000, isClosable: true });
+      closeWithdraw();
+      setWithdrawAmount("");
+      setSelectedPayoutMethod(null);
+      loadStats();
+      loadWithdrawals();
+    } catch (e) {
+      toast({ title: "Error", description: e?.data?.message || e?.message || "Withdrawal failed.", status: "error", duration: 5000, isClosable: true });
+    }
+  };
+
+  const getPaymentIcon = (method) => {
+    if (method.type === "mobile_money") {
+      if (method.provider === "MTN") return SiMtn;
+      if (method.provider === "AIRTEL") return TbBrandAirtel;
+      return FaMobileAlt;
+    }
+    if (method.type === "card") {
+      if (method.brand === "Visa") return SiVisa;
+      if (method.brand === "Mastercard") return SiMastercard;
+      return FaCreditCard;
+    }
+    return FaCreditCard;
   };
 
   if (!userInfo) return null;
@@ -360,15 +448,36 @@ export default function CashoutPage() {
                         flexWrap="wrap"
                         gap={2}
                       >
-                        <HStack>
-                          {m.type === "mobile_money" ? (
-                            <Icon as={FaMobileAlt} color={ThemeColors.primaryColor} />
-                          ) : (
-                            <Icon as={FaCreditCard} color={ThemeColors.primaryColor} />
-                          )}
+                        <HStack spacing={3}>
+                          <Box
+                            p={2}
+                            borderRadius="lg"
+                            bg={`${ThemeColors.primaryColor}10`}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                          >
+                            <Icon as={getPaymentIcon(m)} boxSize={6} color={ThemeColors.primaryColor} />
+                          </Box>
                           <Box>
-                            {m.type === "mobile_money" && <Text fontWeight="600">{m.provider} • ***{String(m.phone || "").slice(-4)}</Text>}
-                            {m.type === "card" && <Text fontWeight="600">•••• {m.last4} {m.brand ? ` • ${m.brand}` : ""}</Text>}
+                            {m.type === "mobile_money" && (
+                              <HStack>
+                                <Text fontWeight="600">{m.provider}</Text>
+                                <Text color="gray.500">•</Text>
+                                <Text fontWeight="500" fontSize="sm">***{String(m.phone || "").slice(-4)}</Text>
+                              </HStack>
+                            )}
+                            {m.type === "card" && (
+                              <HStack>
+                                <Text fontWeight="600">•••• {m.last4}</Text>
+                                {m.brand && (
+                                  <>
+                                    <Text color="gray.500">•</Text>
+                                    <Text fontWeight="500" fontSize="sm">{m.brand}</Text>
+                                  </>
+                                )}
+                              </HStack>
+                            )}
                             {m.isDefault && <Badge size="sm" colorScheme="green" mt={1}>Default</Badge>}
                           </Box>
                         </HStack>
@@ -387,10 +496,10 @@ export default function CashoutPage() {
               <Tabs variant="soft-rounded" colorScheme="green">
                 <TabList flexWrap="wrap" gap={2} borderBottomWidth="1px" borderColor="gray.200" pb={4} mb={4}>
                   <Tab fontWeight="600" _selected={{ color: "white", bg: ThemeColors.primaryColor }}>
-                    <HStack><FaMobileAlt /><Text>Mobile Money</Text></HStack>
+                    <HStack><Icon as={FaMobileAlt} /><Text>Mobile Money</Text></HStack>
                   </Tab>
                   <Tab fontWeight="600" _selected={{ color: "white", bg: ThemeColors.primaryColor }}>
-                    <HStack><FaCreditCard /><Text>Card (last 4)</Text></HStack>
+                    <HStack><Icon as={FaCreditCard} /><Text>Card (last 4)</Text></HStack>
                   </Tab>
                 </TabList>
                 <TabPanels>
@@ -408,6 +517,13 @@ export default function CashoutPage() {
                           <option value="MTN">MTN Mobile Money</option>
                           <option value="AIRTEL">Airtel Money</option>
                         </Select>
+                        {mmProvider && (
+                          <HStack mt={2} spacing={2} p={2} bg="gray.50" borderRadius="md">
+                            {mmProvider === "MTN" && <Icon as={SiMtn} boxSize={6} color="#FFCC00" />}
+                            {mmProvider === "AIRTEL" && <Icon as={TbBrandAirtel} boxSize={6} color="#E60012" />}
+                            <Text fontSize="sm" fontWeight="500" color="gray.700">{mmProvider === "MTN" ? "MTN Mobile Money" : "Airtel Money"} selected</Text>
+                          </HStack>
+                        )}
                         <FormHelperText>Uganda: MTN (076,077,078,031,039) or Airtel (070,075,074,020)</FormHelperText>
                         <FormErrorMessage>{mmError}</FormErrorMessage>
                       </FormControl>
@@ -456,7 +572,7 @@ export default function CashoutPage() {
                       <FormControl>
                         <FormLabel fontWeight="600">Brand</FormLabel>
                         <Select
-                          placeholder="Visa / Mastercard"
+                          placeholder="Select card brand"
                           value={cardBrand}
                           onChange={(e) => setCardBrand(e.target.value)}
                           borderColor="gray.300"
@@ -502,8 +618,161 @@ export default function CashoutPage() {
               </Tabs>
             </CardBody>
           </MotionCard>
+
+          {/* Withdrawal History */}
+          <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden" mt={6}>
+            <CardBody>
+              <HStack mb={4} justify="space-between">
+                <HStack>
+                  <Box p={2} bg={themeBg} borderRadius="lg">
+                    <Icon as={FaArrowDown} color={ThemeColors.primaryColor} boxSize={5} />
+                  </Box>
+                  <Heading size="md" color="gray.800">Withdrawal History</Heading>
+                </HStack>
+                <Button size="sm" variant="ghost" onClick={() => { loadWithdrawals(); openHistory(); }}>
+                  View All
+                </Button>
+              </HStack>
+              {loadingWithdrawals ? (
+                <Skeleton h="60px" borderRadius="md" />
+              ) : withdrawals.length > 0 ? (
+                <VStack align="stretch" spacing={2}>
+                  {withdrawals.slice(0, 3).map((w) => (
+                    <Flex key={w._id} p={3} borderRadius="md" bg="gray.50" justify="space-between" align="center">
+                      <VStack align="start" spacing={0}>
+                        <Text fontWeight="600" fontSize="sm">UGX {w.amount.toLocaleString()}</Text>
+                        <Text fontSize="xs" color="gray.500">{new Date(w.createdAt).toLocaleDateString()}</Text>
+                      </VStack>
+                      <Badge
+                        colorScheme={
+                          w.status === "completed" ? "green" : w.status === "failed" ? "red" : w.status === "processing" ? "blue" : "gray"
+                        }
+                      >
+                        {w.status}
+                      </Badge>
+                    </Flex>
+                  ))}
+                </VStack>
+              ) : (
+                <Text fontSize="sm" color="gray.500" textAlign="center" py={4}>No withdrawals yet</Text>
+              )}
+            </CardBody>
+          </MotionCard>
         </motion.div>
       </Container>
+
+      {/* Withdrawal Modal */}
+      <Modal isOpen={isWithdrawOpen} onClose={closeWithdraw} size="md">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Withdraw Funds</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={4}>
+              <Box w="full">
+                <Text fontSize="sm" color="gray.600" mb={2}>Available Balance</Text>
+                <Heading size="lg" color={ThemeColors.primaryColor}>UGX {(stats.cash || 0).toLocaleString()}</Heading>
+              </Box>
+              {selectedPayoutMethod && (
+                <Box w="full" p={3} bg="gray.50" borderRadius="md">
+                  <Text fontSize="xs" color="gray.600" mb={1}>Withdrawing to:</Text>
+                  <HStack>
+                    <Icon as={getPaymentIcon(selectedPayoutMethod)} boxSize={5} color={ThemeColors.primaryColor} />
+                    <Text fontWeight="600">
+                      {selectedPayoutMethod.type === "mobile_money" 
+                        ? `${selectedPayoutMethod.provider} • ***${String(selectedPayoutMethod.phone || "").slice(-4)}`
+                        : `•••• ${selectedPayoutMethod.last4} ${selectedPayoutMethod.brand || ""}`}
+                    </Text>
+                  </HStack>
+                </Box>
+              )}
+              <FormControl>
+                <FormLabel fontWeight="600">Amount (UGX)</FormLabel>
+                <Input
+                  type="number"
+                  min={1000}
+                  placeholder="Minimum: 1,000"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                />
+                <FormHelperText>Minimum withdrawal: UGX 1,000</FormHelperText>
+              </FormControl>
+              {!selectedPayoutMethod && (
+                <Text fontSize="sm" color="red.500">Please add a mobile money payout method first.</Text>
+              )}
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" onClick={closeWithdraw}>Cancel</Button>
+            <Button
+              colorScheme="green"
+              bg={ThemeColors.primaryColor}
+              _hover={{ bg: ThemeColors.secondaryColor }}
+              onClick={confirmWithdraw}
+              isLoading={withdrawing}
+              isDisabled={!selectedPayoutMethod || !withdrawAmount || Number(withdrawAmount) < 1000}
+              leftIcon={<FaArrowDown />}
+            >
+              Withdraw
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Withdrawal History Modal */}
+      <Modal isOpen={isHistoryOpen} onClose={closeHistory} size="lg">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Withdrawal History</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {loadingWithdrawals ? (
+              <Skeleton h="200px" />
+            ) : withdrawals.length > 0 ? (
+              <VStack align="stretch" spacing={3}>
+                {withdrawals.map((w) => (
+                  <Flex
+                    key={w._id}
+                    p={4}
+                    borderRadius="lg"
+                    borderWidth="1px"
+                    borderColor="gray.200"
+                    justify="space-between"
+                    align="center"
+                  >
+                    <VStack align="start" spacing={1}>
+                      <HStack>
+                        <Text fontWeight="700" fontSize="lg">UGX {w.amount.toLocaleString()}</Text>
+                        <Badge
+                          colorScheme={
+                            w.status === "completed" ? "green" : w.status === "failed" ? "red" : w.status === "processing" ? "blue" : "gray"
+                          }
+                        >
+                          {w.status}
+                        </Badge>
+                      </HStack>
+                      <Text fontSize="xs" color="gray.500">
+                        {w.payoutMethod?.type === "mobile_money" 
+                          ? `${w.payoutMethod?.provider} • ***${String(w.payoutMethod?.phone || "").slice(-4)}`
+                          : `Card • •••• ${w.payoutMethod?.last4}`}
+                      </Text>
+                      <Text fontSize="xs" color="gray.400">{new Date(w.createdAt).toLocaleString()}</Text>
+                      {w.failureReason && (
+                        <Text fontSize="xs" color="red.500">Error: {w.failureReason}</Text>
+                      )}
+                    </VStack>
+                  </Flex>
+                ))}
+              </VStack>
+            ) : (
+              <Text textAlign="center" color="gray.500" py={8}>No withdrawal history</Text>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={closeHistory}>Close</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }
