@@ -223,6 +223,22 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    // Cashout & Payout methods
+    getCashoutStats: builder.mutation({
+      query: () => ({ url: `${DB_URL}/cashout/stats`, method: "GET" }),
+    }),
+    getPayoutMethods: builder.mutation({
+      query: () => ({ url: `${DB_URL}/payout-methods`, method: "GET" }),
+    }),
+    addPayoutMethod: builder.mutation({
+      query: (body) => ({ url: `${DB_URL}/payout-methods`, method: "POST", body }),
+    }),
+    deletePayoutMethod: builder.mutation({
+      query: (id) => ({ url: `${DB_URL}/payout-methods/${id}`, method: "DELETE" }),
+    }),
+    setDefaultPayoutMethod: builder.mutation({
+      query: (id) => ({ url: `${DB_URL}/payout-methods/${id}/default`, method: "PUT" }),
+    }),
   }),
 });
 
@@ -254,5 +270,10 @@ export const {
   useCreateReferralCodeMutation,
   useSendReferralEmailMutation,
   useSendWelcomeEmailMutation,
-  useSendMealNotificationEmailMutation
+  useSendMealNotificationEmailMutation,
+  useGetCashoutStatsMutation,
+  useGetPayoutMethodsMutation,
+  useAddPayoutMethodMutation,
+  useDeletePayoutMethodMutation,
+  useSetDefaultPayoutMethodMutation,
 } = usersApiSlice;
