@@ -59,7 +59,7 @@ import {
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   FaWallet,
@@ -79,6 +79,10 @@ import {
 } from "react-icons/fa";
 import { RiSecurePaymentLine } from "react-icons/ri";
 import { SiVisa, SiMastercard } from "react-icons/si";
+
+// Define motion components at module level after all imports are complete
+const MotionBox = motion(Box);
+const MotionCard = motion(Card);
 
 export default function CashoutPage() {
   const { userInfo } = useSelector((state) => state.auth);
@@ -116,20 +120,21 @@ export default function CashoutPage() {
   const [withdrawFunds, { isLoading: withdrawing }] = useWithdrawFundsMutation();
   const [getWithdrawals] = useGetWithdrawalsMutation();
 
-  // Define constants and motion components inside component to avoid initialization issues
-  const MotionBox = motion(Box);
-  const MotionCard = motion(Card);
-  // Safe theme color access with fallbacks
-  const primaryColor = ThemeColors?.primaryColor || "#185f2d";
-  const secondaryColor = ThemeColors?.secondaryColor || "#2d8659";
-  const themeBg = `${primaryColor}12`;
-  const statCards = [
+  // Safe theme color access with fallbacks - memoized to prevent re-initialization
+  const primaryColor = useMemo(() => ThemeColors?.primaryColor || "#185f2d", []);
+  const secondaryColor = useMemo(() => ThemeColors?.secondaryColor || "#2d8659", []);
+  const themeBg = useMemo(() => `${primaryColor}12`, [primaryColor]);
+  
+  // Memoize stat cards array to prevent re-creation
+  const statCards = useMemo(() => [
     { key: "cash", label: "Cash Earned", sub: "Available to withdraw", icon: FaCoins, gradient: "linear(to-br, green.400, green.700)" },
     { key: "invites", label: "Total Invites", sub: "Friends referred", icon: FaUsers, gradient: "linear(to-br, blue.400, blue.700)" },
     { key: "loyalty", label: "Loyalty Points", sub: "Points to redeem", icon: FaStar, gradient: "linear(to-br, yellow.400, orange.500)" },
-  ];
-  const container = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } } };
-  const item = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } };
+  ], []);
+  
+  // Memoize animation variants
+  const container = useMemo(() => ({ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } } }), []);
+  const item = useMemo(() => ({ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }), []);
 
   const loadStats = useCallback(async () => {
     try {
@@ -324,12 +329,12 @@ export default function CashoutPage() {
     return FaCreditCard;
   };
 
-  // Custom icon component for MTN/Airtel with text/color - defined inside component to avoid hoisting issues
+  // Custom icon component for MTN/Airtel with text/color - use primaryColor from parent scope
   const MobileMoneyIcon = ({ provider, size = 6 }) => {
     const safeSize = typeof size === "number" ? size : 6;
     const boxSize = `${safeSize * 4}px`;
     const fontSize = safeSize === 6 ? "12px" : safeSize === 5 ? "10px" : "14px";
-    const iconPrimaryColor = ThemeColors?.primaryColor || "#185f2d";
+    const iconPrimaryColor = primaryColor;
     
     if (!provider) {
       return <Icon as={FaMobileAlt} boxSize={safeSize} color={iconPrimaryColor} />;
