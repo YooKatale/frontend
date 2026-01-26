@@ -80,9 +80,6 @@ import {
 import { RiSecurePaymentLine } from "react-icons/ri";
 import { SiVisa, SiMastercard } from "react-icons/si";
 
-const MotionBox = motion(Box);
-const MotionCard = motion(Card);
-
 export default function CashoutPage() {
   const { userInfo } = useSelector((state) => state.auth);
   const router = useRouter();
@@ -119,7 +116,9 @@ export default function CashoutPage() {
   const [withdrawFunds, { isLoading: withdrawing }] = useWithdrawFundsMutation();
   const [getWithdrawals] = useGetWithdrawalsMutation();
 
-  // Define constants inside component to avoid initialization issues
+  // Define constants and motion components inside component to avoid initialization issues
+  const MotionBox = motion(Box);
+  const MotionCard = motion(Card);
   const themeBg = `${ThemeColors?.primaryColor || "#185f2d"}12`;
   const statCards = [
     { key: "cash", label: "Cash Earned", sub: "Available to withdraw", icon: FaCoins, gradient: "linear(to-br, green.400, green.700)" },
