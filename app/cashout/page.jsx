@@ -94,62 +94,6 @@ const statCards = [
 const container = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } } };
 const item = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } };
 
-// Custom icon component for MTN/Airtel with text/color - moved outside to prevent re-creation
-const MobileMoneyIcon = ({ provider, size = 6 }) => {
-  const safeSize = typeof size === "number" ? size : 6;
-  const boxSize = `${safeSize * 4}px`;
-  const fontSize = safeSize === 6 ? "12px" : safeSize === 5 ? "10px" : "14px";
-  const primaryColor = ThemeColors?.primaryColor || "#185f2d";
-  
-  if (!provider) {
-    return <Icon as={FaMobileAlt} boxSize={safeSize} color={primaryColor} />;
-  }
-  
-  if (provider === "MTN") {
-    return (
-      <Box
-        w={boxSize}
-        h={boxSize}
-        minW={boxSize}
-        minH={boxSize}
-        bg="#FFCC00"
-        borderRadius="sm"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        color="black"
-        fontWeight="bold"
-        fontSize={fontSize}
-      >
-        MTN
-      </Box>
-    );
-  }
-  
-  if (provider === "AIRTEL") {
-    return (
-      <Box
-        w={boxSize}
-        h={boxSize}
-        minW={boxSize}
-        minH={boxSize}
-        bg="#E60012"
-        borderRadius="sm"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        color="white"
-        fontWeight="bold"
-        fontSize={fontSize}
-      >
-        A
-      </Box>
-    );
-  }
-  
-  return <Icon as={FaMobileAlt} boxSize={safeSize} color={primaryColor} />;
-};
-
 export default function CashoutPage() {
   const { userInfo } = useSelector((state) => state.auth);
   const router = useRouter();
@@ -377,6 +321,62 @@ export default function CashoutPage() {
       return FaCreditCard;
     }
     return FaCreditCard;
+  };
+
+  // Custom icon component for MTN/Airtel with text/color - defined inside component to avoid hoisting issues
+  const MobileMoneyIcon = ({ provider, size = 6 }) => {
+    const safeSize = typeof size === "number" ? size : 6;
+    const boxSize = `${safeSize * 4}px`;
+    const fontSize = safeSize === 6 ? "12px" : safeSize === 5 ? "10px" : "14px";
+    const primaryColor = ThemeColors?.primaryColor || "#185f2d";
+    
+    if (!provider) {
+      return <Icon as={FaMobileAlt} boxSize={safeSize} color={primaryColor} />;
+    }
+    
+    if (provider === "MTN") {
+      return (
+        <Box
+          w={boxSize}
+          h={boxSize}
+          minW={boxSize}
+          minH={boxSize}
+          bg="#FFCC00"
+          borderRadius="sm"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          color="black"
+          fontWeight="bold"
+          fontSize={fontSize}
+        >
+          MTN
+        </Box>
+      );
+    }
+    
+    if (provider === "AIRTEL") {
+      return (
+        <Box
+          w={boxSize}
+          h={boxSize}
+          minW={boxSize}
+          minH={boxSize}
+          bg="#E60012"
+          borderRadius="sm"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          color="white"
+          fontWeight="bold"
+          fontSize={fontSize}
+        >
+          A
+        </Box>
+      );
+    }
+    
+    return <Icon as={FaMobileAlt} boxSize={safeSize} color={primaryColor} />;
   };
 
   // Show loading state while checking authentication
