@@ -158,9 +158,10 @@ export default function CashoutPage() {
       router.push("/signin");
       return;
     }
-    loadStats();
-    loadMethods();
-    loadWithdrawals();
+    // Load data - errors are handled in individual load functions
+    loadStats().catch(console.error);
+    loadMethods().catch(console.error);
+    loadWithdrawals().catch(console.error);
   }, [userInfo, router, loadStats, loadMethods, loadWithdrawals]);
 
   const handleSaveMobileMoney = async () => {
@@ -318,11 +319,21 @@ export default function CashoutPage() {
 
   // Custom icon component for MTN/Airtel with text/color
   const MobileMoneyIcon = ({ provider, size = 6 }) => {
+    const safeSize = typeof size === "number" ? size : 6;
+    const boxSize = `${safeSize * 4}px`;
+    const fontSize = safeSize === 6 ? "12px" : safeSize === 5 ? "10px" : "14px";
+    
+    if (!provider) {
+      return <Icon as={FaMobileAlt} boxSize={safeSize} color={ThemeColors.primaryColor} />;
+    }
+    
     if (provider === "MTN") {
       return (
         <Box
-          w={size}
-          h={size}
+          w={boxSize}
+          h={boxSize}
+          minW={boxSize}
+          minH={boxSize}
           bg="#FFCC00"
           borderRadius="sm"
           display="flex"
@@ -330,17 +341,20 @@ export default function CashoutPage() {
           justifyContent="center"
           color="black"
           fontWeight="bold"
-          fontSize={`${size * 0.6}px`}
+          fontSize={fontSize}
         >
           MTN
         </Box>
       );
     }
+    
     if (provider === "AIRTEL") {
       return (
         <Box
-          w={size}
-          h={size}
+          w={boxSize}
+          h={boxSize}
+          minW={boxSize}
+          minH={boxSize}
           bg="#E60012"
           borderRadius="sm"
           display="flex"
@@ -348,16 +362,19 @@ export default function CashoutPage() {
           justifyContent="center"
           color="white"
           fontWeight="bold"
-          fontSize={`${size * 0.5}px`}
+          fontSize={fontSize}
         >
           A
         </Box>
       );
     }
-    return <Icon as={FaMobileAlt} boxSize={size} />;
+    
+    return <Icon as={FaMobileAlt} boxSize={safeSize} color={ThemeColors.primaryColor} />;
   };
 
-  if (!userInfo) return null;
+  if (!userInfo) {
+    return null;
+  }
 
   return (
     <Box minH="100vh" bg="gray.50" fontFamily="body" pb={16}>
@@ -503,10 +520,12 @@ export default function CashoutPage() {
                             alignItems="center"
                             justifyContent="center"
                           >
-                            {m.type === "mobile_money" ? (
+                            {m.type === "mobile_money" && m.provider ? (
                               <MobileMoneyIcon provider={m.provider} size={6} />
-                            ) : (
+                            ) : m.type === "card" ? (
                               <Icon as={getPaymentIcon(m)} boxSize={6} color={ThemeColors.primaryColor} />
+                            ) : (
+                              <Icon as={FaMobileAlt} boxSize={6} color={ThemeColors.primaryColor} />
                             )}
                           </Box>
                           <Box>
@@ -726,10 +745,12 @@ export default function CashoutPage() {
                 <Box w="full" p={3} bg="gray.50" borderRadius="md">
                   <Text fontSize="xs" color="gray.600" mb={1}>Withdrawing to:</Text>
                   <HStack>
-                    {selectedPayoutMethod.type === "mobile_money" ? (
+                    {selectedPayoutMethod.type === "mobile_money" && selectedPayoutMethod.provider ? (
                       <MobileMoneyIcon provider={selectedPayoutMethod.provider} size={5} />
-                    ) : (
+                    ) : selectedPayoutMethod.type === "card" ? (
                       <Icon as={getPaymentIcon(selectedPayoutMethod)} boxSize={5} color={ThemeColors.primaryColor} />
+                    ) : (
+                      <Icon as={FaMobileAlt} boxSize={5} color={ThemeColors.primaryColor} />
                     )}
                     <Text fontWeight="600">
                       {selectedPayoutMethod.type === "mobile_money" 
