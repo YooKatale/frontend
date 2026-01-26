@@ -494,13 +494,13 @@ export default function CashoutPage() {
                             justifyContent="center"
                           >
                             {m.type === "mobile_money" && m.provider ? (
-                              {m.provider === "MTN" ? (
+                              m.provider === "MTN" ? (
                                 <Box w="24px" h="24px" minW="24px" minH="24px" bg="#FFCC00" borderRadius="sm" display="flex" alignItems="center" justifyContent="center" color="black" fontWeight="bold" fontSize="12px">MTN</Box>
                               ) : m.provider === "AIRTEL" ? (
                                 <Box w="24px" h="24px" minW="24px" minH="24px" bg="#E60012" borderRadius="sm" display="flex" alignItems="center" justifyContent="center" color="white" fontWeight="bold" fontSize="12px">A</Box>
                               ) : (
                                 <Icon as={FaMobileAlt} boxSize={6} color={primaryColor} />
-                              )}
+                              )
                             ) : m.type === "card" ? (
                               <Icon as={getPaymentIcon(m)} boxSize={6} color={primaryColor} />
                             ) : (
