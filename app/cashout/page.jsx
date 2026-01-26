@@ -60,7 +60,6 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCallback, useEffect, useState, useMemo } from "react";
-import { motion } from "framer-motion";
 import {
   FaWallet,
   FaUsers,
@@ -79,10 +78,6 @@ import {
 } from "react-icons/fa";
 import { RiSecurePaymentLine } from "react-icons/ri";
 import { SiVisa, SiMastercard } from "react-icons/si";
-
-// Define motion components at module level after all imports are complete
-const MotionBox = motion(Box);
-const MotionCard = motion(Card);
 
 export default function CashoutPage() {
   const { userInfo } = useSelector((state) => state.auth);
@@ -132,9 +127,6 @@ export default function CashoutPage() {
     { key: "loyalty", label: "Loyalty Points", sub: "Points to redeem", icon: FaStar, gradient: "linear(to-br, yellow.400, orange.500)" },
   ], []);
   
-  // Memoize animation variants
-  const container = useMemo(() => ({ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } } }), []);
-  const item = useMemo(() => ({ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }), []);
 
   const loadStats = useCallback(async () => {
     try {
@@ -411,22 +403,22 @@ export default function CashoutPage() {
       >
         <Box position="absolute" inset={0} bgImage="radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%)" pointerEvents="none" />
         <Container maxW="container.xl" position="relative">
-          <MotionBox initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <Box>
             <HStack spacing={3} mb={2}>
               <Icon as={FaWallet} boxSize={8} />
               <Heading size="xl" letterSpacing="tight" fontWeight="800">Cashout & Rewards</Heading>
             </HStack>
             <Text fontSize="lg" opacity={0.95}>Manage earnings, invites, loyalty points, and where to receive payouts.</Text>
-          </MotionBox>
+          </Box>
         </Container>
       </Box>
 
       <Container maxW="container.xl" px={{ base: 4, md: 6 }} py={8}>
-        <motion.div variants={container} initial="hidden" animate="visible">
+        <Box>
           {/* Stats */}
           <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={5} mb={10}>
             {statCards.map((s) => (
-              <MotionCard key={s.key} variants={item} bg="white" borderRadius="xl" overflow="hidden" boxShadow="md" borderWidth="1px" borderColor="gray.100" _hover={{ boxShadow: "xl", transform: "translateY(-4px)" }} transition="all 0.3s">
+              <Card key={s.key} bg="white" borderRadius="xl" overflow="hidden" boxShadow="md" borderWidth="1px" borderColor="gray.100" _hover={{ boxShadow: "xl", transform: "translateY(-4px)" }} transition="all 0.3s">
                 <CardBody>
                   <Flex align="flex-start" justify="space-between">
                     <VStack align="start" spacing={1}>
@@ -462,12 +454,12 @@ export default function CashoutPage() {
                     </Box>
                   </Flex>
                 </CardBody>
-              </MotionCard>
+              </Card>
             ))}
           </SimpleGrid>
 
           <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={6} mb={8}>
-            <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
+            <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
               <CardBody>
                 <HStack mb={4}>
                   <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={FaGift} color={primaryColor} boxSize={5} /></Box>
@@ -478,8 +470,8 @@ export default function CashoutPage() {
                   <Button size="sm" colorScheme="green" bg={primaryColor} _hover={{ bg: secondaryColor }} leftIcon={<FaGift />} w="full">View Rewards</Button>
                 </Link>
               </CardBody>
-            </MotionCard>
-            <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
+            </Card>
+            <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
               <CardBody>
                 <HStack mb={4}>
                   <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={FaTicketAlt} color={primaryColor} boxSize={5} /></Box>
@@ -490,11 +482,11 @@ export default function CashoutPage() {
                   <Button size="sm" variant="outline" colorScheme="green" borderColor={primaryColor} leftIcon={<FaTicketAlt />} w="full">My Gift Cards</Button>
                 </Link>
               </CardBody>
-            </MotionCard>
+            </Card>
           </SimpleGrid>
 
           <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={6} mb={8}>
-            <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
+            <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
               <CardBody>
                 <HStack mb={4}>
                   <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={FaShareAlt} color={primaryColor} boxSize={5} /></Box>
@@ -503,8 +495,8 @@ export default function CashoutPage() {
                 <Text color="gray.600" fontSize="sm" mb={4}>Earn up to UGX 50,000 for every friend who signs up with your link.</Text>
                 <Button size="sm" colorScheme="green" bg={primaryColor} _hover={{ bg: secondaryColor }} leftIcon={<FaShareAlt />} onClick={openReferral}>Get Referral Link</Button>
               </CardBody>
-            </MotionCard>
-            <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
+            </Card>
+            <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
               <CardBody>
                 <HStack mb={4}>
                   <Box p={2} bg="gray.100" borderRadius="lg"><Icon as={FaGamepad} color="gray.500" boxSize={5} /></Box>
@@ -513,11 +505,11 @@ export default function CashoutPage() {
                 </HStack>
                 <Text color="gray.600" fontSize="sm">Play games to earn extra points and rewards.</Text>
               </CardBody>
-            </MotionCard>
+            </Card>
           </SimpleGrid>
 
           {/* Payment / Payout methods — Jumia/Glovo style */}
-          <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
+          <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
             <CardBody>
               <HStack mb={2}>
                 <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={RiSecurePaymentLine} color={primaryColor} boxSize={5} /></Box>
@@ -721,10 +713,10 @@ export default function CashoutPage() {
                 </TabPanels>
               </Tabs>
             </CardBody>
-          </MotionCard>
+          </Card>
 
           {/* Withdrawal History */}
-          <MotionCard variants={item} bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden" mt={6}>
+          <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden" mt={6}>
             <CardBody>
               <HStack mb={4} justify="space-between">
                 <HStack>
@@ -761,8 +753,8 @@ export default function CashoutPage() {
                 <Text fontSize="sm" color="gray.500" textAlign="center" py={4}>No withdrawals yet</Text>
               )}
             </CardBody>
-          </MotionCard>
-        </motion.div>
+          </Card>
+        </Box>
       </Container>
 
       {/* Withdrawal Modal */}
