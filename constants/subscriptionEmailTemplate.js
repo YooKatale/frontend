@@ -64,17 +64,17 @@ export const subscriptionEmailTemplate = `
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0 0 16px;">
                 <tr>
                   <td width="50%" style="padding: 0 4px 0 0; vertical-align: top;">
-                    <div style="background: linear-gradient(135deg, #0a5c36 0%, #1a7d46 100%); border-radius: 8px; padding: 12px 14px; text-align: center; border: 1px solid rgba(255,255,255,0.15);">
+                    <div style="background: linear-gradient(135deg, #0a5c36 0%, #1a7d46 100%); border-radius: 12px; padding: 14px 16px; text-align: center; border: 1px solid rgba(255,255,255,0.15);">
                       <p style="color: #ffffff; font-size: 12px; font-weight: 700; margin: 0;">Get 10% off today</p>
                       <p style="color: rgba(255,255,255,0.95); font-size: 10px; margin: 4px 0 0; line-height: 1.4;">Test and activate Premium, Family or Business.</p>
-                      <a href="https://www.yookatale.app/subscription" style="display: inline-block; margin-top: 8px; padding: 6px 14px; background-color: #ffffff; color: #0a5c36; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 11px;">Activate plan</a>
+                      <a href="https://www.yookatale.app/subscription" style="display: inline-block; margin-top: 10px; padding: 8px 18px; background-color: #ffffff; color: #0a5c36; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 12px;">Activate plan</a>
                     </div>
                   </td>
                   <td width="50%" style="padding: 0 0 0 4px; vertical-align: top;">
-                    <div style="background-color: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px 14px; text-align: center;">
+                    <div style="background-color: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 14px 16px; text-align: center;">
                       <p style="color: #92400e; font-size: 12px; font-weight: 700; margin: 0;">Earn up to 50,000 in rewards</p>
                       <p style="color: #b45309; font-size: 10px; margin: 4px 0 0; line-height: 1.4;">Refer a friend to Yookatale — cash &amp; prizes.</p>
-                      <a href="https://www.yookatale.app/#refer" style="display: inline-block; margin-top: 8px; padding: 6px 14px; background-color: #f59e0b; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 11px;">Invite a friend</a>
+                      <a href="https://www.yookatale.app/#refer" style="display: inline-block; margin-top: 10px; padding: 8px 18px; background-color: #f59e0b; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 12px;">Invite a friend</a>
                     </div>
                   </td>
                 </tr>
@@ -83,24 +83,17 @@ export const subscriptionEmailTemplate = `
               <p style="color: #111827; font-size: 12px; font-weight: 700; margin: 12px 0 8px; text-align: center;">Your next steps — choose one</p>
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0 0 16px;">
                 <tr>
-                  <td align="center" width="20%" style="padding: 2px 1px; vertical-align: top;"><a href="https://www.yookatale.app/signup" style="display: inline-block; padding: 6px 8px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 10px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/add-user-male.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Signup</a></td>
-                  <td align="center" width="20%" style="padding: 2px 1px; vertical-align: top;"><a href="https://www.yookatale.app/subscription" style="display: inline-block; padding: 6px 8px; background-color: #185f2d; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 10px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shopping-cart.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Subscribe</a></td>
-                  <td align="center" width="20%" style="padding: 2px 1px; vertical-align: top;"><a href="https://www.yookatale.app/partner" style="display: inline-block; padding: 6px 8px; background-color: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 10px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/handshake.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Partner</a></td>
-                  <td align="center" width="20%" style="padding: 2px 1px; vertical-align: top;"><a href="https://www.yookatale.app/#refer" style="display: inline-block; padding: 6px 8px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 10px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/gift.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Invite</a></td>
-                  <td align="center" width="20%" style="padding: 2px 1px; vertical-align: top;"><a href="https://www.yookatale.app" style="display: inline-block; padding: 6px 8px; background-color: #4b5563; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 10px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shop.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Shop</a></td>
+                  <td align="center" width="20%" style="padding: 2px 1px; vertical-align: top;"><a href="https://www.yookatale.app/signup" style="display: inline-block; padding: 8px 10px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 10px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/add-user-male.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Signup</a></td>
+                  <td align="center" width="20%" style="padding: 2px 1px; vertical-align: top;"><a href="https://www.yookatale.app/subscription" style="display: inline-block; padding: 8px 10px; background-color: #185f2d; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 10px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shopping-cart.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Subscribe</a></td>
+                  <td align="center" width="20%" style="padding: 2px 1px; vertical-align: top;"><a href="https://www.yookatale.app/partner" style="display: inline-block; padding: 8px 10px; background-color: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 10px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/handshake.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Partner</a></td>
+                  <td align="center" width="20%" style="padding: 2px 1px; vertical-align: top;"><a href="https://www.yookatale.app/#refer" style="display: inline-block; padding: 8px 10px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 10px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/gift.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Invite</a></td>
+                  <td align="center" width="20%" style="padding: 2px 1px; vertical-align: top;"><a href="https://www.yookatale.app" style="display: inline-block; padding: 8px 10px; background-color: #4b5563; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 10px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shop.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Shop</a></td>
                 </tr>
               </table>
 
               <div style="background-color: #f9fafb; border-radius: 12px; padding: 12px; margin: 16px 0; border: 1px solid #e5e7eb;">
-                <h3 style="color: #111827; font-size: 14px; font-weight: 700; margin: 0 0 8px; text-align: center;">📱 Explore Yookatale App Features</h3>
+                <h3 style="color: #111827; font-size: 14px; font-weight: 700; margin: 0 0 8px; text-align: center;">Explore Yookatale app — subscribe, shop, and earn</h3>
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                  <tr>
-                    <td colspan="2" style="padding: 0 0 8px 0;">
-                      <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
-                        <img src="https://www.yookatale.app/assets/images/app-subscription-plans.png" alt="Subscription Plans" style="display: block; width: 100%; height: auto; border: 0; max-height: 400px; object-fit: contain;" />
-                      </div>
-                    </td>
-                  </tr>
                   <tr>
                     <td width="50%" style="padding: 0 4px 0 0; vertical-align: top;">
                       <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
@@ -117,16 +110,19 @@ export const subscriptionEmailTemplate = `
                       </div>
                     </td>
                   </tr>
+                  <tr>
+                    <td colspan="2" style="padding: 8px 0 0 0;">
+                      <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
+                        <img src="https://www.yookatale.app/assets/images/app-subscription-plans.png" alt="Subscription Plans" style="display: block; width: 100%; height: auto; border: 0; max-height: 400px; object-fit: contain;" />
+                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Subscription plans</p></div>
+                      </div>
+                    </td>
+                  </tr>
                 </table>
               </div>
 
               <div style="margin-top: 16px; padding: 14px; background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 12px; border: 1px solid #e2e8f0; text-align: center;">
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                  <tr>
-                    <td align="center" style="padding-bottom: 8px;">
-                      <img src="https://img.icons8.com/ios-filled/50/0a5c36/smartphone.png" alt="App" width="28" height="28" style="display: block; margin: 0 auto; border: 0;" />
-                    </td>
-                  </tr>
                   <tr>
                     <td align="center">
                       <p style="color: #0f172a; font-size: 13px; font-weight: 700; margin: 0 0 4px;">Yookatale in your pocket</p>
@@ -135,7 +131,7 @@ export const subscriptionEmailTemplate = `
                         <tr>
                           <td align="center" style="padding: 0 6px;">
                             <a href="https://www.yookatale.app/subscription" style="text-decoration: none; display: inline-block;">
-                              <img src="https://www.yookatale.app/assets/images/apple.svg" alt="Download on the App Store" width="140" style="display: block; border: 0; height: auto; max-width: 140px;" />
+                              <img src="https://assets.stickpng.com/images/5a902db97f96951c82922874.png" alt="Download on the App Store" width="140" style="display: block; border: 0; height: auto; max-width: 140px;" />
                             </a>
                           </td>
                           <td align="center" style="padding: 0 6px;">
