@@ -38,14 +38,17 @@ export const getMealCalendarEmailTemplate = (userName, mealType, greeting, meals
     mealItemsHtml = meals
       .map((item) => {
         // Handle different property names (meal vs mealName, etc.)
-        const mealName = item.meal || item.mealName || item.name || "Meal";
+        const itemMealName = item.meal || item.mealName || item.name || "Meal";
         const quantity = item.quantity || item.qty || "1 serving";
-        const mealType = item.type || item.prepType || "ready-to-eat";
-        // Get meal image - check various possible property names
-        const mealImage = item.image || item.mealImage || item.img || item.photo || 
+        const mealTypeVal = item.type || item.prepType || "ready-to-eat";
+        // Get meal image - check various possible property names; make absolute for email
+        let mealImage = item.image || item.mealImage || item.img || item.photo || 
                          item.images?.[0] || item.picture || null;
+        if (mealImage && typeof mealImage === "string" && mealImage.startsWith("/")) {
+          mealImage = "https://www.yookatale.app" + mealImage;
+        }
         
-        const typeBadge = mealType === "ready-to-eat" 
+        const typeBadge = mealTypeVal === "ready-to-eat" 
           ? '<span style="background-color: #10b981; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px;">Ready-to-Eat</span>'
           : '<span style="background-color: #3b82f6; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px;">Ready-to-Cook</span>';
         
@@ -72,26 +75,18 @@ export const getMealCalendarEmailTemplate = (userName, mealType, greeting, meals
         
         const imageUrl = getImageUrl(mealImage);
         const imageHtml = imageUrl 
-          ? `<td style="width: 100px; padding: 12px; vertical-align: top;">
-              <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(mealName)}" style="width: 100%; max-width: 100px; height: auto; border-radius: 8px; object-fit: cover;" />
+          ? `<td style="width: 80px; padding: 6px; vertical-align: middle;">
+              <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(itemMealName)}" style="width: 72px; height: 72px; object-fit: cover; border-radius: 6px; display: block;" />
             </td>`
-          : `<td style="width: 100px; padding: 12px; vertical-align: top; background-color: #f3f4f6; border-radius: 8px; text-align: center;">
-              <div style="width: 60px; height: 60px; background-color: #e5e7eb; border-radius: 6px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                <span style="color: #6b7280; font-size: 20px; font-weight: bold;">MEAL</span>
-              </div>
-            </td>`;
+          : `<td style="width: 80px; padding: 6px; vertical-align: middle; background-color: #f3f4f6; border-radius: 6px; text-align: center;"><span style="color: #9ca3af; font-size: 10px;">—</span></td>`;
         
         return `
           <tr>
             ${imageHtml}
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top;">
-              <div style="display: flex; flex-direction: column; gap: 8px;">
-                <div>
-                  <strong style="color: #1f2937; font-size: 15px; display: block; margin-bottom: 4px;">${escapeHtml(mealName)}</strong>
-                  ${typeBadge}
-                </div>
-                <span style="color: #6b7280; font-size: 13px;">${escapeHtml(quantity)}</span>
-              </div>
+            <td style="padding: 6px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: middle;">
+              <strong style="color: #1f2937; font-size: 13px;">${escapeHtml(itemMealName)}</strong>
+              ${typeBadge}
+              <span style="color: #6b7280; font-size: 11px; display: block; margin-top: 2px;">${escapeHtml(quantity)}</span>
             </td>
           </tr>
         `;
@@ -119,14 +114,10 @@ export const getMealCalendarEmailTemplate = (userName, mealType, greeting, meals
     availabilityText = "All items available as ready-to-cook.";
   }
 
-  // Subscription-specific message
+  // Subscription-specific message (only when plan is set; no "Not subscribed?" block)
   const subscriptionMessage = subscriptionPlan 
-    ? `<p style="font-size: 14px; color: #185f2d; margin: 15px 0; padding: 12px; background-color: #f0fdf4; border-left: 4px solid #185f2d; border-radius: 6px;">
-        <strong>${subscriptionPlan} Plan:</strong> Your personalized meal options are ready!
-      </p>`
-    : `<p style="font-size: 14px; color: #6b7280; margin: 15px 0; padding: 12px; background-color: #f9fafb; border-left: 4px solid #6b7280; border-radius: 6px;">
-        <strong>Not subscribed?</strong> <a href="https://www.yookatale.app/subscription" style="color: #185f2d; text-decoration: underline; font-weight: bold;">Subscribe now</a> to get personalized meal recommendations and exclusive benefits!
-      </p>`;
+    ? `<p style="font-size: 12px; color: #185f2d; margin: 0 0 10px 0; padding: 8px 10px; background-color: #f0fdf4; border-radius: 6px;"><strong>${subscriptionPlan} Plan</strong> — Your options are ready.</p>`
+    : "";
 
   return `
 <html lang="en">
@@ -135,71 +126,68 @@ export const getMealCalendarEmailTemplate = (userName, mealType, greeting, meals
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
-  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: auto; background-color: #ffffff;">
-    <!-- Header with Logo - Black Background -->
+  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 560px; margin: auto; background-color: #ffffff;">
     <tr>
-      <td style="padding: 30px 20px; text-align: center; background-color: #000000;">
-        <img src="https://www.yookatale.app/assets/icons/logo2.png" alt="YooKatale Logo" style="max-width: 180px; height: auto; margin-bottom: 15px;" />
+      <td style="padding: 16px 20px; text-align: center; background-color: #000000;">
+        <img src="https://www.yookatale.app/assets/icons/logo2.png" alt="YooKatale Logo" style="max-width: 120px; height: auto; display: block; margin: 0 auto;" />
       </td>
     </tr>
-    
-    <!-- Meal Notification Content -->
     <tr>
-      <td style="padding: 40px 30px; background-color: #ffffff;">
-        <h2 style="font-size: 24px; color: #1f2937; margin: 0 0 10px 0; font-weight: 600;">${greeting || "Hello"}, ${userName || "Valued Customer"}!</h2>
-        
-        <p style="font-size: 18px; color: #374151; line-height: 1.6; margin: 0 0 25px 0; font-weight: 500;">
-          Your <strong style="color: #185f2d;">${mealName}</strong> menu is ready! Here's what's available for <strong>${mealTime}</strong>:
-        </p>
-        
+      <td style="padding: 14px 18px; background-color: #ffffff;">
+        <p style="font-size: 15px; color: #1f2937; margin: 0 0 4px 0; font-weight: 600;">${greeting || "Hello"}, ${userName || "Valued Customer"}!</p>
+        <p style="font-size: 12px; color: #6b7280; margin: 0 0 10px 0;">Your <strong>${mealName}</strong> menu — ${mealTime}</p>
         ${subscriptionMessage}
-        
-        <!-- Meal Items Table with Images -->
-        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 25px 0; border: 2px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 12px 0; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
           <thead>
             <tr style="background: linear-gradient(135deg, #185f2d 0%, #1f793a 100%);">
-              <th colspan="2" style="padding: 16px 20px; text-align: left; color: #ffffff; font-size: 16px; font-weight: 600;">
-                Today's ${mealName} Menu
-              </th>
+              <th colspan="2" style="padding: 8px 12px; text-align: left; color: #ffffff; font-size: 13px; font-weight: 600;">Today's ${mealName} Menu</th>
             </tr>
           </thead>
           <tbody style="background-color: #ffffff;">
             ${mealItemsHtml}
           </tbody>
         </table>
-        
-        ${availabilityText ? `<p style="font-size: 14px; color: #059669; margin: 15px 0; padding: 12px; background-color: #d1fae5; border-radius: 8px; border-left: 4px solid #10b981;">
-          <strong style="color: #10b981;">●</strong> ${availabilityText}
-        </p>` : ''}
-        
-        <p style="font-size: 16px; color: #374151; line-height: 1.7; margin: 25px 0; text-align: center;">
-          Don't miss out on today's delicious meals. Place your order now and enjoy fresh, customizable meals delivered to your doorstep in <strong style="color: #185f2d;">15-45 minutes</strong>!
-        </p>
-        
-        <!-- CTA Button -->
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="https://www.yookatale.app/subscription" style="display: inline-block; padding: 16px 36px; background: linear-gradient(135deg, #185f2d 0%, #1f793a 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(24, 95, 45, 0.3);">
-            View Meal Calendar & Order Now
-          </a>
+        ${availabilityText ? `<p style="font-size: 11px; color: #059669; margin: 0 0 10px 0; padding: 6px 8px; background-color: #d1fae5; border-radius: 6px;">${availabilityText}</p>` : ''}
+        <div style="text-align: center; margin: 12px 0;">
+          <a href="https://www.yookatale.app/subscription" style="display: inline-block; padding: 10px 24px; background: linear-gradient(135deg, #185f2d 0%, #1f793a 100%); color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 13px;">View meal calendar & order</a>
+        </div>
+
+        <p style="color: #111827; font-size: 12px; font-weight: 700; margin: 14px 0 6px; text-align: center;">Your next steps</p>
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0 0 12px;">
+          <tr>
+            <td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/signup" style="display: inline-block; padding: 8px 10px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 11px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/add-user-male.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Signup</a></td>
+            <td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/subscription" style="display: inline-block; padding: 8px 10px; background-color: #185f2d; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 11px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shopping-cart.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Subscribe</a></td>
+            <td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/partner" style="display: inline-block; padding: 8px 10px; background-color: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 11px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/handshake.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Partner</a></td>
+            <td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app/#refer" style="display: inline-block; padding: 8px 10px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 11px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/gift.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Invite</a></td>
+            <td align="center" width="20%" style="padding: 4px 2px; vertical-align: top;"><a href="https://www.yookatale.app" style="display: inline-block; padding: 8px 10px; background-color: #4b5563; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 11px; white-space: nowrap;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shop.png" width="10" height="10" alt="" style="vertical-align: -1px; margin-right: 2px; border: 0;" />Shop</a></td>
+          </tr>
+        </table>
+
+        <div style="margin-top: 12px; padding: 10px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+          <p style="color: #0f172a; font-size: 12px; font-weight: 700; margin: 0 0 2px;">Yookatale in your pocket</p>
+          <p style="color: #64748b; font-size: 11px; margin: 0 0 8px;">Download the app — shop, subscribe, track orders.</p>
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0 auto;">
+            <tr>
+              <td align="center" style="padding: 0 6px;">
+                <a href="https://www.yookatale.app/subscription" style="text-decoration: none; display: inline-block;">
+                  <img src="https://assets.stickpng.com/images/5a902db97f96951c82922874.png" alt="Download on the App Store" width="140" style="display: block; border: 0; height: auto; max-width: 140px;" />
+                </a>
+              </td>
+              <td align="center" style="padding: 0 6px;">
+                <a href="https://play.google.com/store/apps/details?id=com.yookataleapp.app" style="text-decoration: none; display: inline-block;">
+                  <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="140" style="display: block; border: 0; height: auto;" />
+                </a>
+              </td>
+            </tr>
+          </table>
         </div>
       </td>
     </tr>
     
-    <!-- Footer - Black Background -->
     <tr>
-      <td style="padding: 30px 20px; text-align: center; background-color: #000000; border-top: 2px solid #333333;">
-        <p style="font-size: 13px; color: #9ca3af; margin: 0 0 8px 0; line-height: 1.6;">
-          P.O. Box 74940<br>
-          Clock-Tower Plot 6, 27 Kampala<br>
-          Entebbe, Uganda
-        </p>
-        <p style="font-size: 12px; color: #6b7280; margin: 15px 0 0 0;">
-          Copyright © ${new Date().getFullYear()} YooKatale. All rights reserved.
-        </p>
-        <p style="font-size: 11px; color: #6b7280; margin: 10px 0 0 0;">
-          You're receiving this because you subscribed to meal notifications. 
-          <a href="https://www.yookatale.app/account" style="color: #10b981; text-decoration: underline;">Manage preferences</a>
-        </p>
+      <td style="padding: 14px 18px; text-align: center; background-color: #000000; border-top: 1px solid #333;">
+        <p style="font-size: 11px; color: #9ca3af; margin: 0 0 4px 0;">P.O. Box 74940 · Clock-Tower Plot 6, 27 Kampala · Entebbe, Uganda</p>
+        <p style="font-size: 10px; color: #6b7280; margin: 0;">© ${new Date().getFullYear()} Yookatale. <a href="https://www.yookatale.app/account" style="color: #10b981; text-decoration: underline;">Manage preferences</a></p>
       </td>
     </tr>
   </table>
