@@ -146,12 +146,12 @@ export const subscriptionEmailTemplate = `
                         <tr>
                           <td align="center" style="padding: 0 8px;">
                             <a href="https://www.yookatale.app/subscription" style="text-decoration: none; display: inline-block;">
-                              <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1276560000" alt="Download on the App Store" width="150" style="display: block; border: 0; height: auto;" />
+                              <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1276560000" alt="Download on the App Store" width="180" height="60" style="display: block; border: 0; height: auto; max-width: 180px;" />
                             </a>
                           </td>
                           <td align="center" style="padding: 0 8px;">
                             <a href="https://play.google.com/store/apps/details?id=com.yookataleapp.app" style="text-decoration: none; display: inline-block;">
-                              <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="150" style="display: block; border: 0; height: auto;" />
+                              <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="180" style="display: block; border: 0; height: auto;" />
                             </a>
                           </td>
                         </tr>
