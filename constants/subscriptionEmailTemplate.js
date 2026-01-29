@@ -119,11 +119,8 @@ export const subscriptionEmailTemplate = `
                     <td width="50%" style="padding: 0 0 0 6px; vertical-align: top;">
                       <div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
                         <a href="https://www.yookatale.app/#refer" style="text-decoration: none; color: inherit; display: block;">
-                          <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 20px; text-align: center; min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                            <img src="https://img.icons8.com/ios-filled/50/ffffff/gift.png" alt="Invite" width="48" height="48" style="margin-bottom: 12px; border: 0;" />
-                            <p style="margin: 0; font-weight: 700; color: #ffffff; font-size: 16px;">Invite Feature</p>
-                            <p style="margin: 8px 0 0; font-size: 13px; color: rgba(255,255,255,0.95);">Earn rewards by inviting friends</p>
-                          </div>
+                          <img src="https://www.yookatale.app/assets/images/app-invite-rewards.png" alt="Earn after inviting" style="display: block; width: 100%; height: auto; border: 0;" />
+                          <div style="padding: 12px;"><p style="margin: 0; font-weight: 700; color: #111827; font-size: 14px;">Earn after inviting</p><p style="margin: 4px 0 0; font-size: 12px; color: #4b5563;">Cashout & Rewards</p></div>
                         </a>
                       </div>
                     </td>
@@ -146,7 +143,7 @@ export const subscriptionEmailTemplate = `
                         <tr>
                           <td align="center" style="padding: 0 8px;">
                             <a href="https://www.yookatale.app/subscription" style="text-decoration: none; display: inline-block;">
-                              <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1276560000" alt="Download on the App Store" width="180" height="60" style="display: block; border: 0; height: auto; max-width: 180px;" />
+                              <img src="https://www.yookatale.app/assets/images/apple.svg" alt="Download on the App Store" width="180" style="display: block; border: 0; height: auto; max-width: 180px;" />
                             </a>
                           </td>
                           <td align="center" style="padding: 0 8px;">
