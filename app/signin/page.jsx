@@ -147,105 +147,53 @@ const SignIn = ({ redirect, callback, ismodal }) => {
 
   return (
     <Container maxW="container.xl" p={0}>
-      <Flex minH="100vh" direction={{ base: "column", lg: "row" }} bg="white">
-        {/* Left – Brand */}
+      <Flex minH="100vh" bg="gray.50" alignItems="center" justifyContent="center" p={{ base: 6, lg: 12 }}>
         <Box
-          flex={{ base: "0 0 auto", lg: "1" }}
-          bg={gradient}
-          color="white"
-          p={{ base: 6, lg: 12 }}
-          position="relative"
-          overflow="hidden"
-        >
-          <Flex direction="column" h="full" position="relative" zIndex={1}>
-            <Link href="/">
-              <MotionBox
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                bg="white"
-                borderRadius="2xl"
-                p={4}
-                w="fit-content"
-                boxShadow="0 10px 40px rgba(0,0,0,0.2)"
-                mb={8}
-              >
-                <Box
-                  as="img"
-                  src="/assets/icons/logo2.png"
-                  alt="YooKatale Logo"
-                  w="160px"
-                  h="80px"
-                  objectFit="contain"
-                />
-              </MotionBox>
-            </Link>
-
-            <Box flex="1" mt={{ base: 4, lg: 12 }}>
-              <Heading
-                as="h1"
-                fontSize={{ base: "2xl", lg: "3xl" }}
-                fontWeight="bold"
-                lineHeight="1.2"
-                mb={4}
-              >
-                Sign in to YooKatale
-              </Heading>
-              <Text fontSize="md" opacity={0.9}>
-                Access your account and manage orders, subscriptions, and rewards.
-              </Text>
-            </Box>
-
-            <Box mt="auto" pt={8}>
-              <Text fontSize="sm" opacity={0.7} mb={4}>
-                New to YooKatale?{" "}
-                <ChakraLink
-                  as={Link}
-                  href="/signup"
-                  color="white"
-                  fontWeight="semibold"
-                  textDecoration="underline"
-                  _hover={{ opacity: 0.9 }}
-                >
-                  Create account
-                </ChakraLink>
-              </Text>
-            </Box>
-          </Flex>
-        </Box>
-
-        {/* Right – Form */}
-        <Box
-          flex="1"
-          p={{ base: 6, lg: 12 }}
-          bg="gray.50"
-          overflowY="auto"
-          maxH={{ base: "auto", lg: "100vh" }}
+          w="full"
+          maxW="md"
           display="flex"
           alignItems="center"
           justifyContent="center"
         >
-          <Box maxW="md" w="full">
-            <MotionBox
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+          <MotionBox
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            w="full"
+          >
+            <Card
+              borderRadius="2xl"
+              boxShadow="0 10px 40px rgba(0,0,0,0.08)"
+              border="1px solid"
+              borderColor="gray.100"
+              overflow="hidden"
             >
-              <Card
-                borderRadius="2xl"
-                boxShadow="0 10px 40px rgba(0,0,0,0.08)"
-                border="1px solid"
-                borderColor="gray.100"
-                overflow="hidden"
-              >
-                <CardBody p={{ base: 6, md: 8 }}>
-                  <Box mb={6}>
-                    <Heading size="lg" color="gray.800" mb={1}>
-                      Sign in
-                    </Heading>
-                    <Text color="gray.600" fontSize="sm">
-                      Continue with Google or email
-                    </Text>
-                  </Box>
+              <CardBody p={{ base: 6, md: 8 }}>
+                {/* Logo at the top center */}
+                <Flex justify="center" mb={8}>
+                  <Link href="/">
+                    <Box
+                      as="img"
+                      src="/assets/icons/logo2.png"
+                      alt="YooKatale Logo"
+                      w="140px"
+                      h="70px"
+                      objectFit="contain"
+                      cursor="pointer"
+                      _hover={{ opacity: 0.9 }}
+                      transition="opacity 0.2s"
+                    />
+                  </Link>
+                </Flex>
+
+                <Box mb={6}>
+                  <Heading size="lg" color="gray.800" mb={1}>
+                    Sign in
+                  </Heading>
+                  <Text color="gray.600" fontSize="sm">
+                    Continue with Google or email
+                  </Text>
+                </Box>
 
                   <MotionButton
                     whileHover={{ scale: 1.02 }}
@@ -412,29 +360,8 @@ const SignIn = ({ redirect, callback, ismodal }) => {
                 </CardBody>
               </Card>
             </MotionBox>
-
-            {!ismodal && (
-              <Box textAlign="center" mt={6}>
-                <ChakraLink as={Link} href="/subscription">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    borderColor={ThemeColors.primaryColor}
-                    color={ThemeColors.primaryColor}
-                    borderRadius="xl"
-                    _hover={{
-                      bg: ThemeColors.primaryColor,
-                      color: "white",
-                    }}
-                  >
-                    View plans
-                  </Button>
-                </ChakraLink>
-              </Box>
-            )}
           </Box>
-        </Box>
-      </Flex>
+        </Flex>
     </Container>
   );
 };

@@ -17,11 +17,9 @@ import {
   Container,
   Divider,
   VStack,
-  HStack,
   Badge,
   Card,
   CardBody,
-  SimpleGrid,
   Alert,
   AlertIcon,
   AlertTitle,
@@ -37,10 +35,8 @@ import { useRegisterMutation } from "@slices/usersApiSlice";
 import { setCredentials } from "@slices/authSlice";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { CheckCircle, Truck, Award, Gift, Star } from "lucide-react";
-import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
-import { FaApple, FaGooglePlay, FaPhoneAlt, FaWhatsapp, FaEnvelope } from "react-icons/fa";
+import { FaPhoneAlt, FaWhatsapp, FaEnvelope } from "react-icons/fa";
 import { API_ORIGIN } from "@config/config";
 
 const MotionBox = motion(Box);
@@ -58,7 +54,6 @@ const SignUp = () => {
   const [address, setAddress] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [referralCode, setReferralCode] = useState(null);
-  const [activeStep, setActiveStep] = useState(1);
   const [notifyViaCall, setNotifyViaCall] = useState(false);
   const [notifyViaWhatsApp, setNotifyViaWhatsApp] = useState(false);
   const [notifyViaEmail, setNotifyViaEmail] = useState(true);
@@ -69,13 +64,6 @@ const SignUp = () => {
   const [register] = useRegisterMutation();
   const [isGoogleLoading, setGoogleLoading] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
-
-  const features = [
-    { icon: Truck, label: "Free Delivery", color: "green.500" },
-    { icon: Award, label: "Premium Quality", color: "yellow.500" },
-    { icon: Gift, label: "Loyalty Rewards", color: "purple.500" },
-    { icon: Star, label: "Customizable Meals", color: "blue.500" },
-  ];
 
   useEffect(() => {
     if (userInfo) return push("/");
@@ -167,204 +155,13 @@ const SignUp = () => {
     window.location.href = `${API_ORIGIN}/api/auth/google?${params.toString()}`;
   };
 
-  const steps = [
-    { number: 1, label: "Account" },
-    { number: 2, label: "Profile" },
-    { number: 3, label: "Preferences" },
-  ];
-
-  const gradient = `linear-gradient(135deg, #0d2d14 0%, ${ThemeColors.primaryColor} 50%, ${ThemeColors.secondaryColor} 100%)`;
-
   return (
     <Container maxW="container.xl" p={0}>
-      <Flex minH="100vh" direction={{ base: "column", lg: "row" }} bg="white">
-        {/* Left – Brand */}
+      <Flex minH="100vh" bg="gray.50" alignItems="center" justifyContent="center" p={{ base: 6, lg: 12 }}>
         <Box
-          flex={{ base: "0 0 auto", lg: "1" }}
-          bg={gradient}
-          color="white"
-          p={{ base: 6, lg: 12 }}
-          position="relative"
-          overflow="hidden"
+          w="full"
+          maxW="xl"
         >
-          <Flex direction="column" h="full" position="relative" zIndex={1}>
-            <Link href="/">
-              <MotionBox
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                bg="white"
-                borderRadius="2xl"
-                p={4}
-                w="fit-content"
-                boxShadow="0 10px 40px rgba(0,0,0,0.2)"
-                mb={8}
-              >
-                <Box
-                  as="img"
-                  src="/assets/icons/logo2.png"
-                  alt="YooKatale Logo"
-                  w="160px"
-                  h="80px"
-                  objectFit="contain"
-                />
-              </MotionBox>
-            </Link>
-
-            <Box flex="1" mt={{ base: 4, lg: 12 }}>
-              <Heading
-                as="h1"
-                fontSize={{ base: "2xl", lg: "3xl" }}
-                fontWeight="bold"
-                lineHeight="1.2"
-                mb={4}
-              >
-                Welcome to YooKatale
-              </Heading>
-              <Text fontSize="md" opacity={0.9} mb={8}>
-                Fresh meals, customizable plans, and rewards. Join thousands who trust us.
-              </Text>
-
-              <SimpleGrid columns={2} spacing={4} mb={8}>
-                {features.map((f, i) => (
-                  <MotionBox
-                    key={f.label}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.08 }}
-                  >
-                    <Flex align="center" gap={3}>
-                      <Box
-                        p={2}
-                        bg="whiteAlpha.200"
-                        borderRadius="lg"
-                        border="1px solid"
-                        borderColor="whiteAlpha.300"
-                      >
-                        <Icon as={f.icon} boxSize={5} color={f.color} />
-                      </Box>
-                      <Text fontSize="sm" fontWeight="medium">
-                        {f.label}
-                      </Text>
-                    </Flex>
-                  </MotionBox>
-                ))}
-              </SimpleGrid>
-
-              <Box
-                bg="whiteAlpha.100"
-                p={5}
-                borderRadius="2xl"
-                backdropFilter="blur(10px)"
-              >
-                <Text fontSize="sm" fontWeight="semibold" mb={3} opacity={0.9}>
-                  Why join?
-                </Text>
-                <Stack spacing={2}>
-                  {[
-                    "Earn loyalty points with every order",
-                    "Customize meals to your preference",
-                    "Free delivery on premium plans",
-                    "Secure payments",
-                  ].map((item, idx) => (
-                    <Flex key={idx} align="center" gap={3}>
-                      <CheckCircle size={14} opacity={0.8} />
-                      <Text fontSize="sm" opacity={0.9}>
-                        {item}
-                      </Text>
-                    </Flex>
-                  ))}
-                </Stack>
-              </Box>
-            </Box>
-
-            <Box mt={8}>
-              <Text fontSize="sm" opacity={0.7} mb={4}>
-                Already have an account?{" "}
-                <ChakraLink
-                  as={Link}
-                  href="/signin"
-                  color="white"
-                  fontWeight="semibold"
-                  textDecoration="underline"
-                  _hover={{ opacity: 0.9 }}
-                >
-                  Sign In
-                </ChakraLink>
-              </Text>
-              <Flex gap={3} mt={4}>
-                <ChakraLink
-                  href="/subscription"
-                  target="_blank"
-                  _hover={{ transform: "translateY(-2px)" }}
-                  transition="transform 0.2s"
-                >
-                  <Image
-                    src="/assets/images/apple.svg"
-                    width={120}
-                    height={36}
-                    alt="App Store"
-                  />
-                </ChakraLink>
-                <ChakraLink
-                  href="https://play.google.com/store/apps/details?id=com.yookataleapp.app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  _hover={{ transform: "translateY(-2px)" }}
-                  transition="transform 0.2s"
-                >
-                  <Image
-                    src="/assets/images/google.svg"
-                    width={120}
-                    height={36}
-                    alt="Google Play"
-                  />
-                </ChakraLink>
-              </Flex>
-            </Box>
-          </Flex>
-        </Box>
-
-        {/* Right – Form */}
-        <Box
-          flex="1"
-          p={{ base: 6, lg: 12 }}
-          bg="gray.50"
-          overflowY="auto"
-          maxH={{ base: "auto", lg: "100vh" }}
-        >
-          <Box maxW="xl" mx="auto">
-            <Flex justify="center" mb={8} gap={2}>
-              {steps.map((s) => (
-                <Flex key={s.number} align="center" gap={2}>
-                  <Box
-                    w={8}
-                    h={8}
-                    borderRadius="full"
-                    bg={activeStep >= s.number ? ThemeColors.primaryColor : "gray.200"}
-                    color={activeStep >= s.number ? "white" : "gray.500"}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontSize="sm"
-                    fontWeight="semibold"
-                    transition="all 0.3s"
-                  >
-                    {s.number}
-                  </Box>
-                  <Text
-                    fontSize="sm"
-                    fontWeight="medium"
-                    color={activeStep >= s.number ? "gray.800" : "gray.500"}
-                    display={{ base: "none", md: "block" }}
-                  >
-                    {s.label}
-                  </Text>
-                  {s.number < steps.length && (
-                    <Box w={6} h="1px" bg="gray.300" mx={2} />
-                  )}
-                </Flex>
-              ))}
-            </Flex>
 
             <MotionBox
               initial={{ opacity: 0, y: 20 }}
@@ -379,6 +176,23 @@ const SignUp = () => {
                 overflow="hidden"
               >
                 <CardBody p={{ base: 6, md: 8 }}>
+                  {/* Logo at the top center */}
+                  <Flex justify="center" mb={8}>
+                    <Link href="/">
+                      <Box
+                        as="img"
+                        src="/assets/icons/logo2.png"
+                        alt="YooKatale Logo"
+                        w="140px"
+                        h="70px"
+                        objectFit="contain"
+                        cursor="pointer"
+                        _hover={{ opacity: 0.9 }}
+                        transition="opacity 0.2s"
+                      />
+                    </Link>
+                  </Flex>
+
                   <Box mb={6}>
                     <Heading size="lg" color="gray.800" mb={1}>
                       Create account
@@ -745,72 +559,61 @@ const SignUp = () => {
                       </AlertDescription>
                     </Box>
                   </Alert>
+
+                  {/* Already have account link */}
+                  <Box textAlign="center" mt={4}>
+                    <Text fontSize="sm" color="gray.600">
+                      Already have an account?{" "}
+                      <ChakraLink
+                        as={Link}
+                        href="/signin"
+                        color={ThemeColors.primaryColor}
+                        fontWeight="semibold"
+                        _hover={{ textDecoration: "underline" }}
+                      >
+                        Sign In
+                      </ChakraLink>
+                    </Text>
+                  </Box>
                 </CardBody>
               </Card>
 
-              <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={4} mt={8}>
+              {/* App Store & Play Store Icons */}
+              <Flex justify="center" gap={4} mt={8}>
                 <ChakraLink
-                  as={Link}
-                  href="/subscription"
-                  bg="white"
-                  p={4}
-                  borderRadius="xl"
-                  textAlign="center"
-                  border="1px solid"
-                  borderColor="gray.200"
-                  _hover={{
-                    borderColor: ThemeColors.primaryColor,
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
-                  }}
-                  transition="all 0.3s"
+                  href="https://apps.apple.com/app/yookatale"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  _hover={{ transform: "translateY(-2px)" }}
+                  transition="transform 0.2s"
                 >
-                  <Text fontWeight="semibold" color="gray.800">Plans</Text>
-                  <Text fontSize="sm" color="gray.600">Subscribe</Text>
+                  <Box
+                    as="img"
+                    src="https://assets.stickpng.com/images/5a902db97f96951c82922874.png"
+                    alt="Download on the App Store"
+                    h="40px"
+                    objectFit="contain"
+                  />
                 </ChakraLink>
                 <ChakraLink
-                  as={Link}
-                  href="/partner"
-                  bg="white"
-                  p={4}
-                  borderRadius="xl"
-                  textAlign="center"
-                  border="1px solid"
-                  borderColor="gray.200"
-                  _hover={{
-                    borderColor: ThemeColors.primaryColor,
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
-                  }}
-                  transition="all 0.3s"
+                  href="https://play.google.com/store/apps/details?id=com.yookataleapp.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  _hover={{ transform: "translateY(-2px)" }}
+                  transition="transform 0.2s"
                 >
-                  <Text fontWeight="semibold" color="gray.800">Partner</Text>
-                  <Text fontSize="sm" color="gray.600">Join us</Text>
+                  <Box
+                    as="img"
+                    src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                    alt="Get it on Google Play"
+                    h="40px"
+                    objectFit="contain"
+                  />
                 </ChakraLink>
-                <ChakraLink
-                  as={Link}
-                  href="/contact"
-                  bg="white"
-                  p={4}
-                  borderRadius="xl"
-                  textAlign="center"
-                  border="1px solid"
-                  borderColor="gray.200"
-                  _hover={{
-                    borderColor: ThemeColors.primaryColor,
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
-                  }}
-                  transition="all 0.3s"
-                >
-                  <Text fontWeight="semibold" color="gray.800">Help</Text>
-                  <Text fontSize="sm" color="gray.600">Contact</Text>
-                </ChakraLink>
-              </SimpleGrid>
+              </Flex>
             </MotionBox>
           </Box>
-        </Box>
-      </Flex>
+        </Flex>
     </Container>
   );
 };
