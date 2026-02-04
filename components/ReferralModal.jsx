@@ -20,6 +20,11 @@ import {
   Text,
   useClipboard,
   useToast,
+  VStack,
+  HStack,
+  Divider,
+  Badge,
+  Icon,
 } from "@chakra-ui/react";
 import { useCreateReferralCodeMutation } from "@slices/usersApiSlice";
 import { useSelector } from "react-redux";
@@ -36,6 +41,29 @@ import {
   TelegramShareButton,
   TelegramIcon,
 } from "next-share";
+import { motion } from "framer-motion";
+import {
+  Gift,
+  Share2,
+  Copy,
+  Check,
+  Mail,
+  Users,
+  DollarSign,
+  Sparkles,
+  Link as LinkIcon,
+  Send,
+  X,
+  Facebook,
+  MessageCircle,
+  Twitter,
+  Linkedin,
+  Send as TelegramIcon,
+} from "lucide-react";
+import { ThemeColors } from "@constants/constants";
+
+const MotionBox = motion(Box);
+const MotionButton = motion(Button);
 
 const shareUrl = "https://www.yookatale.app";
 const defaultMessage =
@@ -88,12 +116,12 @@ export default function ReferralModal({ isOpen, onClose }) {
       }).unwrap();
       if (res?.status === "Success") {
         chakraToast({
-          title: "Success",
-          description: "Your referral link has been saved",
+          title: "Success! 🎉",
+          description: "Your referral link has been copied and saved",
           status: "success",
-          duration: 6000,
-          isClosable: false,
-          position: "top",
+          duration: 4000,
+          isClosable: true,
+          position: "top-right",
         });
       }
     } catch (err) {
@@ -101,9 +129,9 @@ export default function ReferralModal({ isOpen, onClose }) {
         title: "Error",
         description: err?.data?.message || "Could not save referral link",
         status: "error",
-        duration: 6000,
-        isClosable: false,
-        position: "top",
+        duration: 4000,
+        isClosable: true,
+        position: "top-right",
       });
     }
   }, [onCopy, userInfo?._id, referralCode, createReferralCode, chakraToast]);
@@ -111,11 +139,12 @@ export default function ReferralModal({ isOpen, onClose }) {
   const handleMailInvitation = useCallback(async () => {
     if (!invitee?.trim()) {
       chakraToast({
-        title: "Error",
+        title: "Email Required",
         description: "Please enter an email address",
         status: "error",
         duration: 3000,
         isClosable: true,
+        position: "top-right",
       });
       return;
     }
@@ -133,20 +162,22 @@ export default function ReferralModal({ isOpen, onClose }) {
       if (res.ok) {
         setInvitee("");
         chakraToast({
-          title: "Success",
-          description: "Invitation sent successfully",
+          title: "Invitation Sent! ✉️",
+          description: "Your friend will receive an invitation email shortly",
           status: "success",
           duration: 5000,
-          isClosable: false,
+          isClosable: true,
+          position: "top-right",
         });
       } else throw new Error("Failed to send invitation");
     } catch (e) {
       chakraToast({
         title: "Error",
-        description: "Sending invitation failed",
+        description: "Failed to send invitation. Please try again.",
         status: "error",
         duration: 5000,
-        isClosable: false,
+        isClosable: true,
+        position: "top-right",
       });
     } finally {
       setIsReferralLoading(false);
@@ -159,131 +190,407 @@ export default function ReferralModal({ isOpen, onClose }) {
     onClose();
   }, [onClose]);
 
+  const socialButtons = [
+    {
+      component: FacebookShareButton,
+      icon: Facebook,
+      label: "Facebook",
+      color: "#1877F2",
+      props: { url: shareUrl, quote: defaultMessage, hashtag: "#yookatale" },
+    },
+    {
+      component: WhatsappShareButton,
+      icon: MessageCircle,
+      label: "WhatsApp",
+      color: "#25D366",
+      props: { url: shareUrl, title: defaultMessage, separator: ":: " },
+    },
+    {
+      component: TwitterShareButton,
+      icon: Twitter,
+      label: "Twitter",
+      color: "#1DA1F2",
+      props: { url: shareUrl, title: defaultMessage },
+    },
+    {
+      component: LinkedinShareButton,
+      icon: Linkedin,
+      label: "LinkedIn",
+      color: "#0A66C2",
+      props: { url: shareUrl },
+    },
+    {
+      component: TelegramShareButton,
+      icon: Send,
+      label: "Telegram",
+      color: "#0088CC",
+      props: { url: shareUrl, title: defaultMessage },
+    },
+  ];
+
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={false} size="lg">
-      <ModalOverlay />
-      <ModalContent pt={3} pb={2}>
-        <ModalHeader textAlign="center" textDecoration="underline">
-          Share Your Referral Link
-        </ModalHeader>
-        <ModalCloseButton />
-        {userInfo?._id !== undefined ? (
-          <ModalBody>
-            <Box mt={-4} mb={2} fontWeight="400">
-              <Text fontSize={15} mt={0}>
-                Refer others and earn some extra cash. Simply share your referral
-                link with your associates or businesses
-              </Text>
-              <List fontSize={14} styleType="disc" pl={8}>
-                <ListItem>Make sure they sign up using your referral link</ListItem>
-                <ListItem>Confirm and claim your payout</ListItem>
-              </List>
-            </Box>
-            <Box mb={6} fontWeight="400">
-              <FormControl>
-                <FormLabel>Invite By Mail</FormLabel>
-                <InputGroup>
-                  <Input
-                    placeholder="Input email to invite"
-                    type="email"
-                    disabled={isReferralLoading}
-                    value={invitee}
-                    onChange={(e) => setInvitee(e.target.value)}
-                    _hover={{}}
-                  />
-                  <InputRightElement
-                    width={isReferralLoading ? "6rem" : "4.5rem"}
-                    mr={isReferralLoading ? 1 : 0}
+    <Modal 
+      isOpen={isOpen} 
+      onClose={handleClose} 
+      closeOnOverlayClick={true} 
+      size="xl"
+      isCentered
+    >
+      <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
+      <ModalContent 
+        borderRadius="2xl"
+        overflow="hidden"
+        maxW="600px"
+        boxShadow="2xl"
+      >
+        {/* Header with Gradient */}
+        <Box
+          bgGradient={`linear(to-r, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`}
+          p={6}
+          color="white"
+          position="relative"
+          overflow="hidden"
+        >
+          <Box
+            position="absolute"
+            top="-50%"
+            right="-10%"
+            w="200px"
+            h="200px"
+            borderRadius="full"
+            bg="whiteAlpha.200"
+            blur="xl"
+          />
+          <Box
+            position="absolute"
+            bottom="-30%"
+            left="-10%"
+            w="150px"
+            h="150px"
+            borderRadius="full"
+            bg="whiteAlpha.100"
+            blur="xl"
+          />
+          <ModalCloseButton 
+            color="white" 
+            _hover={{ bg: "whiteAlpha.200" }}
+            size="lg"
+            borderRadius="full"
+          />
+          <VStack spacing={3} align="center" position="relative" zIndex={1}>
+            <MotionBox
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            >
+              <Box
+                p={4}
+                borderRadius="2xl"
+                bg="whiteAlpha.200"
+                backdropFilter="blur(10px)"
+              >
+                <Gift size={40} color="white" />
+              </Box>
+            </MotionBox>
+            <Text fontSize="2xl" fontWeight="bold" textAlign="center">
+              Invite Friends & Earn Rewards
+            </Text>
+            <HStack spacing={4} fontSize="sm" opacity={0.95}>
+              <HStack spacing={1}>
+                <DollarSign size={16} />
+                <Text>20K - 50K UGX</Text>
+              </HStack>
+              <Text>•</Text>
+              <HStack spacing={1}>
+                <Sparkles size={16} />
+                <Text>Loyalty Points</Text>
+              </HStack>
+              <Text>•</Text>
+              <HStack spacing={1}>
+                <Gift size={16} />
+                <Text>Gifts</Text>
+              </HStack>
+            </HStack>
+          </VStack>
+        </Box>
+
+        <ModalBody p={6}>
+          {userInfo?._id !== undefined ? (
+            <VStack spacing={6} align="stretch">
+              {/* Info Section */}
+              <MotionBox
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                p={4}
+                borderRadius="xl"
+                bg={`${ThemeColors.primaryColor}08`}
+                border="1px solid"
+                borderColor={`${ThemeColors.primaryColor}20`}
+              >
+                <HStack spacing={3} mb={3}>
+                  <Users size={20} style={{ color: ThemeColors.primaryColor }} />
+                  <Text fontWeight="semibold" color="gray.700">
+                    How It Works
+                  </Text>
+                </HStack>
+                <List spacing={2} fontSize="sm" color="gray.600">
+                  <ListItem display="flex" alignItems="start" gap={2}>
+                    <Box mt={1}>
+                      <Check size={16} style={{ color: ThemeColors.primaryColor }} />
+                    </Box>
+                    <Text>Share your referral link with friends and associates</Text>
+                  </ListItem>
+                  <ListItem display="flex" alignItems="start" gap={2}>
+                    <Box mt={1}>
+                      <Check size={16} style={{ color: ThemeColors.primaryColor }} />
+                    </Box>
+                    <Text>They sign up using your referral link</Text>
+                  </ListItem>
+                  <ListItem display="flex" alignItems="start" gap={2}>
+                    <Box mt={1}>
+                      <Check size={16} style={{ color: ThemeColors.primaryColor }} />
+                    </Box>
+                    <Text>Earn rewards when they make their first order</Text>
+                  </ListItem>
+                </List>
+              </MotionBox>
+
+              {/* Email Invite Section */}
+              <MotionBox
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <FormControl>
+                  <FormLabel 
+                    fontWeight="semibold" 
+                    color="gray.700"
+                    display="flex"
+                    alignItems="center"
+                    gap={2}
+                    mb={2}
                   >
-                    <Button
-                      h="2rem"
-                      size="sm"
-                      bg="orange.400"
-                      color="white"
-                      fontWeight="500"
-                      _hover={{ bg: "orange.500" }}
-                      onClick={handleMailInvitation}
-                      isLoading={isReferralLoading}
-                      loadingText="Sending"
-                      isDisabled={!referralCode}
-                    >
-                      Invite
-                    </Button>
-                  </InputRightElement>
-                </InputGroup>
-              </FormControl>
-            </Box>
-            <Box mb={6}>
-              <FormControl>
-                <FormLabel>Referral URL</FormLabel>
-                <InputGroup>
-                  <Input value={referralUrl} isDisabled _hover={{}} />
-                  <InputRightElement width="4.5rem">
-                    <Button
-                      h="2rem"
-                      size="sm"
-                      bg="black"
-                      color="white"
-                      fontWeight="500"
-                      _hover={{ bg: "gray.800" }}
-                      onClick={handleOnCopy}
-                      mr={hasCopied ? 1 : 0}
-                    >
-                      {hasCopied ? "Copied" : "Copy"}
-                    </Button>
-                  </InputRightElement>
-                </InputGroup>
-              </FormControl>
-            </Box>
-            <Box justifyContent="center" textAlign="center">
-              <FacebookShareButton
-                url={shareUrl}
-                quote={defaultMessage}
-                hashtag="#yookatale"
-                style={{ padding: 3 }}
+                    <Mail size={18} style={{ color: ThemeColors.primaryColor }} />
+                    Invite by Email
+                  </FormLabel>
+                  <InputGroup size="lg">
+                    <Input
+                      placeholder="Enter friend's email address"
+                      type="email"
+                      disabled={isReferralLoading}
+                      value={invitee}
+                      onChange={(e) => setInvitee(e.target.value)}
+                      borderRadius="xl"
+                      border="2px solid"
+                      borderColor="gray.200"
+                      _hover={{ borderColor: `${ThemeColors.primaryColor}40` }}
+                      _focus={{
+                        borderColor: ThemeColors.primaryColor,
+                        boxShadow: `0 0 0 3px ${ThemeColors.primaryColor}20`,
+                      }}
+                      h="50px"
+                      fontSize="md"
+                    />
+                    <InputRightElement width="auto" pr={2} h="50px">
+                      <MotionButton
+                        h="38px"
+                        px={6}
+                        borderRadius="xl"
+                        bg={ThemeColors.primaryColor}
+                        color="white"
+                        fontWeight="semibold"
+                        _hover={{ 
+                          bg: ThemeColors.secondaryColor,
+                          transform: "scale(1.05)",
+                        }}
+                        onClick={handleMailInvitation}
+                        isLoading={isReferralLoading}
+                        loadingText="Sending..."
+                        isDisabled={!referralCode || !invitee.trim()}
+                        leftIcon={!isReferralLoading && <Send size={16} />}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {isReferralLoading ? "Sending..." : "Send Invite"}
+                      </MotionButton>
+                    </InputRightElement>
+                  </InputGroup>
+                </FormControl>
+              </MotionBox>
+
+              <Divider />
+
+              {/* Referral Link Section */}
+              <MotionBox
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
               >
-                <FacebookIcon size={40} round />
-              </FacebookShareButton>
-              <WhatsappShareButton
-                url={shareUrl}
-                title={defaultMessage}
-                style={{ padding: 3 }}
-                separator=":: "
+                <FormControl>
+                  <FormLabel 
+                    fontWeight="semibold" 
+                    color="gray.700"
+                    display="flex"
+                    alignItems="center"
+                    gap={2}
+                    mb={2}
+                  >
+                    <LinkIcon size={18} style={{ color: ThemeColors.primaryColor }} />
+                    Your Referral Link
+                  </FormLabel>
+                  <InputGroup size="lg">
+                    <Input
+                      value={referralUrl}
+                      isReadOnly
+                      borderRadius="xl"
+                      border="2px solid"
+                      borderColor="gray.200"
+                      bg="gray.50"
+                      fontFamily="mono"
+                      fontSize="sm"
+                      h="50px"
+                      pr="120px"
+                    />
+                    <InputRightElement width="auto" pr={2} h="50px">
+                      <MotionButton
+                        h="38px"
+                        px={6}
+                        borderRadius="xl"
+                        bg={hasCopied ? ThemeColors.secondaryColor : "gray.800"}
+                        color="white"
+                        fontWeight="semibold"
+                        _hover={{ 
+                          bg: hasCopied ? ThemeColors.secondaryColor : "gray.700",
+                          transform: "scale(1.05)",
+                        }}
+                        onClick={handleOnCopy}
+                        leftIcon={hasCopied ? <Check size={16} /> : <Copy size={16} />}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {hasCopied ? "Copied!" : "Copy"}
+                      </MotionButton>
+                    </InputRightElement>
+                  </InputGroup>
+                  {referralCode && (
+                    <HStack mt={2} spacing={2}>
+                      <Badge
+                        px={3}
+                        py={1}
+                        borderRadius="full"
+                        bg={`${ThemeColors.primaryColor}15`}
+                        color={ThemeColors.primaryColor}
+                        fontSize="xs"
+                        fontWeight="semibold"
+                      >
+                        Code: {referralCode}
+                      </Badge>
+                    </HStack>
+                  )}
+                </FormControl>
+              </MotionBox>
+
+              <Divider />
+
+              {/* Social Share Section */}
+              <MotionBox
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
               >
-                <WhatsappIcon size={40} round />
-              </WhatsappShareButton>
-              <TwitterShareButton
-                url={shareUrl}
-                title={defaultMessage}
-                style={{ padding: 3 }}
+                <Text 
+                  fontWeight="semibold" 
+                  color="gray.700"
+                  mb={4}
+                  display="flex"
+                  alignItems="center"
+                  gap={2}
+                >
+                  <Share2 size={18} style={{ color: ThemeColors.primaryColor }} />
+                  Share on Social Media
+                </Text>
+                <HStack spacing={3} justify="center" flexWrap="wrap">
+                  {socialButtons.map((social, index) => {
+                    const ShareButton = social.component;
+                    const IconComponent = social.icon;
+                    return (
+                      <MotionBox
+                        key={social.label}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.5 + index * 0.1 }}
+                        whileHover={{ scale: 1.1, y: -5 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <ShareButton {...social.props}>
+                          <Box
+                            p={3}
+                            borderRadius="xl"
+                            bg="white"
+                            border="2px solid"
+                            borderColor="gray.200"
+                            _hover={{
+                              borderColor: social.color,
+                              bg: `${social.color}08`,
+                              transform: "translateY(-2px)",
+                            }}
+                            transition="all 0.2s"
+                            cursor="pointer"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            w="56px"
+                            h="56px"
+                          >
+                            <IconComponent size={24} style={{ color: social.color }} />
+                          </Box>
+                        </ShareButton>
+                      </MotionBox>
+                    );
+                  })}
+                </HStack>
+              </MotionBox>
+            </VStack>
+          ) : (
+            <VStack spacing={4} py={8}>
+              <Box
+                p={4}
+                borderRadius="xl"
+                bg={`${ThemeColors.primaryColor}08`}
+                border="2px dashed"
+                borderColor={`${ThemeColors.primaryColor}40`}
               >
-                <TwitterIcon size={40} round />
-              </TwitterShareButton>
-              <LinkedinShareButton url={shareUrl} style={{ padding: 3 }}>
-                <LinkedinIcon size={40} round />
-              </LinkedinShareButton>
-              <TelegramShareButton
-                url={shareUrl}
-                title={defaultMessage}
-                style={{ padding: 3 }}
-              >
-                <TelegramIcon size={40} round />
-              </TelegramShareButton>
-            </Box>
-          </ModalBody>
-        ) : (
-          <ModalBody>
-            <Box mt={-4} mb={2} fontWeight="400" textAlign="center" marginTop={3}>
-              <Text fontSize={17} mt={0}>
-                You need to sign in to refer friends
+                <Users size={48} style={{ color: ThemeColors.primaryColor }} />
+              </Box>
+              <Text fontSize="lg" fontWeight="semibold" color="gray.700" textAlign="center">
+                Sign in to Start Earning
               </Text>
-            </Box>
-          </ModalBody>
-        )}
-        <ModalFooter justifyContent="center" textAlign="center">
-          <Button colorScheme="gray" onClick={handleClose}>
+              <Text fontSize="sm" color="gray.500" textAlign="center">
+                Create an account or sign in to get your referral link and start earning rewards!
+              </Text>
+            </VStack>
+          )}
+        </ModalBody>
+
+        <ModalFooter justifyContent="center" pt={4} pb={6}>
+          <MotionButton
+            onClick={handleClose}
+            borderRadius="xl"
+            px={8}
+            py={6}
+            bg="gray.100"
+            color="gray.700"
+            fontWeight="semibold"
+            _hover={{ 
+              bg: "gray.200",
+              transform: "scale(1.05)",
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             Close
-          </Button>
+          </MotionButton>
         </ModalFooter>
       </ModalContent>
     </Modal>
