@@ -13,7 +13,7 @@ import {
 import { FormatCurr } from "@utils/utils";
 import { Loader2, Check, Shield, CreditCard, Truck, Smartphone, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { DB_URL } from "@config/config";
 import axios from "axios";
@@ -36,6 +36,8 @@ const Payment = ({ params }) => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isOrderLoading, setIsOrderLoading] = useState(true);
+  const [orderError, setOrderError] = useState(null);
   const [CouponFormIsLoading, setCouponFormIsLoading] = useState(false);
   const [CouponCode, setCouponCode] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
@@ -53,38 +55,62 @@ const Payment = ({ params }) => {
   useEffect(() => {
     if (!userInfo || Object.keys(userInfo).length === 0) {
       router.push("/signin");
+      return;
     }
   }, [userInfo, router]);
 
-  const handleDataFetch = async () => {
+  const handleDataFetch = useCallback(async () => {
+    // Security: Validate params.id exists and userInfo is available
+    if (!params?.id || !userInfo?.token) {
+      setIsOrderLoading(false);
+      return;
+    }
+
+    setIsOrderLoading(true);
+    setOrderError(null);
     try {
       const res = await fetchOrder(params.id).unwrap();
 
-      if (res.data?.status && res.data.status != "") {
+      // Check if order already has a status (completed/paid)
+      if (res.data?.status && res.data.status !== "" && res.data.status !== "pending") {
         router.push("/");
         return;
       }
 
-      if (res.status == "Success" || res.status == "success") {
-        setOrder({ ...res.data });
-        // Show payment options after a brief delay
-        setTimeout(() => setShowPaymentOptions(true), 300);
+      // Handle successful response
+      if (res.status === "Success" || res.status === "success") {
+        // Set order data - handle both response structures
+        const orderData = res.data || res;
+        if (orderData && (orderData._id || orderData.id)) {
+          setOrder(orderData);
+          // Show payment options immediately
+          setShowPaymentOptions(true);
+        } else {
+          throw new Error("Invalid order data received");
+        }
       } else {
         throw new Error(res.message || "Failed to fetch order");
       }
     } catch (error) {
       console.error("Error fetching order:", error);
+      const errorMessage = error.data?.message || error.message || "Unable to load order details. Please try again.";
+      setOrderError(errorMessage);
       chakraToast({
-        title: "Error",
-        description: error.data?.message || error.message || "Unexpected error occurred. Please try again.",
+        title: "Error Loading Order",
+        description: errorMessage,
         status: "error",
         duration: 5000,
         isClosable: true,
+        position: "top",
       });
+    } finally {
+      setIsOrderLoading(false);
     }
-  };
+  }, [params?.id, userInfo?.token, fetchOrder, router, chakraToast]);
 
-  const fetchSubscriptionStatus = async () => {
+  const fetchSubscriptionStatus = useCallback(async () => {
+    if (!userInfo?.token) return;
+    
     try {
       const response = await axios.get(
         `${DB_URL}/subscription`,
@@ -95,20 +121,29 @@ const Payment = ({ params }) => {
         }
       );
 
-      if (response.data.isSubscribed) {
+      if (response.data?.isSubscribed) {
         setIsSubscribed(true);
       }
     } catch (error) {
+      // Silently fail - subscription status is optional
       console.error("Error fetching subscription status:", error);
     }
-  };
+  }, [userInfo?.token]);
 
+  // Fetch order and subscription status when component mounts or dependencies change
   useEffect(() => {
-    if (userInfo?.token) {
-      fetchSubscriptionStatus();
-      handleDataFetch();
+    if (userInfo?.token && params?.id) {
+      // Fetch both in parallel for faster loading
+      Promise.all([
+        handleDataFetch(),
+        fetchSubscriptionStatus()
+      ]).catch(err => {
+        console.error("Error in parallel fetch:", err);
+      });
+    } else if (!userInfo?.token) {
+      setIsOrderLoading(false);
     }
-  }, [userInfo]);
+  }, [userInfo?.token, params?.id, handleDataFetch, fetchSubscriptionStatus]);
 
   const handlePayment = async () => {
     if (!paymentMethod || isLoading) return;
@@ -424,7 +459,28 @@ const Payment = ({ params }) => {
 
           {/* Payment Methods */}
           <Box p={6}>
-            {Order?._id ? (
+            {isOrderLoading ? (
+              <Box py={12} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
+                <Box position="relative">
+                  <Loader2 className="w-12 h-12 animate-spin" style={{ color: ThemeColors.primaryColor }} />
+                </Box>
+                <Text mt={4} color="gray.600">Loading your order details...</Text>
+              </Box>
+            ) : orderError ? (
+              <Box py={12} display="flex" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center">
+                <Text fontSize="xl" fontWeight="semibold" color="red.600" mb={2}>
+                  Unable to Load Order
+                </Text>
+                <Text color="gray.600" mb={4}>
+                  {orderError}
+                </Text>
+                <ButtonComponent
+                  text="Try Again"
+                  size="md"
+                  onClick={handleDataFetch}
+                />
+              </Box>
+            ) : Order?._id ? (
               <>
                 <Box mb={6}>
                   <Text fontSize="lg" fontWeight="semibold" color="gray.800" mb={4}>
