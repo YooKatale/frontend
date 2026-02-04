@@ -30,6 +30,7 @@
  * - invite_friends: Sent to guide users on how to invite friends and earn rewards
  * - download_app: Sent to guide users on how to download the Yookatale app (website footer or app store search)
  * - how_to_subscribe: Sent to guide users on how to subscribe to meal calendar or subscription plans
+ * - subscription_confirmation: Sent to users when they subscribe from the webapp, thanking them and informing them they'll receive updates
  */
 
 import { emailTemplate, newsletterEmailTemplate, invitationEmailTemplate } from "@constants/constants";
@@ -40,6 +41,7 @@ import { getStartedEmailTemplate } from "@constants/getStartedEmailTemplate";
 import { inviteFriendsEmailTemplate } from "@constants/inviteFriendsEmailTemplate";
 import { downloadAppEmailTemplate } from "@constants/downloadAppEmailTemplate";
 import { howToSubscribeEmailTemplate } from "@constants/howToSubscribeEmailTemplate";
+import { subscriptionConfirmationEmailTemplate } from "@constants/subscriptionConfirmationEmailTemplate";
 import { NextResponse } from "next/server";
 import transporter, { defaultSender } from "@lib/emailConfig";
 
@@ -92,7 +94,7 @@ export const POST = async (req, res) => {
     const sanitizedGreeting = sanitizeInput(greeting);
     
     // Security: Validate email type to prevent template injection
-    const validTypes = ['welcome', 'newsletter', 'meal_notification', 'invitation', 'subscription', 'app_download', 'get_started', 'invite_friends', 'download_app', 'how_to_subscribe'];
+    const validTypes = ['welcome', 'newsletter', 'meal_notification', 'invitation', 'subscription', 'app_download', 'get_started', 'invite_friends', 'download_app', 'how_to_subscribe', 'subscription_confirmation'];
     const emailType = validTypes.includes(type) ? type : 'welcome';
     
     // Check if email transporter is configured
@@ -135,6 +137,10 @@ export const POST = async (req, res) => {
       emailHtml = howToSubscribeEmailTemplate;
       subject = "How to Subscribe - Meal Calendar & Subscription Plans Guide 📅";
       emailTypeLabel = "how_to_subscribe";
+    } else if (emailType === 'subscription_confirmation') {
+      emailHtml = subscriptionConfirmationEmailTemplate;
+      subject = "Thank You for Subscribing to Yookatale! 🎉";
+      emailTypeLabel = "subscription_confirmation";
     } else if (emailType === 'newsletter') {
       emailHtml = newsletterEmailTemplate;
       subject = "YooKatale Newsletter - Subscription Plans & Latest News";

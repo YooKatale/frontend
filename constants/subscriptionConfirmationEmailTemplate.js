@@ -1,18 +1,18 @@
 /**
- * How to Subscribe Email Template
+ * Subscription Confirmation Email Template
  * 
- * Guides users on how to subscribe to meal calendar or subscription plans
- * Includes screenshots: Subscription plans, Meal calendar, Payment page
+ * Sent to users when they subscribe from the webapp
+ * Thanks them for subscribing and informs them they'll receive updates from Yookatale
  */
 
-export const howToSubscribeEmailTemplate = `
+export const subscriptionConfirmationEmailTemplate = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>How to Subscribe - Yookatale</title>
+  <title>Thank You for Subscribing - Yookatale</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f3f4f6; line-height: 1.6; color: #1f2937;">
 
@@ -24,18 +24,24 @@ export const howToSubscribeEmailTemplate = `
           <tr>
             <td style="background-color: #000000; padding: 20px 20px; text-align: center;">
               <img src="https://www.yookatale.app/assets/icons/logo2.png" alt="Yookatale Logo" style="max-width: 120px; height: auto; margin: 0 auto 8px; display: block;" />
-              <h1 style="color: #ffffff; font-size: 22px; font-weight: 800; margin: 0;">How to Subscribe</h1>
+              <h1 style="color: #ffffff; font-size: 22px; font-weight: 800; margin: 0;">Thank You for Subscribing! 🎉</h1>
               <p style="color: #e0f2fe; font-size: 13px; margin: 6px 0 0;">Yoo mobile food market</p>
             </td>
           </tr>
 
           <tr>
             <td style="padding: 20px 18px; background-color: #ffffff;">
-              <p style="color: #374151; font-size: 13px; line-height: 1.5; margin: 0 0 10px;">
+              <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0 0 12px; font-weight: 600; text-align: center;">
+                We're thrilled to have you join the Yookatale family!
+              </p>
+              <p style="color: #4b5563; font-size: 13px; line-height: 1.6; margin: 0 0 16px;">
+                Thank you for subscribing to Yookatale. You're now part of our community, and we'll keep you updated on all the latest news, exclusive offers, meal recommendations, and exciting updates from Yookatale.
+              </p>
+              <p style="color: #4b5563; font-size: 13px; line-height: 1.6; margin: 0 0 16px;">
                 Switch to a new shopping style this new year. Forget about cooking or going to the market — subscribe for our <strong>Freemium</strong>, <strong>Premium</strong>, <strong>Family</strong> or <strong>Business</strong> Plan monthly or annually. Get everything delivered at your doorstep.
               </p>
               <p style="color: #4b5563; font-size: 12px; line-height: 1.5; margin: 0 0 16px;">
-                You can subscribe in two ways: (1) Choose a <strong>subscription plan</strong> (Premium, Family, or Business) for comprehensive meal delivery, or (2) Select meals from our <strong>meal calendar</strong> with ready-to-eat or ready-to-cook options. Subscribe weekly or monthly for breakfast, lunch, supper, or all meals. Both options lead to the payment page where you'll complete your subscription. Visit <a href="https://www.yookatale.app/subscription" style="color: #185f2d; text-decoration: underline; font-weight: 600;">yookatale.app/subscription</a> to get started.
+                Discover and customize your meals, set when and where to eat with friends, family and loved ones. Earn loyalty points, credit points, gifts and discounts.
               </p>
 
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0 0 16px;">
@@ -92,35 +98,6 @@ export const howToSubscribeEmailTemplate = `
               </table>
 
               <div style="background-color: #f9fafb; border-radius: 12px; padding: 12px; margin: 16px 0; border: 1px solid #e5e7eb;">
-                <h3 style="color: #111827; font-size: 14px; font-weight: 700; margin: 0 0 8px; text-align: center;">How to Subscribe — Step by Step</h3>
-                <p style="color: #4b5563; font-size: 11px; line-height: 1.5; margin: 0 0 12px; text-align: center;">Choose either a subscription plan or meal calendar — both lead to payment</p>
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                  <tr>
-                    <td colspan="2" style="padding: 0 0 8px 0;">
-                      <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
-                        <img src="https://www.yookatale.app/assets/images/app-subscription-plans.png" alt="Subscription Plans" style="display: block; width: 100%; height: auto; border: 0; max-height: 400px; object-fit: contain;" />
-                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Step 1: Choose Your Subscription Plan (Premium, Family, or Business) or Meal Calendar</p></div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td width="50%" style="padding: 8px 4px 0 0; vertical-align: top;">
-                      <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
-                        <img src="https://www.yookatale.app/assets/images/meal-calendar-subscription.png" alt="Meal Calendar" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
-                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Step 2: Select Meals (Ready-to-Eat or Ready-to-Cook)</p></div>
-                      </div>
-                    </td>
-                    <td width="50%" style="padding: 8px 0 0 4px; vertical-align: top;">
-                      <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
-                        <img src="https://www.yookatale.app/assets/images/payment-complete.png" alt="Complete Payment" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
-                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Step 3: Complete Payment</p></div>
-                      </div>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-
-              <div style="background-color: #f9fafb; border-radius: 12px; padding: 12px; margin: 16px 0; border: 1px solid #e5e7eb;">
                 <h3 style="color: #111827; font-size: 14px; font-weight: 700; margin: 0 0 8px; text-align: center;">Explore Yookatale app — subscribe, shop, and earn</h3>
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                   <tr>
@@ -136,6 +113,14 @@ export const howToSubscribeEmailTemplate = `
                           <img src="https://www.yookatale.app/assets/images/app-invite-rewards.png" alt="Earn after inviting" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
                           <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Earn after inviting</p></div>
                         </a>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" style="padding: 8px 0 0 0;">
+                      <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
+                        <img src="https://www.yookatale.app/assets/images/app-subscription-plans.png" alt="Subscription Plans" style="display: block; width: 100%; height: auto; border: 0; max-height: 400px; object-fit: contain;" />
+                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Subscription plans</p></div>
                       </div>
                     </td>
                   </tr>
