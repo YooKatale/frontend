@@ -24,7 +24,6 @@ import {
   HStack,
   Divider,
   Badge,
-  Icon,
 } from "@chakra-ui/react";
 import { useCreateReferralCodeMutation } from "@slices/usersApiSlice";
 import { useSelector } from "react-redux";
@@ -53,12 +52,6 @@ import {
   Sparkles,
   Link as LinkIcon,
   Send,
-  X,
-  Facebook,
-  MessageCircle,
-  Twitter,
-  Linkedin,
-  SendHorizontal,
 } from "lucide-react";
 import { ThemeColors } from "@constants/constants";
 
@@ -189,44 +182,6 @@ export default function ReferralModal({ isOpen, onClose }) {
     setInvitee("");
     onClose();
   }, [onClose]);
-
-  const socialButtons = [
-    {
-      component: FacebookShareButton,
-      icon: Facebook,
-      label: "Facebook",
-      color: "#1877F2",
-      props: { url: shareUrl, quote: defaultMessage, hashtag: "#yookatale" },
-    },
-    {
-      component: WhatsappShareButton,
-      icon: MessageCircle,
-      label: "WhatsApp",
-      color: "#25D366",
-      props: { url: shareUrl, title: defaultMessage, separator: ":: " },
-    },
-    {
-      component: TwitterShareButton,
-      icon: Twitter,
-      label: "Twitter",
-      color: "#1DA1F2",
-      props: { url: shareUrl, title: defaultMessage },
-    },
-    {
-      component: LinkedinShareButton,
-      icon: Linkedin,
-      label: "LinkedIn",
-      color: "#0A66C2",
-      props: { url: shareUrl },
-    },
-    {
-      component: TelegramShareButton,
-      icon: SendHorizontal,
-      label: "Telegram",
-      color: "#0088CC",
-      props: { url: shareUrl, title: defaultMessage },
-    },
-  ];
 
   return (
     <Modal 
@@ -511,44 +466,75 @@ export default function ReferralModal({ isOpen, onClose }) {
                   Share on Social Media
                 </Text>
                 <HStack spacing={3} justify="center" flexWrap="wrap">
-                  {socialButtons.map((social, index) => {
-                    const ShareButton = social.component;
-                    const IconComponent = social.icon;
-                    return (
-                      <MotionBox
-                        key={social.label}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.5 + index * 0.1 }}
-                        whileHover={{ scale: 1.1, y: -5 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <ShareButton {...social.props}>
-                          <Box
-                            p={3}
-                            borderRadius="xl"
-                            bg="white"
-                            border="2px solid"
-                            borderColor="gray.200"
-                            _hover={{
-                              borderColor: social.color,
-                              bg: `${social.color}08`,
-                              transform: "translateY(-2px)",
-                            }}
-                            transition="all 0.2s"
-                            cursor="pointer"
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            w="56px"
-                            h="56px"
-                          >
-                            <IconComponent size={24} style={{ color: social.color }} />
-                          </Box>
-                        </ShareButton>
-                      </MotionBox>
-                    );
-                  })}
+                  <MotionBox
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FacebookShareButton
+                      url={shareUrl}
+                      quote={defaultMessage}
+                      hashtag="#yookatale"
+                    >
+                      <FacebookIcon size={48} round />
+                    </FacebookShareButton>
+                  </MotionBox>
+                  <MotionBox
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <WhatsappShareButton
+                      url={shareUrl}
+                      title={defaultMessage}
+                      separator=":: "
+                    >
+                      <WhatsappIcon size={48} round />
+                    </WhatsappShareButton>
+                  </MotionBox>
+                  <MotionBox
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.7 }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <TwitterShareButton
+                      url={shareUrl}
+                      title={defaultMessage}
+                    >
+                      <TwitterIcon size={48} round />
+                    </TwitterShareButton>
+                  </MotionBox>
+                  <MotionBox
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.8 }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <LinkedinShareButton url={shareUrl}>
+                      <LinkedinIcon size={48} round />
+                    </LinkedinShareButton>
+                  </MotionBox>
+                  <MotionBox
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.9 }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <TelegramShareButton
+                      url={shareUrl}
+                      title={defaultMessage}
+                    >
+                      <TelegramIcon size={48} round />
+                    </TelegramShareButton>
+                  </MotionBox>
                 </HStack>
               </MotionBox>
             </VStack>
