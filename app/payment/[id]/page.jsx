@@ -61,40 +61,67 @@ const Payment = ({ params }) => {
 
   const handleDataFetch = useCallback(async () => {
     // Security: Validate params.id exists and userInfo is available
-    if (!params?.id || !userInfo?.token) {
+    const orderId = params?.id;
+    if (!orderId) {
       setIsOrderLoading(false);
+      setOrderError("Order ID is missing from URL");
+      return;
+    }
+    
+    if (!userInfo?.token) {
+      setIsOrderLoading(false);
+      setOrderError("Please sign in to view order details");
       return;
     }
 
     setIsOrderLoading(true);
     setOrderError(null);
+    
     try {
-      const res = await fetchOrder(params.id).unwrap();
+      console.log("Fetching order with ID:", orderId);
+      const res = await fetchOrder(orderId).unwrap();
+      console.log("Order API response:", res);
 
-      // Check if order already has a status (completed/paid)
-      if (res.data?.status && res.data.status !== "" && res.data.status !== "pending") {
+      // Handle different response structures - be very flexible
+      let orderData = null;
+      
+      // Check if response has data property
+      if (res?.data) {
+        orderData = res.data;
+      } 
+      // Check if response itself is the order (has _id or id)
+      else if (res?._id || res?.id) {
+        orderData = res;
+      }
+      // Check nested structures
+      else if (res?.order) {
+        orderData = res.order;
+      }
+
+      console.log("Extracted order data:", orderData);
+
+      // Validate we have order data with an ID
+      if (!orderData || (!orderData._id && !orderData.id)) {
+        throw new Error("Invalid order data received - missing order ID");
+      }
+
+      // Check if order already has a status (completed/paid) - redirect if so
+      if (orderData.status && orderData.status !== "" && orderData.status !== "pending" && orderData.status !== "Pending") {
         router.push("/");
         return;
       }
 
-      // Handle successful response
-      if (res.status === "Success" || res.status === "success") {
-        // Set order data - handle both response structures
-        const orderData = res.data || res;
-        if (orderData && (orderData._id || orderData.id)) {
-          setOrder(orderData);
-          // Show payment options immediately
-          setShowPaymentOptions(true);
-        } else {
-          throw new Error("Invalid order data received");
-        }
-      } else {
-        throw new Error(res.message || "Failed to fetch order");
-      }
+      // Success - set order data
+      setOrder(orderData);
+      setShowPaymentOptions(true);
+      setIsOrderLoading(false);
+      
     } catch (error) {
-      console.error("Error fetching order:", error);
-      const errorMessage = error.data?.message || error.message || "Unable to load order details. Please try again.";
+      console.error("Error fetching order - Full error:", error);
+      const errorMessage = error?.data?.message || error?.message || "Unable to load order details. Please try again.";
       setOrderError(errorMessage);
+      setIsOrderLoading(false);
+      
       chakraToast({
         title: "Error Loading Order",
         description: errorMessage,
@@ -103,10 +130,8 @@ const Payment = ({ params }) => {
         isClosable: true,
         position: "top",
       });
-    } finally {
-      setIsOrderLoading(false);
     }
-  }, [params?.id, userInfo?.token, fetchOrder, router, chakraToast]);
+  }, [params?.id, userInfo?.token, router, chakraToast]);
 
   const fetchSubscriptionStatus = useCallback(async () => {
     if (!userInfo?.token) return;
@@ -132,17 +157,35 @@ const Payment = ({ params }) => {
 
   // Fetch order and subscription status when component mounts or dependencies change
   useEffect(() => {
-    if (userInfo?.token && params?.id) {
+    // Ensure params is available (Next.js 13+ might have async params)
+    const orderId = params?.id;
+    let timeoutId = null;
+    
+    if (userInfo?.token && orderId) {
+      console.log("Initializing payment page - Order ID:", orderId, "User:", userInfo?.email || userInfo?._id);
       // Fetch both in parallel for faster loading
-      Promise.all([
-        handleDataFetch(),
-        fetchSubscriptionStatus()
-      ]).catch(err => {
-        console.error("Error in parallel fetch:", err);
-      });
-    } else if (!userInfo?.token) {
-      setIsOrderLoading(false);
+      handleDataFetch();
+      fetchSubscriptionStatus();
+      
+      // Safety timeout - clear loading after 15 seconds if no response
+      timeoutId = setTimeout(() => {
+        console.warn("Order fetch timeout - this should not happen if API responds");
+        // Don't set error here, let the error handler in handleDataFetch do it
+      }, 15000);
+    } else {
+      if (!userInfo?.token) {
+        console.log("No user token, redirecting to signin");
+        setIsOrderLoading(false);
+      } else if (!orderId) {
+        console.log("No order ID found in params");
+        setIsOrderLoading(false);
+        setOrderError("Order ID is missing from URL");
+      }
     }
+    
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [userInfo?.token, params?.id, handleDataFetch, fetchSubscriptionStatus]);
 
   const handlePayment = async () => {
