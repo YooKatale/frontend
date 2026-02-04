@@ -1,6 +1,6 @@
 "use client";
 
-import { useToast, Box, Flex, Text, SimpleGrid } from "@chakra-ui/react";
+import { useToast, Box, Flex, Text, SimpleGrid, keyframes } from "@chakra-ui/react";
 import ButtonComponent from "@components/Button";
 import FlutterwavePayment from "@components/FlutterwavePayment";
 import { Input } from "@components/ui/input";
@@ -11,23 +11,35 @@ import {
   useValidateCouponMutation,
 } from "@slices/productsApiSlice";
 import { FormatCurr } from "@utils/utils";
-import { Loader2 } from "lucide-react";
+import { Loader2, Check, Shield, CreditCard, Truck, Smartphone, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { DB_URL } from "@config/config";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
+
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
+const pulse = keyframes`
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+`;
 
 const Payment = ({ params }) => {
   const [Order, setOrder] = useState({});
   const [paymentDisplay, setPaymentDisplay] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
   const [CouponFormIsLoading, setCouponFormIsLoading] = useState(false);
-
   const [CouponCode, setCouponCode] = useState("");
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
 
   const [fetchOrder] = useOrderMutation();
   const [updateOrder] = useOrderUpdateMutation();
@@ -37,10 +49,12 @@ const Payment = ({ params }) => {
   const { userInfo } = useSelector((state) => state.auth);
   const router = useRouter();
 
-  // check if user logged in
-  if (!userInfo || userInfo == {} || userInfo == "") {
-    router.push("/signin");
-  }
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!userInfo || Object.keys(userInfo).length === 0) {
+      router.push("/signin");
+    }
+  }, [userInfo, router]);
 
   const handleDataFetch = async () => {
     try {
@@ -53,6 +67,8 @@ const Payment = ({ params }) => {
 
       if (res.status == "Success" || res.status == "success") {
         setOrder({ ...res.data });
+        // Show payment options after a brief delay
+        setTimeout(() => setShowPaymentOptions(true), 300);
       } else {
         throw new Error(res.message || "Failed to fetch order");
       }
@@ -83,18 +99,21 @@ const Payment = ({ params }) => {
         setIsSubscribed(true);
       }
     } catch (error) {
-      console.error("Error fetching subscrption status:", error);
+      console.error("Error fetching subscription status:", error);
     }
   };
 
   useEffect(() => {
-    fetchSubscriptionStatus();
-    handleDataFetch();
+    if (userInfo?.token) {
+      fetchSubscriptionStatus();
+      handleDataFetch();
+    }
   }, [userInfo]);
 
-  // function to display payment component
   const handlePayment = async () => {
-    setIsLoading((prev) => (prev ? false : true));
+    if (!paymentMethod || isLoading) return;
+    
+    setIsLoading(true);
   
     if (paymentMethod === "cash_on_delivery") {
       try {
@@ -107,31 +126,28 @@ const Payment = ({ params }) => {
           },
         }).unwrap();
     
-        setIsLoading((prev) => (prev ? false : true));
-    
         if (res?.status === "Success") {
           chakraToast({
-            description: "Order successfully placed for Cash on Delivery.",
+            description: "✅ Order placed successfully for Cash on Delivery!",
             status: "success",
             duration: 5000,
-            isClosable: false,
+            isClosable: true,
+            position: "top",
           });
-    
-          router.push("/");
+          setTimeout(() => router.push("/"), 1500);
         }
       } catch (err) {
         console.error("Error:", err);
-        setIsLoading((prev) => (prev ? false : true));
-    
         chakraToast({
           title: "Error",
-          description: err.data?.message
-            ? err.data?.message
-            : err.data || err.error,
+          description: err.data?.message || err.data || err.error,
           status: "error",
           duration: 5000,
-          isClosable: false,
+          isClosable: true,
+          position: "top",
         });
+      } finally {
+        setIsLoading(false);
       }
     } else if (paymentMethod === "payLater") {
       try {
@@ -144,48 +160,48 @@ const Payment = ({ params }) => {
           }
         }).unwrap();
   
-        setIsLoading((prev) => (prev ? false : true));
-  
         if (res?.status === "success") {
           chakraToast({
-            description: "Order successfully  placed for pay later",
+            description: "✅ Order placed successfully for Pay Later!",
             status: "success",
             duration: 5000,
-            isClosable: false
+            isClosable: true,
+            position: "top",
           });
-          router.push("/");
+          setTimeout(() => router.push("/"), 1500);
         }   
       } catch (err) {
         console.error("Error", err);
-        setIsLoading((prev) => (prev ? false : true));
-
         chakraToast({
           title: "Error",
-          description: err.data?.message
-          ? err.data?.message
-          : err.data || err.error,
+          description: err.data?.message || err.data || err.error,
           status: "error",
           duration: 5000,
-          isClosable: false,
+          isClosable: true,
+          position: "top",
         });
+      } finally {
+        setIsLoading(false);
       }
-    }  else {
+    } else {
       // Handle other payment methods here
-      setPaymentDisplay((prev) => true);
+      setPaymentDisplay(true);
+      setIsLoading(false);
     }    
   };  
   
   const handleCallback = async (param) => {
-    setPaymentDisplay((prev) => false);
+    setPaymentDisplay(false);
 
-    if (param.status == "error")
+    if (param.status == "error") {
       return chakraToast({
-        description:
-          param.message || "Payment failed. Please refresh page and try again",
+        description: param.message || "Payment failed. Please try again",
         status: "error",
         duration: 5000,
-        isClosable: false,
+        isClosable: true,
+        position: "top",
       });
+    }
 
     try {
       const res = await updateOrder({
@@ -197,199 +213,422 @@ const Payment = ({ params }) => {
         },
       }).unwrap();
 
-      setIsLoading((prev) => (prev ? false : true));
-
       if (res?.status == "Success") {
         chakraToast({
-          description:
-            "Payment successful, you're order has been placed. You will receive an email confirmation shortly",
+          description: "🎉 Payment successful! Order confirmed.",
           status: "success",
           duration: 5000,
-          isClosable: false,
+          isClosable: true,
+          position: "top",
         });
-
-        router.push("/");
+        setTimeout(() => router.push("/"), 1500);
       }
     } catch (err) {
-      setIsLoading((prev) => (prev ? false : true));
-
       chakraToast({
         title: "Error",
-        description: err.data?.message
-          ? err.data?.message
-          : err.data || err.error,
+        description: err.data?.message || err.data || err.error,
         status: "error",
         duration: 5000,
-        isClosable: false,
+        isClosable: true,
+        position: "top",
       });
     }
   };
 
   const handleCouponFormSubmit = async (e) => {
     e.preventDefault();
+    // Coupon is optional - only submit if code is provided
+    if (!CouponCode.trim()) return;
+
     try {
-      setCouponFormIsLoading((prev) => (prev ? false : true));
+      setCouponFormIsLoading(true);
 
       const res = await validateCoupon({
         couponCode: CouponCode,
         orderId: Order?._id,
       }).unwrap();
 
-      if (res.status == "Success")
+      if (res.status == "Success") {
+        setCouponApplied(true);
         chakraToast({
-          description: "Coupon Applied",
+          description: "🎉 Coupon applied successfully!",
           status: "success",
-          duration: 5000,
-          isClosable: false,
+          duration: 3000,
+          isClosable: true,
+          position: "top",
         });
-
+        
+        // Reset coupon applied after 3 seconds
+        setTimeout(() => setCouponApplied(false), 3000);
+        
+        // Refetch order data
+        handleDataFetch();
+      }
+      
       setCouponCode("");
-
-      // refetch order data
-      handleDataFetch();
     } catch (err) {
       chakraToast({
         title: "Error",
-        description: err.data?.message
-          ? err.data?.message
-          : err.data || err.error,
+        description: err.data?.message || err.data || err.error,
         status: "error",
         duration: 5000,
-        isClosable: false,
+        isClosable: true,
+        position: "top",
       });
     } finally {
-      setCouponFormIsLoading((prev) => (prev ? false : true));
+      setCouponFormIsLoading(false);
     }
   };
 
+  const paymentOptions = [
+    {
+      value: "mobileMoney",
+      label: "Mobile Money",
+      description: "Pay with MTN or Airtel Money",
+      icon: <Smartphone className="w-6 h-6" />,
+      logos: (
+        <Flex gap={3} align="center">
+          <Box as="img" src={PaymentLogos.mtn} alt="MTN" w="32px" h="32px" objectFit="contain" />
+          <Box as="img" src={PaymentLogos.airtel} alt="Airtel" w="32px" h="32px" objectFit="contain" />
+        </Flex>
+      ),
+      colorScheme: "purple",
+    },
+    {
+      value: "card",
+      label: "Debit/Credit Card",
+      description: "Visa • Mastercard • Verve",
+      icon: <CreditCard className="w-6 h-6" />,
+      logos: null,
+      colorScheme: "blue",
+    },
+    {
+      value: "cash_on_delivery",
+      label: "Cash on Delivery",
+      description: "Pay when you receive your order",
+      icon: <Truck className="w-6 h-6" />,
+      logos: null,
+      colorScheme: "green",
+    },
+    ...(isSubscribed ? [{
+      value: "payLater",
+      label: "Pay Later",
+      description: "Exclusive for subscribers",
+      icon: <Zap className="w-6 h-6" />,
+      logos: null,
+      colorScheme: "orange",
+    }] : []),
+  ];
+
   return (
-    <div className="pt-[3rem] pb-[5rem]">
-      <div className="flex">
-        <div className="m-auto lg:w-3/5 sm:w-3/5 w-4/5 bg-white shadow-md px-6 py-10 min-h-[300px]">
-          {Order?._id ? (
-            <>
-              <div className="py-2">
-                <h3 className="text-center text-primary text-3xl">Checkout</h3>
-              </div>
+    <Box minH="100vh" bgGradient="linear(to-b, gray.50, white)" pt={4} pb={12} px={4}>
+      {/* Security Badge */}
+      <Box maxW="lg" mx="auto" mb={6}>
+        <Flex align="center" justify="center" gap={2} p={3} bg="white" borderRadius="lg" shadow="sm">
+          <Shield className="w-5 h-5" style={{ color: ThemeColors.secondaryColor }} />
+          <Text fontSize="sm" color="gray.600">
+            Secure payment • Encrypted connection • No extra fees
+          </Text>
+        </Flex>
+      </Box>
 
-              <div className="py-2">
-                <h3 className="text-2xl text-center">
-                  Amount to be paid{" "}
-                  <span className="text-primary font-bold">
-                    UGX {FormatCurr(Order?.total)}
-                  </span>
-                </h3>
-              </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{ maxWidth: "32rem", margin: "0 auto" }}
+      >
+        <Box bg="white" borderRadius="2xl" shadow="xl" overflow="hidden" border="1px solid" borderColor="gray.100">
+          {/* Header */}
+          <Box bgGradient={`linear(to-r, ${ThemeColors.primaryColor}15, ${ThemeColors.secondaryColor}10)`} p={6} borderBottom="1px solid" borderColor="gray.100">
+            <Flex direction="column" align="center" gap={2}>
+              <Box w="48px" h="48px" borderRadius="full" bg={`${ThemeColors.primaryColor}15`} display="flex" alignItems="center" justifyContent="center">
+                <CreditCard className="w-6 h-6" style={{ color: ThemeColors.primaryColor }} />
+              </Box>
+              <Text fontSize="2xl" fontWeight="bold" color="gray.800">Complete Payment</Text>
+              <Text color="gray.500" textAlign="center">
+                Order #{Order?._id?.slice(-8) || "..."}
+              </Text>
+            </Flex>
+          </Box>
 
-              <div className="flex">
-                <div className="py-4 m-auto lg:w-2/5 sm:w-3/5 w-4/5">
-                  <div className="py-1">
-                    <h3 className="text-center text-lg">Apply Coupon</h3>
-                  </div>
-
-                  <div className="py-2">
-                    <form onSubmit={handleCouponFormSubmit}>
-                      <Input
-                        type="text"
-                        name="coupon"
-                        placeholder="Enter coupon code"
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        value={CouponCode}
-                      />
-
-                      <div className="py-2 flex justify-center">
-                        <ButtonComponent
-                          text={"Apply coupon"}
-                          size={"lg"}
-                          type={"submit"}
-                          icon={CouponFormIsLoading && <Loader2 size={20} />}
-                        />
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-
-              <div className="py-4">
-                <div className="py-1">
-                  <h3 className="text-center text-[1.3rem]">
-                    Select payment option
-                  </h3>
-                </div>
-
-                <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={3} maxW="500px" mx="auto" mt={4}>
-                  {[
-                    {
-                      value: "mobileMoney",
-                      label: "Mobile Money",
-                      logos: (
-                        <Flex gap={2} align="center" justify="center">
-                          <Box as="img" src={PaymentLogos.mtn} alt="MTN" w="36px" h="36px" objectFit="contain" />
-                          <Box as="img" src={PaymentLogos.airtel} alt="Airtel" w="36px" h="36px" objectFit="contain" />
-                        </Flex>
-                      ),
-                    },
-                    { value: "card", label: "Debit/Credit Card", logos: <Text fontSize="sm" color="gray.600">Visa • Mastercard</Text> },
-                    { value: "cash_on_delivery", label: "Cash on Delivery", logos: <Text fontSize="sm" color="gray.600">Pay when you receive</Text> },
-                    ...(isSubscribed ? [{ value: "payLater", label: "Pay Later", logos: <Text fontSize="sm" color="gray.600">For subscribers</Text> }] : []),
-                  ].map((opt) => (
-                    <Box
-                      key={opt.value}
-                      as="button"
-                      type="button"
-                      onClick={() => setPaymentMethod(opt.value)}
-                      p={4}
-                      borderRadius="lg"
-                      borderWidth="2px"
-                      borderColor={paymentMethod === opt.value ? ThemeColors.primaryColor : "gray.200"}
-                      bg={paymentMethod === opt.value ? `${ThemeColors.primaryColor}08` : "white"}
-                      textAlign="center"
-                      _hover={{ borderColor: ThemeColors.primaryColor, bg: `${ThemeColors.primaryColor}08` }}
-                      transition="all 0.2s"
-                    >
-                      <Box mb={1}>{opt.logos}</Box>
-                      <Text fontWeight="600" color="gray.800">{opt.label}</Text>
+          {/* Order Summary */}
+          {Order?._id && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <Box p={6} borderBottom="1px solid" borderColor="gray.100">
+                <Box>
+                  <Flex justify="space-between" align="center" mb={4}>
+                    <Text fontSize="lg" fontWeight="600" color="gray.700">
+                      Total Amount
+                    </Text>
+                    <Box textAlign="right">
+                      <Text fontSize="3xl" fontWeight="bold" color={ThemeColors.primaryColor}>
+                        UGX {FormatCurr(Order?.total)}
+                      </Text>
+                      {Order?.discount > 0 && (
+                        <Text fontSize="sm" color="green.600" mt={1}>
+                          🎉 You saved UGX {FormatCurr(Order?.discount)}
+                        </Text>
+                      )}
                     </Box>
-                  ))}
-                </SimpleGrid>
-              </div>
+                  </Flex>
 
-              <div className="py-2 flex justify-center items-center">
-                <div
-                  onClick={() => paymentMethod && !isLoading && handlePayment()}
-                  className={!paymentMethod || isLoading ? "opacity-60 cursor-not-allowed pointer-events-none" : "cursor-pointer"}
-                >
-                  <ButtonComponent
-                    text={"Make Payment"}
-                    size={"lg"}
-                    type={"button"}
-                    icon={isLoading && <Loader2 size={20} />}
-                  />
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="flex justify-center items-center relative h-[250px]">
-              <Loader2 size={30} className="text-primary absolute top-[45%]" />
-            </div>
+                  {/* Coupon Section - Optional */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    style={{ paddingTop: "1rem", borderTop: "1px solid #e5e7eb", ...(couponApplied && { backgroundColor: "#f0fdf4", borderRadius: "0.5rem", padding: "1rem" }) }}
+                  >
+                    <Flex align="center" justify="space-between" mb={3}>
+                      <Text fontWeight="600" color="gray.700">Have a coupon code? <Text as="span" fontSize="xs" color="gray.500" fontWeight="normal">(Optional)</Text></Text>
+                      {couponApplied && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: ThemeColors.secondaryColor }}
+                        >
+                          <Check className="w-4 h-4" />
+                          <Text fontSize="sm">Applied!</Text>
+                        </motion.div>
+                      )}
+                    </Flex>
+                    <form onSubmit={handleCouponFormSubmit}>
+                      <Flex gap={2}>
+                        <Input
+                          type="text"
+                          placeholder="Enter coupon code (optional)"
+                          value={CouponCode}
+                          onChange={(e) => setCouponCode(e.target.value)}
+                          style={{ flex: 1 }}
+                          disabled={CouponFormIsLoading}
+                        />
+                        <ButtonComponent
+                          text={CouponFormIsLoading ? "" : "Apply"}
+                          size="md"
+                          type="submit"
+                          variant="outline"
+                          icon={CouponFormIsLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                          disabled={CouponFormIsLoading || !CouponCode.trim()}
+                        />
+                      </Flex>
+                    </form>
+                  </motion.div>
+                </Box>
+              </Box>
+            </motion.div>
           )}
-        </div>
-      </div>
 
-      {/* // displaying payment component */}
-      {paymentDisplay && (
-        <FlutterwavePayment
-          data={{
-            total: Order?.total,
-            paymentMethod: paymentMethod,
-            title: "Delivery Schedule",
-            message: "You are making payment for the delivery schedule service",
-          }}
-          callback={handleCallback}
-          closeComponent={() => setPaymentDisplay(false)}
-        />
-      )}
-    </div>
+          {/* Payment Methods */}
+          <Box p={6}>
+            {Order?._id ? (
+              <>
+                <Box mb={6}>
+                  <Text fontSize="lg" fontWeight="semibold" color="gray.800" mb={4}>
+                    Select Payment Method
+                  </Text>
+                  
+                  <AnimatePresence>
+                    {showPaymentOptions && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+                      >
+                        {paymentOptions.map((option, index) => (
+                          <motion.div
+                            key={option.value}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                          >
+                            <Box
+                              as="button"
+                              type="button"
+                              onClick={() => setPaymentMethod(option.value)}
+                              w="100%"
+                              p={4}
+                              borderRadius="xl"
+                              borderWidth="2px"
+                              borderColor={paymentMethod === option.value ? ThemeColors.primaryColor : "gray.200"}
+                              bg={paymentMethod === option.value ? `${ThemeColors.primaryColor}08` : "white"}
+                              transition="all 0.2s"
+                              _hover={{ 
+                                borderColor: ThemeColors.primaryColor, 
+                                bg: `${ThemeColors.primaryColor}08`,
+                                transform: "translateY(-2px)"
+                              }}
+                            >
+                              <Flex align="center" justify="space-between">
+                                <Flex align="center" gap={3}>
+                                  <Box p={2} borderRadius="lg" bg={paymentMethod === option.value ? ThemeColors.primaryColor : "gray.100"} color={paymentMethod === option.value ? "white" : "gray.600"}>
+                                    {option.icon}
+                                  </Box>
+                                  <Box textAlign="left">
+                                    <Text fontWeight="600" color="gray.800">
+                                      {option.label}
+                                    </Text>
+                                    <Text fontSize="sm" color="gray.500">
+                                      {option.description}
+                                    </Text>
+                                  </Box>
+                                </Flex>
+                                <Flex align="center" gap={2}>
+                                  {option.logos}
+                                  {paymentMethod === option.value && (
+                                    <motion.div
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      style={{ width: "24px", height: "24px", borderRadius: "50%", backgroundColor: ThemeColors.primaryColor, display: "flex", alignItems: "center", justifyContent: "center" }}
+                                    >
+                                      <Check className="w-3 h-3" style={{ color: "white" }} />
+                                    </motion.div>
+                                  )}
+                                </Flex>
+                              </Flex>
+                            </Box>
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </Box>
+
+                {/* Payment Button */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  style={{ paddingTop: "1rem", borderTop: "1px solid #e5e7eb" }}
+                >
+                  <Box
+                    as="button"
+                    onClick={handlePayment}
+                    disabled={!paymentMethod || isLoading}
+                    w="100%"
+                    py={4}
+                    px={6}
+                    borderRadius="xl"
+                    fontWeight="semibold"
+                    fontSize="lg"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    gap={3}
+                    bgGradient={!paymentMethod || isLoading 
+                      ? "linear(to-r, gray.200, gray.300)" 
+                      : `linear(to-r, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`}
+                    color={!paymentMethod || isLoading ? "gray.400" : "white"}
+                    shadow={!paymentMethod || isLoading ? "none" : "lg"}
+                    cursor={!paymentMethod || isLoading ? "not-allowed" : "pointer"}
+                    transition="all 0.3s"
+                    _hover={!paymentMethod || isLoading ? {} : {
+                      shadow: "xl",
+                      transform: "scale(1.02)"
+                    }}
+                    _active={!paymentMethod || isLoading ? {} : {
+                      transform: "scale(0.98)"
+                    }}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        {paymentMethod === "cash_on_delivery" && <Truck className="w-5 h-5" />}
+                        {paymentMethod === "payLater" && <Zap className="w-5 h-5" />}
+                        {!["cash_on_delivery", "payLater"].includes(paymentMethod) && <CreditCard className="w-5 h-5" />}
+                        {paymentMethod === "cash_on_delivery" ? "Place Order" : 
+                         paymentMethod === "payLater" ? "Confirm Pay Later" : 
+                         `Pay UGX ${FormatCurr(Order?.total)}`}
+                      </>
+                    )}
+                  </Box>
+                  
+                  {paymentMethod && (
+                    <Text fontSize="sm" color="gray.500" textAlign="center" mt={3}>
+                      {paymentMethod === "cash_on_delivery" 
+                        ? "You'll pay when your order arrives"
+                        : paymentMethod === "payLater"
+                        ? "Payment will be charged to your subscription"
+                        : "You'll be redirected to a secure payment page"}
+                    </Text>
+                  )}
+                </motion.div>
+              </>
+            ) : (
+              <Box py={12} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
+                <Box position="relative">
+                  <Loader2 className="w-12 h-12 animate-spin" style={{ color: ThemeColors.primaryColor }} />
+                </Box>
+                <Text mt={4} color="gray.600">Loading your order details...</Text>
+              </Box>
+            )}
+          </Box>
+
+          {/* Security Footer */}
+          <Box bg="gray.50" p={4} borderTop="1px solid" borderColor="gray.100">
+            <Flex align="center" justify="center" gap={4}>
+              <Text fontSize="xs" color="gray.500">
+                🔒 256-bit SSL Encryption
+              </Text>
+              <Text fontSize="xs" color="gray.500">
+                💳 Safe & Secure
+              </Text>
+              <Text fontSize="xs" color="gray.500">
+                ⚡ Instant Confirmation
+              </Text>
+            </Flex>
+          </Box>
+        </Box>
+      </motion.div>
+
+      {/* Payment Modal */}
+      <AnimatePresence>
+        {paymentDisplay && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: "fixed",
+              inset: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              backdropFilter: "blur(4px)",
+              zIndex: 50,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "1rem"
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              style={{ width: "100%", maxWidth: "28rem" }}
+            >
+              <FlutterwavePayment
+                data={{
+                  total: Order?.total,
+                  paymentMethod: paymentMethod,
+                  title: "Delivery Schedule",
+                  message: "You are making payment for the delivery schedule service",
+                }}
+                callback={handleCallback}
+                closeComponent={() => setPaymentDisplay(false)}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Box>
   );
 };
 
