@@ -106,14 +106,14 @@ export const howToSubscribeEmailTemplate = `
                   <tr>
                     <td width="50%" style="padding: 8px 4px 0 0; vertical-align: top;">
                       <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
-                        <img src="https://www.yookatale.app/assets/images/meal-calendar-subscription.png" alt="Meal Calendar" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
-                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Step 2: Select Meals (Ready-to-Eat or Ready-to-Cook)</p></div>
+                        <img src="https://www.yookatale.app/assets/images/payment-complete.png" alt="Complete Payment" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
+                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Step 2: Complete Payment</p></div>
                       </div>
                     </td>
                     <td width="50%" style="padding: 8px 0 0 4px; vertical-align: top;">
                       <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
-                        <img src="https://www.yookatale.app/assets/images/payment-complete.png" alt="Complete Payment" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
-                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Step 3: Complete Payment</p></div>
+                        <img src="https://www.yookatale.app/assets/images/meal-calendar-subscription.png" alt="Meal Calendar" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
+                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Step 3: Select Meals (Ready-to-Eat or Ready-to-Cook)</p></div>
                       </div>
                     </td>
                   </tr>
