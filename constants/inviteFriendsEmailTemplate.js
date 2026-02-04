@@ -1,24 +1,26 @@
 /**
- * Get Started Email Template
+ * Invite Friends and Earn Email Template
  *
- * Sent to users after signup to guide them on how to get started with Yookatale.
- * Includes instructions for downloading the app, signing up, and logging in.
+ * Sent to users to guide them on how to invite friends and earn rewards (money and points).
+ * Includes instructions on sharing referral links and earning cash/points.
  */
 
-export const getStartedEmailTemplate = `
+export const inviteFriendsEmailTemplate = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Get Started with Yookatale - Your Food Journey Begins</title>
+  <title>Invite Friends & Earn Rewards - Yookatale</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f3f4f6; line-height: 1.6; color: #1f2937;">
+
   <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: #f3f4f6; padding: 20px 12px;">
     <tr>
       <td align="center">
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); border: 1px solid rgba(0, 0, 0, 0.05);">
+
           <tr>
             <td style="background-color: #000000; padding: 20px 20px; text-align: center;">
               <img src="https://www.yookatale.app/assets/icons/logo2.png" alt="Yookatale Logo" style="max-width: 120px; height: auto; margin: 0 auto 8px; display: block;" />
@@ -26,13 +28,14 @@ export const getStartedEmailTemplate = `
               <p style="color: #e0f2fe; font-size: 13px; margin: 6px 0 0;">Yoo mobile food market</p>
             </td>
           </tr>
+
           <tr>
             <td style="padding: 20px 18px; background-color: #ffffff;">
               <p style="color: #374151; font-size: 13px; line-height: 1.5; margin: 0 0 10px;">
-                Get started with Yookatale in just a few simple steps! Visit <strong>yookatale.app</strong> on your browser, or download our mobile app from the <strong>Play Store</strong> (Android) or <strong>App Store</strong> (iOS). Once you have the app or website open, create your account by signing up with all required credentials.
+                Invite your friends, family, and associates to Yookatale and earn rewards! Share your unique referral link via email, social media, or by copying the link. When they sign up using your referral link and make their first order, you'll earn cash rewards and loyalty points that you can use for future purchases.
               </p>
               <p style="color: #4b5563; font-size: 12px; line-height: 1.5; margin: 0 0 16px;">
-                After signing up, you can log in using your email and password, or sign in quickly with your <strong>Google account</strong>. Once logged in, you'll be able to browse meals, subscribe to plans, and start ordering delicious food delivered right to your doorstep.
+                The more friends you invite, the more you earn. Simply share your referral link, make sure they sign up using it, and claim your payout. Start earning today by inviting others to join Yookatale!
               </p>
 
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0 0 16px;">
@@ -89,27 +92,27 @@ export const getStartedEmailTemplate = `
               </table>
 
               <div style="background-color: #f9fafb; border-radius: 12px; padding: 12px; margin: 16px 0; border: 1px solid #e5e7eb;">
-                <h3 style="color: #111827; font-size: 14px; font-weight: 700; margin: 0 0 8px; text-align: center;">How to Get Started with Yookatale</h3>
+                <h3 style="color: #111827; font-size: 14px; font-weight: 700; margin: 0 0 8px; text-align: center;">How to Invite Friends & Earn Rewards</h3>
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                   <tr>
                     <td width="50%" style="padding: 0 4px 0 0; vertical-align: top;">
                       <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
-                        <img src="https://www.yookatale.app/assets/images/signup-page.png" alt="Create Account" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
-                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Create Account</p></div>
+                        <img src="https://www.yookatale.app/assets/images/invite-menu.png" alt="Click to Invite" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
+                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Click to Invite</p></div>
                       </div>
                     </td>
                     <td width="50%" style="padding: 0 0 0 4px; vertical-align: top;">
                       <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
-                        <img src="https://www.yookatale.app/assets/images/signup-form.png" alt="Complete Signup" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
-                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Complete Signup</p></div>
+                        <img src="https://www.yookatale.app/assets/images/referral-link-modal.png" alt="Share Referral Link" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
+                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Share Referral Link</p></div>
                       </div>
                     </td>
                   </tr>
                   <tr>
                     <td colspan="2" style="padding: 8px 0 0 0;">
                       <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
-                        <img src="https://www.yookatale.app/assets/images/login-page.png" alt="Sign In" style="display: block; width: 100%; height: auto; border: 0; max-height: 400px; object-fit: contain;" />
-                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Sign In</p></div>
+                        <img src="https://www.yookatale.app/assets/images/rewards-page.png" alt="Rewards Page" style="display: block; width: 100%; height: auto; border: 0; max-height: 400px; object-fit: contain;" />
+                        <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Rewards Page</p></div>
                       </div>
                     </td>
                   </tr>
