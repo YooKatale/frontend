@@ -58,7 +58,7 @@ import {
   MessageCircle,
   Twitter,
   Linkedin,
-  Send as TelegramIcon,
+  SendHorizontal,
 } from "lucide-react";
 import { ThemeColors } from "@constants/constants";
 
@@ -221,7 +221,7 @@ export default function ReferralModal({ isOpen, onClose }) {
     },
     {
       component: TelegramShareButton,
-      icon: Send,
+      icon: SendHorizontal,
       label: "Telegram",
       color: "#0088CC",
       props: { url: shareUrl, title: defaultMessage },
