@@ -51,26 +51,12 @@ const Payment = ({ params }) => {
   const { userInfo } = useSelector((state) => state.auth);
   const router = useRouter();
 
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!userInfo || Object.keys(userInfo).length === 0) {
-      router.push("/signin");
-      return;
-    }
-  }, [userInfo, router]);
-
   const handleDataFetch = useCallback(async () => {
-    // Security: Validate params.id exists and userInfo is available
+    // Only validate orderId - remove token requirement
     const orderId = params?.id;
     if (!orderId) {
       setIsOrderLoading(false);
       setOrderError("Order ID is missing from URL");
-      return;
-    }
-    
-    if (!userInfo?.token) {
-      setIsOrderLoading(false);
-      setOrderError("Please sign in to view order details");
       return;
     }
 
@@ -78,31 +64,22 @@ const Payment = ({ params }) => {
     setOrderError(null);
     
     try {
-      console.log("Fetching order with ID:", orderId);
       const res = await fetchOrder(orderId).unwrap();
-      console.log("Order API response:", res);
 
       // Handle different response structures - be very flexible
       let orderData = null;
       
-      // Check if response has data property
       if (res?.data) {
         orderData = res.data;
-      } 
-      // Check if response itself is the order (has _id or id)
-      else if (res?._id || res?.id) {
+      } else if (res?._id || res?.id) {
         orderData = res;
-      }
-      // Check nested structures
-      else if (res?.order) {
+      } else if (res?.order) {
         orderData = res.order;
       }
 
-      console.log("Extracted order data:", orderData);
-
       // Validate we have order data with an ID
       if (!orderData || (!orderData._id && !orderData.id)) {
-        throw new Error("Invalid order data received - missing order ID");
+        throw new Error("Invalid order data received");
       }
 
       // Check if order already has a status (completed/paid) - redirect if so
@@ -117,24 +94,18 @@ const Payment = ({ params }) => {
       setIsOrderLoading(false);
       
     } catch (error) {
-      console.error("Error fetching order - Full error:", error);
       const errorMessage = error?.data?.message || error?.message || "Unable to load order details. Please try again.";
       setOrderError(errorMessage);
       setIsOrderLoading(false);
-      
-      chakraToast({
-        title: "Error Loading Order",
-        description: errorMessage,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "top",
-      });
     }
-  }, [params?.id, userInfo?.token, router, chakraToast]);
+  }, [params?.id, router, fetchOrder]);
 
   const fetchSubscriptionStatus = useCallback(async () => {
-    if (!userInfo?.token) return;
+    // Only fetch if user is logged in - fail silently if not
+    if (!userInfo?.token) {
+      setIsSubscribed(false);
+      return;
+    }
     
     try {
       const response = await axios.get(
@@ -151,42 +122,26 @@ const Payment = ({ params }) => {
       }
     } catch (error) {
       // Silently fail - subscription status is optional
-      console.error("Error fetching subscription status:", error);
+      setIsSubscribed(false);
     }
   }, [userInfo?.token]);
 
-  // Fetch order and subscription status when component mounts or dependencies change
+  // Fetch order immediately when component mounts - no token requirement
   useEffect(() => {
-    // Ensure params is available (Next.js 13+ might have async params)
     const orderId = params?.id;
-    let timeoutId = null;
     
-    if (userInfo?.token && orderId) {
-      console.log("Initializing payment page - Order ID:", orderId, "User:", userInfo?.email || userInfo?._id);
-      // Fetch both in parallel for faster loading
+    if (orderId) {
+      // Fetch order immediately - don't wait for user token
       handleDataFetch();
-      fetchSubscriptionStatus();
-      
-      // Safety timeout - clear loading after 15 seconds if no response
-      timeoutId = setTimeout(() => {
-        console.warn("Order fetch timeout - this should not happen if API responds");
-        // Don't set error here, let the error handler in handleDataFetch do it
-      }, 15000);
-    } else {
-      if (!userInfo?.token) {
-        console.log("No user token, redirecting to signin");
-        setIsOrderLoading(false);
-      } else if (!orderId) {
-        console.log("No order ID found in params");
-        setIsOrderLoading(false);
-        setOrderError("Order ID is missing from URL");
+      // Try to fetch subscription status if user is logged in (optional)
+      if (userInfo?.token) {
+        fetchSubscriptionStatus();
       }
+    } else {
+      setIsOrderLoading(false);
+      setOrderError("Order ID is missing from URL");
     }
-    
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [userInfo?.token, params?.id, handleDataFetch, fetchSubscriptionStatus]);
+  }, [params?.id, handleDataFetch, fetchSubscriptionStatus, userInfo?.token]);
 
   const handlePayment = async () => {
     if (!paymentMethod || isLoading) return;
@@ -200,11 +155,11 @@ const Payment = ({ params }) => {
             payment: { paymentMethod: paymentMethod },
             order: params.id,
             schema: "schedule",
-            user: userInfo,
+            user: userInfo || {},
           },
         }).unwrap();
     
-        if (res?.status === "Success") {
+        if (res?.status === "Success" || res?.status === "success") {
           chakraToast({
             description: "✅ Order placed successfully for Cash on Delivery!",
             status: "success",
@@ -215,10 +170,9 @@ const Payment = ({ params }) => {
           setTimeout(() => router.push("/"), 1500);
         }
       } catch (err) {
-        console.error("Error:", err);
         chakraToast({
           title: "Error",
-          description: err.data?.message || err.data || err.error,
+          description: err.data?.message || err.data || err.error || "Payment failed. Please try again.",
           status: "error",
           duration: 5000,
           isClosable: true,
@@ -234,11 +188,11 @@ const Payment = ({ params }) => {
             payment: {paymentMethod: paymentMethod},
             order: params.id,
             schema: "schedule",
-            user: userInfo
+            user: userInfo || {}
           }
         }).unwrap();
   
-        if (res?.status === "success") {
+        if (res?.status === "success" || res?.status === "Success") {
           chakraToast({
             description: "✅ Order placed successfully for Pay Later!",
             status: "success",
@@ -249,10 +203,9 @@ const Payment = ({ params }) => {
           setTimeout(() => router.push("/"), 1500);
         }   
       } catch (err) {
-        console.error("Error", err);
         chakraToast({
           title: "Error",
-          description: err.data?.message || err.data || err.error,
+          description: err.data?.message || err.data || err.error || "Payment failed. Please try again.",
           status: "error",
           duration: 5000,
           isClosable: true,
@@ -262,7 +215,7 @@ const Payment = ({ params }) => {
         setIsLoading(false);
       }
     } else {
-      // Handle other payment methods here
+      // Handle other payment methods (card, mobile money)
       setPaymentDisplay(true);
       setIsLoading(false);
     }    
@@ -287,11 +240,11 @@ const Payment = ({ params }) => {
           payment: { ...param.payment, paymentMethod },
           order: params.id,
           schema: "schedule",
-          user: userInfo,
+          user: userInfo || {},
         },
       }).unwrap();
 
-      if (res?.status == "Success") {
+      if (res?.status == "Success" || res?.status == "success") {
         chakraToast({
           description: "🎉 Payment successful! Order confirmed.",
           status: "success",
@@ -304,7 +257,7 @@ const Payment = ({ params }) => {
     } catch (err) {
       chakraToast({
         title: "Error",
-        description: err.data?.message || err.data || err.error,
+        description: err.data?.message || err.data || err.error || "Payment confirmation failed. Please contact support.",
         status: "error",
         duration: 5000,
         isClosable: true,
