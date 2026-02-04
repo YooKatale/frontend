@@ -67,10 +67,59 @@ function sanitizeInput(input) {
 }
 
 /**
+ * Get CORS headers for API responses
+ * Allows requests from admin panel and localhost for development
+ */
+function getCorsHeaders(origin) {
+  const allowedOrigins = [
+    'https://admin.yookatale.app',
+    'https://www.yookatale.app',
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+  ];
+  
+  // Check if origin is allowed (exact match or starts with localhost/127.0.0.1)
+  const isAllowed = origin && (
+    allowedOrigins.includes(origin) ||
+    origin.startsWith('http://localhost:') ||
+    origin.startsWith('http://127.0.0.1:')
+  );
+  
+  // Use the origin if allowed, otherwise use the first allowed origin as default
+  const allowedOrigin = isAllowed ? origin : allowedOrigins[0];
+  
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400', // 24 hours
+  };
+}
+
+/**
+ * OPTIONS handler for CORS preflight requests
+ */
+export async function OPTIONS(req) {
+  const origin = req.headers.get('origin') || '';
+  const corsHeaders = getCorsHeaders(origin);
+  
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
+/**
  * POST handler for sending emails
  * Validates input, selects appropriate template, and sends email via SMTP
  */
 export const POST = async (req, res) => {
+  // Get origin for CORS headers
+  const origin = req.headers.get('origin') || '';
+  const corsHeaders = getCorsHeaders(origin);
+  
   try {
     // Parse and validate request body
     const body = await req.json();
@@ -84,7 +133,14 @@ export const POST = async (req, res) => {
           error: "Invalid email address format",
           details: "Please provide a valid email address"
         }), 
-        { status: 400, headers: { "Content-Type": "application/json" } }
+        { 
+          status: 400, 
+          headers: { 
+            "Content-Type": "application/json",
+            ...corsHeaders,
+            "X-Content-Type-Options": "nosniff"
+          } 
+        }
       );
     }
     
@@ -105,7 +161,14 @@ export const POST = async (req, res) => {
           error: "Email service not configured. Please contact support.", 
           details: "EMAIL_PASSWORD is missing" 
         }), 
-        { status: 503, headers: { "Content-Type": "application/json" } }
+        { 
+          status: 503, 
+          headers: { 
+            "Content-Type": "application/json",
+            ...corsHeaders,
+            "X-Content-Type-Options": "nosniff"
+          } 
+        }
       );
     }
 
@@ -210,6 +273,8 @@ export const POST = async (req, res) => {
         status: 200,
         headers: { 
           "Content-Type": "application/json",
+          // CORS headers to allow admin panel requests
+          ...corsHeaders,
           // Security headers to prevent XSS and clickjacking
           "X-Content-Type-Options": "nosniff",
           "X-Frame-Options": "DENY"
@@ -250,6 +315,7 @@ export const POST = async (req, res) => {
         status: 500,
         headers: { 
           "Content-Type": "application/json",
+          ...corsHeaders,
           "X-Content-Type-Options": "nosniff"
         }
       }
