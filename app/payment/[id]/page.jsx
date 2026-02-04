@@ -386,7 +386,7 @@ const Payment = ({ params }) => {
             message: "You are making payment for the delivery schedule service",
           }}
           callback={handleCallback}
-          closeComponent={setPaymentDisplay}
+          closeComponent={() => setPaymentDisplay(false)}
         />
       )}
     </div>

@@ -39,12 +39,12 @@ export const POST = async (req) => {
       );
     }
 
-    const results = [];
     const host = req.headers.get("host") || "localhost:3000";
     const base = req.nextUrl?.origin || `http://${host}`;
+    const CONCURRENCY = 5;
+    const CHUNK_DELAY_MS = 120;
 
-    for (const email of unique) {
-      let sent = false;
+    const sendOne = async (email) => {
       try {
         const res = await fetch(`${base}/api/mail`, {
           method: "POST",
@@ -52,12 +52,21 @@ export const POST = async (req) => {
           body: JSON.stringify({ email, type: "subscription" }),
         });
         const data = await res.json().catch(() => ({}));
-        sent = res.ok && !!data.success;
+        return { email, sent: res.ok && !!data.success, status: res.ok && data.success ? "success" : "error" };
       } catch (e) {
         console.error(`⚠️ Mail failed ${email}:`, e.message);
+        return { email, sent: false, status: "error" };
       }
-      results.push({ email, sent, status: sent ? "success" : "error" });
-      await new Promise((r) => setTimeout(r, 80));
+    };
+
+    const results = [];
+    for (let i = 0; i < unique.length; i += CONCURRENCY) {
+      const chunk = unique.slice(i, i + CONCURRENCY);
+      const chunkResults = await Promise.all(chunk.map((email) => sendOne(email)));
+      results.push(...chunkResults);
+      if (i + CONCURRENCY < unique.length) {
+        await new Promise((r) => setTimeout(r, CHUNK_DELAY_MS));
+      }
     }
 
     const successCount = results.filter((r) => r.sent).length;

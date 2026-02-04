@@ -2,6 +2,7 @@
 
 import {
   Box,
+  Button,
   Grid,
   Heading,
   Text,
@@ -10,6 +11,7 @@ import {
   useToast,
   Flex,
 } from "@chakra-ui/react";
+import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -229,9 +231,12 @@ export default function MarketplacePage() {
             <Text fontSize="xl" color="gray.500" mb={2}>
               No products found
             </Text>
-            <Text color="gray.400">
-              Try adjusting your filters or search query
+            <Text color="gray.400" mb={4}>
+              Try adjusting your filters or explore our subscription plans for curated meals.
             </Text>
+            <Button as={Link} href="/subscription" colorScheme="green" variant="outline" size="md">
+              View Subscription Plans
+            </Button>
           </Box>
         )}
       </Box>

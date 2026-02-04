@@ -154,7 +154,7 @@ const Home = () => {
     const filteredProducts = Products?.filter(p =>
       !["popular", "topdeals", "discover", "promotional", "recommended"].includes(p?.category)
     ) || [];
-    
+
     const grouped = filteredProducts.reduce((acc, product) => {
       const category = product?.category;
       if (!acc[category]) {
@@ -163,12 +163,24 @@ const Home = () => {
       acc[category].push(product);
       return acc;
     }, {});
-    
+
     return Object.entries(grouped).map(([category, products]) => ({
       category,
       products
     }));
   }, [Products]);
+
+  // Categories that have at least one product (for redirecting empty ones to /subscription)
+  const categoriesWithProductsSet = useMemo(() => {
+    const set = new Set();
+    otherProducts.forEach((o) => set.add((o.category || "").toLowerCase().trim()));
+    if (topDealsProducts?.length) set.add("topdeals");
+    if (popularProducts?.length) set.add("popular");
+    if (discoverProducts?.length) set.add("discover");
+    if (promotionalProducts?.length) set.add("promotional");
+    if (recommendedProducts?.length) set.add("recommended");
+    return set;
+  }, [otherProducts, topDealsProducts, popularProducts, discoverProducts, promotionalProducts, recommendedProducts]);
 
   const [currSliderIndex, setCurrSliderIndex] = useState(0);
 
@@ -270,19 +282,24 @@ const Home = () => {
               py={8}
               px={{ base: 2, md: 4 }}
             >
-              {displayCategories.map((category, index) => (
-                <motion.div
-                  key={category._id || index}
-                  variants={itemVariants}
-                  whileHover={{ scale: 1.08, y: -8 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                  style={{ willChange: 'transform' }}
-                >
-                  <CategoryCard
-                    category={typeof category === 'string' ? category : category.name}
-                  />
-                </motion.div>
-              ))}
+              {displayCategories.map((category, index) => {
+                const categoryName = typeof category === "string" ? category : category?.name || "";
+                const hasProducts = categoriesWithProductsSet.has((categoryName || "").toLowerCase().trim());
+                return (
+                  <motion.div
+                    key={category._id || index}
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.08, y: -8 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    style={{ willChange: "transform" }}
+                  >
+                    <CategoryCard
+                      category={categoryName}
+                      hasProducts={hasProducts}
+                    />
+                  </motion.div>
+                );
+              })}
             </Box>
           </motion.div>
         )}

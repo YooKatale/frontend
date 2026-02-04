@@ -16,6 +16,7 @@
 
 import { NextResponse } from "next/server";
 import { DB_URL } from "@config/config";
+import { getTodaysMealsFromCalendar } from "@lib/mealCalendarService";
 
 /**
  * GET handler - Can trigger email send with query param, or returns schedule info
@@ -184,8 +185,8 @@ export const POST = async (req) => {
               type: 'meal_notification',
               mealType: mealType,
               greeting: greeting,
-              userName: 'Valued Customer', // Can be customized per user if you have names
-              meals: [], // Empty array for general calendar - can be populated with actual meals
+              userName: 'Valued Customer',
+              meals: getTodaysMealsFromCalendar(mealType),
               subscriptionPlan: null
             }),
           });

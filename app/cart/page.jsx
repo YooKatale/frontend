@@ -57,6 +57,7 @@ const Cart = () => {
   const { onOpen, onClose, isOpen } = useDisclosure();
   const { userInfo } = useSelector((state) => state.auth);
 
+  /** Resets checkout step to 0 and closes modal. Used by Modal onClose & close button. */
   const handleModalClose = () => {
     setTabIndex(0);
     onClose();
@@ -234,6 +235,7 @@ const Cart = () => {
     }, 1500);
   };
 
+  /** Opens checkout modal. Called by “Proceed to Checkout” button. */
   const handleCheckout = () => {
     setIsCheckingOut(true);
     setTimeout(() => {
@@ -567,6 +569,11 @@ const Cart = () => {
                     </Flex>
                   </Box>
 
+                  {/* ─── PROCEED TO CHECKOUT BUTTON ─────────────────────────────────────────────
+                   *  Clicking this opens the checkout modal (see “CHECKOUT MODAL” block below).
+                   *  Trigger: handleCheckout() → onOpen() from useDisclosure.
+                   *  Edit this <Button> to change label, styles, or add logic before opening modal.
+                   */}
                   <MotionBox whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                       w="full"
@@ -611,7 +618,13 @@ const Cart = () => {
         </Flex>
       </Box>
 
-      {/* Checkout Modal — Professional design, Yookatale theme only */}
+      {/* ─── CHECKOUT MODAL (opens when you click “Proceed to Checkout”) ─────────────────────
+       *  • Modal container (overlay, size, header “Complete Your Purchase”): edit this block.
+       *  • Step 1 – Delivery & details: components/modals/tabs/TabOne.jsx
+       *  • Step 2 – Receipt / review / “Proceed to Payment”: components/modals/tabs/TabTwo.jsx
+       *  • handleCheckout (opens modal): see “PROCEED TO CHECKOUT BUTTON” block above.
+       *  • handleModalClose (resets tab + closes): defined near useDisclosure in this file.
+       */}
       <Modal
         isOpen={isOpen}
         onClose={handleModalClose}

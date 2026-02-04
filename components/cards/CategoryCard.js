@@ -61,16 +61,19 @@ const normalizeCategoryName = (categoryName) => {
   return categoryName;
 };
 
-const CategoryCard = ({ category }) => {
+const CategoryCard = ({ category, hasProducts = true }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
-  
+
+  // Categories with no products redirect to subscription
+  const href = hasProducts ? `/search?q=${encodeURIComponent(category)}` : '/subscription';
+
   // Normalize category name for image path
   const normalizedCategory = normalizeCategoryName(category);
   const imagePath = `/assets/images/categories/${normalizedCategory}.jpg`;
-  
+
   return (
-    <Link href={`/search?q=${category}`} passHref style={{ textDecoration: 'none' }}>
+    <Link href={href} passHref style={{ textDecoration: 'none' }}>
       <Box
         position="relative"
         overflow="hidden"

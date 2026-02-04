@@ -25,11 +25,15 @@
  * - meal_notification: Sent for meal reminders (breakfast, lunch, supper)
  * - invitation: Sent when users invite friends via referral system
  * - subscription: Sent to new subscribers with app download links
+ * - app_download: Sent after signup to guide users on downloading the mobile app
+ * - get_started: Sent after signup to guide users on how to get started (signup and login)
  */
 
 import { emailTemplate, newsletterEmailTemplate, invitationEmailTemplate } from "@constants/constants";
 import { getMealCalendarEmailTemplate } from "@constants/mealCalendarEmailTemplate";
 import { subscriptionEmailTemplate } from "@constants/subscriptionEmailTemplate";
+import { appDownloadEmailTemplate } from "@constants/appDownloadEmailTemplate";
+import { getStartedEmailTemplate } from "@constants/getStartedEmailTemplate";
 import { NextResponse } from "next/server";
 import transporter, { defaultSender } from "@lib/emailConfig";
 
@@ -82,7 +86,7 @@ export const POST = async (req, res) => {
     const sanitizedGreeting = sanitizeInput(greeting);
     
     // Security: Validate email type to prevent template injection
-    const validTypes = ['welcome', 'newsletter', 'meal_notification', 'invitation', 'subscription'];
+    const validTypes = ['welcome', 'newsletter', 'meal_notification', 'invitation', 'subscription', 'app_download', 'get_started'];
     const emailType = validTypes.includes(type) ? type : 'welcome';
     
     // Check if email transporter is configured
@@ -105,6 +109,14 @@ export const POST = async (req, res) => {
       emailHtml = subscriptionEmailTemplate;
       subject = "Welcome to Yookatale - Download Our App & Start Your Food Journey! 🍽️";
       emailTypeLabel = "subscription";
+    } else if (emailType === 'app_download') {
+      emailHtml = appDownloadEmailTemplate;
+      subject = "Download the Yookatale App - Get Started Today! 📱";
+      emailTypeLabel = "app_download";
+    } else if (emailType === 'get_started') {
+      emailHtml = getStartedEmailTemplate;
+      subject = "Get Started with Yookatale - Your Food Journey Begins! 🚀";
+      emailTypeLabel = "get_started";
     } else if (emailType === 'newsletter') {
       emailHtml = newsletterEmailTemplate;
       subject = "YooKatale Newsletter - Subscription Plans & Latest News";

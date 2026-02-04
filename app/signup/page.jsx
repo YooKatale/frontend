@@ -36,8 +36,9 @@ import { setCredentials } from "@slices/authSlice";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
-import { FaPhoneAlt, FaWhatsapp, FaEnvelope } from "react-icons/fa";
+import { FaPhoneAlt, FaWhatsapp, FaEnvelope, FaApple } from "react-icons/fa";
 import { API_ORIGIN } from "@config/config";
+import Image from "next/image";
 
 const MotionBox = motion(Box);
 const MotionButton = motion(Button);
@@ -578,38 +579,73 @@ const SignUp = () => {
                 </CardBody>
               </Card>
 
-              {/* App Store & Play Store Icons */}
-              <Flex justify="center" gap={4} mt={8}>
-                <ChakraLink
-                  href="https://apps.apple.com/app/yookatale"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  _hover={{ transform: "translateY(-2px)" }}
-                  transition="transform 0.2s"
-                >
-                  <Box
-                    as="img"
-                    src="https://assets.stickpng.com/images/5a902db97f96951c82922874.png"
-                    alt="Download on the App Store"
-                    h="40px"
-                    objectFit="contain"
-                  />
-                </ChakraLink>
-                <ChakraLink
+              {/* App Store & Play Store - footer style, mobile responsive */}
+              <Flex
+                direction={{ base: "column", sm: "row" }}
+                align="center"
+                justify="center"
+                gap={{ base: 3, sm: 4 }}
+                mt={8}
+                flexWrap="wrap"
+              >
+                <Button
+                  as="a"
                   href="https://play.google.com/store/apps/details?id=com.yookataleapp.app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  _hover={{ transform: "translateY(-2px)" }}
-                  transition="transform 0.2s"
+                  size="lg"
+                  px={{ base: 4, sm: 5 }}
+                  py={2}
+                  h="auto"
+                  minH={{ base: "44px", sm: "48px" }}
+                  borderRadius="xl"
+                  bg="gray.800"
+                  color="white"
+                  border="1px solid"
+                  borderColor="gray.600"
+                  _hover={{ bg: "gray.700", transform: "translateY(-2px)", boxShadow: "lg", borderColor: "gray.500" }}
+                  transition="all 0.3s"
+                  gap={2}
+                  w={{ base: "full", sm: "auto" }}
+                  maxW={{ base: "280px", sm: "none" }}
                 >
-                  <Box
-                    as="img"
-                    src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
-                    alt="Get it on Google Play"
-                    h="40px"
-                    objectFit="contain"
-                  />
-                </ChakraLink>
+                  <Box position="relative" w={{ base: "24px", sm: "28px" }} h={{ base: "24px", sm: "28px" }} flexShrink={0}>
+                    <Image src="/assets/images/google.svg" alt="" width={28} height={28} style={{ objectFit: "contain" }} />
+                  </Box>
+                  <VStack align="start" spacing={0}>
+                    <Text fontSize={{ base: "9px", sm: "10px" }} color="white" opacity={0.9}>Get it on</Text>
+                    <Text fontSize={{ base: "xs", sm: "sm" }} fontWeight="700" color="white">Google Play</Text>
+                  </VStack>
+                </Button>
+                <Button
+                  as="a"
+                  href="https://apps.apple.com/app/yookatale"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  size="lg"
+                  px={{ base: 4, sm: 5 }}
+                  py={2}
+                  h="auto"
+                  minH={{ base: "44px", sm: "48px" }}
+                  borderRadius="xl"
+                  bg="gray.800"
+                  color="white"
+                  border="1px solid"
+                  borderColor="gray.600"
+                  _hover={{ bg: "gray.700", transform: "translateY(-2px)", boxShadow: "lg", borderColor: "gray.500" }}
+                  transition="all 0.3s"
+                  gap={2}
+                  w={{ base: "full", sm: "auto" }}
+                  maxW={{ base: "280px", sm: "none" }}
+                >
+                  <Box position="relative" w={{ base: "22px", sm: "24px" }} h={{ base: "22px", sm: "24px" }} flexShrink={0}>
+                    <Image src="/assets/images/apple.svg" alt="" width={24} height={24} style={{ objectFit: "contain" }} />
+                  </Box>
+                  <VStack align="start" spacing={0}>
+                    <Text fontSize={{ base: "9px", sm: "10px" }} color="white" opacity={0.9}>Download on the</Text>
+                    <Text fontSize={{ base: "xs", sm: "sm" }} fontWeight="700" color="white">App Store</Text>
+                  </VStack>
+                </Button>
               </Flex>
             </MotionBox>
           </Box>

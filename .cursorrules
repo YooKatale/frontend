@@ -1,0 +1,5 @@
+# YooKatale Frontend Rules
+
+## Git Commits
+- NEVER add "Co-authored-by: Cursor <cursoragent@cursor.com>" or any Co-authored-by trailer to commit messages.
+- The prepare-commit-msg hook strips these automatically; do not introduce them.

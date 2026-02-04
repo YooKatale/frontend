@@ -1,9 +1,9 @@
 "use client";
 
-import { Box, Flex, Grid, Heading, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Grid, Heading, Text } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import { useSearchMutation } from "@slices/productsApiSlice";
-
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -71,14 +71,13 @@ const Search = () => {
                   ))}
                 </div>
               ) : (
-                <div>
-                  <div
-                    className={"lg:py-12 py-8 lg:px-0 px-8"}
-                    padding={{ base: "2rem", md: "2rem", xl: "3rem 0" }}
-                  >
-                    <p className="text-3xl">No products currently</p>
-                  </div>
-                </div>
+                <Box className={"lg:py-12 py-8 lg:px-0 px-8"} padding={{ base: "2rem", md: "2rem", xl: "3rem 0" }} textAlign="center">
+                  <Text fontSize="xl" mb={2}>No products currently</Text>
+                  <Text color="gray.600" mb={4}>Explore our meal subscription plans for curated meals delivered to you.</Text>
+                  <Link href="/subscription">
+                    <Button colorScheme="green" size="md">View Subscription Plans</Button>
+                  </Link>
+                </Box>
               )
             ) : (
               <div className="grid grid-cols-5 gap-4">

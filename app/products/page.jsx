@@ -19,6 +19,7 @@ import {
 import { CategoriesJson, ThemeColors } from "@constants/constants";
 import { FaArrowDown, FaArrowUp, FaFilter, FaTimes } from "react-icons/fa";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -355,20 +356,23 @@ const Products = () => {
                   </Grid>
                 ) : (
                   <Box textAlign="center" py={20}>
-                    <Text fontSize="3xl" mb={2}>
-                      🛒
-                    </Text>
+                    <Text fontSize="3xl" mb={2}>🛒</Text>
                     <Heading as="h3" size="md" color="gray.600" mb={2}>
                       No products found
                     </Heading>
                     <Text color="gray.500" mb={4}>
-                      Try adjusting your filters or browse all products
+                      Try adjusting your filters or browse our subscription plans for curated meals.
                     </Text>
-                    {selectedFilters.length > 0 && (
-                      <Button colorScheme="green" onClick={clearFilters}>
-                        Clear All Filters
+                    <Flex justify="center" gap={3} wrap="wrap">
+                      {selectedFilters.length > 0 && (
+                        <Button colorScheme="green" onClick={clearFilters}>
+                          Clear All Filters
+                        </Button>
+                      )}
+                      <Button as={Link} href="/subscription" colorScheme="green" variant="outline">
+                        View Subscription Plans
                       </Button>
-                    )}
+                    </Flex>
                   </Box>
                 )}
               </Box>
