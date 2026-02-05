@@ -18,6 +18,11 @@ export const ThemeColors = {
   lightColor: "#F0F0F0",
 };
 
+/** Client dashboard URL for SELL / seller center (configurable via env) */
+export const CLIENT_DASHBOARD_URL =
+  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_CLIENT_DASHBOARD_URL) ||
+  "https://client.yookatale.app";
+
 /** MTN & Airtel payment logos — use on cashout, payment page, and all payment UIs */
 export const PaymentLogos = {
   mtn: "/assets/images/payment/mtn-mobile-money.png",

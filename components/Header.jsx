@@ -61,7 +61,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "@slices/usersApiSlice";
 import { useCartMutation } from "@slices/productsApiSlice";
 import { logout } from "@slices/authSlice";
-import { ThemeColors } from "@constants/constants";
+import { ThemeColors, CLIENT_DASHBOARD_URL } from "@constants/constants";
 import ReferralModal from "@components/ReferralModal";
 
 const Header = () => {
@@ -162,6 +162,7 @@ const Header = () => {
     { label: "Home", href: "/", icon: AiOutlineHome },
     { label: "Categories", href: "/products", icon: AiOutlineAppstore },
     { label: "Marketplace", href: "/marketplace", icon: FaStore },
+    { label: "SELL", href: CLIENT_DASHBOARD_URL, icon: FaStore, isSell: true },
     { label: "About", href: "/about", icon: AiOutlineTeam },
     { label: "Blog", href: "/news", icon: FaBlog },
     { label: "Careers", href: "/careers", icon: FaBriefcase },
@@ -236,6 +237,34 @@ const Header = () => {
                     }}
                     _active={{ transform: "translateY(0)" }}
                     onClick={openReferral}
+                  >
+                    {link.label}
+                  </Button>
+                );
+              }
+              if (link.isSell) {
+                return (
+                  <Button
+                    key="sell"
+                    as={Link}
+                    href={link.href}
+                    size="sm"
+                    fontSize="0.9375rem"
+                    fontWeight="700"
+                    color="white"
+                    bg={ThemeColors.primaryColor}
+                    px={4}
+                    py={2.5}
+                    h="auto"
+                    borderRadius="lg"
+                    transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                    _hover={{
+                      bg: ThemeColors.secondaryColor,
+                      color: "white",
+                      transform: "translateY(-1px)",
+                      boxShadow: "0 4px 12px rgba(24, 95, 45, 0.35)",
+                    }}
+                    _active={{ transform: "translateY(0)" }}
                   >
                     {link.label}
                   </Button>
@@ -780,6 +809,35 @@ const Header = () => {
                           {link.label}
                         </Text>
                       </Flex>
+                    );
+                  }
+                  if (link.isSell) {
+                    return (
+                      <Link
+                        key="sell"
+                        href={link.href}
+                        onClick={closeMobileNav}
+                        display="block"
+                        mx={4}
+                        mt={3}
+                        mb={2}
+                      >
+                        <Flex
+                          align="center"
+                          justify="center"
+                          px={6}
+                          py={4}
+                          borderRadius="xl"
+                          bg={ThemeColors.primaryColor}
+                          color="white"
+                          fontWeight="700"
+                          fontSize="1rem"
+                          transition="all 0.2s"
+                          _active={{ bg: ThemeColors.secondaryColor }}
+                        >
+                          {link.label}
+                        </Flex>
+                      </Link>
                     );
                   }
                   return (

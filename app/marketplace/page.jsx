@@ -20,11 +20,15 @@ import {
   useProductsFilterGetMutation,
   useSearchMutation,
 } from "@slices/productsApiSlice";
+import { DB_URL } from "@config/config";
 import ProductCard from "@components/ProductCard";
 import MarketplaceFilters from "@components/MarketplaceFilters";
 import VendorCard from "@components/VendorCard";
 import LoaderSkeleton from "@components/LoaderSkeleton";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { Box, Text } from "@chakra-ui/react";
+import { FormatCurr } from "@utils/utils";
 
 /**
  * Enhanced Marketplace Page (Like Ujiji)
@@ -36,6 +40,7 @@ import { motion } from "framer-motion";
  */
 export default function MarketplacePage() {
   const [products, setProducts] = useState([]);
+  const [sellerListings, setSellerListings] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,10 +61,22 @@ export default function MarketplacePage() {
   const [fetchFiltered] = useProductsFilterGetMutation();
   const [searchProducts] = useSearchMutation();
 
+  const fetchSellerListings = async () => {
+    try {
+      const base = (DB_URL || "").replace(/\/api\/?$/, "") || "";
+      const res = await fetch(`${base}/api/listings/public`, { credentials: "include" });
+      const json = await res.json();
+      if (json?.status === "Success" && Array.isArray(json.data)) setSellerListings(json.data);
+    } catch (e) {
+      console.error("Error fetching seller listings:", e);
+    }
+  };
+
   // Fetch initial data
   useEffect(() => {
     handleDataFetch();
     handleCategoriesFetch();
+    fetchSellerListings();
   }, []);
 
   // Apply filters when they change
@@ -191,14 +208,14 @@ export default function MarketplacePage() {
           <Text color="gray.600" fontSize="sm">
             {isLoading
               ? "Loading..."
-              : `Found ${products.length} product${products.length !== 1 ? "s" : ""}`}
+              : `Found ${products.length + sellerListings.length} item${products.length + sellerListings.length !== 1 ? "s" : ""} (${products.length} products, ${sellerListings.length} seller listings)`}
           </Text>
         </Flex>
 
-        {/* Products Grid */}
+        {/* Products + Seller Listings Grid */}
         {isLoading ? (
           <LoaderSkeleton />
-        ) : products.length > 0 ? (
+        ) : products.length > 0 || sellerListings.length > 0 ? (
           <Grid
             templateColumns={{
               base: "1fr",
@@ -210,12 +227,51 @@ export default function MarketplacePage() {
           >
             {products.map((product, index) => (
               <motion.div
-                key={product._id || product.id}
+                key={`p-${product._id || product.id}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
                 <ProductCard product={product} userInfo={userInfo} />
+              </motion.div>
+            ))}
+            {sellerListings.map((listing, index) => (
+              <motion.div
+                key={`s-${listing._id}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: (products.length + index) * 0.05 }}
+              >
+                <Link href={`/listing/${listing._id}`}>
+                  <Box
+                    bg="white"
+                    borderRadius="lg"
+                    overflow="hidden"
+                    borderWidth={1}
+                    borderColor="gray.200"
+                    _hover={{ borderColor: "green.300", shadow: "md" }}
+                    transition="all 0.2s"
+                    height="100%"
+                    display="flex"
+                    flexDirection="column"
+                  >
+                    <Box position="relative" h="140px" bg="gray.100">
+                      {listing.images?.[0] ? (
+                        <Box as="img" src={listing.images[0]} alt={listing.title} w="100%" h="100%" objectFit="cover" />
+                      ) : (
+                        <Box w="100%" h="100%" display="flex" alignItems="center" justifyContent="center" color="gray.400">No image</Box>
+                      )}
+                      {listing.negotiable && (
+                        <Text position="absolute" top={2} left={2} bg="green.500" color="white" fontSize="xs" px={2} py={0.5} borderRadius="md">Negotiable</Text>
+                      )}
+                    </Box>
+                    <Box p={3} flex={1}>
+                      <Text fontWeight="600" noOfLines={2} color="gray.800">{listing.title}</Text>
+                      <Text color="green.600" fontWeight="700" mt={1}>{FormatCurr(listing.price)}</Text>
+                      <Text fontSize="xs" color="gray.500" mt={1}>Seller listing</Text>
+                    </Box>
+                  </Box>
+                </Link>
               </motion.div>
             ))}
           </Grid>
@@ -229,7 +285,7 @@ export default function MarketplacePage() {
             borderColor="gray.200"
           >
             <Text fontSize="xl" color="gray.500" mb={2}>
-              No products found
+              No products or listings found
             </Text>
             <Text color="gray.400" mb={4}>
               Try adjusting your filters or explore our subscription plans for curated meals.
