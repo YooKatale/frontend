@@ -23,6 +23,9 @@ import {
   DrawerCloseButton,
   VStack,
   useDisclosure,
+  Divider,
+  Avatar,
+  HStack,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,6 +44,7 @@ import {
   AiOutlineLogin,
   AiOutlineAppstore,
   AiOutlineCreditCard,
+  AiOutlineLogout,
 } from "react-icons/ai";
 import {
   FaShoppingBag,
@@ -51,6 +55,7 @@ import {
   FaBriefcase,
   FaGift,
   FaWallet,
+  FaHeart,
 } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "@slices/usersApiSlice";
@@ -104,11 +109,12 @@ const Header = () => {
     e.preventDefault();
     if (!searchParam)
       return chakraToast({
-        title: "Error",
-        description: "Search cannot be empty",
-        status: "error",
-        duration: 5000,
-        isClosable: false,
+        title: "Search Required",
+        description: "Please enter a search term",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
       });
     push(`/search?q=${searchParam}`);
   };
@@ -131,11 +137,12 @@ const Header = () => {
         sessionStorage.clear();
       }
       chakraToast({
-        title: "Logged Out",
-        description: "You have been successfully logged out.",
+        title: "Logged Out Successfully",
+        description: "Come back soon!",
         status: "success",
         duration: 3000,
         isClosable: true,
+        position: "top",
       });
       push("/");
     } catch (err) {
@@ -146,6 +153,7 @@ const Header = () => {
         status: "error",
         duration: 3000,
         isClosable: true,
+        position: "top",
       });
     }
   };
@@ -179,74 +187,99 @@ const Header = () => {
       <Box
         as="header"
         bg="white"
-        borderBottomWidth="1px"
-        borderColor="gray.100"
         position="sticky"
         top={0}
         zIndex="1000"
-        boxShadow="sm"
+        boxShadow="0 2px 8px rgba(0,0,0,0.04)"
+        backdropFilter="blur(10px)"
+        borderBottom="1px solid"
+        borderColor="gray.100"
       >
-        {/* Top nav links — large devices only, full width 100%, no side margins */}
-        <Flex
-          display={{ base: "none", lg: "flex" }}
-          as="nav"
-          align="center"
-          justify="center"
-          gap={{ lg: 3, xl: 5 }}
-          w="100%"
-          px={0}
-          py={3}
-          bg="gray.50"
-          borderBottomWidth="1px"
-          borderColor="gray.200"
-          flexWrap="wrap"
+        {/* Top Navigation Bar - Desktop Only */}
+        <Box
+          display={{ base: "none", lg: "block" }}
+          bg="linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)"
+          borderBottom="1px solid"
+          borderColor="gray.100"
         >
-          {visibleNavLinks.map((link) => {
-            if (link.isInvite) {
+          <Flex
+            as="nav"
+            align="center"
+            justify="center"
+            gap={{ lg: 2, xl: 4 }}
+            maxW="1400px"
+            mx="auto"
+            px={6}
+            py={2.5}
+            flexWrap="wrap"
+          >
+            {visibleNavLinks.map((link) => {
+              if (link.isInvite) {
+                return (
+                  <Button
+                    key="invite"
+                    variant="ghost"
+                    size="sm"
+                    fontSize="0.875rem"
+                    fontWeight="600"
+                    color="gray.700"
+                    px={3}
+                    py={2}
+                    h="auto"
+                    borderRadius="lg"
+                    transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                    _hover={{
+                      bg: "white",
+                      color: ThemeColors.darkColor,
+                      transform: "translateY(-1px)",
+                      boxShadow: "0 2px 8px rgba(124, 193, 68, 0.15)",
+                    }}
+                    _active={{ transform: "translateY(0)" }}
+                    onClick={openReferral}
+                  >
+                    {link.label}
+                  </Button>
+                );
+              }
               return (
-                <Button
-                  key="invite"
-                  variant="ghost"
-                  size="sm"
-                  fontSize="0.9375rem"
-                  fontWeight="700"
-                  color="gray.800"
-                  _hover={{ bg: "white", color: ThemeColors.darkColor }}
-                  onClick={openReferral}
-                >
-                  {link.label}
-                </Button>
+                <Link key={link.href} href={link.href}>
+                  <Box
+                    as="span"
+                    display="inline-flex"
+                    alignItems="center"
+                    px={3}
+                    py={2}
+                    borderRadius="lg"
+                    fontSize="0.875rem"
+                    fontWeight="600"
+                    color="gray.700"
+                    cursor="pointer"
+                    transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                    _hover={{
+                      bg: "white",
+                      color: ThemeColors.darkColor,
+                      transform: "translateY(-1px)",
+                      boxShadow: "0 2px 8px rgba(124, 193, 68, 0.15)",
+                    }}
+                    _active={{ transform: "translateY(0)" }}
+                  >
+                    {link.label}
+                  </Box>
+                </Link>
               );
-            }
-            return (
-              <Link key={link.href} href={link.href}>
-                <Flex
-                  as="span"
-                  align="center"
-                  px={2}
-                  py={1.5}
-                  borderRadius="md"
-                  fontSize="0.9375rem"
-                  fontWeight="700"
-                  color="gray.800"
-                  _hover={{ bg: "white", color: ThemeColors.darkColor }}
-                >
-                  {link.label}
-                </Flex>
-              </Link>
-            );
-          })}
-        </Flex>
+            })}
+          </Flex>
+        </Box>
 
+        {/* Main Navigation Bar */}
         <Flex
           as="nav"
           align="center"
           justify="space-between"
           maxW="1400px"
-          px={{ base: 3, md: 0, lg: 0 }}
+          px={{ base: 4, md: 6 }}
           mx="auto"
-          minH="64px"
-          py={2}
+          h={{ base: "72px", md: "80px" }}
         >
           {/* Logo */}
           <Flex align="center" flexShrink={0}>
@@ -255,8 +288,9 @@ const Header = () => {
                 as="span"
                 display="flex"
                 alignItems="center"
-                _hover={{ opacity: 0.9 }}
-                transition="opacity 0.2s"
+                transition="all 0.2s"
+                _hover={{ transform: "scale(1.02)" }}
+                _active={{ transform: "scale(0.98)" }}
               >
                 <Image
                   src="/assets/icons/logo2.png"
@@ -272,17 +306,17 @@ const Header = () => {
             </Link>
           </Flex>
 
-          {/* Desktop Search Bar - Center */}
+          {/* Desktop Search Bar */}
           <Box
-            mx={{ base: 2, md: 3, lg: 4 }}
+            mx={6}
             flex="1"
-            maxW="600px"
+            maxW="650px"
             display={{ base: "none", md: "block" }}
           >
             <form onSubmit={handleSearchFormSubmit}>
-              <InputGroup size="md">
-                <InputLeftElement pointerEvents="none">
-                  <AiOutlineSearch color="#718096" size={20} />
+              <InputGroup size="lg">
+                <InputLeftElement h="full" pointerEvents="none">
+                  <AiOutlineSearch color="#A0AEC0" size={20} />
                 </InputLeftElement>
                 <Input
                   type="text"
@@ -290,51 +324,77 @@ const Header = () => {
                   value={searchParam}
                   onChange={(e) => setSearchParam(e.target.value)}
                   fontSize="0.9375rem"
-                  h="44px"
-                  borderRadius="lg"
+                  h="52px"
+                  borderRadius="xl"
                   bg="gray.50"
+                  borderWidth="2px"
                   borderColor="gray.200"
-                  paddingLeft="2.8rem"
+                  pl="3rem"
+                  transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                  _placeholder={{ color: "gray.400" }}
+                  _hover={{
+                    bg: "white",
+                    borderColor: "gray.300",
+                  }}
                   _focus={{
                     bg: "white",
                     borderColor: ThemeColors.darkColor,
-                    boxShadow: `0 0 0 3px ${ThemeColors.darkColor}20`,
+                    boxShadow: `0 0 0 4px ${ThemeColors.darkColor}15`,
+                    outline: "none",
                   }}
-                  _hover={{ borderColor: "gray.300" }}
-                  transition="all 0.2s"
                 />
               </InputGroup>
             </form>
           </Box>
 
-          {/* Desktop Navigation Right Section */}
-          <Flex align="center" display={{ base: "none", md: "flex" }} gap={2}>
+          {/* Desktop Right Actions */}
+          <HStack spacing={3} display={{ base: "none", md: "flex" }}>
             {/* Call Button */}
             <Button
               as={Link}
               href="tel:+256786118137"
-              leftIcon={<AiOutlinePhone size={16} />}
-              bg="#F6AD55"
+              leftIcon={<AiOutlinePhone size={18} />}
+              bg="linear-gradient(135deg, #F6AD55 0%, #ED8936 100%)"
               color="white"
-              size="sm"
-              fontSize="0.8125rem"
+              size="md"
+              fontSize="0.875rem"
               fontWeight="600"
-              px={3}
-              py={2}
-              borderRadius="lg"
+              px={5}
+              h="48px"
+              borderRadius="xl"
+              boxShadow="0 4px 12px rgba(246, 173, 85, 0.25)"
+              transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
               _hover={{
-                bg: "#ED8936",
-                color: "white",
-                transform: "translateY(-1px)",
-                boxShadow: "sm",
+                transform: "translateY(-2px)",
+                boxShadow: "0 6px 20px rgba(246, 173, 85, 0.35)",
               }}
-              _active={{ transform: "translateY(0)" }}
-              transition="all 0.2s"
+              _active={{
+                transform: "translateY(0)",
+              }}
             >
               Call Us
             </Button>
 
-            {/* Cart with Badge */}
+            {/* Wishlist Button */}
+            <IconButton
+              aria-label="Wishlist"
+              icon={<FaHeart size={20} />}
+              variant="ghost"
+              size="lg"
+              h="48px"
+              w="48px"
+              borderRadius="xl"
+              color="gray.600"
+              transition="all 0.2s"
+              _hover={{
+                bg: "red.50",
+                color: "red.500",
+                transform: "scale(1.05)",
+              }}
+              _active={{ transform: "scale(0.95)" }}
+            />
+
+            {/* Cart Button with Badge */}
             <Link href="/cart">
               <Box position="relative" as="span" display="inline-block">
                 <IconButton
@@ -342,7 +402,204 @@ const Header = () => {
                   icon={<AiOutlineShoppingCart size={22} />}
                   variant="ghost"
                   size="lg"
-                  color="gray.700"
+                  h="48px"
+                  w="48px"
+                  borderRadius="xl"
+                  color="gray.600"
+                  transition="all 0.2s"
+                  _hover={{
+                    bg: "green.50",
+                    color: ThemeColors.darkColor,
+                    transform: "scale(1.05)",
+                  }}
+                  _active={{ transform: "scale(0.95)" }}
+                />
+                {cartItemsCount > 0 && (
+                  <Badge
+                    position="absolute"
+                    top="-4px"
+                    right="-4px"
+                    bg="linear-gradient(135deg, #E53E3E 0%, #C53030 100%)"
+                    color="white"
+                    borderRadius="full"
+                    fontSize="0.7rem"
+                    minW="22px"
+                    h="22px"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    fontWeight="700"
+                    boxShadow="0 2px 8px rgba(229, 62, 62, 0.4)"
+                    border="2px solid white"
+                  >
+                    {cartItemsCount > 99 ? "99+" : cartItemsCount}
+                  </Badge>
+                )}
+              </Box>
+            </Link>
+
+            {/* User Menu */}
+            <Menu>
+              <MenuButton
+                as={Button}
+                variant="ghost"
+                size="lg"
+                h="48px"
+                px={3}
+                borderRadius="xl"
+                color="gray.700"
+                rightIcon={<FaChevronDown size={12} />}
+                transition="all 0.2s"
+                _hover={{
+                  bg: "green.50",
+                  color: ThemeColors.darkColor,
+                }}
+                _active={{
+                  bg: "green.100",
+                }}
+              >
+                <HStack spacing={2.5}>
+                  <Avatar
+                    size="sm"
+                    name={userDisplayName}
+                    bg={ThemeColors.darkColor}
+                    color="white"
+                    fontSize="0.75rem"
+                    fontWeight="700"
+                  />
+                  <Text fontSize="0.9375rem" fontWeight="600" display={{ base: "none", lg: "block" }}>
+                    {userDisplayName}
+                  </Text>
+                </HStack>
+              </MenuButton>
+              <MenuList
+                py={0}
+                borderRadius="xl"
+                borderColor="gray.200"
+                borderWidth="2px"
+                boxShadow="0 10px 40px rgba(0,0,0,0.12)"
+                minW="240px"
+                overflow="hidden"
+              >
+                {userInfo ? (
+                  <>
+                    <Box px={4} py={3} bg="gray.50">
+                      <Text fontSize="0.75rem" color="gray.500" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
+                        Account
+                      </Text>
+                      <Text fontSize="0.9375rem" fontWeight="600" color="gray.800" mt={1}>
+                        {userDisplayName}
+                      </Text>
+                      {userInfo?.email && (
+                        <Text fontSize="0.8125rem" color="gray.500" mt={0.5}>
+                          {userInfo.email}
+                        </Text>
+                      )}
+                    </Box>
+                    <Divider />
+                    <MenuItem
+                      as={Link}
+                      href="/account"
+                      py={3}
+                      px={4}
+                      fontSize="0.9375rem"
+                      fontWeight="500"
+                      icon={<AiOutlineUser size={18} />}
+                      transition="all 0.2s"
+                      _hover={{
+                        bg: "green.50",
+                        color: ThemeColors.darkColor,
+                      }}
+                    >
+                      My Account
+                    </MenuItem>
+                    <MenuItem
+                      as={Link}
+                      href="/invoices"
+                      py={3}
+                      px={4}
+                      fontSize="0.9375rem"
+                      fontWeight="500"
+                      icon={<FaShoppingBag size={16} />}
+                      transition="all 0.2s"
+                      _hover={{
+                        bg: "green.50",
+                        color: ThemeColors.darkColor,
+                      }}
+                    >
+                      My Orders
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem
+                      py={3}
+                      px={4}
+                      fontSize="0.9375rem"
+                      fontWeight="500"
+                      icon={<AiOutlineLogout size={18} />}
+                      color="red.600"
+                      transition="all 0.2s"
+                      _hover={{
+                        bg: "red.50",
+                        color: "red.700",
+                      }}
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </MenuItem>
+                  </>
+                ) : (
+                  <>
+                    <MenuItem
+                      as={Link}
+                      href="/signin"
+                      py={3}
+                      px={4}
+                      fontSize="0.9375rem"
+                      fontWeight="500"
+                      icon={<AiOutlineLogin size={18} />}
+                      transition="all 0.2s"
+                      _hover={{
+                        bg: "green.50",
+                        color: ThemeColors.darkColor,
+                      }}
+                    >
+                      Sign In
+                    </MenuItem>
+                    <MenuItem
+                      as={Link}
+                      href="/signup"
+                      py={3}
+                      px={4}
+                      fontSize="0.9375rem"
+                      fontWeight="500"
+                      transition="all 0.2s"
+                      _hover={{
+                        bg: "green.50",
+                        color: ThemeColors.darkColor,
+                      }}
+                    >
+                      Create Account
+                    </MenuItem>
+                  </>
+                )}
+              </MenuList>
+            </Menu>
+          </HStack>
+
+          {/* Mobile Right Actions */}
+          <HStack spacing={2} display={{ base: "flex", md: "none" }}>
+            {/* Mobile Cart */}
+            <Link href="/cart">
+              <Box position="relative" as="span" display="inline-block">
+                <IconButton
+                  aria-label="Shopping Cart"
+                  icon={<AiOutlineShoppingCart size={22} />}
+                  variant="ghost"
+                  size="lg"
+                  h="44px"
+                  w="44px"
+                  borderRadius="xl"
+                  color="gray.600"
                   _hover={{
                     bg: "green.50",
                     color: ThemeColors.darkColor,
@@ -353,16 +610,18 @@ const Header = () => {
                     position="absolute"
                     top="-2px"
                     right="-2px"
-                    bg="red.500"
+                    bg="linear-gradient(135deg, #E53E3E 0%, #C53030 100%)"
                     color="white"
                     borderRadius="full"
                     fontSize="0.65rem"
-                    minW="5"
-                    h="5"
+                    minW="20px"
+                    h="20px"
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
                     fontWeight="700"
+                    boxShadow="0 2px 6px rgba(229, 62, 62, 0.4)"
+                    border="2px solid white"
                   >
                     {cartItemsCount > 99 ? "99+" : cartItemsCount}
                   </Badge>
@@ -370,105 +629,38 @@ const Header = () => {
               </Box>
             </Link>
 
-            {/* User Profile Menu */}
-            <Menu>
-              <MenuButton
-                as={Button}
-                variant="ghost"
-                size="lg"
-                px={2}
-                color="gray.700"
-                _hover={{ bg: "green.50" }}
-                _active={{ bg: "green.50" }}
-                rightIcon={<FaChevronDown size={12} />}
-              >
-                <Flex align="center" gap={2}>
-                  <AiOutlineUser size={20} />
-                  <Text fontSize="0.875rem" fontWeight="500">
-                    {userDisplayName}
-                  </Text>
-                </Flex>
-              </MenuButton>
-              <MenuList py={0} borderRadius="lg" borderColor="gray.200" boxShadow="lg">
-                {userInfo ? (
-                  <>
-                    <MenuItem 
-                      as={Link} 
-                      href="/account"
-                      py={3}
-                      _hover={{ bg: "green.50" }}
-                    >
-                      <AiOutlineUser size={16} />
-                      <Text ml={2}>My Account</Text>
-                    </MenuItem>
-                    <MenuItem 
-                      as={Link} 
-                      href="/invoices"
-                      py={3}
-                      _hover={{ bg: "green.50" }}
-                    >
-                      <FaShoppingBag size={14} />
-                      <Text ml={2}>My Orders</Text>
-                    </MenuItem>
-                    <MenuItem
-                      py={3}
-                      _hover={{ bg: "red.50", color: "red.600" }}
-                      onClick={handleLogout}
-                    >
-                      <Text ml={2}>Logout</Text>
-                    </MenuItem>
-                  </>
-                ) : (
-                  <>
-                    <MenuItem 
-                      as={Link} 
-                      href="/signin"
-                      py={3}
-                      _hover={{ bg: "green.50" }}
-                    >
-                      <AiOutlineLogin size={16} />
-                      <Text ml={2}>Sign In</Text>
-                    </MenuItem>
-                    <MenuItem 
-                      as={Link} 
-                      href="/signup"
-                      py={3}
-                      _hover={{ bg: "green.50" }}
-                    >
-                      <Text ml={2}>Create Account</Text>
-                    </MenuItem>
-                  </>
-                )}
-              </MenuList>
-            </Menu>
-          </Flex>
-
-          {/* Mobile Menu Button */}
-          <IconButton
-            ref={btnRef}
-            aria-label="Menu"
-            icon={mobileNavOpen ? <AiOutlineClose size={22} /> : <AiOutlineMenu size={22} />}
-            variant="ghost"
-            size="lg"
-            display={{ base: "flex", md: "none" }}
-            onClick={toggleMobileNav}
-            ml={2}
-          />
+            {/* Mobile Menu Toggle */}
+            <IconButton
+              ref={btnRef}
+              aria-label="Menu"
+              icon={mobileNavOpen ? <AiOutlineClose size={24} /> : <AiOutlineMenu size={24} />}
+              variant="ghost"
+              size="lg"
+              h="44px"
+              w="44px"
+              borderRadius="xl"
+              color="gray.700"
+              transition="all 0.2s"
+              _hover={{
+                bg: "green.50",
+                color: ThemeColors.darkColor,
+              }}
+              onClick={toggleMobileNav}
+            />
+          </HStack>
         </Flex>
 
-        {/* Mobile Search Bar - Shows below main nav on scroll */}
+        {/* Mobile Search Bar */}
         <Box
           display={{ base: "block", md: "none" }}
           px={4}
-          py={3}
-          bg="gray.50"
-          borderY="1px"
-          borderColor="gray.100"
+          pb={4}
+          bg="white"
         >
           <form onSubmit={handleSearchFormSubmit}>
-            <InputGroup size="md">
-              <InputLeftElement pointerEvents="none">
-                <AiOutlineSearch color="#718096" size={18} />
+            <InputGroup>
+              <InputLeftElement h="full" pointerEvents="none">
+                <AiOutlineSearch color="#A0AEC0" size={18} />
               </InputLeftElement>
               <Input
                 type="text"
@@ -476,21 +668,26 @@ const Header = () => {
                 value={searchParam}
                 onChange={(e) => setSearchParam(e.target.value)}
                 fontSize="0.9375rem"
-                h="40px"
-                borderRadius="lg"
-                bg="white"
+                h="48px"
+                borderRadius="xl"
+                bg="gray.50"
+                borderWidth="2px"
                 borderColor="gray.200"
-                paddingLeft="2.8rem"
+                pl="2.75rem"
+                transition="all 0.2s"
+                _placeholder={{ color: "gray.400" }}
                 _focus={{
+                  bg: "white",
                   borderColor: ThemeColors.darkColor,
-                  boxShadow: `0 0 0 2px ${ThemeColors.darkColor}20`,
+                  boxShadow: `0 0 0 3px ${ThemeColors.darkColor}15`,
+                  outline: "none",
                 }}
               />
             </InputGroup>
           </form>
         </Box>
 
-        {/* Mobile Drawer Menu */}
+        {/* Mobile Drawer */}
         <Drawer
           isOpen={mobileNavOpen}
           placement="right"
@@ -498,21 +695,53 @@ const Header = () => {
           finalFocusRef={btnRef}
           size="xs"
         >
-          <DrawerOverlay />
-          <DrawerContent>
-            <DrawerCloseButton size="lg" />
-            <DrawerHeader borderBottomWidth="1px">
-              <Flex align="center" gap={3}>
-                <AiOutlineUser size={22} />
-                <Text fontSize="md" fontWeight="600">
-                  {userInfo ? userDisplayName : "Welcome"}
-                </Text>
-              </Flex>
+          <DrawerOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
+          <DrawerContent borderLeftRadius="2xl" maxW="340px">
+            <DrawerCloseButton
+              size="lg"
+              top={4}
+              right={4}
+              borderRadius="lg"
+              _hover={{ bg: "gray.100" }}
+            />
+            <DrawerHeader borderBottomWidth="2px" borderColor="gray.100" pt={6} pb={4}>
+              {userInfo ? (
+                <HStack spacing={3}>
+                  <Avatar
+                    size="md"
+                    name={userDisplayName}
+                    bg={ThemeColors.darkColor}
+                    color="white"
+                    fontWeight="700"
+                  />
+                  <Box>
+                    <Text fontSize="1rem" fontWeight="700" color="gray.800">
+                      {userDisplayName}
+                    </Text>
+                    {userInfo?.email && (
+                      <Text fontSize="0.8125rem" color="gray.500" fontWeight="500">
+                        {userInfo.email}
+                      </Text>
+                    )}
+                  </Box>
+                </HStack>
+              ) : (
+                <HStack spacing={3}>
+                  <Avatar
+                    size="md"
+                    bg="gray.300"
+                    icon={<AiOutlineUser size={24} />}
+                  />
+                  <Text fontSize="1rem" fontWeight="700" color="gray.800">
+                    Welcome!
+                  </Text>
+                </HStack>
+              )}
             </DrawerHeader>
 
-            <DrawerBody px={0}>
+            <DrawerBody px={0} py={0}>
               <VStack align="stretch" spacing={0}>
-                {visibleNavLinks.map((link) => {
+                {visibleNavLinks.map((link, index) => {
                   const Icon = link.icon;
                   if (link.isInvite) {
                     return (
@@ -525,13 +754,29 @@ const Header = () => {
                         py={4}
                         w="full"
                         textAlign="left"
-                        _hover={{ bg: "green.50" }}
                         borderBottomWidth="1px"
                         borderColor="gray.100"
+                        transition="all 0.2s"
+                        _hover={{
+                          bg: "green.50",
+                          pl: 7,
+                        }}
+                        _active={{ bg: "green.100" }}
                         onClick={openInviteModal}
                       >
-                        <Icon size={18} color="#4A5568" />
-                        <Text ml={4} fontSize="md" fontWeight="500">
+                        <Flex
+                          align="center"
+                          justify="center"
+                          w="36px"
+                          h="36px"
+                          borderRadius="lg"
+                          bg="green.50"
+                          color={ThemeColors.darkColor}
+                          mr={3}
+                        >
+                          <Icon size={18} />
+                        </Flex>
+                        <Text fontSize="0.9375rem" fontWeight="600" color="gray.700">
                           {link.label}
                         </Text>
                       </Flex>
@@ -547,76 +792,158 @@ const Header = () => {
                         align="center"
                         px={6}
                         py={4}
-                        _hover={{ bg: "green.50" }}
                         borderBottomWidth="1px"
                         borderColor="gray.100"
+                        transition="all 0.2s"
+                        _hover={{
+                          bg: "green.50",
+                          pl: 7,
+                        }}
+                        _active={{ bg: "green.100" }}
                       >
-                        <Icon size={18} color="#4A5568" />
-                        <Text ml={4} fontSize="md" fontWeight="500">
+                        <Flex
+                          align="center"
+                          justify="center"
+                          w="36px"
+                          h="36px"
+                          borderRadius="lg"
+                          bg="gray.100"
+                          color="gray.600"
+                          mr={3}
+                        >
+                          <Icon size={18} />
+                        </Flex>
+                        <Text fontSize="0.9375rem" fontWeight="600" color="gray.700">
                           {link.label}
                         </Text>
                       </Flex>
                     </Link>
                   );
                 })}
-                
-                {/* Cart in Mobile Menu */}
-                <Link href="/cart" onClick={closeMobileNav}>
-                  <Flex
-                    align="center"
-                    px={6}
-                    py={4}
-                    _hover={{ bg: "green.50" }}
-                    borderBottomWidth="1px"
-                    borderColor="gray.100"
-                  >
-                    <AiOutlineShoppingCart size={18} color="#4A5568" />
-                    <Text ml={4} fontSize="md" fontWeight="500">
-                      Cart
-                    </Text>
-                    {cartItemsCount > 0 && (
-                      <Badge
-                        ml="auto"
-                        bg="red.500"
-                        color="white"
-                        borderRadius="full"
-                        fontSize="0.7rem"
-                        minW="5"
-                        h="5"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        fontWeight="700"
-                      >
-                        {cartItemsCount > 99 ? "99+" : cartItemsCount}
-                      </Badge>
-                    )}
-                  </Flex>
-                </Link>
 
-                {/* Call Button in Mobile Menu */}
-                <Box px={6} py={4}>
+                {/* Mobile Account Section */}
+                {userInfo && (
+                  <>
+                    <Box px={6} py={3} bg="gray.50" mt={2}>
+                      <Text fontSize="0.75rem" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="wider">
+                        My Account
+                      </Text>
+                    </Box>
+                    <Link href="/account" onClick={closeMobileNav}>
+                      <Flex
+                        align="center"
+                        px={6}
+                        py={4}
+                        borderBottomWidth="1px"
+                        borderColor="gray.100"
+                        transition="all 0.2s"
+                        _hover={{
+                          bg: "green.50",
+                          pl: 7,
+                        }}
+                      >
+                        <Flex
+                          align="center"
+                          justify="center"
+                          w="36px"
+                          h="36px"
+                          borderRadius="lg"
+                          bg="blue.50"
+                          color="blue.500"
+                          mr={3}
+                        >
+                          <AiOutlineUser size={18} />
+                        </Flex>
+                        <Text fontSize="0.9375rem" fontWeight="600" color="gray.700">
+                          Profile
+                        </Text>
+                      </Flex>
+                    </Link>
+                    <Link href="/invoices" onClick={closeMobileNav}>
+                      <Flex
+                        align="center"
+                        px={6}
+                        py={4}
+                        borderBottomWidth="1px"
+                        borderColor="gray.100"
+                        transition="all 0.2s"
+                        _hover={{
+                          bg: "green.50",
+                          pl: 7,
+                        }}
+                      >
+                        <Flex
+                          align="center"
+                          justify="center"
+                          w="36px"
+                          h="36px"
+                          borderRadius="lg"
+                          bg="purple.50"
+                          color="purple.500"
+                          mr={3}
+                        >
+                          <FaShoppingBag size={16} />
+                        </Flex>
+                        <Text fontSize="0.9375rem" fontWeight="600" color="gray.700">
+                          My Orders
+                        </Text>
+                      </Flex>
+                    </Link>
+                  </>
+                )}
+
+                {/* Call Button in Mobile */}
+                <Box px={6} py={6} bg="gray.50" mt="auto">
                   <Button
                     as="a"
                     href="tel:+256786118137"
                     w="full"
-                    leftIcon={<AiOutlinePhone />}
-                    bg="#F6AD55"
+                    h="56px"
+                    leftIcon={<AiOutlinePhone size={20} />}
+                    bg="linear-gradient(135deg, #F6AD55 0%, #ED8936 100%)"
                     color="white"
-                    size="lg"
-                    fontSize="md"
-                    fontWeight="600"
-                    py={3}
-                    borderRadius="lg"
+                    fontSize="1rem"
+                    fontWeight="700"
+                    borderRadius="xl"
+                    boxShadow="0 4px 12px rgba(246, 173, 85, 0.3)"
+                    transition="all 0.2s"
                     _hover={{
-                      bg: "#ED8936",
                       transform: "translateY(-2px)",
-                      boxShadow: "md"
+                      boxShadow: "0 6px 20px rgba(246, 173, 85, 0.4)",
+                    }}
+                    _active={{
+                      transform: "translateY(0)",
                     }}
                     onClick={closeMobileNav}
                   >
                     Call +256 786 118137
                   </Button>
+
+                  {userInfo && (
+                    <Button
+                      w="full"
+                      h="52px"
+                      mt={3}
+                      leftIcon={<AiOutlineLogout size={18} />}
+                      variant="outline"
+                      colorScheme="red"
+                      fontSize="0.9375rem"
+                      fontWeight="600"
+                      borderRadius="xl"
+                      borderWidth="2px"
+                      transition="all 0.2s"
+                      _hover={{
+                        bg: "red.50",
+                        transform: "translateY(-1px)",
+                      }}
+                      _active={{
+                        transform: "translateY(0)",
+                      }}
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </Button>
+                  )}
                 </Box>
               </VStack>
             </DrawerBody>
