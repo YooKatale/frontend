@@ -26,8 +26,6 @@ import MarketplaceFilters from "@components/MarketplaceFilters";
 import VendorCard from "@components/VendorCard";
 import LoaderSkeleton from "@components/LoaderSkeleton";
 import { motion } from "framer-motion";
-import Link from "next/link";
-import { Box, Text } from "@chakra-ui/react";
 import { FormatCurr } from "@utils/utils";
 
 /**
