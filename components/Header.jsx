@@ -61,7 +61,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "@slices/usersApiSlice";
 import { useCartMutation } from "@slices/productsApiSlice";
 import { logout } from "@slices/authSlice";
-import { ThemeColors, CLIENT_DASHBOARD_URL } from "@constants/constants";
+import { ThemeColors } from "@constants/constants";
 import ReferralModal from "@components/ReferralModal";
 
 const Header = () => {
@@ -162,7 +162,7 @@ const Header = () => {
     { label: "Home", href: "/", icon: AiOutlineHome },
     { label: "Categories", href: "/products", icon: AiOutlineAppstore },
     { label: "Marketplace", href: "/marketplace", icon: FaStore },
-    { label: "SELL", href: CLIENT_DASHBOARD_URL, icon: FaStore, isSell: true },
+    { label: "SELL", href: "/sell", icon: FaStore, isSell: true },
     { label: "About", href: "/about", icon: AiOutlineTeam },
     { label: "Blog", href: "/news", icon: FaBlog },
     { label: "Careers", href: "/careers", icon: FaBriefcase },
@@ -177,12 +177,6 @@ const Header = () => {
   const visibleNavLinks = navLinks.filter(
     (link) => !link.hideWhenLoggedIn || !userInfo
   );
-
-  // When signed in, pass token so client dashboard accepts same session (no separate login)
-  const authToken = userInfo?.token ?? userInfo?.accessToken;
-  const sellHref = authToken
-    ? `${CLIENT_DASHBOARD_URL}#token=${encodeURIComponent(authToken)}`
-    : CLIENT_DASHBOARD_URL;
 
   const openInviteModal = () => {
     closeMobileNav();
@@ -252,8 +246,8 @@ const Header = () => {
                 return (
                   <Button
                     key="sell"
-                    as="a"
-                    href={sellHref}
+                    as={Link}
+                    href={link.href}
                     size="sm"
                     fontSize="0.9375rem"
                     fontWeight="700"
@@ -821,8 +815,8 @@ const Header = () => {
                     return (
                       <Box
                         key="sell"
-                        as="a"
-                        href={sellHref}
+                        as={Link}
+                        href={link.href}
                         onClick={closeMobileNav}
                         display="block"
                         mx={4}

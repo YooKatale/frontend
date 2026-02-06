@@ -26,7 +26,7 @@ import {
   AlertDescription,
   Link as ChakraLink,
 } from "@chakra-ui/react";
-import { ThemeColors, CLIENT_DASHBOARD_URL } from "@constants/constants";
+import { ThemeColors } from "@constants/constants";
 import Link from "next/link";
 import { useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
@@ -137,10 +137,8 @@ const SignUp = () => {
         position: "top-right",
       });
 
-      if (redirectSell && res?.token) {
-        setTimeout(() => {
-          window.location.href = `${CLIENT_DASHBOARD_URL}#token=${encodeURIComponent(res.token)}`;
-        }, 500);
+      if (redirectSell) {
+        setTimeout(() => push("/sell"), 500);
       } else {
         setTimeout(() => push("/signin"), 1500);
       }

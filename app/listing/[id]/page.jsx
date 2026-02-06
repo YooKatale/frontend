@@ -17,7 +17,6 @@ import { useRouter } from "next/navigation";
 import { DisplayImages, ThemeColors } from "@constants/constants";
 import { FormatCurr } from "@utils/utils";
 import { DB_URL } from "@config/config";
-import { CLIENT_DASHBOARD_URL } from "@constants/constants";
 import { AiOutlinePhone, AiOutlineUser, AiFillStar } from "react-icons/ai";
 import { BsWhatsapp } from "react-icons/bs";
 
@@ -174,9 +173,7 @@ export default function ListingDetailPage({ params }) {
               {sellerId && (
                 <ChakraLink
                   as={Link}
-                  href={`${CLIENT_DASHBOARD_URL}/seller/${sellerId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={`/seller/${sellerId}`}
                   fontSize="sm"
                   color="green.600"
                 >
