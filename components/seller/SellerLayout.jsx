@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -12,6 +12,14 @@ import {
   useColorModeValue,
   Spinner,
   Center,
+  Drawer,
+  DrawerBody,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  IconButton,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import { useLastSeenMutation } from "@slices/sellerApiSlice";
@@ -23,6 +31,7 @@ import {
   RiUserLine,
   RiBarChartBoxLine,
   RiFileList3Line,
+  RiMenuLine,
 } from "react-icons/ri";
 
 const nav = [
@@ -40,6 +49,7 @@ export default function SellerLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
   const [lastSeen] = useLastSeenMutation();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   // All hooks must be called before any conditional returns
   const sidebarBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -83,9 +93,74 @@ export default function SellerLayout({ children }) {
     userInfo?.email ||
     "Seller";
 
+  const SidebarContent = () => (
+    <VStack align="stretch" spacing={2}>
+      <Text
+        fontSize="lg"
+        fontWeight="bold"
+        color={ThemeColors.primaryColor}
+        mb={2}
+        display={{ base: "none", md: "block" }}
+      >
+        Seller Center
+      </Text>
+      <Text
+        fontSize="sm"
+        color="gray.500"
+        mb={4}
+        display={{ base: "none", md: "block" }}
+      >
+        {displayName}
+      </Text>
+      {nav.map(({ href, label, Icon }) => {
+        const isActive =
+          pathname === href ||
+          (href !== "/sell" && pathname?.startsWith(href));
+        return (
+          <Link key={href} href={href} onClick={() => onClose()}>
+            <Flex
+              align="center"
+              gap={2}
+              px={4}
+              py={2.5}
+              borderRadius="lg"
+              fontSize="sm"
+              fontWeight="medium"
+              transition="all 0.2s"
+              bg={isActive ? activeBg : "transparent"}
+              color={isActive ? activeColor : inactiveColor}
+              _hover={{
+                bg: isActive ? activeBg : hoverBg,
+              }}
+            >
+              <Icon size={20} />
+              <Text>{label}</Text>
+            </Flex>
+          </Link>
+        );
+      })}
+    </VStack>
+  );
+
   return (
     <Flex minH="100vh" direction={{ base: "column", md: "row" }}>
-      {/* Sidebar */}
+      {/* Mobile Hamburger Button */}
+      <IconButton
+        aria-label="Open menu"
+        icon={<RiMenuLine />}
+        onClick={onOpen}
+        display={{ base: "block", md: "none" }}
+        position="fixed"
+        top={4}
+        left={4}
+        zIndex={1000}
+        bg={ThemeColors.primaryColor}
+        color="white"
+        _hover={{ bg: ThemeColors.secondaryColor }}
+        size="md"
+      />
+
+      {/* Desktop Sidebar */}
       <Box
         as="aside"
         w={{ base: "100%", md: "240px" }}
@@ -94,57 +169,32 @@ export default function SellerLayout({ children }) {
         borderRight={{ base: "none", md: "1px" }}
         borderColor={borderColor}
         p={{ base: 4, md: 6 }}
+        display={{ base: "none", md: "block" }}
       >
-        <VStack align="stretch" spacing={2}>
-          <Text
-            fontSize="lg"
-            fontWeight="bold"
-            color={ThemeColors.primaryColor}
-            mb={2}
-            display={{ base: "none", md: "block" }}
-          >
-            Seller Center
-          </Text>
-          <Text
-            fontSize="sm"
-            color="gray.500"
-            mb={4}
-            display={{ base: "none", md: "block" }}
-          >
-            {displayName}
-          </Text>
-          {nav.map(({ href, label, Icon }) => {
-            const isActive =
-              pathname === href ||
-              (href !== "/sell" && pathname?.startsWith(href));
-            return (
-              <Link key={href} href={href}>
-                <Flex
-                  align="center"
-                  gap={2}
-                  px={4}
-                  py={2.5}
-                  borderRadius="lg"
-                  fontSize="sm"
-                  fontWeight="medium"
-                  transition="all 0.2s"
-                  bg={isActive ? activeBg : "transparent"}
-                  color={isActive ? activeColor : inactiveColor}
-                  _hover={{
-                    bg: isActive ? activeBg : hoverBg,
-                  }}
-                >
-                  <Icon size={20} />
-                  <Text>{label}</Text>
-                </Flex>
-              </Link>
-            );
-          })}
-        </VStack>
+        <SidebarContent />
       </Box>
 
+      {/* Mobile Drawer */}
+      <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>
+            <Text color={ThemeColors.primaryColor} fontWeight="bold">
+              Seller Center
+            </Text>
+            <Text fontSize="sm" color="gray.500">
+              {displayName}
+            </Text>
+          </DrawerHeader>
+          <DrawerBody>
+            <SidebarContent />
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
+
       {/* Main Content */}
-      <Box flex="1" p={{ base: 4, md: 6 }} bg={contentBg}>
+      <Box flex="1" p={{ base: 4, md: 6 }} bg={contentBg} pt={{ base: 16, md: 6 }}>
         {children}
       </Box>
     </Flex>

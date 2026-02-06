@@ -44,6 +44,8 @@ import {
   Motorcycle
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { 
   ShopOutlined,
@@ -65,6 +67,8 @@ const MotionCard = motion(Card);
 const Partner = () => {
   const [activeTab, setActiveTab] = useState(0);
   const chakraToast = useToast();
+  const router = useRouter();
+  const { userInfo } = useSelector((state) => state.auth || {});
 
   // Vendor Form State
   const [vendorFormData, setVendorFormData] = useState({
@@ -179,6 +183,12 @@ const Partner = () => {
           });
           setVendorFormStep(1);
           setIsVendorLoading(false);
+          // Redirect to seller stores page if user is logged in
+          if (userInfo) {
+            setTimeout(() => {
+              router.push('/sell/stores');
+            }, 2000);
+          }
         }, 1500);
       }
     } catch (error) {

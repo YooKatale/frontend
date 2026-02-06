@@ -22,6 +22,8 @@ import { DB_URL } from "@config/config";
 import { AiFillStar, AiOutlinePhone } from "react-icons/ai";
 import { BsWhatsapp } from "react-icons/bs";
 import { ThemeColors } from "@constants/constants";
+import FollowButton from "@components/seller/FollowButton";
+import SellerRating from "@components/seller/SellerRating";
 
 export default function PublicSellerProfilePage() {
   const params = useParams();
@@ -169,19 +171,18 @@ export default function PublicSellerProfilePage() {
               )}
             </HStack>
 
-            {profile.followersCount !== undefined && (
-              <Box>
-                <Text fontWeight="600" mb={1}>
-                  Followers
-                </Text>
-                <Text fontSize="2xl" fontWeight="bold" color={ThemeColors.primaryColor}>
-                  {profile.followersCount}
-                </Text>
-              </Box>
-            )}
+            {/* Follow Button */}
+            <Box>
+              <FollowButton sellerId={id} />
+            </Box>
           </VStack>
         </CardBody>
       </Card>
+
+      {/* Ratings Section */}
+      <Box mt={6}>
+        <SellerRating sellerId={id} />
+      </Box>
     </Box>
   );
 }
