@@ -24,7 +24,7 @@ export default function FollowButton({ sellerId, size = "md" }) {
     skip: !sellerId || !userInfo,
   });
 
-  const [followSeller, { isLoading: isFollowing }] = useFollowSellerMutation();
+  const [followSeller, { isLoading: isFollowLoading }] = useFollowSellerMutation();
   const [unfollowSeller, { isLoading: isUnfollowing }] = useUnfollowSellerMutation();
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function FollowButton({ sellerId, size = "md" }) {
 
   const followersCount = followersData?.data?.count || followersData?.count || 0;
   const isFollowing = isFollowingState;
-  const isLoading = isFollowing || isUnfollowing;
+  const isLoading = isFollowLoading || isUnfollowing;
 
   const handleToggleFollow = async () => {
     if (!userInfo) {
