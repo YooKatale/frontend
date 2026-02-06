@@ -26,14 +26,14 @@ import {
   AlertDescription,
   Link as ChakraLink,
 } from "@chakra-ui/react";
-import { ThemeColors } from "@constants/constants";
+import { ThemeColors, CLIENT_DASHBOARD_URL } from "@constants/constants";
 import Link from "next/link";
 import { useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRegisterMutation } from "@slices/usersApiSlice";
 import { setCredentials } from "@slices/authSlice";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { FaPhoneAlt, FaWhatsapp, FaEnvelope, FaApple } from "react-icons/fa";
@@ -60,11 +60,13 @@ const SignUp = () => {
   const [notifyViaEmail, setNotifyViaEmail] = useState(true);
 
   const { push } = useRouter();
+  const searchParams = useSearchParams();
   const chakraToast = useToast();
   const dispatch = useDispatch();
   const [register] = useRegisterMutation();
   const [isGoogleLoading, setGoogleLoading] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
+  const redirectSell = searchParams.get("redirect") === "sell";
 
   useEffect(() => {
     if (userInfo) return push("/");
@@ -128,14 +130,20 @@ const SignUp = () => {
 
       chakraToast({
         title: "Welcome to YooKatale!",
-        description: "Account created. Redirecting to sign in…",
+        description: redirectSell ? "Account created. Taking you to seller dashboard…" : "Account created. Redirecting to sign in…",
         status: "success",
         duration: 3000,
         isClosable: true,
         position: "top-right",
       });
 
-      setTimeout(() => push("/signin"), 1500);
+      if (redirectSell && res?.token) {
+        setTimeout(() => {
+          window.location.href = `${CLIENT_DASHBOARD_URL}#token=${encodeURIComponent(res.token)}`;
+        }, 500);
+      } else {
+        setTimeout(() => push("/signin"), 1500);
+      }
     } catch (err) {
       setLoading(false);
       chakraToast({

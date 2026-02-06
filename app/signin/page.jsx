@@ -22,7 +22,7 @@ import {
   CardBody,
   Link as ChakraLink,
 } from "@chakra-ui/react";
-import { ThemeColors } from "@constants/constants";
+import { ThemeColors, CLIENT_DASHBOARD_URL } from "@constants/constants";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
@@ -58,6 +58,7 @@ const SignIn = ({ redirect, callback, ismodal }) => {
 
   const googleCallback = searchParams.get("google_callback");
   const redirectTo = searchParams.get("redirect") || "/";
+  const redirectSell = searchParams.get("redirect") === "sell";
 
   useEffect(() => {
     if (!googleCallback) return;
@@ -110,6 +111,10 @@ const SignIn = ({ redirect, callback, ismodal }) => {
       });
       setLoading(false);
       if (callback) return callback({ loggedIn: true, user: res?._id });
+      if (redirectSell && res?.token) {
+        window.location.href = `${CLIENT_DASHBOARD_URL}#token=${encodeURIComponent(res.token)}`;
+        return;
+      }
       if (redirect) return push(redirect);
       push("/");
     } catch (err) {
