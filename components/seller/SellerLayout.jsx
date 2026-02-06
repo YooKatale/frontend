@@ -40,12 +40,14 @@ export default function SellerLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
   const [lastSeen] = useLastSeenMutation();
+  // All hooks must be called before any conditional returns
   const sidebarBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const activeBg = ThemeColors.primaryColor;
   const activeColor = "white";
   const inactiveColor = useColorModeValue("gray.600", "gray.300");
   const hoverBg = useColorModeValue("gray.100", "gray.700");
+  const contentBg = useColorModeValue("gray.50", "gray.900");
 
   // Redirect to signin if not authenticated
   useEffect(() => {
@@ -142,7 +144,7 @@ export default function SellerLayout({ children }) {
       </Box>
 
       {/* Main Content */}
-      <Box flex="1" p={{ base: 4, md: 6 }} bg={useColorModeValue("gray.50", "gray.900")}>
+      <Box flex="1" p={{ base: 4, md: 6 }} bg={contentBg}>
         {children}
       </Box>
     </Flex>
