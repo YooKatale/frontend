@@ -179,8 +179,9 @@ const Header = () => {
   );
 
   // When signed in, pass token so client dashboard accepts same session (no separate login)
-  const sellHref = userInfo?.token
-    ? `${CLIENT_DASHBOARD_URL}#token=${encodeURIComponent(userInfo.token)}`
+  const authToken = userInfo?.token ?? userInfo?.accessToken;
+  const sellHref = authToken
+    ? `${CLIENT_DASHBOARD_URL}#token=${encodeURIComponent(authToken)}`
     : CLIENT_DASHBOARD_URL;
 
   const openInviteModal = () => {
