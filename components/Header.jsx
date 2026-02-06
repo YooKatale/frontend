@@ -252,7 +252,7 @@ const Header = () => {
                 return (
                   <Button
                     key="sell"
-                    as={Link}
+                    as="a"
                     href={sellHref}
                     size="sm"
                     fontSize="0.9375rem"
@@ -819,8 +819,9 @@ const Header = () => {
                   }
                   if (link.isSell) {
                     return (
-                      <Link
+                      <Box
                         key="sell"
+                        as="a"
                         href={sellHref}
                         onClick={closeMobileNav}
                         display="block"
@@ -843,7 +844,7 @@ const Header = () => {
                         >
                           {link.label}
                         </Flex>
-                      </Link>
+                      </Box>
                     );
                   }
                   return (
