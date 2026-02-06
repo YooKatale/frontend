@@ -178,6 +178,11 @@ const Header = () => {
     (link) => !link.hideWhenLoggedIn || !userInfo
   );
 
+  // When signed in, pass token so client dashboard accepts same session (no separate login)
+  const sellHref = userInfo?.token
+    ? `${CLIENT_DASHBOARD_URL}#token=${encodeURIComponent(userInfo.token)}`
+    : CLIENT_DASHBOARD_URL;
+
   const openInviteModal = () => {
     closeMobileNav();
     openReferral();
@@ -247,7 +252,7 @@ const Header = () => {
                   <Button
                     key="sell"
                     as={Link}
-                    href={link.href}
+                    href={sellHref}
                     size="sm"
                     fontSize="0.9375rem"
                     fontWeight="700"
@@ -815,7 +820,7 @@ const Header = () => {
                     return (
                       <Link
                         key="sell"
-                        href={link.href}
+                        href={sellHref}
                         onClick={closeMobileNav}
                         display="block"
                         mx={4}
