@@ -37,7 +37,7 @@ import {
   useSubscriptionPostMutation,
 } from "@slices/usersApiSlice";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import {
   FaPercent,
@@ -51,6 +51,7 @@ import {
   FaUsers,
   FaChartLine,
   FaLeaf,
+  FaSync,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 
@@ -62,6 +63,7 @@ const themeBorder = `${ThemeColors.primaryColor}25`;
 const Subscription = () => {
   const [subscriptionPackages, setSubscriptionPackages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
 
   const chakraToast = useToast();
@@ -83,7 +85,8 @@ const Subscription = () => {
     }
   }, [userInfo, router]);
 
-  const handleSubscriptionCardFetch = async () => {
+  const handleSubscriptionCardFetch = useCallback(async () => {
+    setIsRefreshing(true);
     try {
       const res = await fetchPackages().unwrap();
       if (res?.status === "Success") {
@@ -94,6 +97,7 @@ const Subscription = () => {
             status: "info",
             duration: 3000,
             isClosable: true,
+            position: "top-right",
           });
         }
         setSubscriptionPackages(res?.data || []);
@@ -104,18 +108,21 @@ const Subscription = () => {
     } catch (error) {
       console.error("Error fetching subscription packages:", error);
       chakraToast({
-        title: "Error",
-        description: "Failed to load subscription packages",
+        title: "Could not load plans",
+        description: "Failed to load subscription packages. Please try again.",
         status: "error",
-        duration: 5000,
+        duration: 6000,
         isClosable: true,
+        position: "top-right",
       });
+    } finally {
+      setIsRefreshing(false);
     }
-  };
+  }, [fetchPackages, chakraToast]);
 
   useEffect(() => {
     handleSubscriptionCardFetch();
-  }, []);
+  }, [handleSubscriptionCardFetch]);
 
   const handleSubmit = async (ID) => {
     if (!userInfo?._id) {
@@ -218,15 +225,28 @@ const Subscription = () => {
         {/* Subscription plans */}
         <Box mb={{ base: 12, md: 16 }}>
           <VStack spacing={8} align="stretch">
-            <Box textAlign="center">
-              <Heading size="xl" mb={3} color={ThemeColors.primaryColor}>
-                Choose Your Perfect Plan
-              </Heading>
-              <Text color="gray.600" maxW="2xl" mx="auto">
-                Select from our carefully crafted meal plans designed to fit your
-                lifestyle and dietary preferences.
-              </Text>
-            </Box>
+            <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
+              <Box textAlign={{ base: "center", md: "left" }} flex="1">
+                <Heading size="xl" mb={3} color={ThemeColors.primaryColor}>
+                  Choose Your Perfect Plan
+                </Heading>
+                <Text color="gray.600" maxW="2xl">
+                  Select from our carefully crafted meal plans designed to fit your
+                  lifestyle and dietary preferences.
+                </Text>
+              </Box>
+              <Button
+                variant="outline"
+                size="sm"
+                colorScheme="green"
+                leftIcon={<Icon as={FaSync} />}
+                onClick={handleSubscriptionCardFetch}
+                isLoading={isRefreshing}
+                loadingText="Refreshing..."
+              >
+                Refresh plans
+              </Button>
+            </Flex>
 
             {subscriptionPackages.length > 0 ? (
               <ScaleFade in={subscriptionPackages.length > 0}>

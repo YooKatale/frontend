@@ -120,8 +120,14 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
     ],
   };
 
-  const benefits =
-    planBenefits[card?.type?.toLowerCase()] || planBenefits.standard;
+  // Use API details when available (admin-edited), else fall back to hardcoded benefits
+  const apiDetails = Array.isArray(card?.details) && card.details.length > 0
+    ? card.details
+    : null;
+  const fallbackBenefits = planBenefits[card?.type?.toLowerCase()] || planBenefits.standard;
+  const benefits = apiDetails
+    ? apiDetails.map((text) => ({ icon: CheckCircle, text, color: `${planColor}.500` }))
+    : fallbackBenefits;
 
   const handleSubscriptionClick = (e) => {
     e.stopPropagation();
@@ -209,7 +215,7 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
               color={`${planColor}.700`}
               textTransform="capitalize"
             >
-              {card?.type} Plan
+              {card?.name || `${card?.type} Plan`}
             </Heading>
           </Flex>
 
