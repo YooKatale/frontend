@@ -280,9 +280,11 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
             >
               UGX {FormatCurr(card?.price || 0)}
             </Text>
-            <Text fontSize="sm" color="gray.600" fontWeight="medium">
-              {card?.price === 0 ? "Contact for custom pricing" : "per month"}
-            </Text>
+            {card?.price === 0 && (
+              <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                Contact for custom pricing
+              </Text>
+            )}
           </Flex>
 
           <Box position="absolute" top="-8px" right="-8px">
