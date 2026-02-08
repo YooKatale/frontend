@@ -32,9 +32,8 @@ import React, { useState, useEffect } from "react";
 import { ShoppingCart, Check, Calendar, Clock, X, Share2, Star } from "lucide-react";
 import { getMealForDay } from "@lib/mealMenuConfig";
 import { getMealPricing, formatPrice } from "@lib/mealPricingConfig";
-import { getMealImageUrl } from "@lib/mealImageMap";
 import { useNewScheduleMutation } from "@slices/productsApiSlice";
-import { usePlanRatingCreateMutation, useGetPlanRatingsQuery, useMealCalendarOverridesGetMutation } from "@slices/usersApiSlice";
+import { usePlanRatingCreateMutation, useGetPlanRatingsQuery, useMealCalendarOverridesGetMutation, useMealSlotsPublicGetMutation } from "@slices/usersApiSlice";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -48,8 +47,11 @@ const themeBorder = `${ThemeColors.primaryColor}30`;
  */
 const MotionBox = motion(Box);
 
+const PLACEHOLDER_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='150' fill='%23e2e8f0'%3E%3Crect width='200' height='150' fill='%23f7fafc'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='14' font-family='sans-serif'%3ENo image%3C/text%3E%3C/svg%3E";
+
 const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
-  const incomeLevel = "middle";
+  const [incomeLevel, setIncomeLevel] = useState("middle");
+  const [duration, setDuration] = useState("monthly");
   const [selectedDay, setSelectedDay] = useState("monday");
   const [selectedMeals, setSelectedMeals] = useState([]);
   const [isVegetarian, setIsVegetarian] = useState(false);
@@ -59,6 +61,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
   const [ratingEffect, setRatingEffect] = useState(false);
   const [failedImages, setFailedImages] = useState(() => new Set());
   const [mealOverrides, setMealOverrides] = useState([]);
+  const [mealSlots, setMealSlots] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const { userInfo } = useSelector((state) => state.auth);
@@ -66,6 +69,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
   const [createSchedule] = useNewScheduleMutation();
   const [createPlanRating] = usePlanRatingCreateMutation();
   const [fetchOverrides] = useMealCalendarOverridesGetMutation();
+  const [fetchSlots] = useMealSlotsPublicGetMutation();
 
   useEffect(() => {
     fetchOverrides()
@@ -75,6 +79,15 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
       })
       .catch(() => {});
   }, [fetchOverrides]);
+
+  useEffect(() => {
+    fetchSlots()
+      .unwrap()
+      .then((res) => {
+        if (res?.status === "Success" && Array.isArray(res?.data)) setMealSlots(res.data);
+      })
+      .catch(() => {});
+  }, [fetchSlots]);
   const { data: ratingsData, refetch: refetchRatings } = useGetPlanRatingsQuery(
     { planType, context: "meal_plan" },
     { skip: !planType }
@@ -95,12 +108,35 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
     { id: "ready-to-cook", name: "Ready to Cook", color: "blue" },
   ];
 
+  const getSlot = (day, mealTypeId, prepTypeId) =>
+    mealSlots.find(
+      (s) =>
+        s.incomeLevel === incomeLevel &&
+        s.prepType === prepTypeId &&
+        s.day === day &&
+        s.mealType === mealTypeId
+    );
+
   const getMeal = (day, mealType, prepType) => {
-    const meal = getMealForDay(day, mealType, incomeLevel, prepType);
-    if (meal) {
-      const pricing = getMealPricing(mealType, prepType, incomeLevel);
+    const slot = getSlot(day, mealType, prepType);
+    const configMeal = getMealForDay(day, mealType, incomeLevel, prepType);
+    const pricing = getMealPricing(mealType, prepType, incomeLevel);
+    if (slot) {
       return {
-        ...meal,
+        meal: slot.mealName || configMeal?.meal || "",
+        description: slot.description || configMeal?.description || "",
+        quantity: slot.quantity || configMeal?.quantity || "",
+        image: slot.imageUrl || "",
+        type: prepType,
+        pricing: {
+          weekly: slot.priceWeekly ?? pricing?.weekly ?? 0,
+          monthly: slot.priceMonthly ?? pricing?.monthly ?? 0,
+        },
+      };
+    }
+    if (configMeal) {
+      return {
+        ...configMeal,
         type: prepType,
         pricing,
       };
@@ -109,6 +145,8 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
   };
 
   const getMealImage = (meal, day, mealTypeId, prepTypeId) => {
+    const slot = getSlot(day, mealTypeId, prepTypeId);
+    if (slot?.imageUrl) return slot.imageUrl;
     const override = mealOverrides.find(
       (o) =>
         o.incomeLevel === incomeLevel &&
@@ -117,7 +155,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
         o.mealType === mealTypeId
     );
     if (override?.imageUrl) return override.imageUrl;
-    return getMealImageUrl(meal);
+    return PLACEHOLDER_IMAGE;
   };
 
   const handleMealSelect = (meal) => {
@@ -150,8 +188,9 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
   };
 
   const calculateTotal = () => {
+    const priceKey = duration === "weekly" ? "weekly" : "monthly";
     return selectedMeals.reduce(
-      (sum, meal) => sum + (meal.pricing?.monthly || 0),
+      (sum, meal) => sum + (meal.pricing?.[priceKey] || 0),
       0
     );
   };
@@ -244,8 +283,8 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
           meals: selectedMeals.map((meal) => ({
             mealType: meal.mealType,
             prepType: meal.prepType,
-            duration: "monthly",
-            price: meal.pricing?.monthly || 0,
+            duration,
+            price: duration === "weekly" ? (meal.pricing?.weekly || 0) : (meal.pricing?.monthly || 0),
             mealName: meal.meal,
           })),
         },
@@ -298,9 +337,9 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
         borderColor="gray.200"
       >
         {/* Header */}
-        <Flex justify="space-between" align="center" mb={4}>
+        <Flex flexDirection={{ base: "column", sm: "row" }} justify="space-between" align={{ base: "stretch", sm: "center" }} gap={4} mb={4}>
           <Box>
-            <Heading size="lg" color={ThemeColors.darkColor}>
+            <Heading size={{ base: "md", md: "lg" }} color={ThemeColors.darkColor}>
               Weekly Meal Plan
             </Heading>
             <Text color="gray.600" mt={1}>
@@ -369,6 +408,89 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
 
         <Divider mb={6} borderColor="gray.200" />
 
+        {/* Duration & Income Level Selectors */}
+        <Stack
+          direction={{ base: "column", sm: "row" }}
+          spacing={4}
+          mb={6}
+          p={4}
+          bg={themeBg}
+          borderRadius="lg"
+          borderWidth="1px"
+          borderColor={themeBorder}
+        >
+          <Box flex={1}>
+            <Text fontWeight="semibold" mb={2} color="gray.700" fontSize="sm">
+              Purchase duration
+            </Text>
+            <HStack spacing={2}>
+              <Button
+                size="md"
+                variant={duration === "weekly" ? "solid" : "outline"}
+                bg={duration === "weekly" ? ThemeColors.primaryColor : undefined}
+                color={duration === "weekly" ? "white" : undefined}
+                borderColor={ThemeColors.primaryColor}
+                _hover={{
+                  bg: duration === "weekly" ? ThemeColors.secondaryColor : themeBg,
+                }}
+                onClick={() => setDuration("weekly")}
+                minW={{ base: "100px", sm: "120px" }}
+              >
+                Weekly
+              </Button>
+              <Button
+                size="md"
+                variant={duration === "monthly" ? "solid" : "outline"}
+                bg={duration === "monthly" ? ThemeColors.primaryColor : undefined}
+                color={duration === "monthly" ? "white" : undefined}
+                borderColor={ThemeColors.primaryColor}
+                _hover={{
+                  bg: duration === "monthly" ? ThemeColors.secondaryColor : themeBg,
+                }}
+                onClick={() => setDuration("monthly")}
+                minW={{ base: "100px", sm: "120px" }}
+              >
+                Monthly
+              </Button>
+            </HStack>
+          </Box>
+          <Box flex={1}>
+            <Text fontWeight="semibold" mb={2} color="gray.700" fontSize="sm">
+              Income level
+            </Text>
+            <HStack spacing={2}>
+              <Button
+                size="md"
+                variant={incomeLevel === "low" ? "solid" : "outline"}
+                bg={incomeLevel === "low" ? ThemeColors.primaryColor : undefined}
+                color={incomeLevel === "low" ? "white" : undefined}
+                borderColor={ThemeColors.primaryColor}
+                _hover={{
+                  bg: incomeLevel === "low" ? ThemeColors.secondaryColor : themeBg,
+                }}
+                onClick={() => setIncomeLevel("low")}
+                minW={{ base: "100px", sm: "120px" }}
+              >
+                Low income
+              </Button>
+              <Button
+                size="md"
+                variant={incomeLevel === "middle" ? "solid" : "outline"}
+                bg={incomeLevel === "middle" ? ThemeColors.primaryColor : undefined}
+                color={incomeLevel === "middle" ? "white" : undefined}
+                borderColor={ThemeColors.primaryColor}
+                _hover={{
+                  bg: incomeLevel === "middle" ? ThemeColors.secondaryColor : themeBg,
+                }}
+                onClick={() => setIncomeLevel("middle")}
+                minW={{ base: "100px", sm: "120px" }}
+              >
+                Middle income
+              </Button>
+            </HStack>
+          </Box>
+        </Stack>
+
         {/* Day Selector */}
         <Box mb={8}>
           <Text fontWeight="semibold" mb={3} color="gray.700">
@@ -391,6 +513,8 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                   }}
                   onClick={() => setSelectedDay(dayKey)}
                   minW="100px"
+                  minH={{ base: "44px", md: "40px" }}
+                  py={{ base: 3, md: 2 }}
                 >
                   {day.slice(0, 3)}
                 </Button>
@@ -458,6 +582,8 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                         cursor="pointer"
                         onClick={() => handleMealSelect(mealKey)}
                         transition="all 0.2s"
+                        p={{ base: 4, md: 4 }}
+                        minH={{ base: "280px", md: "260px" }}
                         _hover={{
                           borderColor: ThemeColors.primaryColor,
                           transform: "translateY(-2px)",
@@ -516,7 +642,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                               failedImages.has(
                                 `${meal.meal}-${mealType.id}-${prepType.id}`
                               )
-                                ? "/assets/images/img5.png"
+                                ? PLACEHOLDER_IMAGE
                                 : getMealImage(meal, selectedDay, mealType.id, prepType.id)
                             }
                             alt={meal.meal || "Meal"}
@@ -546,14 +672,14 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                             fontWeight="bold"
                             color={ThemeColors.darkColor}
                           >
-                            {formatPrice(meal.pricing?.monthly)}
+                            {formatPrice(duration === "weekly" ? meal.pricing?.weekly : meal.pricing?.monthly)}
                             <Text
                               as="span"
                               fontSize="sm"
                               color="gray.600"
                               ml={1}
                             >
-                              /month
+                              /{duration === "weekly" ? "week" : "month"}
                             </Text>
                           </Text>
                           {isSelected && (
@@ -666,7 +792,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                         fontWeight="bold"
                         color={ThemeColors.darkColor}
                       >
-                        {formatPrice(meal.pricing?.monthly)}
+                        {formatPrice(duration === "weekly" ? meal.pricing?.weekly : meal.pricing?.monthly)}
                       </Text>
                       <Button
                         size="sm"
@@ -684,7 +810,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                 <Box mt={6} pt={4} borderTop="1px solid" borderColor="gray.200">
                   <Flex justify="space-between" align="center">
                     <Text fontSize="lg" fontWeight="bold">
-                      Total (Monthly)
+                      Total ({duration === "weekly" ? "Weekly" : "Monthly"})
                     </Text>
                     <Text
                       fontSize="2xl"

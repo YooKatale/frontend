@@ -31,6 +31,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
+const PLACEHOLDER_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='150' fill='%23e2e8f0'%3E%3Crect width='200' height='150' fill='%23f7fafc'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='14' font-family='sans-serif'%3ENo image%3C/text%3E%3C/svg%3E";
+
 /**
  * Professional Meal Calendar Component with Slider
  * Displays 7-day meal calendar in a professional table format
@@ -110,7 +112,7 @@ const MealCalendar = ({ planType = "premium" }) => {
             type: "ready-to-eat",
             quantity: readyToEat.quantity,
             description: readyToEat.description,
-            image: readyToEat.image || "/assets/images/img5.png",
+            image: readyToEat.image || PLACEHOLDER_IMAGE,
           });
         }
         
@@ -120,7 +122,7 @@ const MealCalendar = ({ planType = "premium" }) => {
             type: "ready-to-cook",
             quantity: readyToCook.quantity,
             description: readyToCook.description,
-            image: readyToCook.image || "/assets/images/img5.png",
+            image: readyToCook.image || PLACEHOLDER_IMAGE,
           });
         }
       });
@@ -296,7 +298,7 @@ const MealCalendar = ({ planType = "premium" }) => {
                               position={"relative"}
                             >
                               <Image
-                                src={item.image || "/assets/images/img5.png"}
+                                src={item.image || PLACEHOLDER_IMAGE}
                                 alt={item.meal}
                                 fill
                                 style={{ objectFit: "cover" }}
@@ -375,7 +377,7 @@ const MealCalendar = ({ planType = "premium" }) => {
                               position={"relative"}
                             >
                               <Image
-                                src={item.image || "/assets/images/img5.png"}
+                                src={item.image || PLACEHOLDER_IMAGE}
                                 alt={item.meal}
                                 fill
                                 style={{ objectFit: "cover" }}
@@ -454,7 +456,7 @@ const MealCalendar = ({ planType = "premium" }) => {
                               position={"relative"}
                             >
                               <Image
-                                src={item.image || "/assets/images/img5.png"}
+                                src={item.image || PLACEHOLDER_IMAGE}
                                 alt={item.meal}
                                 fill
                                 style={{ objectFit: "cover" }}

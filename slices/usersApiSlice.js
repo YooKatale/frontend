@@ -100,6 +100,12 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    mealSlotsPublicGet: builder.mutation({
+      query: (params) => {
+        const q = params ? `?${new URLSearchParams(params).toString()}` : "";
+        return { url: `${DB_URL}/meal-calendar/slots/public${q}`, method: "GET" };
+      },
+    }),
     messagePost: builder.mutation({
       query: (data) => ({
         url: `${DB_URL}/message`,
@@ -298,6 +304,7 @@ export const {
   useSubscriptionPackageGetMutation,
   useSubscriptionPostMutation,
   useMealCalendarOverridesGetMutation,
+  useMealSlotsPublicGetMutation,
   useMessagePostMutation,
   useBlogFetchMutation,
   useBlogsFetchMutation,
