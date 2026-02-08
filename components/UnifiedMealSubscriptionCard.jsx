@@ -582,7 +582,6 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
                         cursor="pointer"
                         onClick={() => handleMealSelect(mealKey)}
                         transition="all 0.2s"
-                        p={{ base: 4, md: 4 }}
                         minH={{ base: "280px", md: "260px" }}
                         _hover={{
                           borderColor: ThemeColors.primaryColor,
