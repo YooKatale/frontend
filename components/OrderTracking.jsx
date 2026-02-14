@@ -10,24 +10,8 @@ import {
   DeliveryDining, 
   DoneAll 
 } from "lucide-react";
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, off } from "firebase/database";
-
-// Initialize Firebase (use your existing config)
-const firebaseConfig = {
-  // Add your Firebase config here
-  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL || "https://yookatale-aa476-default-rtdb.firebaseio.com/",
-};
-
-let app;
-let db;
-
-try {
-  app = initializeApp(firebaseConfig);
-  db = getDatabase(app);
-} catch (error) {
-  console.error("Firebase initialization error:", error);
-}
+import { ref, onValue, off } from "firebase/database";
+import { db } from "@lib/firebase";
 
 /**
  * Real-time Order Tracking Component (like Jumia Foods/Glovo)

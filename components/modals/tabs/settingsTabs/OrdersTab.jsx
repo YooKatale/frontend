@@ -14,28 +14,10 @@ import { useOrdersMutation } from "@slices/productsApiSlice";
 
 import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
-import { initializeApp, getApp } from "firebase/app";
-import { getDatabase, ref, onValue, off } from "firebase/database";
+import { ref, onValue, off } from "firebase/database";
+import { db as firebaseDb } from "@lib/firebase";
 
 import OrderCard from "@components/OrderCard";
-
-const firebaseConfig = {
-  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL || "https://yookatale-aa476-default-rtdb.firebaseio.com/",
-};
-
-let firebaseDb;
-try {
-  const app = (() => {
-    try {
-      return getApp();
-    } catch {
-      return initializeApp(firebaseConfig);
-    }
-  })();
-  firebaseDb = getDatabase(app);
-} catch (err) {
-  console.warn("Firebase init for order list:", err?.message);
-}
 
 // import React from 'react'
 
