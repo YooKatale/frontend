@@ -28,11 +28,10 @@ const DynamicSpecialProducts = dynamic(
     loading: () => <p>Loading...</p>,
   }
 );
-const DynamicHomepageMealsBlock = dynamic(
-  () => import("@components/HomepageMealsBlock"),
-  { loading: () => <Box py={6} px={4}><Box h="24px" w="80px" bg="gray.200" borderRadius="full" /></Box> }
+const DynamicMealCalendarSection = dynamic(
+  () => import("@components/MealCalendarSection"),
+  { loading: () => <Box py={4} height="120px" bg="gray.100" borderRadius="lg" mx={2} /> }
 );
-
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -224,9 +223,6 @@ const Home = () => {
       >
         <Hero />
       </motion.div>
-
-      {/* Meal calendar: Breakfast, Lunch, Supper (ready-to-eat & ready-to-cook) */}
-      <DynamicHomepageMealsBlock />
 
       {/* Categories Section - Glovo Style with YooKatale Colors */}
       <Box pt={{ base: "2rem", md: "3rem", lg: "4rem" }} mx="auto" px={{ base: 4, md: 6, lg: 8 }} bg="white">
@@ -483,7 +479,10 @@ const Home = () => {
         <Subscription />
       </Box>
 
-      {otherProducts.length > 0 && otherProducts.map((product, index) => (
+      {otherProducts.length > 0 && otherProducts.map((product, index) => {
+        const cat = (product?.category || "").toLowerCase().trim();
+        const isMealCategory = cat === "breakfast" || cat === "lunch" || cat === "supper";
+        return (
         <React.Fragment key={product?.category}>
           <motion.div
             initial="hidden"
@@ -494,12 +493,16 @@ const Home = () => {
             <Box pt={2} mx={2}>
               <Flex>
                 <Box width="100%" mx="auto">
-                  <DynamicSpecialProducts
-                    Products={product?.products}
-                    userInfo={userInfo}
-                    category={product?.category}
-                    text={product?.category}
-                  />
+                  {isMealCategory ? (
+                    <DynamicMealCalendarSection mealType={cat} />
+                  ) : (
+                    <DynamicSpecialProducts
+                      Products={product?.products}
+                      userInfo={userInfo}
+                      category={product?.category}
+                      text={product?.category}
+                    />
+                  )}
                 </Box>
               </Flex>
             </Box>
@@ -517,7 +520,8 @@ const Home = () => {
             </Box>
           )}
         </React.Fragment>
-      ))}
+        );
+      })}
 
       {/* Testimonials Section with Animation */}
       <Box>
