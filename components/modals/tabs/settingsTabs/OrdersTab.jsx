@@ -12,10 +12,30 @@ import {
 import { ThemeColors } from "@constants/constants";
 import { useOrdersMutation } from "@slices/productsApiSlice";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
+import { initializeApp, getApp } from "firebase/app";
+import { getDatabase, ref, onValue, off } from "firebase/database";
 
 import OrderCard from "@components/OrderCard";
+
+const firebaseConfig = {
+  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL || "https://yookatale-aa476-default-rtdb.firebaseio.com/",
+};
+
+let firebaseDb;
+try {
+  const app = (() => {
+    try {
+      return getApp();
+    } catch {
+      return initializeApp(firebaseConfig);
+    }
+  })();
+  firebaseDb = getDatabase(app);
+} catch (err) {
+  console.warn("Firebase init for order list:", err?.message);
+}
 
 // import React from 'react'
 
@@ -23,17 +43,21 @@ const OrdersTab = () => {
   const [fetchOrders, { isLoading }] = useOrdersMutation();
   const [orderTabs, setOrderTabs] = useState("active");
   const [Orders, setOrders] = useState({ CompletedOrders: [], AllOrders: [] });
+  const ordersRef = useRef({ CompletedOrders: [], AllOrders: [] });
 
   const chakraToast = useToast();
 
   const { userInfo } = useSelector((state) => state.auth);
 
   const fetchData = async () => {
+    if (!userInfo?._id) return;
     try {
       const res = await fetchOrders(userInfo._id).unwrap();
 
       if (res?.status == "Success") {
-        setOrders(res?.data);
+        const data = res?.data || { CompletedOrders: [], AllOrders: [] };
+        setOrders(data);
+        ordersRef.current = data;
       }
     } catch (err) {
       chakraToast({
@@ -50,7 +74,41 @@ const OrdersTab = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [userInfo?._id]);
+
+  // Realtime: merge Firebase user_orders/{userId} updates into order list
+  useEffect(() => {
+    const userId = userInfo?._id;
+    if (!userId || !firebaseDb) return;
+
+    const userOrdersRef = ref(firebaseDb, `user_orders/${userId}`);
+    const unsubscribe = onValue(userOrdersRef, (snapshot) => {
+      const val = snapshot.val();
+      if (!val || typeof val !== "object") return;
+
+      const current = ordersRef.current;
+      const allMap = new Map(
+        (current.AllOrders || []).map((o) => [o._id, { ...o }])
+      );
+      Object.entries(val).forEach(([orderId, data]) => {
+        const existing = allMap.get(orderId) || {};
+        allMap.set(orderId, { _id: orderId, ...existing, ...data });
+      });
+      const newAllOrders = Array.from(allMap.values());
+      const newCompletedOrders = newAllOrders.filter(
+        (o) => (o.status || "").toLowerCase() === "completed"
+      );
+
+      const next = {
+        AllOrders: newAllOrders,
+        CompletedOrders: newCompletedOrders,
+      };
+      ordersRef.current = next;
+      setOrders(next);
+    });
+
+    return () => off(userOrdersRef);
+  }, [userInfo?._id]);
 
   return (
     <>

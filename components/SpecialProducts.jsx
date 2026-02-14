@@ -96,24 +96,28 @@ const SpecialProducts = ({ Products, userInfo, category, text }) => {
             </Box>
             <Box>
               <Text
-                fontSize={{ base: "lg", md: "xl", lg: "2xl" }}
-                fontWeight="800"
+                as="h2"
+                fontSize={{ base: "1.125rem", md: "1.35rem", lg: "1.5rem" }}
+                fontWeight="700"
                 color="white"
                 textTransform="capitalize"
                 mb={0}
                 textShadow="0 2px 8px rgba(0,0,0,0.3)"
-                letterSpacing="tight"
+                letterSpacing="-0.02em"
+                lineHeight="tight"
               >
                 {displayText}
               </Text>
               {Products?.length > 0 && (
                 <Text
-                  fontSize={{ base: "xs", md: "sm" }}
+                  as="p"
+                  fontSize={{ base: "0.7rem", md: "0.8rem" }}
                   color="whiteAlpha.900"
-                  fontWeight="600"
-                  mt={-1}
+                  fontWeight="500"
+                  mt={1}
+                  letterSpacing="0.01em"
                 >
-                  {Products.length} {Products.length === 1 ? 'Product' : 'Products'} Available
+                  {Products.length} {Products.length === 1 ? "product" : "products"} available
                 </Text>
               )}
             </Box>

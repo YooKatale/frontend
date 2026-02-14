@@ -28,6 +28,10 @@ const DynamicSpecialProducts = dynamic(
     loading: () => <p>Loading...</p>,
   }
 );
+const DynamicHomepageMealsBlock = dynamic(
+  () => import("@components/HomepageMealsBlock"),
+  { loading: () => <Box py={6} px={4}><Box h="24px" w="80px" bg="gray.200" borderRadius="full" /></Box> }
+);
 
 // Animation variants
 const containerVariants = {
@@ -104,9 +108,10 @@ const Home = () => {
   const handleFetchCategories = async () => {
     try {
       const res = await fetchCategories().unwrap();
-      if (res?.success && res?.categories) {
+      if (res?.status === "Success" && Array.isArray(res?.data)) {
+        setCategories(res.data);
+      } else if (res?.success && res?.categories) {
         setCategories(res.categories);
-        console.log("Fetched Categories:", res.categories);
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -120,9 +125,12 @@ const Home = () => {
   }, []);
 
   const displayCategories = useMemo(() => {
-    return categories.length > 0
-      ? categories
-      : CategoriesJson.map(cat => ({ name: cat }));
+    if (categories.length === 0) return CategoriesJson.map(cat => ({ name: cat }));
+    return categories.map((item) => ({
+      _id: item._id,
+      name: item.category ?? item.name,
+      ...item,
+    }));
   }, [categories]);
 
   const topDealsProducts = useMemo(() =>
@@ -216,6 +224,9 @@ const Home = () => {
       >
         <Hero />
       </motion.div>
+
+      {/* Meal calendar: Breakfast, Lunch, Supper (ready-to-eat & ready-to-cook) */}
+      <DynamicHomepageMealsBlock />
 
       {/* Categories Section - Glovo Style with YooKatale Colors */}
       <Box pt={{ base: "2rem", md: "3rem", lg: "4rem" }} mx="auto" px={{ base: 4, md: 6, lg: 8 }} bg="white">

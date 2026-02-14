@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Environment
+
+- **NEXT_PUBLIC_FIREBASE_DATABASE_URL** (optional): Firebase Realtime Database URL used for live order updates (order list and order tracking). If not set, the app falls back to a default URL. Set this in production to your project’s Realtime Database URL.
+
 ## Getting Started
 
 First, run the development server:

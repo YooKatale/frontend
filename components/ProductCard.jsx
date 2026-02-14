@@ -187,9 +187,10 @@ const ProductCard = ({ product, userInfo }) => {
               {product.images && product.images[0] ? (
                 <Image
                   src={product.images[0]}
-                  alt={product.name}
+                  alt={product.name ?? "Product"}
                   fill
-                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                  sizes="(max-width: 480px) 50vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                  priority={false}
                   style={{
                     objectFit: 'cover',
                     transition: 'transform 0.3s ease-in-out',
