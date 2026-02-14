@@ -41,7 +41,7 @@ function formatBotMessage(content) {
     const nodes = [];
     let lastIndex = 0;
     let m;
-    const re = /\*\*(.+?)\*\*|(https?:\/\/[^\s<>"{}|\\^`[\]]+)/gi;
+    const re = new RegExp("\\*\\*(.+?)\\*\\*|(https?://[^\\s<>\"{}|\\\\^\\[\\]]+)", "gi");
     while ((m = re.exec(seg)) !== null) {
       if (m.index > lastIndex) {
         nodes.push(seg.slice(lastIndex, m.index));
