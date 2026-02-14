@@ -1,0 +1,342 @@
+/* Yookatale support widget – scoped under .widget */
+.widget {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.button {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 1000;
+  background: #006b4f;
+  width: 70px;
+  height: 70px;
+  border-radius: 30px 30px 10px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(0, 107, 79, 0.5), 0 6px 0 #004d3a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid white;
+  outline: 3px solid #ff8c42;
+}
+
+.button:hover {
+  transform: scale(1.06) translateY(-4px);
+  box-shadow: 0 20px 30px rgba(0, 90, 70, 0.5), 0 8px 0 #004d3a;
+  background: #008a64;
+}
+
+.buttonIcon {
+  color: white;
+  font-size: 32px;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.15));
+}
+
+.button::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  background: #ff8c42;
+  border: 3px solid white;
+  border-radius: 50%;
+  animation: pulse 1.8s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.2); background: #ffaa5e; }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.container {
+  position: fixed;
+  bottom: 120px;
+  right: 32px;
+  width: 400px;
+  max-width: calc(100vw - 70px);
+  background: white;
+  border-radius: 32px 32px 32px 8px;
+  box-shadow: 0 25px 45px -8px rgba(0, 40, 20, 0.4), 0 8px 0 #004d3a inset, 0 -2px 0 #ff8c42 inset;
+  overflow: hidden;
+  z-index: 1001;
+  display: none;
+  flex-direction: column;
+  border: 2px solid white;
+  outline: 2px solid #ff8c42;
+  transition: opacity 0.2s, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-origin: bottom right;
+}
+
+.containerOpen {
+  display: flex;
+}
+
+.header {
+  background: #006b4f;
+  padding: 20px 22px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid #ff8c42;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  background: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 18px 18px 6px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #006b4f;
+  font-size: 24px;
+  font-weight: 700;
+  box-shadow: 0 4px 0 #b16300;
+  border: 2px solid #ff8c42;
+}
+
+.title h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.title p {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.title p i {
+  color: #b8ffd8;
+  font-size: 10px;
+}
+
+.closeBtn {
+  background: rgba(255, 255, 255, 0.2);
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  font-size: 22px;
+}
+
+.closeBtn:hover {
+  background: #ff8c42;
+  color: #1e3d33;
+}
+
+.messages {
+  background: #fefefd;
+  background-image: radial-gradient(#d9f0e6 0.8px, transparent 0.8px);
+  background-size: 18px 18px;
+  padding: 22px 18px 18px;
+  min-height: 320px;
+  max-height: 380px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+}
+
+.messageBot {
+  align-self: flex-start;
+}
+
+.messageUser {
+  align-self: flex-end;
+}
+
+.bubble {
+  padding: 12px 16px;
+  border-radius: 24px 24px 24px 8px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  word-break: break-word;
+  box-shadow: 0 3px 8px rgba(0, 30, 10, 0.08);
+}
+
+.messageBot .bubble {
+  background: white;
+  border: 2px solid #006b4f;
+  border-bottom-color: #ff8c42;
+  color: #1d2f2a;
+  border-radius: 24px 24px 24px 8px;
+}
+
+.messageUser .bubble {
+  background: #006b4f;
+  color: white;
+  border-radius: 24px 24px 8px 24px;
+  border-bottom: 3px solid #ff8c42;
+}
+
+.timestamp {
+  font-size: 0.65rem;
+  color: #4a6a5f;
+  margin: 5px 12px 0;
+  font-weight: 500;
+}
+
+.messageUser .timestamp {
+  text-align: right;
+  color: #006b4f;
+}
+
+.footer {
+  background: white;
+  border-top: 2px solid #cfe8de;
+  padding: 18px 16px 16px;
+}
+
+.inputTools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f2faf6;
+  border-radius: 40px;
+  padding: 6px 6px 6px 18px;
+  border: 2px solid #006b4f;
+  transition: 0.1s;
+}
+
+.inputTools:focus-within {
+  border-color: #ff8c42;
+  box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.3);
+}
+
+.inputTools input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 12px 5px;
+  font-size: 0.95rem;
+  outline: none;
+  color: #1a332c;
+}
+
+.inputTools input::placeholder {
+  color: #6b8f81;
+  font-style: italic;
+}
+
+.actionBtn {
+  background: transparent;
+  border: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: #006b4f;
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.actionBtn:hover {
+  background: #ff8c42;
+  color: white;
+  transform: scale(1.08);
+}
+
+.actionBtnOrange {
+  background: #ff8c42;
+  color: white;
+  box-shadow: 0 4px 0 #b45f24;
+}
+
+.actionBtnOrange:hover {
+  background: #ffa55c;
+}
+
+.actionBtn:disabled,
+.actionBtnOrange:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.attachedRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 4px;
+}
+
+.chip {
+  background: #eefcf5;
+  padding: 6px 14px 6px 10px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-left: 3px solid #ff8c42;
+  color: #1f4d3d;
+  font-weight: 500;
+}
+
+.chip i {
+  color: #006b4f;
+  font-size: 1rem;
+}
+
+.chipRemove {
+  color: #bb3e03;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.chipRemove:hover {
+  opacity: 1;
+}
+
+.note {
+  font-size: 0.7rem;
+  padding-left: 20px;
+  margin-top: 8px;
+  color: #3f5e53;
+}
+
+@media (max-width: 500px) {
+  .container {
+    width: 340px;
+    bottom: 100px;
+    right: 16px;
+  }
+  .button {
+    width: 60px;
+    height: 60px;
+    bottom: 20px;
+    right: 20px;
+  }
+}
