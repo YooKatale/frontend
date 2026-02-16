@@ -16,6 +16,7 @@ import Hero from "@components/Hero";
 import CategoryCard from "@components/cards/CategoryCard";
 import ResponsiveBackground from "@components/cards/ResponsiveBackground";
 import Subscription from "@components/cards/SubscriptionSection";
+import HomepageDiscoverySection from "@components/HomepageDiscoverySection";
 import SwipperComponent from "@components/Swiper";
 import LoaderSkeleton from "@components/LoaderSkeleton";
 
@@ -32,6 +33,22 @@ const DynamicMealCalendarSection = dynamic(
   () => import("@components/MealCalendarSection"),
   { loading: () => <Box py={4} height="120px" bg="gray.100" borderRadius="lg" mx={2} /> }
 );
+
+/** Budget filter price ranges (UGX) */
+const BUDGET_LOW_MAX = 50000;
+const BUDGET_MIDDLE_MIN = 50000;
+const BUDGET_MIDDLE_MAX = 150000;
+const BUDGET_HIGH_MIN = 150000;
+function filterByBudget(products, budget) {
+  if (!Array.isArray(products) || !budget || budget === "all") return products;
+  return products.filter((p) => {
+    const price = Number(p?.price) || 0;
+    if (budget === "low") return price < BUDGET_LOW_MAX;
+    if (budget === "middle") return price >= BUDGET_MIDDLE_MIN && price <= BUDGET_MIDDLE_MAX;
+    if (budget === "high") return price > BUDGET_HIGH_MIN;
+    return true;
+  });
+}
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -73,6 +90,7 @@ const Home = () => {
   const [Comments, setComments] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setLoading] = useState(false);
+  const [budget, setBudget] = useState("middle");
 
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -82,7 +100,6 @@ const Home = () => {
 
   const handleFetchCommentsData = async () => {
     const res = await fetchComments().unwrap();
-
     if (res?.status && res?.status == "Success") {
       setComments(res?.data);
     }
@@ -94,7 +111,6 @@ const Home = () => {
       const res = await fetchProducts().unwrap();
       if (res?.status && res?.status === "Success") {
         setProducts(res.data || []);
-        console.log("Fetched Products:", res.data);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -123,6 +139,12 @@ const Home = () => {
     handleFetchCategories();
   }, []);
 
+  // Defer comments fetch until after first paint (faster initial load)
+  useEffect(() => {
+    const t = setTimeout(handleFetchCommentsData, 400);
+    return () => clearTimeout(t);
+  }, []);
+
   const displayCategories = useMemo(() => {
     if (categories.length === 0) return CategoriesJson.map(cat => ({ name: cat }));
     return categories.map((item) => ({
@@ -132,37 +154,54 @@ const Home = () => {
     }));
   }, [categories]);
 
-  const topDealsProducts = useMemo(() =>
+  const baseTopDeals = useMemo(() =>
     Products?.filter(p => p?.category === "topdeals") || [],
     [Products]
   );
-
-  const popularProducts = useMemo(() =>
+  const basePopular = useMemo(() =>
     Products?.filter(p => p?.category === "popular") || [],
     [Products]
   );
-
-  const discoverProducts = useMemo(() =>
+  const baseDiscover = useMemo(() =>
     Products?.filter(p => p?.category === "discover") || [],
     [Products]
   );
-
-  const promotionalProducts = useMemo(() =>
+  const basePromotional = useMemo(() =>
     Products?.filter(p => p?.category === "promotional") || [],
     [Products]
   );
-
-  const recommendedProducts = useMemo(() =>
+  const baseRecommended = useMemo(() =>
     Products?.filter(p => p?.category === "recommended") || [],
     [Products]
+  );
+
+  const topDealsProducts = useMemo(
+    () => filterByBudget(baseTopDeals, budget),
+    [baseTopDeals, budget]
+  );
+  const popularProducts = useMemo(
+    () => filterByBudget(basePopular, budget),
+    [basePopular, budget]
+  );
+  const discoverProducts = useMemo(
+    () => filterByBudget(baseDiscover, budget),
+    [baseDiscover, budget]
+  );
+  const promotionalProducts = useMemo(
+    () => filterByBudget(basePromotional, budget),
+    [basePromotional, budget]
+  );
+  const recommendedProducts = useMemo(
+    () => filterByBudget(baseRecommended, budget),
+    [baseRecommended, budget]
   );
 
   const otherProducts = useMemo(() => {
     const filteredProducts = Products?.filter(p =>
       !["popular", "topdeals", "discover", "promotional", "recommended"].includes(p?.category)
     ) || [];
-
-    const grouped = filteredProducts.reduce((acc, product) => {
+    const byBudget = filterByBudget(filteredProducts, budget);
+    const grouped = byBudget.reduce((acc, product) => {
       const category = product?.category;
       if (!acc[category]) {
         acc[category] = [];
@@ -175,7 +214,7 @@ const Home = () => {
       category,
       products
     }));
-  }, [Products]);
+  }, [Products, budget]);
 
   // Categories that have at least one product (for redirecting empty ones to /subscription)
   const categoriesWithProductsSet = useMemo(() => {
@@ -311,6 +350,9 @@ const Home = () => {
           </motion.div>
         )}
       </Box>
+
+      {/* Country flags, Budget, Cuisine menus - below Shop by Category */}
+      <HomepageDiscoverySection budget={budget} onBudgetChange={setBudget} />
 
       {/* Product Sections with Animations */}
       {topDealsProducts.length > 0 && (

@@ -214,6 +214,31 @@ const Header = () => {
             py={2.5}
             flexWrap="wrap"
           >
+            {/* Desktop Menu icon - opens nav drawer */}
+            <Button
+              leftIcon={<AiOutlineMenu size={20} />}
+              variant="ghost"
+              size="sm"
+              fontSize="0.875rem"
+              fontWeight="600"
+              color="gray.700"
+              px={3}
+              py={2}
+              h="auto"
+              borderRadius="lg"
+              aria-label="Open menu"
+              transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+              _hover={{
+                bg: "white",
+                color: ThemeColors.darkColor,
+                transform: "translateY(-1px)",
+                boxShadow: "0 2px 8px rgba(124, 193, 68, 0.15)",
+              }}
+              _active={{ transform: "translateY(0)" }}
+              onClick={() => setMobileNavOpen(true)}
+            >
+              Menu
+            </Button>
             {visibleNavLinks.map((link) => {
               if (link.isInvite) {
                 return (
@@ -467,7 +492,7 @@ const Header = () => {
               </Box>
             </Link>
 
-            {/* User Menu */}
+            {/* User Menu / Profile */}
             <Menu>
               <MenuButton
                 as={Button}
@@ -486,19 +511,27 @@ const Header = () => {
                 _active={{
                   bg: "green.100",
                 }}
+                aria-label={userInfo ? "Profile menu" : "Account menu"}
               >
                 <HStack spacing={2.5}>
                   <Avatar
-                    size="sm"
+                    size="md"
                     name={userDisplayName}
                     bg={ThemeColors.darkColor}
                     color="white"
-                    fontSize="0.75rem"
+                    fontSize="0.8rem"
                     fontWeight="700"
                   />
-                  <Text fontSize="0.9375rem" fontWeight="600" display={{ base: "none", lg: "block" }}>
-                    {userDisplayName}
-                  </Text>
+                  <Box textAlign="left" display={{ base: "none", lg: "block" }}>
+                    <Text fontSize="0.9375rem" fontWeight="600" lineHeight="tight">
+                      {userDisplayName}
+                    </Text>
+                    {userInfo && (
+                      <Text fontSize="0.7rem" color="gray.500" fontWeight="500">
+                        Profile
+                      </Text>
+                    )}
+                  </Box>
                 </HStack>
               </MenuButton>
               <MenuList
@@ -514,7 +547,7 @@ const Header = () => {
                   <>
                     <Box px={4} py={3} bg="gray.50">
                       <Text fontSize="0.75rem" color="gray.500" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
-                        Account
+                        Profile
                       </Text>
                       <Text fontSize="0.9375rem" fontWeight="600" color="gray.800" mt={1}>
                         {userDisplayName}

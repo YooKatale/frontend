@@ -37,8 +37,9 @@ import {
   useSubscriptionPostMutation,
 } from "@slices/usersApiSlice";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useSelector } from "react-redux";
+import { COUNTRY_MENUS } from "@lib/countryMenusConfig";
 import {
   FaPercent,
   FaCalendarAlt,
@@ -65,9 +66,14 @@ const Subscription = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const plansSectionRef = useRef(null);
 
   const chakraToast = useToast();
   const router = useRouter();
+
+  const scrollToPlans = () => {
+    plansSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const [fetchPackages] = useSubscriptionPackageGetMutation();
   const [createSubscription] = useSubscriptionPostMutation();
@@ -170,6 +176,35 @@ const Subscription = () => {
   return (
     <Box minHeight="100vh" bg="white">
       <Container maxW="container.xl" px={{ base: 4, md: 6 }} py={{ base: 6, md: 10 }}>
+        {/* Browse by menu — names only, click scrolls to plans */}
+        <Box mb={{ base: 6, md: 8 }}>
+          <Heading size="md" mb={3} color="gray.800" fontWeight="700">
+            Browse by menu
+          </Heading>
+          <Flex wrap="wrap" gap={2}>
+            {COUNTRY_MENUS.map((country) => (
+              <Button
+                key={country.code}
+                size="sm"
+                variant="outline"
+                colorScheme="green"
+                borderRadius="full"
+                fontWeight="600"
+                fontSize="0.875rem"
+                borderColor="gray.300"
+                _hover={{
+                  bg: "green.50",
+                  borderColor: ThemeColors.primaryColor,
+                  color: ThemeColors.darkColor,
+                }}
+                onClick={scrollToPlans}
+              >
+                {country.menuName}
+              </Button>
+            ))}
+          </Flex>
+        </Box>
+
         {/* Discount banner — theme colors */}
         <MotionBox
           initial={{ opacity: 0, scale: 0.95 }}
@@ -223,7 +258,7 @@ const Subscription = () => {
         </MotionBox>
 
         {/* Subscription plans */}
-        <Box mb={{ base: 12, md: 16 }}>
+        <Box ref={plansSectionRef} mb={{ base: 12, md: 16 }} scrollMarginTop="24px">
           <VStack spacing={8} align="stretch">
             <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
               <Box textAlign={{ base: "center", md: "left" }} flex="1">
