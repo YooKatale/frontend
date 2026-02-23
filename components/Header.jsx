@@ -61,7 +61,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "@slices/usersApiSlice";
 import { useCartMutation } from "@slices/productsApiSlice";
 import { logout } from "@slices/authSlice";
-import { ThemeColors } from "@constants/constants";
+import { ThemeColors, CLIENT_DASHBOARD_URL } from "@constants/constants";
 import ReferralModal from "@components/ReferralModal";
 
 const Header = () => {
@@ -162,7 +162,7 @@ const Header = () => {
     { label: "Home", href: "/", icon: AiOutlineHome },
     { label: "Categories", href: "/products", icon: AiOutlineAppstore },
     { label: "Marketplace", href: "/marketplace", icon: FaStore },
-    { label: "SELL", href: "/sell", icon: FaStore, isSell: true },
+    { label: "SELL", href: CLIENT_DASHBOARD_URL, icon: FaStore, isSell: true },
     { label: "About", href: "/about", icon: AiOutlineTeam },
     { label: "Blog", href: "/news", icon: FaBlog },
     { label: "Careers", href: "/careers", icon: FaBriefcase },
@@ -214,31 +214,6 @@ const Header = () => {
             py={2.5}
             flexWrap="wrap"
           >
-            {/* Desktop Menu icon - opens nav drawer */}
-            <Button
-              leftIcon={<AiOutlineMenu size={20} />}
-              variant="ghost"
-              size="sm"
-              fontSize="0.875rem"
-              fontWeight="600"
-              color="gray.700"
-              px={3}
-              py={2}
-              h="auto"
-              borderRadius="lg"
-              aria-label="Open menu"
-              transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
-              _hover={{
-                bg: "white",
-                color: ThemeColors.darkColor,
-                transform: "translateY(-1px)",
-                boxShadow: "0 2px 8px rgba(124, 193, 68, 0.15)",
-              }}
-              _active={{ transform: "translateY(0)" }}
-              onClick={() => setMobileNavOpen(true)}
-            >
-              Menu
-            </Button>
             {visibleNavLinks.map((link) => {
               if (link.isInvite) {
                 return (
@@ -492,7 +467,7 @@ const Header = () => {
               </Box>
             </Link>
 
-            {/* User Menu / Profile */}
+            {/* User Menu */}
             <Menu>
               <MenuButton
                 as={Button}
@@ -511,27 +486,19 @@ const Header = () => {
                 _active={{
                   bg: "green.100",
                 }}
-                aria-label={userInfo ? "Profile menu" : "Account menu"}
               >
                 <HStack spacing={2.5}>
                   <Avatar
-                    size="md"
+                    size="sm"
                     name={userDisplayName}
                     bg={ThemeColors.darkColor}
                     color="white"
-                    fontSize="0.8rem"
+                    fontSize="0.75rem"
                     fontWeight="700"
                   />
-                  <Box textAlign="left" display={{ base: "none", lg: "block" }}>
-                    <Text fontSize="0.9375rem" fontWeight="600" lineHeight="tight">
-                      {userDisplayName}
-                    </Text>
-                    {userInfo && (
-                      <Text fontSize="0.7rem" color="gray.500" fontWeight="500">
-                        Profile
-                      </Text>
-                    )}
-                  </Box>
+                  <Text fontSize="0.9375rem" fontWeight="600" display={{ base: "none", lg: "block" }}>
+                    {userDisplayName}
+                  </Text>
                 </HStack>
               </MenuButton>
               <MenuList
@@ -547,7 +514,7 @@ const Header = () => {
                   <>
                     <Box px={4} py={3} bg="gray.50">
                       <Text fontSize="0.75rem" color="gray.500" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
-                        Profile
+                        Account
                       </Text>
                       <Text fontSize="0.9375rem" fontWeight="600" color="gray.800" mt={1}>
                         {userDisplayName}
@@ -846,9 +813,8 @@ const Header = () => {
                   }
                   if (link.isSell) {
                     return (
-                      <Box
+                      <Link
                         key="sell"
-                        as={Link}
                         href={link.href}
                         onClick={closeMobileNav}
                         display="block"
@@ -871,7 +837,7 @@ const Header = () => {
                         >
                           {link.label}
                         </Flex>
-                      </Box>
+                      </Link>
                     );
                   }
                   return (

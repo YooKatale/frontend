@@ -14,10 +14,6 @@ import { motion } from "framer-motion";
 import { Box, Skeleton, SkeletonText } from "@chakra-ui/react";
 import Hero from "@components/Hero";
 import CategoryCard from "@components/cards/CategoryCard";
-import ResponsiveBackground from "@components/cards/ResponsiveBackground";
-import Subscription from "@components/cards/SubscriptionSection";
-import HomepageDiscoverySection from "@components/HomepageDiscoverySection";
-import SwipperComponent from "@components/Swiper";
 import LoaderSkeleton from "@components/LoaderSkeleton";
 
 const DynamicButton = dynamic(() => import("@components/Button"), {
@@ -25,30 +21,17 @@ const DynamicButton = dynamic(() => import("@components/Button"), {
 });
 const DynamicSpecialProducts = dynamic(
   () => import("@components/SpecialProducts"),
-  {
-    loading: () => <p>Loading...</p>,
-  }
+  { loading: () => <Box py={8}><Skeleton height="200px" borderRadius="lg" /></Box> }
 );
-const DynamicMealCalendarSection = dynamic(
-  () => import("@components/MealCalendarSection"),
-  { loading: () => <Box py={4} height="120px" bg="gray.100" borderRadius="lg" mx={2} /> }
+const DynamicResponsiveBackground = dynamic(
+  () => import("@components/cards/ResponsiveBackground"),
+  { loading: () => <Box height={{ base: "50px", sm: "70px", md: "100px" }} /> }
+);
+const DynamicSubscription = dynamic(
+  () => import("@components/cards/SubscriptionSection"),
+  { loading: () => <Box minH="280px" /> }
 );
 
-/** Budget filter price ranges (UGX) */
-const BUDGET_LOW_MAX = 50000;
-const BUDGET_MIDDLE_MIN = 50000;
-const BUDGET_MIDDLE_MAX = 150000;
-const BUDGET_HIGH_MIN = 150000;
-function filterByBudget(products, budget) {
-  if (!Array.isArray(products) || !budget || budget === "all") return products;
-  return products.filter((p) => {
-    const price = Number(p?.price) || 0;
-    if (budget === "low") return price < BUDGET_LOW_MAX;
-    if (budget === "middle") return price >= BUDGET_MIDDLE_MIN && price <= BUDGET_MIDDLE_MAX;
-    if (budget === "high") return price > BUDGET_HIGH_MIN;
-    return true;
-  });
-}
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -90,7 +73,6 @@ const Home = () => {
   const [Comments, setComments] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  const [budget, setBudget] = useState("middle");
 
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -100,6 +82,7 @@ const Home = () => {
 
   const handleFetchCommentsData = async () => {
     const res = await fetchComments().unwrap();
+
     if (res?.status && res?.status == "Success") {
       setComments(res?.data);
     }
@@ -111,6 +94,7 @@ const Home = () => {
       const res = await fetchProducts().unwrap();
       if (res?.status && res?.status === "Success") {
         setProducts(res.data || []);
+        console.log("Fetched Products:", res.data);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -123,10 +107,9 @@ const Home = () => {
   const handleFetchCategories = async () => {
     try {
       const res = await fetchCategories().unwrap();
-      if (res?.status === "Success" && Array.isArray(res?.data)) {
-        setCategories(res.data);
-      } else if (res?.success && res?.categories) {
+      if (res?.success && res?.categories) {
         setCategories(res.categories);
+        console.log("Fetched Categories:", res.categories);
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -137,71 +120,46 @@ const Home = () => {
   useEffect(() => {
     handleFetchProductsData();
     handleFetchCategories();
-  }, []);
-
-  // Defer comments fetch until after first paint (faster initial load)
-  useEffect(() => {
-    const t = setTimeout(handleFetchCommentsData, 400);
-    return () => clearTimeout(t);
+    handleFetchCommentsData();
   }, []);
 
   const displayCategories = useMemo(() => {
-    if (categories.length === 0) return CategoriesJson.map(cat => ({ name: cat }));
-    return categories.map((item) => ({
-      _id: item._id,
-      name: item.category ?? item.name,
-      ...item,
-    }));
+    return categories.length > 0
+      ? categories
+      : CategoriesJson.map(cat => ({ name: cat }));
   }, [categories]);
 
-  const baseTopDeals = useMemo(() =>
+  const topDealsProducts = useMemo(() =>
     Products?.filter(p => p?.category === "topdeals") || [],
     [Products]
   );
-  const basePopular = useMemo(() =>
+
+  const popularProducts = useMemo(() =>
     Products?.filter(p => p?.category === "popular") || [],
     [Products]
   );
-  const baseDiscover = useMemo(() =>
+
+  const discoverProducts = useMemo(() =>
     Products?.filter(p => p?.category === "discover") || [],
     [Products]
   );
-  const basePromotional = useMemo(() =>
+
+  const promotionalProducts = useMemo(() =>
     Products?.filter(p => p?.category === "promotional") || [],
     [Products]
   );
-  const baseRecommended = useMemo(() =>
+
+  const recommendedProducts = useMemo(() =>
     Products?.filter(p => p?.category === "recommended") || [],
     [Products]
-  );
-
-  const topDealsProducts = useMemo(
-    () => filterByBudget(baseTopDeals, budget),
-    [baseTopDeals, budget]
-  );
-  const popularProducts = useMemo(
-    () => filterByBudget(basePopular, budget),
-    [basePopular, budget]
-  );
-  const discoverProducts = useMemo(
-    () => filterByBudget(baseDiscover, budget),
-    [baseDiscover, budget]
-  );
-  const promotionalProducts = useMemo(
-    () => filterByBudget(basePromotional, budget),
-    [basePromotional, budget]
-  );
-  const recommendedProducts = useMemo(
-    () => filterByBudget(baseRecommended, budget),
-    [baseRecommended, budget]
   );
 
   const otherProducts = useMemo(() => {
     const filteredProducts = Products?.filter(p =>
       !["popular", "topdeals", "discover", "promotional", "recommended"].includes(p?.category)
     ) || [];
-    const byBudget = filterByBudget(filteredProducts, budget);
-    const grouped = byBudget.reduce((acc, product) => {
+
+    const grouped = filteredProducts.reduce((acc, product) => {
       const category = product?.category;
       if (!acc[category]) {
         acc[category] = [];
@@ -214,7 +172,7 @@ const Home = () => {
       category,
       products
     }));
-  }, [Products, budget]);
+  }, [Products]);
 
   // Categories that have at least one product (for redirecting empty ones to /subscription)
   const categoriesWithProductsSet = useMemo(() => {
@@ -247,24 +205,16 @@ const Home = () => {
   };
 
   return (
-    <Box 
-      width="100%"
-      maxWidth="100%"
-      margin="0 auto"
-      bg="white"
-      minH="100vh"
-    >
+    <Box width="100%" maxWidth="100%" margin="0 auto" bg="white" minH="100vh">
       {/* Hero Section with Animation */}
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={fadeInUp}
-      >
+      <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
         <Hero />
       </motion.div>
 
-      {/* Categories Section - Glovo Style with YooKatale Colors */}
-      <Box pt={{ base: "2rem", md: "3rem", lg: "4rem" }} mx="auto" px={{ base: 4, md: 6, lg: 8 }} bg="white">
+      {/* Main content: consistent container and spacing */}
+      <Box maxW="7xl" mx="auto" px={{ base: 4, md: 6, lg: 8 }} pb={12}>
+      {/* Categories Section */}
+      <Box pt={{ base: 6, md: 8, lg: 12 }} bg="white">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -284,7 +234,7 @@ const Home = () => {
           <Box
             height="4px"
             width="100px"
-            margin="0 auto 2.5rem"
+            margin="0 auto 2rem"
             background="#185F2D"
             borderRadius="full"
             boxShadow="0 2px 8px rgba(24, 95, 45, 0.3)"
@@ -351,10 +301,7 @@ const Home = () => {
         )}
       </Box>
 
-      {/* Country flags, Budget, Cuisine menus - below Shop by Category */}
-      <HomepageDiscoverySection budget={budget} onBudgetChange={setBudget} />
-
-      {/* Product Sections with Animations */}
+      {/* Product Sections */}
       {topDealsProducts.length > 0 && (
         <motion.div
           initial="hidden"
@@ -362,7 +309,7 @@ const Home = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeInUp}
         >
-          <Box pt="4rem" mx={2}>
+          <Box pt={{ base: 8, md: 10, lg: 12 }}>
             <Flex direction="column" alignItems="center">
               <Box mx="auto" width="100%">
                 <DynamicSpecialProducts
@@ -377,7 +324,7 @@ const Home = () => {
         </motion.div>
       )}
       
-      <ResponsiveBackground url="/assets/images/new.jpeg" />
+      <DynamicResponsiveBackground url="/assets/images/new.jpeg" />
 
       {popularProducts.length > 0 ? (
         <motion.div
@@ -386,7 +333,7 @@ const Home = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeInUp}
         >
-          <Box pt="4rem" mx={2}>
+          <Box pt={{ base: 8, md: 10, lg: 12 }}>
             <Flex direction="column" alignItems="center">
               <Box width="100%">
                 <DynamicSpecialProducts
@@ -412,7 +359,7 @@ const Home = () => {
         </Heading>
       )}
       
-      <ResponsiveBackground url="/assets/images/b1.jpeg" />
+      <DynamicResponsiveBackground url="/assets/images/b1.jpeg" />
 
       {discoverProducts.length > 0 ? (
         <motion.div
@@ -421,9 +368,9 @@ const Home = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeInUp}
         >
-          <Box pt="4rem" width="100%">
+          <Box pt={{ base: 8, md: 10, lg: 12 }} width="100%">
             <Flex>
-              <Box width="100%" mx={2}>
+              <Box width="100%">
                 <DynamicSpecialProducts
                   Products={discoverProducts}
                   userInfo={userInfo}
@@ -447,7 +394,7 @@ const Home = () => {
         </Heading>
       )}
       
-      <ResponsiveBackground url="/assets/images/b2.jpeg" />
+      <DynamicResponsiveBackground url="/assets/images/b2.jpeg" />
 
       {promotionalProducts.length > 0 ? (
         <motion.div
@@ -456,9 +403,9 @@ const Home = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeInUp}
         >
-          <Box pt="4rem" width="100%">
+          <Box pt={{ base: 8, md: 10, lg: 12 }} width="100%">
             <Flex>
-              <Box width="100%" mx={2}>
+              <Box width="100%">
                 <DynamicSpecialProducts
                   Products={promotionalProducts}
                   userInfo={userInfo}
@@ -482,7 +429,7 @@ const Home = () => {
         </Heading>
       )}
       
-      <ResponsiveBackground url="/assets/images/banner2.jpeg" />
+      <DynamicResponsiveBackground url="/assets/images/banner2.jpeg" />
 
       {recommendedProducts.length > 0 ? (
         <motion.div
@@ -491,9 +438,9 @@ const Home = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeInUp}
         >
-          <Box pt={1} width="100%">
+          <Box pt={{ base: 8, md: 10, lg: 12 }} width="100%">
             <Flex>
-              <Box mx={2} width="100%">
+              <Box width="100%">
                 <DynamicSpecialProducts
                   Products={recommendedProducts}
                   userInfo={userInfo}
@@ -517,14 +464,11 @@ const Home = () => {
         </Heading>
       )}
       
-      <Box width="100%">
-        <Subscription />
+      <Box width="100%" pt={{ base: 8, md: 10, lg: 12 }}>
+        <DynamicSubscription />
       </Box>
 
-      {otherProducts.length > 0 && otherProducts.map((product, index) => {
-        const cat = (product?.category || "").toLowerCase().trim();
-        const isMealCategory = cat === "breakfast" || cat === "lunch" || cat === "supper";
-        return (
+      {otherProducts.length > 0 && otherProducts.map((product, index) => (
         <React.Fragment key={product?.category}>
           <motion.div
             initial="hidden"
@@ -532,19 +476,15 @@ const Home = () => {
             viewport={{ once: true, amount: 0.3 }}
             variants={fadeInUp}
           >
-            <Box pt={2} mx={2}>
+            <Box pt={{ base: 6, md: 8 }}>
               <Flex>
-                <Box width="100%" mx="auto">
-                  {isMealCategory ? (
-                    <DynamicMealCalendarSection mealType={cat} />
-                  ) : (
-                    <DynamicSpecialProducts
-                      Products={product?.products}
-                      userInfo={userInfo}
-                      category={product?.category}
-                      text={product?.category}
-                    />
-                  )}
+                <Box width="100%">
+                  <DynamicSpecialProducts
+                    Products={product?.products}
+                    userInfo={userInfo}
+                    category={product?.category}
+                    text={product?.category}
+                  />
                 </Box>
               </Flex>
             </Box>
@@ -552,21 +492,20 @@ const Home = () => {
 
           {index === 2 && (
             <Box key={`banner2-${index}`}>
-              <ResponsiveBackground url="/assets/images/banner3.jpeg" />
+              <DynamicResponsiveBackground url="/assets/images/banner3.jpeg" />
             </Box>
           )}
 
           {index === otherProducts?.length - 7 && (
             <Box key={`banner3-${index}`}>
-              <ResponsiveBackground url="/assets/images/banner2.jpeg" />
+              <DynamicResponsiveBackground url="/assets/images/banner2.jpeg" />
             </Box>
           )}
         </React.Fragment>
-        );
-      })}
+      ))}
 
-      {/* Testimonials Section with Animation */}
-      <Box>
+      {/* Testimonials Section */}
+      <Box pt={{ base: 8, md: 12 }} borderTopWidth="1px" borderColor="gray.100">
         {Comments?.length > 0 ? (
           <motion.div
             initial="hidden"
@@ -575,13 +514,10 @@ const Home = () => {
             variants={fadeInUp}
           >
             <Box
-              padding={{ base: "3rem 1rem", md: "4rem 2rem" }}
-              borderBottom={"1.7px solid " + ThemeColors.lightColor}
-              position={"relative"}
-              bg="white"
+              padding={{ base: 6, md: 8 }}
+              position="relative"
+              bg="gray.50"
               borderRadius="xl"
-              mx={4}
-              my={8}
               boxShadow="0 4px 6px rgba(0, 0, 0, 0.05)"
             >
               <Box padding={"2rem 0"}>
@@ -607,9 +543,12 @@ const Home = () => {
               </Box>
               <Box>
                 <Box
-                  cursor={"pointer"}
-                  position={"absolute"}
-                  top={"50%"}
+                  as="button"
+                  type="button"
+                  aria-label="Previous testimonial"
+                  cursor="pointer"
+                  position="absolute"
+                  top="50%"
                   left={{ base: "5%", md: "10%", xl: "15%" }}
                   p={2}
                   borderRadius="full"
@@ -617,13 +556,17 @@ const Home = () => {
                   boxShadow="0 2px 8px rgba(0,0,0,0.1)"
                   _hover={{ bg: "gray.50", transform: "scale(1.1)" }}
                   transition="all 0.2s"
+                  onClick={decreaseSliderIndex}
                 >
-                  <AiOutlineArrowLeft size={35} onClick={decreaseSliderIndex} />
+                  <AiOutlineArrowLeft size={35} />
                 </Box>
                 <Box
-                  cursor={"pointer"}
-                  position={"absolute"}
-                  top={"50%"}
+                  as="button"
+                  type="button"
+                  aria-label="Next testimonial"
+                  cursor="pointer"
+                  position="absolute"
+                  top="50%"
                   right={{ base: "5%", md: "10%", xl: "15%" }}
                   p={2}
                   borderRadius="full"
@@ -631,8 +574,9 @@ const Home = () => {
                   boxShadow="0 2px 8px rgba(0,0,0,0.1)"
                   _hover={{ bg: "gray.50", transform: "scale(1.1)" }}
                   transition="all 0.2s"
+                  onClick={increaseSliderIndex}
                 >
-                  <AiOutlineArrowRight size={35} onClick={increaseSliderIndex} />
+                  <AiOutlineArrowRight size={35} />
                 </Box>
               </Box>
               <Flex>
@@ -684,9 +628,8 @@ const Home = () => {
               </Flex>
             </Box>
           </motion.div>
-        ) : (
-          ""
-        )}
+        ) : null}
+      </Box>
       </Box>
     </Box>
   );

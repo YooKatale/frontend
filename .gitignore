@@ -38,6 +38,8 @@ credentials.json
 *.key
 *.pem
 *.cert
+# Generated at build from template (contains env-injected Firebase config - do not commit)
+public/firebase-messaging-sw.js
 
 # vercel
 .vercel

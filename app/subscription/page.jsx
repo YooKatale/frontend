@@ -37,9 +37,8 @@ import {
   useSubscriptionPostMutation,
 } from "@slices/usersApiSlice";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { COUNTRY_MENUS } from "@lib/countryMenusConfig";
 import {
   FaPercent,
   FaCalendarAlt,
@@ -52,7 +51,6 @@ import {
   FaUsers,
   FaChartLine,
   FaLeaf,
-  FaSync,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 
@@ -64,16 +62,10 @@ const themeBorder = `${ThemeColors.primaryColor}25`;
 const Subscription = () => {
   const [subscriptionPackages, setSubscriptionPackages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const plansSectionRef = useRef(null);
 
   const chakraToast = useToast();
   const router = useRouter();
-
-  const scrollToPlans = () => {
-    plansSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
 
   const [fetchPackages] = useSubscriptionPackageGetMutation();
   const [createSubscription] = useSubscriptionPostMutation();
@@ -91,8 +83,7 @@ const Subscription = () => {
     }
   }, [userInfo, router]);
 
-  const handleSubscriptionCardFetch = useCallback(async () => {
-    setIsRefreshing(true);
+  const handleSubscriptionCardFetch = async () => {
     try {
       const res = await fetchPackages().unwrap();
       if (res?.status === "Success") {
@@ -103,7 +94,6 @@ const Subscription = () => {
             status: "info",
             duration: 3000,
             isClosable: true,
-            position: "top-right",
           });
         }
         setSubscriptionPackages(res?.data || []);
@@ -114,21 +104,18 @@ const Subscription = () => {
     } catch (error) {
       console.error("Error fetching subscription packages:", error);
       chakraToast({
-        title: "Could not load plans",
-        description: "Failed to load subscription packages. Please try again.",
+        title: "Error",
+        description: "Failed to load subscription packages",
         status: "error",
-        duration: 6000,
+        duration: 5000,
         isClosable: true,
-        position: "top-right",
       });
-    } finally {
-      setIsRefreshing(false);
     }
-  }, [fetchPackages, chakraToast]);
+  };
 
   useEffect(() => {
     handleSubscriptionCardFetch();
-  }, [handleSubscriptionCardFetch]);
+  }, []);
 
   const handleSubmit = async (ID) => {
     if (!userInfo?._id) {
@@ -176,35 +163,6 @@ const Subscription = () => {
   return (
     <Box minHeight="100vh" bg="white">
       <Container maxW="container.xl" px={{ base: 4, md: 6 }} py={{ base: 6, md: 10 }}>
-        {/* Browse by menu — names only, click scrolls to plans */}
-        <Box mb={{ base: 6, md: 8 }}>
-          <Heading size="md" mb={3} color="gray.800" fontWeight="700">
-            Browse by menu
-          </Heading>
-          <Flex wrap="wrap" gap={2}>
-            {COUNTRY_MENUS.map((country) => (
-              <Button
-                key={country.code}
-                size="sm"
-                variant="outline"
-                colorScheme="green"
-                borderRadius="full"
-                fontWeight="600"
-                fontSize="0.875rem"
-                borderColor="gray.300"
-                _hover={{
-                  bg: "green.50",
-                  borderColor: ThemeColors.primaryColor,
-                  color: ThemeColors.darkColor,
-                }}
-                onClick={scrollToPlans}
-              >
-                {country.menuName}
-              </Button>
-            ))}
-          </Flex>
-        </Box>
-
         {/* Discount banner — theme colors */}
         <MotionBox
           initial={{ opacity: 0, scale: 0.95 }}
@@ -258,30 +216,17 @@ const Subscription = () => {
         </MotionBox>
 
         {/* Subscription plans */}
-        <Box ref={plansSectionRef} mb={{ base: 12, md: 16 }} scrollMarginTop="24px">
+        <Box mb={{ base: 12, md: 16 }}>
           <VStack spacing={8} align="stretch">
-            <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
-              <Box textAlign={{ base: "center", md: "left" }} flex="1">
-                <Heading size="xl" mb={3} color={ThemeColors.primaryColor}>
-                  Choose Your Perfect Plan
-                </Heading>
-                <Text color="gray.600" maxW="2xl">
-                  Select from our carefully crafted meal plans designed to fit your
-                  lifestyle and dietary preferences.
-                </Text>
-              </Box>
-              <Button
-                variant="outline"
-                size="sm"
-                colorScheme="green"
-                leftIcon={<Icon as={FaSync} />}
-                onClick={handleSubscriptionCardFetch}
-                isLoading={isRefreshing}
-                loadingText="Refreshing..."
-              >
-                Refresh plans
-              </Button>
-            </Flex>
+            <Box textAlign="center">
+              <Heading size="xl" mb={3} color={ThemeColors.primaryColor}>
+                Choose Your Perfect Plan
+              </Heading>
+              <Text color="gray.600" maxW="2xl" mx="auto">
+                Select from our carefully crafted meal plans designed to fit your
+                lifestyle and dietary preferences.
+              </Text>
+            </Box>
 
             {subscriptionPackages.length > 0 ? (
               <ScaleFade in={subscriptionPackages.length > 0}>

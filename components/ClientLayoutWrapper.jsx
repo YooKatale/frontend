@@ -11,7 +11,8 @@ import AppStoreRatingPrompt from "@components/AppStoreRatingPrompt";
 import PlatformFeedbackModal from "@components/PlatformFeedbackModal";
 import dynamic from "next/dynamic";
 import LocationGate from "@components/LocationGate";
-import SupportChatWidget from "@components/SupportChatWidget";
+
+const SupportChatWidget = dynamic(() => import("@components/SupportChatWidget"), { ssr: false });
 
 const NO_NAVBAR_FOOTER = ["/signin", "/signup"];
 
