@@ -44,13 +44,12 @@ import {
 } from "react-icons/ri";
 import { HiOutlineDeviceMobile } from "react-icons/hi";
 import Image from "next/image";
-import { useSelector } from "react-redux";
-import { selectAuth } from "@slices/authSlice";
+import { useAuth } from "@slices/authSlice";
 import NewsletterForm from "./NewsletterForm";
 import ReferralModal from "./ReferralModal";
 
 const Footer = () => {
-  const { userInfo } = useSelector(selectAuth);
+  const { userInfo } = useAuth();
   const [NewsletterEmail, setNewsletterEmail] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState("");

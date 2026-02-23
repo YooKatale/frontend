@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
 import { initializeFCM, setupForegroundMessageListener } from "@lib/fcmService";
 import { startNotificationPolling } from "@lib/notificationPolling";
+import { useAuth } from "@slices/authSlice";
 
 const ServiceWorker = () => {
-  // Safely get userInfo from Redux store, default to null if not available
-  const userInfo = useSelector((state) => state?.auth?.userInfo || null);
+  const { userInfo } = useAuth();
 
   async function handleSend() {
     try {

@@ -60,12 +60,12 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "@slices/usersApiSlice";
 import { useCartMutation } from "@slices/productsApiSlice";
-import { logout, selectAuth } from "@slices/authSlice";
+import { logout, useAuth } from "@slices/authSlice";
 import { ThemeColors, CLIENT_DASHBOARD_URL } from "@constants/constants";
 import ReferralModal from "@components/ReferralModal";
 
 const Header = () => {
-  const { userInfo } = useSelector(selectAuth);
+  const { userInfo } = useAuth();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [cartItemsCount, setCartItemsCount] = useState(0);

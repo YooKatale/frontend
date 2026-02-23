@@ -8,8 +8,7 @@ import { useCommentsGetMutation } from "@slices/usersApiSlice";
 import dynamic from "next/dynamic";
 import { useEffect, useState, useMemo } from "react";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
-import { useSelector } from "react-redux";
-import { selectAuth } from "@slices/authSlice";
+import { useAuth } from "@slices/authSlice";
 import { motion } from "framer-motion";
 
 import { Box, Skeleton, SkeletonText } from "@chakra-ui/react";
@@ -72,7 +71,7 @@ const Home = () => {
   const [categories, setCategories] = useState([]);
   const [isLoading, setLoading] = useState(false);
 
-  const { userInfo } = useSelector(selectAuth);
+  const { userInfo } = useAuth();
 
   const [fetchProducts] = useProductsGetMutation();
   const [fetchComments] = useCommentsGetMutation();
