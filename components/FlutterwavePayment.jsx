@@ -4,9 +4,10 @@ import { closePaymentModal, useFlutterwave } from "flutterwave-react-v3";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import { selectAuth } from "@slices/authSlice";
 
 const FlutterwavePayment = ({ data, callback, closeComponent }) => {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector(selectAuth);
   const router = useRouter();
   const launched = useRef(false);
 

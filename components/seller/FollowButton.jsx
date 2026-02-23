@@ -3,6 +3,7 @@
 import { Button, HStack, Text, Spinner, useToast } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { selectAuth } from "@slices/authSlice";
 import {
   useFollowSellerMutation,
   useUnfollowSellerMutation,
@@ -13,7 +14,7 @@ import { ThemeColors } from "@constants/constants";
 import { RiUserFollowLine, RiUserUnfollowLine } from "react-icons/ri";
 
 export default function FollowButton({ sellerId, size = "md" }) {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector(selectAuth);
   const toast = useToast();
   const [isFollowingState, setIsFollowingState] = useState(false);
 

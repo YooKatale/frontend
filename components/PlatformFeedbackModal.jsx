@@ -23,6 +23,7 @@ import {
 import { ThemeColors } from "@constants/constants";
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { selectAuth } from "@slices/authSlice";
 import { Star, X, Send } from "lucide-react";
 import { usePlatformFeedbackCreateMutation } from "@slices/usersApiSlice";
 
@@ -35,7 +36,7 @@ const PlatformFeedbackModal = () => {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [userAgent, setUserAgent] = useState("");
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector(selectAuth);
   const chakraToast = useToast();
   const [createPlatformFeedback] = usePlatformFeedbackCreateMutation();
 

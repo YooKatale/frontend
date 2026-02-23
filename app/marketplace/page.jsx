@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { selectAuth } from "@slices/authSlice";
 import {
   useProductsGetMutation,
   useProductsCategoriesGetMutation,
@@ -51,7 +52,7 @@ export default function MarketplacePage() {
     ratings: [],
   });
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector(selectAuth);
   const chakraToast = useToast();
 
   const [fetchProducts] = useProductsGetMutation();

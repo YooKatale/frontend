@@ -14,6 +14,7 @@ import { useOrdersMutation } from "@slices/productsApiSlice";
 
 import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
+import { selectAuth } from "@slices/authSlice";
 import { ref, onValue, off } from "firebase/database";
 import { db as firebaseDb } from "@lib/firebase";
 
@@ -29,7 +30,7 @@ const OrdersTab = () => {
 
   const chakraToast = useToast();
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector(selectAuth);
 
   const fetchData = async () => {
     if (!userInfo?._id) return;
