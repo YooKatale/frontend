@@ -64,7 +64,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
   const [mealSlots, setMealSlots] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const router = useRouter();
   const [createSchedule] = useNewScheduleMutation();
   const [createPlanRating] = usePlanRatingCreateMutation();

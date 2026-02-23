@@ -30,7 +30,7 @@ const AppStoreRatingPrompt = () => {
   const [showStoreRedirect, setShowStoreRedirect] = useState(false);
   const [userAgent, setUserAgent] = useState("");
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const chakraToast = useToast();
   const [createAppRating] = useAppRatingCreateMutation();
 

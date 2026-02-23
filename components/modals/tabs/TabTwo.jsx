@@ -70,7 +70,7 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
   const [createCartCheckout] = useCartCheckoutMutation();
   const router = useRouter();
   const chakraToast = useToast();
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [receiptId, setReceiptId] = useState("");
   const [orderId, setOrderId] = useState("");

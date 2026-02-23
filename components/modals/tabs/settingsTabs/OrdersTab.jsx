@@ -29,7 +29,7 @@ const OrdersTab = () => {
 
   const chakraToast = useToast();
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
 
   const fetchData = async () => {
     if (!userInfo?._id) return;

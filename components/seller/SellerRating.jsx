@@ -32,7 +32,7 @@ import { ThemeColors } from "@constants/constants";
 import { RiStarFill, RiStarLine } from "react-icons/ri";
 
 export default function SellerRating({ sellerId }) {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const toast = useToast();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);

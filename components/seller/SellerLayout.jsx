@@ -45,7 +45,7 @@ const nav = [
 ];
 
 export default function SellerLayout({ children }) {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const pathname = usePathname();
   const router = useRouter();
   const [lastSeen] = useLastSeenMutation();

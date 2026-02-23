@@ -43,7 +43,7 @@ const MealSubscriptionSelector = ({ planType = "premium", incomeLevel: propIncom
   const [incomeLevel, setIncomeLevel] = useState(propIncomeLevel);
   const toast = useToast();
   const router = useRouter();
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const [createSubscription] = useSubscriptionPostMutation();
   const [createSchedule] = useNewScheduleMutation();
 

@@ -30,7 +30,7 @@ const Advertising = () => {
   const [createAdvertisement] = useAdvertisementPostMutation();
   const [isLoading, setIsLoading] = useState(false);
   const [advertId, setAdvertId] = useState(null);
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
 
   // check if user logged in
   if (!userInfo || userInfo == {} || userInfo == "") {

@@ -70,7 +70,7 @@ const Subscription = () => {
   const [fetchPackages] = useSubscriptionPackageGetMutation();
   const [createSubscription] = useSubscriptionPostMutation();
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   useEffect(() => {

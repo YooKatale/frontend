@@ -68,7 +68,7 @@ const Partner = () => {
   const [activeTab, setActiveTab] = useState(0);
   const chakraToast = useToast();
   const router = useRouter();
-  const { userInfo } = useSelector((state) => state.auth || {});
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
 
   // Vendor Form State
   const [vendorFormData, setVendorFormData] = useState({

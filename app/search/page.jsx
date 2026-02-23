@@ -16,7 +16,7 @@ const Search = () => {
   // use the useSearchParam hooks from next/navigation to get url params
   const searchParam = useSearchParams();
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
 
   const param = searchParam.get("q");
 

@@ -36,7 +36,7 @@ import SettingsTab from "@components/modals/tabs/settingsTabs/SettingsTab";
 import SubscriptionsTab from "@components/modals/tabs/settingsTabs/SubscriptionsTab";
 
 const Account = () => {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const [activeTab, setActiveTab] = useState("general");
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({

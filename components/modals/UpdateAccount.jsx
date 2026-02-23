@@ -24,7 +24,7 @@ import { setCredentials } from "@slices/authSlice";
 import { ThemeColors } from "@constants/constants";
 
 const UpdateAccount = ({ isOpen, onClose }) => {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const dispatch = useDispatch();
   const toast = useToast();
   const [isLoading, setLoading] = useState(false);

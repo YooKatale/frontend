@@ -49,7 +49,7 @@ import { FaTicketAlt, FaPlus, FaCopy, FaCheckCircle } from "react-icons/fa";
 const MotionCard = motion(Card);
 
 export default function GiftCardsPage() {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const router = useRouter();
   const toast = useToast();
   const { isOpen: isPurchaseOpen, onOpen: openPurchase, onClose: closePurchase } = useDisclosure();

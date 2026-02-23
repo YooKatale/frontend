@@ -32,4 +32,7 @@ const authSlice = createSlice({
 
 export const { setCredentials, logout } = authSlice.actions;
 
+/** Safe selector: prevents "Cannot destructure property 'auth' of undefined" when state is missing (e.g. during hydration). */
+export const selectAuth = (state) => (state && state.auth) ? state.auth : { userInfo: null };
+
 export default authSlice.reducer;

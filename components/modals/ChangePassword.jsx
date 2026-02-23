@@ -26,7 +26,7 @@ import { DB_URL } from "@config/config";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const ChangePassword = ({ isOpen, onClose }) => {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const toast = useToast();
   const [isLoading, setLoading] = useState(false);
   const [showCurrent, setShowCurrent] = useState(false);

@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const PopupAd = () => {
   const [display, setDisplay] = useState(false);
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   console.log("user", userInfo);
 
   useEffect(() => {

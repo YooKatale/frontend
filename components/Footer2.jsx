@@ -59,7 +59,7 @@ import NewsletterForm from "./NewsletterForm";
 import ReferralModal from "./ReferralModal";
 
 const Footer2 = () => {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const [NewsletterEmail, setNewsletterEmail] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState("");

@@ -48,7 +48,7 @@ const Payment = ({ params }) => {
   const [validateCoupon] = useValidateCouponMutation();
 
   const chakraToast = useToast();
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const router = useRouter();
 
   const handleDataFetch = useCallback(async () => {

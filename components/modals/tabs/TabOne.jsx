@@ -68,7 +68,7 @@ const themeBg = `${ThemeColors.primaryColor}08`;
 const themeBorder = `${ThemeColors.primaryColor}25`;
 
 const TabOne = ({ updateTabIndex, fetchData }) => {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const [isGuest, setIsGuest] = useState(!userInfo);
   const [activeStep, setActiveStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);

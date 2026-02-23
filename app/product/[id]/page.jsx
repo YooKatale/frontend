@@ -30,7 +30,7 @@ import RatingAndComment from "@components/RatingAndComment";
 
 const Product = ({ params }) => {
   // get user information stored in the localstorage
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
 
   // create state to hold fetched Product information
   const [ProductData, setProductData] = useState({});

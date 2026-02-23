@@ -6,7 +6,7 @@ import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 
 const FlutterwavePayment = ({ data, callback, closeComponent }) => {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const router = useRouter();
   const launched = useRef(false);
 

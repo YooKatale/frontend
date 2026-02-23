@@ -54,7 +54,7 @@ const ScheduleDelivery = () => {
   // chakra functions for controlling modal display
   const { onOpen, onClose, isOpen } = useDisclosure();
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const router = useRouter();
   const [createSchedule] = useNewScheduleMutation();
   const chakraToast = useToast();

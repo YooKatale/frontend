@@ -34,7 +34,7 @@ import { ThemeColors } from "@constants/constants";
 const MotionBox = motion(Box);
 
 function CartPage() {
-  const { cart } = useSelector((state) => state.cart);
+  const { cart } = useSelector((state) => (state?.cart) ?? { cart: [] });
   const [totalPrice, setTotalPrice] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
   const [shippingFee, setShippingFee] = useState(0);

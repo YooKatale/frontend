@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 
 const TabTwo = ({ updateTabIndex, fetchData }) => {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const [deliveryAddress, setDeliveryAddress] = useState({
     address1: "",
     address2: "",

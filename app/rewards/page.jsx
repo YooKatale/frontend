@@ -45,7 +45,7 @@ import { FaGift, FaStar } from "react-icons/fa";
 const MotionCard = motion(Card);
 
 export default function RewardsPage() {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const router = useRouter();
   const toast = useToast();
   const { isOpen: isRedeemOpen, onOpen: openRedeem, onClose: closeRedeem } = useDisclosure();

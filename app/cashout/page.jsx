@@ -82,7 +82,7 @@ import PaymentProviderLogo from "@components/PaymentProviderLogo";
 import { PaymentLogos } from "@constants/constants";
 
 export default function CashoutPage() {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const router = useRouter();
   const toast = useToast();
   const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = useDisclosure();

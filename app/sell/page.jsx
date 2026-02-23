@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 import { ThemeColors } from "@constants/constants";
 
 export default function SellDashboardPage() {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
   const name =
     [userInfo?.firstname, userInfo?.lastname].filter(Boolean).join(" ") ||
     userInfo?.email ||

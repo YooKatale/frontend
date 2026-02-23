@@ -39,7 +39,7 @@ const Products = () => {
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
 
   const [fetchProducts] = useProductsGetMutation();
   const [fetchProductsFilter] = useProductsFilterGetMutation();

@@ -55,7 +55,7 @@ const Cart = () => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const { onOpen, onClose, isOpen } = useDisclosure();
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
 
   /** Resets checkout step to 0 and closes modal. Used by Modal onClose & close button. */
   const handleModalClose = () => {
