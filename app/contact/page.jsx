@@ -20,6 +20,9 @@ import {
   Container,
   VStack,
   HStack,
+  Link,
+  SimpleGrid,
+  Divider,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import { useMessagePostMutation } from "@slices/usersApiSlice";
@@ -27,9 +30,22 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { FiSend, FiUser, FiMail, FiMessageSquare, FiCheckCircle } from "react-icons/fi";
 import { HiOutlineLocationMarker, HiOutlinePhone, HiOutlineClock } from "react-icons/hi";
+import { FaWhatsapp } from "react-icons/fa";
 
 const MotionBox = motion(Box);
 const MotionButton = motion(Button);
+
+// YooKatale contact details
+const YOOKATALE_CONTACT = {
+  phone: "+256 786 118137",
+  phoneRaw: "+256786118137",
+  whatsapp: "256786118137",
+  email: "support@yookatale.app",
+  address: "P.O. Box 74940, Clock-Tower Plot 6, Kampala · Entebbe, Uganda",
+  addressMapUrl: "https://www.google.com/maps/search/Clock+Tower+Plot+6+Kampala+Uganda",
+  businessHours: "Mon–Sat 8am–8pm EAT",
+  responseTime: "Within 24 hours · Usually 2–4 hours",
+};
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -42,28 +58,20 @@ const Contact = () => {
   const [sendMessage, { isLoading: isSending }] = useMessagePostMutation();
   const chakraToast = useToast();
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
+      transition: { staggerChildren: 0.08, delayChildren: 0.15 },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 16, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 12,
-      },
+      transition: { type: "spring", stiffness: 120, damping: 14 },
     },
   };
 
@@ -106,7 +114,6 @@ const Contact = () => {
           icon: <FiCheckCircle />,
         });
 
-        // Reset success state after animation
         setTimeout(() => setIsSubmitted(false), 3000);
       }
     } catch (err) {
@@ -121,22 +128,27 @@ const Contact = () => {
     }
   };
 
-  // Contact info data
-  const contactInfo = [
+  const contactCards = [
     {
       icon: HiOutlineLocationMarker,
       title: "Visit Us",
-      details: "123 Business Street, Suite 100\nNew York, NY 10001",
+      details: YOOKATALE_CONTACT.address,
+      href: YOOKATALE_CONTACT.addressMapUrl,
+      label: "Get directions",
     },
     {
       icon: HiOutlinePhone,
       title: "Call Us",
-      details: "+1 (555) 123-4567\nMon-Fri: 9AM-6PM EST",
+      details: YOOKATALE_CONTACT.phone,
+      sub: YOOKATALE_CONTACT.businessHours,
+      href: `tel:${YOOKATALE_CONTACT.phoneRaw}`,
+      label: "Call now",
     },
     {
       icon: HiOutlineClock,
       title: "Response Time",
-      details: "Within 24 hours\nTypically 2-4 hours",
+      details: YOOKATALE_CONTACT.responseTime,
+      sub: "We reply quickly",
     },
   ];
 
@@ -146,196 +158,239 @@ const Contact = () => {
       id="contact"
       position="relative"
       overflow="hidden"
-      bgGradient="linear(to-b, white, gray.50)"
+      bg="gray.50"
       minH="100vh"
-      py={{ base: "5rem", md: "6rem", xl: "7rem" }}
+      py={{ base: 8, md: 12, xl: 16 }}
     >
-      {/* Background decorative elements - YooKatale themed */}
+      {/* Subtle background */}
       <Box
         position="absolute"
-        top="-20%"
-        right="-10%"
-        w="400px"
-        h="400px"
+        top="-10%"
+        right="-5%"
+        w={{ base: "200px", md: "360px" }}
+        h={{ base: "200px", md: "360px" }}
         borderRadius="full"
-        bg="green.50"
-        opacity="0.6"
-        filter="blur(60px)"
-        zIndex="0"
+        bg={ThemeColors.primaryColor}
+        opacity={0.04}
+        filter="blur(80px)"
+        zIndex={0}
       />
       <Box
         position="absolute"
-        bottom="-10%"
-        left="-10%"
-        w="300px"
-        h="300px"
+        bottom="-5%"
+        left="-5%"
+        w={{ base: "180px", md: "280px" }}
+        h={{ base: "180px", md: "280px" }}
         borderRadius="full"
-        bg="green.50"
-        opacity="0.4"
-        filter="blur(50px)"
-        zIndex="0"
+        bg={ThemeColors.secondaryColor}
+        opacity={0.05}
+        filter="blur(60px)"
+        zIndex={0}
       />
 
-      <Container maxW="container.xl" position="relative" zIndex="1">
-        <VStack spacing={{ base: 8, md: 12 }}>
-          {/* Header Section */}
-          <MotionBox
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            textAlign="center"
-            maxW="800px"
-          >
+      <Container maxW="container.xl" position="relative" zIndex={1}>
+        <MotionBox
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+        >
+          {/* Hero */}
+          <VStack spacing={4} textAlign="center" maxW="720px" mx="auto" mb={{ base: 10, md: 14 }}>
             <MotionBox variants={itemVariants}>
               <Text
-                fontSize="sm"
-                fontWeight="semibold"
+                fontSize="xs"
+                fontWeight="700"
                 color={ThemeColors.primaryColor}
-                letterSpacing="wide"
+                letterSpacing="wider"
                 textTransform="uppercase"
-                mb="3"
               >
-                Get In Touch
+                Get in touch
               </Text>
             </MotionBox>
-
             <MotionBox variants={itemVariants}>
               <Heading
-                as="h2"
-                fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}
-                fontWeight="bold"
-                lineHeight="shorter"
-                mb="4"
-                bgGradient={`linear(to-r, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`}
-                bgClip="text"
+                as="h1"
+                fontSize={{ base: "2.5rem", md: "3.5rem", lg: "4rem" }}
+                fontWeight="800"
+                lineHeight="1.1"
+                letterSpacing="tight"
+                color="gray.900"
               >
-                Let's Start a Conversation
+                Contact{" "}
+                <Box as="span" color={ThemeColors.primaryColor}>
+                  YooKatale
+                </Box>
               </Heading>
             </MotionBox>
-
             <MotionBox variants={itemVariants}>
-              <Text
-                fontSize={{ base: "lg", md: "xl" }}
-                color="gray.600"
-                maxW="600px"
-                mx="auto"
-                lineHeight="tall"
-              >
-                Have questions or ready to collaborate? Send us a message and our team will respond promptly.
+              <Text fontSize={{ base: "md", md: "lg" }} color="gray.600" lineHeight="tall">
+                Questions, orders, or partnerships? Send a message or call us. We’re here to help.
               </Text>
             </MotionBox>
-          </MotionBox>
 
-          {/* Contact Cards */}
-          <Grid
-            templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }}
-            gap={{ base: 6, md: 8 }}
-            width="full"
-            mb={{ base: 8, md: 12 }}
-          >
-            {contactInfo.map((info, index) => (
-              <MotionBox
-                key={index}
-                variants={itemVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+            {/* Quick contact strip */}
+            <MotionBox variants={itemVariants} w="full" pt={2}>
+              <Flex
+                flexWrap="wrap"
+                justify="center"
+                gap={3}
+                p={4}
+                borderRadius="xl"
+                bg="white"
+                boxShadow="sm"
+                border="1px solid"
+                borderColor="gray.100"
               >
-                <ScaleFade in={true} delay={index * 0.1}>
-                  <VStack
-                    spacing="4"
-                    p="6"
+                <Button
+                  as={Link}
+                  href={`tel:${YOOKATALE_CONTACT.phoneRaw}`}
+                  size="sm"
+                  colorScheme="green"
+                  leftIcon={<HiOutlinePhone />}
+                  _hover={{ textDecoration: "none" }}
+                >
+                  {YOOKATALE_CONTACT.phone}
+                </Button>
+                <Button
+                  as={Link}
+                  href={`https://wa.me/${YOOKATALE_CONTACT.whatsapp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  size="sm"
+                  colorScheme="green"
+                  variant="outline"
+                  leftIcon={<FaWhatsapp />}
+                  _hover={{ textDecoration: "none" }}
+                >
+                  WhatsApp
+                </Button>
+                <Button
+                  as={Link}
+                  href={`mailto:${YOOKATALE_CONTACT.email}`}
+                  size="sm"
+                  variant="ghost"
+                  colorScheme="gray"
+                  leftIcon={<FiMail />}
+                  _hover={{ textDecoration: "none" }}
+                >
+                  {YOOKATALE_CONTACT.email}
+                </Button>
+              </Flex>
+            </MotionBox>
+          </VStack>
+
+          {/* Contact cards */}
+          <SimpleGrid
+            columns={{ base: 1, md: 3 }}
+            spacing={{ base: 4, md: 6 }}
+            mb={{ base: 10, md: 14 }}
+          >
+            {contactCards.map((card, index) => (
+              <MotionBox key={card.title} variants={itemVariants}>
+                <ScaleFade in initialDelay={index * 0.08}>
+                  <Box
+                    as={card.href ? Link : Box}
+                    href={card.href}
+                    target={card.href?.startsWith("http") ? "_blank" : undefined}
+                    rel={card.href?.startsWith("http") ? "noopener noreferrer" : undefined}
+                    _hover={card.href ? { textDecoration: "none" } : undefined}
+                    p={6}
+                    h="full"
                     bg="white"
-                    borderRadius="xl"
-                    boxShadow="lg"
+                    borderRadius="2xl"
+                    boxShadow="sm"
                     border="1px solid"
                     borderColor="gray.100"
-                    textAlign="center"
-                    height="full"
-                    transition="all 0.3s"
+                    transition="all 0.2s ease"
                     _hover={{
-                      transform: "translateY(-4px)",
-                      boxShadow: "xl",
                       borderColor: ThemeColors.primaryColor,
+                      boxShadow: "md",
+                      transform: "translateY(-2px)",
                     }}
                   >
                     <Flex
-                      w="60px"
-                      h="60px"
+                      w="12"
+                      h="12"
                       align="center"
                       justify="center"
-                      borderRadius="full"
-                      bgGradient="linear(to-br, green.50, green.100)"
+                      borderRadius="xl"
+                      bg={`${ThemeColors.primaryColor}12`}
                       color={ThemeColors.primaryColor}
+                      mb={4}
                     >
-                      <Icon as={info.icon} boxSize="28px" />
+                      <Icon as={card.icon} boxSize="6" />
                     </Flex>
-                    <Text fontWeight="semibold" fontSize="lg">
-                      {info.title}
+                    <Text fontWeight="700" fontSize="lg" color="gray.900" mb={2}>
+                      {card.title}
                     </Text>
-                    <Text color="gray.600" whiteSpace="pre-line" fontSize="sm">
-                      {info.details}
+                    <Text color="gray.600" fontSize="sm" lineHeight="tall" whiteSpace="pre-line">
+                      {card.details}
                     </Text>
-                  </VStack>
+                    {card.sub && (
+                      <Text color="gray.500" fontSize="xs" mt={2}>
+                        {card.sub}
+                      </Text>
+                    )}
+                    {card.label && (
+                      <Text
+                        mt={3}
+                        fontSize="sm"
+                        fontWeight="600"
+                        color={ThemeColors.primaryColor}
+                        _hover={{ textDecoration: "underline" }}
+                      >
+                        {card.label} →
+                      </Text>
+                    )}
+                  </Box>
                 </ScaleFade>
               </MotionBox>
             ))}
-          </Grid>
+          </SimpleGrid>
 
-          {/* Form Section */}
+          <Divider borderColor="gray.200" mb={{ base: 8, md: 12 }} />
+
+          {/* Form + success */}
           <Flex
             direction={{ base: "column", lg: "row" }}
             gap={{ base: 8, lg: 12 }}
-            width="full"
             align="stretch"
           >
-            <MotionBox
-              flex="1"
-              variants={itemVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              <SlideFade in={true} offsetY="20px">
+            <MotionBox flex="1" variants={itemVariants}>
+              <SlideFade in offsetY="12px">
                 <Box
                   p={{ base: 6, md: 8 }}
                   bg="white"
                   borderRadius="2xl"
-                  boxShadow="xl"
+                  boxShadow="sm"
                   border="1px solid"
-                  borderColor="gray.200"
-                  height="full"
+                  borderColor="gray.100"
                   ref={formRef}
                 >
+                  <Heading size="md" mb={6} color="gray.800">
+                    Send a message
+                  </Heading>
                   <form onSubmit={handleSubmit}>
-                    <VStack spacing="6" align="stretch">
+                    <VStack spacing={5} align="stretch">
                       <ScaleFade in={!isSubmitted} unmountOnExit>
-                        <Grid
-                          templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
-                          gap="6"
-                        >
+                        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={5}>
                           <FormControl isInvalid={!!formErrors.name}>
-                            <FormLabel htmlFor="name" fontWeight="medium" color="gray.700">
-                              <HStack spacing="2">
-                                <Icon as={FiUser} color="gray.500" />
-                                <Text>Full Name</Text>
-                              </HStack>
+                            <FormLabel fontWeight="600" color="gray.700" fontSize="sm">
+                              Full name
                             </FormLabel>
                             <Input
                               type="text"
-                              placeholder="John Doe"
+                              placeholder="e.g. Nakato Okello"
                               name="name"
                               value={name}
                               size="lg"
-                              variant="filled"
-                              bg="gray.50"
+                              variant="outline"
                               border="2px solid"
-                              borderColor="transparent"
-                              _hover={{ bg: "gray.100" }}
+                              borderColor="gray.200"
+                              _placeholder={{ color: "gray.400" }}
+                              _hover={{ borderColor: "gray.300" }}
                               _focus={{
-                                bg: "white",
                                 borderColor: ThemeColors.primaryColor,
                                 boxShadow: `0 0 0 3px ${ThemeColors.primaryColor}20`,
                               }}
@@ -348,25 +403,21 @@ const Contact = () => {
                           </FormControl>
 
                           <FormControl isInvalid={!!formErrors.email}>
-                            <FormLabel htmlFor="email" fontWeight="medium" color="gray.700">
-                              <HStack spacing="2">
-                                <Icon as={FiMail} color="gray.500" />
-                                <Text>Email Address</Text>
-                              </HStack>
+                            <FormLabel fontWeight="600" color="gray.700" fontSize="sm">
+                              Email address
                             </FormLabel>
                             <Input
                               type="email"
-                              placeholder="john@example.com"
+                              placeholder="e.g. nakato.okello@gmail.com"
                               name="email"
                               value={email}
                               size="lg"
-                              variant="filled"
-                              bg="gray.50"
+                              variant="outline"
                               border="2px solid"
-                              borderColor="transparent"
-                              _hover={{ bg: "gray.100" }}
+                              borderColor="gray.200"
+                              _placeholder={{ color: "gray.400" }}
+                              _hover={{ borderColor: "gray.300" }}
                               _focus={{
-                                bg: "white",
                                 borderColor: ThemeColors.primaryColor,
                                 boxShadow: `0 0 0 3px ${ThemeColors.primaryColor}20`,
                               }}
@@ -379,41 +430,34 @@ const Contact = () => {
                           </FormControl>
                         </Grid>
 
-                        <FormControl isInvalid={!!formErrors.message} mt="6">
-                          <FormLabel htmlFor="message" fontWeight="medium" color="gray.700">
-                            <HStack spacing="2">
-                              <Icon as={FiMessageSquare} color="gray.500" />
-                              <Text>Your Message</Text>
-                            </HStack>
+                        <FormControl isInvalid={!!formErrors.message} mt={2}>
+                          <FormLabel fontWeight="600" color="gray.700" fontSize="sm">
+                            Your message
                           </FormLabel>
                           <Textarea
                             name="message"
                             value={message}
-                            placeholder="Tell us about your project or question..."
+                            placeholder="Tell us what you need—orders, partnerships, or general questions..."
                             size="lg"
-                            minH="180px"
-                            variant="filled"
-                            bg="gray.50"
+                            minH="160px"
+                            variant="outline"
                             border="2px solid"
-                            borderColor="transparent"
-                            resize="vertical"
-                            _hover={{ bg: "gray.100" }}
+                            borderColor="gray.200"
+                            _placeholder={{ color: "gray.400" }}
+                            _hover={{ borderColor: "gray.300" }}
                             _focus={{
-                              bg: "white",
                               borderColor: ThemeColors.primaryColor,
                               boxShadow: `0 0 0 3px ${ThemeColors.primaryColor}20`,
                             }}
+                            resize="vertical"
                             onChange={(e) => {
                               setMessage(e.target.value);
                               if (formErrors.message) setFormErrors((p) => ({ ...p, message: "" }));
                             }}
                           />
-                          <Flex justify="space-between" align="center" mt="2">
+                          <Flex justify="space-between" align="center" mt={2}>
                             <FormErrorMessage>{formErrors.message}</FormErrorMessage>
-                            <Text
-                              fontSize="sm"
-                              color={message.length >= 10 ? "green.500" : "gray.400"}
-                            >
+                            <Text fontSize="xs" color={message.length >= 10 ? "green.600" : "gray.400"}>
                               {message.length}/500
                             </Text>
                           </Flex>
@@ -423,27 +467,26 @@ const Contact = () => {
                       <MotionButton
                         type="submit"
                         size="lg"
-                        bgGradient={`linear(to-r, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`}
+                        w="full"
+                        bg={ThemeColors.primaryColor}
                         color="white"
                         _hover={{
-                          bgGradient: `linear(to-r, ${ThemeColors.darkColor}, ${ThemeColors.primaryColor})`,
-                          transform: "translateY(-2px)",
+                          bg: ThemeColors.darkColor,
+                          transform: "translateY(-1px)",
                           boxShadow: "lg",
                         }}
-                        _active={{
-                          transform: "translateY(0)",
-                        }}
+                        _active={{ transform: "translateY(0)" }}
                         isLoading={isSending}
                         loadingText="Sending..."
                         leftIcon={<FiSend />}
                         isDisabled={isSending}
-                        height="56px"
+                        h="52px"
                         borderRadius="xl"
-                        fontWeight="semibold"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                        fontWeight="700"
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
                       >
-                        Send Message
+                        Send message
                       </MotionButton>
                     </VStack>
                   </form>
@@ -451,74 +494,50 @@ const Contact = () => {
               </SlideFade>
             </MotionBox>
 
-            {/* Success Message */}
-            <MotionBox
-              flex="1"
-              variants={itemVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
+            {/* Success state */}
+            <MotionBox flex="1" variants={itemVariants}>
               <Fade in={isSubmitted}>
                 <VStack
-                  spacing="6"
+                  spacing={5}
                   p={{ base: 6, md: 8 }}
                   bg="white"
                   borderRadius="2xl"
-                  boxShadow="xl"
+                  boxShadow="sm"
                   border="1px solid"
-                  borderColor="gray.200"
-                  height="full"
+                  borderColor="gray.100"
+                  h="full"
                   justify="center"
                   textAlign="center"
                 >
-                  <MotionBox
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                  <Flex
+                    w="16"
+                    h="16"
+                    align="center"
+                    justify="center"
+                    borderRadius="full"
+                    bg="green.50"
+                    color="green.500"
                   >
-                    <Flex
-                      w="80px"
-                      h="80px"
-                      align="center"
-                      justify="center"
-                      borderRadius="full"
-                      bg="green.50"
-                      mx="auto"
-                      mb="6"
-                    >
-                      <Icon as={FiCheckCircle} boxSize="40px" color="green.500" />
-                    </Flex>
-                  </MotionBox>
-                  <Heading size="lg" color={ThemeColors.primaryColor}>
-                    Message Sent Successfully!
+                    <Icon as={FiCheckCircle} boxSize="8" />
+                  </Flex>
+                  <Heading size="md" color="gray.900">
+                    Message sent!
                   </Heading>
-                  <Text color="gray.600" fontSize="lg">
-                    Thank you for reaching out. We've received your message and will respond within 24 hours.
+                  <Text color="gray.600">
+                    We’ve received your message and will get back to you within 24 hours.
                   </Text>
                   <Text color="gray.500" fontSize="sm">
-                    Check your email for a confirmation message.
+                    Check your email for confirmation.
                   </Text>
                 </VStack>
               </Fade>
             </MotionBox>
           </Flex>
 
-          {/* Additional Info */}
-          <MotionBox
-            variants={itemVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            textAlign="center"
-            mt="8"
-          >
-            <Text color="gray.500" fontSize="sm">
-              We typically respond within 2-4 hours during business hours. For urgent matters,
-              please call us directly.
-            </Text>
-          </MotionBox>
-        </VStack>
+          <Text textAlign="center" color="gray.500" fontSize="sm" mt={8}>
+            We usually reply within 2–4 hours during business hours. For urgent requests, call or WhatsApp us.
+          </Text>
+        </MotionBox>
       </Container>
     </Box>
   );

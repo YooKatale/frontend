@@ -8,9 +8,9 @@ import { NextResponse } from "next/server";
 
 const FALLBACK = {
   phone: "+256786118137",
-  email: "info@yookatale.app",
+  email: "support@yookatale.app",
   whatsapp: "256786118137",
-  address: "Kampala, Uganda",
+  address: "P.O. Box 74940, Clock-Tower Plot 6, Kampala · Entebbe, Uganda",
   businessHours: "Mon–Sat 8am–8pm EAT",
 };
 
