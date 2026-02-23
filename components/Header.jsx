@@ -60,25 +60,22 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "@slices/usersApiSlice";
 import { useCartMutation } from "@slices/productsApiSlice";
-import { logout, selectAuth } from "@slices/authSlice";
+import { logout } from "@slices/authSlice";
 import { ThemeColors, CLIENT_DASHBOARD_URL } from "@constants/constants";
 import ReferralModal from "@components/ReferralModal";
 
 const Header = () => {
-  const { userInfo } = useSelector(selectAuth);
+  const { userInfo } = useSelector((state) => state.auth);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [cartItemsCount, setCartItemsCount] = useState(0);
-  const router = useRouter();
-  const push = router?.push ?? (() => {});
-  const _toast = useToast();
-  const chakraToast = typeof _toast === "function" ? _toast : (typeof _toast?.toast === "function" ? _toast.toast : () => {});
+  const { push } = useRouter();
+  const chakraToast = useToast();
   const btnRef = useRef();
   const dispatch = useDispatch();
   const [logoutUser] = useLogoutMutation();
   const [fetchCart] = useCartMutation();
-  const _disclosure = useDisclosure();
-  const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = _disclosure ?? { isOpen: false, onOpen: () => {}, onClose: () => {} };
+  const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = useDisclosure();
 
   const userDisplayName = userInfo?.name || userInfo?.firstname || userInfo?.email || "Account";
 

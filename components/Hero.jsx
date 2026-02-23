@@ -1,7 +1,6 @@
 "use client";
 
-import { Box, Text } from "@chakra-ui/react";
-import Image from "next/image";
+import { Box, Text, HStack, IconButton } from "@chakra-ui/react";
 import { MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
 import LocationSearchPicker from "./LocationSearchPicker";
@@ -45,17 +44,14 @@ const Hero = () => {
           sm: "25rem",
           lg: "32rem"
         }}
+        backgroundImage="url('/assets/images/banner.jpg')"
+        backgroundPosition="center"
+        backgroundSize="cover"
+        backgroundRepeat="no-repeat"
         borderRadius={{ base: 0, lg: "0 0 24px 24px" }}
         overflow="hidden"
       >
-        <Image
-          src="/assets/images/banner.jpg"
-          alt=""
-          fill
-          priority
-          sizes="(max-width: 1400px) 100vw, 1400px"
-          style={{ objectFit: "cover" }}
-        />
+        {/* Overlay for better text readability */}
         <Box
           position="absolute"
           top={0}
@@ -63,7 +59,6 @@ const Hero = () => {
           right={0}
           bottom={0}
           bg="linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%)"
-          pointerEvents="none"
         />
 
         {/* Location Badge - Glovo Style */}

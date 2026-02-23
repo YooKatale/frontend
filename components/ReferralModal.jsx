@@ -80,8 +80,7 @@ async function generateReferralCode(userId) {
 
 export default function ReferralModal({ isOpen, onClose }) {
   const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
-  const _toast = useToast();
-  const chakraToast = typeof _toast === "function" ? _toast : (typeof _toast?.toast === "function" ? _toast.toast : () => {});
+  const chakraToast = useToast();
   const [referralCode, setReferralCode] = useState("");
   const [referralUrl, setReferralUrl] = useState("");
   const [invitee, setInvitee] = useState("");

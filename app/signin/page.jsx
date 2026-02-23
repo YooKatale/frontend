@@ -54,7 +54,7 @@ const SignIn = ({ redirect, callback, ismodal }) => {
   const dispatch = useDispatch();
   const [login] = useLoginMutation();
   const [fetchAuthMe] = useLazyAuthMeQuery();
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useSelector((state) => state.auth);
 
   const googleCallback = searchParams.get("google_callback");
   const redirectTo = searchParams.get("redirect") || "/";

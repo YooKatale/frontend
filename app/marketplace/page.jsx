@@ -51,7 +51,7 @@ export default function MarketplacePage() {
     ratings: [],
   });
 
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useSelector((state) => state.auth);
   const chakraToast = useToast();
 
   const [fetchProducts] = useProductsGetMutation();

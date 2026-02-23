@@ -9,12 +9,14 @@ import dynamic from "next/dynamic";
 import { useEffect, useState, useMemo } from "react";
 import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
 import { useSelector } from "react-redux";
-import { selectAuth } from "@slices/authSlice";
 import { motion } from "framer-motion";
 
 import { Box, Skeleton, SkeletonText } from "@chakra-ui/react";
 import Hero from "@components/Hero";
 import CategoryCard from "@components/cards/CategoryCard";
+import ResponsiveBackground from "@components/cards/ResponsiveBackground";
+import Subscription from "@components/cards/SubscriptionSection";
+import SwipperComponent from "@components/Swiper";
 import LoaderSkeleton from "@components/LoaderSkeleton";
 
 const DynamicButton = dynamic(() => import("@components/Button"), {
@@ -22,15 +24,9 @@ const DynamicButton = dynamic(() => import("@components/Button"), {
 });
 const DynamicSpecialProducts = dynamic(
   () => import("@components/SpecialProducts"),
-  { loading: () => <Box py={8}><Skeleton height="200px" borderRadius="lg" /></Box> }
-);
-const DynamicResponsiveBackground = dynamic(
-  () => import("@components/cards/ResponsiveBackground"),
-  { loading: () => <Box height={{ base: "50px", sm: "70px", md: "100px" }} /> }
-);
-const DynamicSubscription = dynamic(
-  () => import("@components/cards/SubscriptionSection"),
-  { loading: () => <Box minH="280px" /> }
+  {
+    loading: () => <p>Loading...</p>,
+  }
 );
 
 // Animation variants
@@ -75,7 +71,7 @@ const Home = () => {
   const [categories, setCategories] = useState([]);
   const [isLoading, setLoading] = useState(false);
 
-  const { userInfo } = useSelector(selectAuth);
+  const { userInfo } = useSelector((state) => state.auth);
 
   const [fetchProducts] = useProductsGetMutation();
   const [fetchComments] = useCommentsGetMutation();
@@ -121,7 +117,6 @@ const Home = () => {
   useEffect(() => {
     handleFetchProductsData();
     handleFetchCategories();
-    handleFetchCommentsData();
   }, []);
 
   const displayCategories = useMemo(() => {
@@ -206,16 +201,24 @@ const Home = () => {
   };
 
   return (
-    <Box width="100%" maxWidth="100%" margin="0 auto" bg="white" minH="100vh">
+    <Box 
+      width="100%"
+      maxWidth="100%"
+      margin="0 auto"
+      bg="white"
+      minH="100vh"
+    >
       {/* Hero Section with Animation */}
-      <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={fadeInUp}
+      >
         <Hero />
       </motion.div>
 
-      {/* Main content: consistent container and spacing */}
-      <Box maxW="7xl" mx="auto" px={{ base: 4, md: 6, lg: 8 }} pb={12}>
-      {/* Categories Section */}
-      <Box pt={{ base: 6, md: 8, lg: 12 }} bg="white">
+      {/* Categories Section - Glovo Style with YooKatale Colors */}
+      <Box pt={{ base: "2rem", md: "3rem", lg: "4rem" }} mx="auto" px={{ base: 4, md: 6, lg: 8 }} bg="white">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -235,7 +238,7 @@ const Home = () => {
           <Box
             height="4px"
             width="100px"
-            margin="0 auto 2rem"
+            margin="0 auto 2.5rem"
             background="#185F2D"
             borderRadius="full"
             boxShadow="0 2px 8px rgba(24, 95, 45, 0.3)"
@@ -302,7 +305,7 @@ const Home = () => {
         )}
       </Box>
 
-      {/* Product Sections */}
+      {/* Product Sections with Animations */}
       {topDealsProducts.length > 0 && (
         <motion.div
           initial="hidden"
@@ -310,7 +313,7 @@ const Home = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeInUp}
         >
-          <Box pt={{ base: 8, md: 10, lg: 12 }}>
+          <Box pt="4rem" mx={2}>
             <Flex direction="column" alignItems="center">
               <Box mx="auto" width="100%">
                 <DynamicSpecialProducts
@@ -325,7 +328,7 @@ const Home = () => {
         </motion.div>
       )}
       
-      <DynamicResponsiveBackground url="/assets/images/new.jpeg" />
+      <ResponsiveBackground url="/assets/images/new.jpeg" />
 
       {popularProducts.length > 0 ? (
         <motion.div
@@ -334,7 +337,7 @@ const Home = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeInUp}
         >
-          <Box pt={{ base: 8, md: 10, lg: 12 }}>
+          <Box pt="4rem" mx={2}>
             <Flex direction="column" alignItems="center">
               <Box width="100%">
                 <DynamicSpecialProducts
@@ -360,7 +363,7 @@ const Home = () => {
         </Heading>
       )}
       
-      <DynamicResponsiveBackground url="/assets/images/b1.jpeg" />
+      <ResponsiveBackground url="/assets/images/b1.jpeg" />
 
       {discoverProducts.length > 0 ? (
         <motion.div
@@ -369,9 +372,9 @@ const Home = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeInUp}
         >
-          <Box pt={{ base: 8, md: 10, lg: 12 }} width="100%">
+          <Box pt="4rem" width="100%">
             <Flex>
-              <Box width="100%">
+              <Box width="100%" mx={2}>
                 <DynamicSpecialProducts
                   Products={discoverProducts}
                   userInfo={userInfo}
@@ -395,7 +398,7 @@ const Home = () => {
         </Heading>
       )}
       
-      <DynamicResponsiveBackground url="/assets/images/b2.jpeg" />
+      <ResponsiveBackground url="/assets/images/b2.jpeg" />
 
       {promotionalProducts.length > 0 ? (
         <motion.div
@@ -404,9 +407,9 @@ const Home = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeInUp}
         >
-          <Box pt={{ base: 8, md: 10, lg: 12 }} width="100%">
+          <Box pt="4rem" width="100%">
             <Flex>
-              <Box width="100%">
+              <Box width="100%" mx={2}>
                 <DynamicSpecialProducts
                   Products={promotionalProducts}
                   userInfo={userInfo}
@@ -430,7 +433,7 @@ const Home = () => {
         </Heading>
       )}
       
-      <DynamicResponsiveBackground url="/assets/images/banner2.jpeg" />
+      <ResponsiveBackground url="/assets/images/banner2.jpeg" />
 
       {recommendedProducts.length > 0 ? (
         <motion.div
@@ -439,9 +442,9 @@ const Home = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeInUp}
         >
-          <Box pt={{ base: 8, md: 10, lg: 12 }} width="100%">
+          <Box pt={1} width="100%">
             <Flex>
-              <Box width="100%">
+              <Box mx={2} width="100%">
                 <DynamicSpecialProducts
                   Products={recommendedProducts}
                   userInfo={userInfo}
@@ -465,8 +468,8 @@ const Home = () => {
         </Heading>
       )}
       
-      <Box width="100%" pt={{ base: 8, md: 10, lg: 12 }}>
-        <DynamicSubscription />
+      <Box width="100%">
+        <Subscription />
       </Box>
 
       {otherProducts.length > 0 && otherProducts.map((product, index) => (
@@ -477,9 +480,9 @@ const Home = () => {
             viewport={{ once: true, amount: 0.3 }}
             variants={fadeInUp}
           >
-            <Box pt={{ base: 6, md: 8 }}>
+            <Box pt={2} mx={2}>
               <Flex>
-                <Box width="100%">
+                <Box width="100%" mx="auto">
                   <DynamicSpecialProducts
                     Products={product?.products}
                     userInfo={userInfo}
@@ -493,20 +496,20 @@ const Home = () => {
 
           {index === 2 && (
             <Box key={`banner2-${index}`}>
-              <DynamicResponsiveBackground url="/assets/images/banner3.jpeg" />
+              <ResponsiveBackground url="/assets/images/banner3.jpeg" />
             </Box>
           )}
 
           {index === otherProducts?.length - 7 && (
             <Box key={`banner3-${index}`}>
-              <DynamicResponsiveBackground url="/assets/images/banner2.jpeg" />
+              <ResponsiveBackground url="/assets/images/banner2.jpeg" />
             </Box>
           )}
         </React.Fragment>
       ))}
 
-      {/* Testimonials Section */}
-      <Box pt={{ base: 8, md: 12 }} borderTopWidth="1px" borderColor="gray.100">
+      {/* Testimonials Section with Animation */}
+      <Box>
         {Comments?.length > 0 ? (
           <motion.div
             initial="hidden"
@@ -515,10 +518,13 @@ const Home = () => {
             variants={fadeInUp}
           >
             <Box
-              padding={{ base: 6, md: 8 }}
-              position="relative"
-              bg="gray.50"
+              padding={{ base: "3rem 1rem", md: "4rem 2rem" }}
+              borderBottom={"1.7px solid " + ThemeColors.lightColor}
+              position={"relative"}
+              bg="white"
               borderRadius="xl"
+              mx={4}
+              my={8}
               boxShadow="0 4px 6px rgba(0, 0, 0, 0.05)"
             >
               <Box padding={"2rem 0"}>
@@ -544,12 +550,9 @@ const Home = () => {
               </Box>
               <Box>
                 <Box
-                  as="button"
-                  type="button"
-                  aria-label="Previous testimonial"
-                  cursor="pointer"
-                  position="absolute"
-                  top="50%"
+                  cursor={"pointer"}
+                  position={"absolute"}
+                  top={"50%"}
                   left={{ base: "5%", md: "10%", xl: "15%" }}
                   p={2}
                   borderRadius="full"
@@ -557,17 +560,13 @@ const Home = () => {
                   boxShadow="0 2px 8px rgba(0,0,0,0.1)"
                   _hover={{ bg: "gray.50", transform: "scale(1.1)" }}
                   transition="all 0.2s"
-                  onClick={decreaseSliderIndex}
                 >
-                  <AiOutlineArrowLeft size={35} />
+                  <AiOutlineArrowLeft size={35} onClick={decreaseSliderIndex} />
                 </Box>
                 <Box
-                  as="button"
-                  type="button"
-                  aria-label="Next testimonial"
-                  cursor="pointer"
-                  position="absolute"
-                  top="50%"
+                  cursor={"pointer"}
+                  position={"absolute"}
+                  top={"50%"}
                   right={{ base: "5%", md: "10%", xl: "15%" }}
                   p={2}
                   borderRadius="full"
@@ -575,9 +574,8 @@ const Home = () => {
                   boxShadow="0 2px 8px rgba(0,0,0,0.1)"
                   _hover={{ bg: "gray.50", transform: "scale(1.1)" }}
                   transition="all 0.2s"
-                  onClick={increaseSliderIndex}
                 >
-                  <AiOutlineArrowRight size={35} />
+                  <AiOutlineArrowRight size={35} onClick={increaseSliderIndex} />
                 </Box>
               </Box>
               <Flex>
@@ -629,8 +627,9 @@ const Home = () => {
               </Flex>
             </Box>
           </motion.div>
-        ) : null}
-      </Box>
+        ) : (
+          ""
+        )}
       </Box>
     </Box>
   );

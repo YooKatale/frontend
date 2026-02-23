@@ -45,54 +45,6 @@ import { subscriptionConfirmationEmailTemplate } from "@constants/subscriptionCo
 import { NextResponse } from "next/server";
 import transporter, { defaultSender } from "@lib/emailConfig";
 
-function adminCredentialsEmailTemplate({ firstname, username, password, email }) {
-  const safeName = firstname || "Admin";
-  return `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Your YooKatale Admin Credentials</title>
-        <style>
-          body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background-color: #f5f5f7; margin: 0; padding: 0; }
-          .wrapper { padding: 24px; }
-          .card { max-width: 520px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 24px 28px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08); }
-          .logo { font-size: 20px; font-weight: 700; color: #16a34a; margin-bottom: 12px; }
-          h1 { font-size: 22px; margin: 8px 0 12px; color: #0f172a; }
-          p { font-size: 14px; line-height: 1.6; color: #4b5563; margin: 4px 0; }
-          .credentials { margin: 18px 0; padding: 14px 16px; background-color: #f0fdf4; border-radius: 12px; border: 1px solid #bbf7d0; }
-          .credentials p { margin: 4px 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-          .hint { font-size: 12px; color: #6b7280; margin-top: 4px; }
-          .footer { font-size: 12px; color: #9ca3af; margin-top: 20px; border-top: 1px solid #e5e7eb; padding-top: 12px; }
-          .btn { display: inline-block; margin-top: 16px; padding: 10px 18px; background-color: #16a34a; color: #ffffff; text-decoration: none; border-radius: 999px; font-size: 14px; font-weight: 500; }
-        </style>
-      </head>
-      <body>
-        <div class="wrapper">
-          <div class="card">
-            <div class="logo">YooKatale Admin</div>
-            <h1>Welcome, ${safeName}</h1>
-            <p>An administrator has created an account for you on the YooKatale admin panel.</p>
-            <p>Use the credentials below to sign in to your account:</p>
-            <div class="credentials">
-              <p><strong>Login email:</strong> ${email}</p>
-              <p><strong>Username:</strong> ${username}</p>
-              <p><strong>Temporary password:</strong> ${password}</p>
-            </div>
-            <p class="hint">For security, please log in and change your password immediately after your first sign in.</p>
-            <a href="https://admin.yookatale.app/signin" class="btn">Go to Admin Panel</a>
-            <div class="footer">
-              <p>If you did not expect this email, you can safely ignore it.</p>
-              <p>&copy; ${new Date().getFullYear()} YooKatale. All rights reserved.</p>
-            </div>
-          </div>
-        </div>
-      </body>
-    </html>
-  `;
-}
-
 /**
  * Validates email address format
  * Prevents email injection attacks
@@ -171,7 +123,7 @@ export const POST = async (req, res) => {
   try {
     // Parse and validate request body
     const body = await req.json();
-    const { email, type = 'welcome', userName, mealType, greeting, meals, referralCode, subscriptionPlan, username, password, firstname } = body;
+    const { email, type = 'welcome', userName, mealType, greeting, meals, referralCode, subscriptionPlan } = body;
     
     // Security: Validate email address format to prevent injection attacks
     if (!isValidEmail(email)) {
@@ -198,7 +150,7 @@ export const POST = async (req, res) => {
     const sanitizedGreeting = sanitizeInput(greeting);
     
     // Security: Validate email type to prevent template injection
-    const validTypes = ['welcome', 'newsletter', 'meal_notification', 'invitation', 'subscription', 'app_download', 'get_started', 'invite_friends', 'download_app', 'how_to_subscribe', 'subscription_confirmation', 'admin_credentials'];
+    const validTypes = ['welcome', 'newsletter', 'meal_notification', 'invitation', 'subscription', 'app_download', 'get_started', 'invite_friends', 'download_app', 'how_to_subscribe', 'subscription_confirmation'];
     const emailType = validTypes.includes(type) ? type : 'welcome';
     
     // Check if email transporter is configured
@@ -279,18 +231,6 @@ export const POST = async (req, res) => {
       emailHtml = invitationEmailTemplate;
       subject = "Invitation To YooKatale";
       emailTypeLabel = "invitation";
-    } else if (emailType === 'admin_credentials') {
-      const safeFirst = sanitizeInput(firstname || sanitizedUserName || '');
-      const safeUsername = sanitizeInput(username || '');
-      const safePassword = sanitizeInput(password || '');
-      emailHtml = adminCredentialsEmailTemplate({
-        firstname: safeFirst || email,
-        username: safeUsername,
-        password: safePassword,
-        email,
-      });
-      subject = "Your YooKatale Admin Login Credentials";
-      emailTypeLabel = "admin_credentials";
     } else {
       // Default to welcome email for signups
       emailHtml = emailTemplate;
