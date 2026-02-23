@@ -8,7 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import ProductCard from "@components/ProductCard";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import { Loader2 } from "lucide-react";
 import LoaderSkeleton from "@components/LoaderSkeleton";
 
@@ -16,7 +16,7 @@ const Search = () => {
   // use the useSearchParam hooks from next/navigation to get url params
   const searchParam = useSearchParams();
 
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
 
   const param = searchParam.get("q");
 

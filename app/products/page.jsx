@@ -21,8 +21,7 @@ import { FaArrowDown, FaArrowUp, FaFilter, FaTimes } from "react-icons/fa";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { selectAuth } from "@slices/authSlice";
+import { useAuth } from "@slices/authSlice";
 import {
   useProductsFilterGetMutation,
   useProductsGetMutation,
@@ -40,7 +39,7 @@ const Products = () => {
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  const { userInfo } = useSelector(selectAuth);
+  const { userInfo } = useAuth();
 
   const [fetchProducts] = useProductsGetMutation();
   const [fetchProductsFilter] = useProductsFilterGetMutation();

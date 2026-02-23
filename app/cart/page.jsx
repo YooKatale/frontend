@@ -20,6 +20,7 @@ import {
 import { ThemeColors } from "@constants/constants";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import TabOne from "@components/modals/tabs/TabOne";
 import TabTwo from "@components/modals/tabs/TabTwo";
 import {
@@ -55,7 +56,7 @@ const Cart = () => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const { onOpen, onClose, isOpen } = useDisclosure();
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
 
   /** Resets checkout step to 0 and closes modal. Used by Modal onClose & close button. */
   const handleModalClose = () => {

@@ -34,8 +34,7 @@ import { getMealForDay } from "@lib/mealMenuConfig";
 import { getMealPricing, formatPrice } from "@lib/mealPricingConfig";
 import { useNewScheduleMutation } from "@slices/productsApiSlice";
 import { usePlanRatingCreateMutation, useGetPlanRatingsQuery, useMealCalendarOverridesGetMutation, useMealSlotsPublicGetMutation } from "@slices/usersApiSlice";
-import { useSelector } from "react-redux";
-import { selectAuth } from "@slices/authSlice";
+import { useAuth } from "@slices/authSlice";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
@@ -65,7 +64,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
   const [mealSlots, setMealSlots] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
-  const { userInfo } = useSelector(selectAuth);
+  const { userInfo } = useAuth();
   const router = useRouter();
   const [createSchedule] = useNewScheduleMutation();
   const [createPlanRating] = usePlanRatingCreateMutation();

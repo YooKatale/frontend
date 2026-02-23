@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import axios from "axios";
 import numeral from "numeral";
 import {
@@ -37,7 +37,7 @@ const themeBgLight = `${ThemeColors.primaryColor}08`;
 const Invoice = () => {
   const [orderData, setOrderData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const [shippingfee, setShippingFee] = useState(0.05);
   const [collectionfee, setCollectionFee] = useState(0.03);
   const [fixedfee, setFixedFee] = useState(500);

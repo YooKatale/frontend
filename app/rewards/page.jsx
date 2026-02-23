@@ -36,7 +36,7 @@ import {
   useRedeemRewardMutation,
   useGetCashoutStatsMutation,
 } from "@slices/usersApiSlice";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -45,7 +45,7 @@ import { FaGift, FaStar } from "react-icons/fa";
 const MotionCard = motion(Card);
 
 export default function RewardsPage() {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const router = useRouter();
   const toast = useToast();
   const { isOpen: isRedeemOpen, onOpen: openRedeem, onClose: closeRedeem } = useDisclosure();

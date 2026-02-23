@@ -45,7 +45,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
+import { useAuth } from '@slices/authSlice';
 import { motion } from 'framer-motion';
 import { 
   ShopOutlined,
@@ -68,7 +68,7 @@ const Partner = () => {
   const [activeTab, setActiveTab] = useState(0);
   const chakraToast = useToast();
   const router = useRouter();
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
 
   // Vendor Form State
   const [vendorFormData, setVendorFormData] = useState({

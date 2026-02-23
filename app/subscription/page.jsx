@@ -38,8 +38,7 @@ import {
 } from "@slices/usersApiSlice";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { selectAuth } from "@slices/authSlice";
+import { useAuth } from "@slices/authSlice";
 import {
   FaPercent,
   FaCalendarAlt,
@@ -71,7 +70,7 @@ const Subscription = () => {
   const [fetchPackages] = useSubscriptionPackageGetMutation();
   const [createSubscription] = useSubscriptionPostMutation();
 
-  const { userInfo } = useSelector(selectAuth);
+  const { userInfo } = useAuth();
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   useEffect(() => {

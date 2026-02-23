@@ -13,8 +13,7 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
-import { useSelector } from "react-redux";
-import { selectAuth } from "@slices/authSlice";
+import { useAuth } from "@slices/authSlice";
 import {
   useProductsGetMutation,
   useProductsCategoriesGetMutation,
@@ -52,7 +51,7 @@ export default function MarketplacePage() {
     ratings: [],
   });
 
-  const { userInfo } = useSelector(selectAuth);
+  const { userInfo } = useAuth();
   const chakraToast = useToast();
 
   const [fetchProducts] = useProductsGetMutation();

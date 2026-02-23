@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 
 const PopupAd = () => {
   const [display, setDisplay] = useState(false);
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   console.log("user", userInfo);
 
   useEffect(() => {

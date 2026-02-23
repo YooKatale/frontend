@@ -25,9 +25,9 @@ import {
 import { ThemeColors } from "@constants/constants";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useLoginMutation, useLazyAuthMeQuery } from "@slices/usersApiSlice";
-import { setCredentials, selectAuth } from "@slices/authSlice";
+import { setCredentials, useAuth } from "@slices/authSlice";
 import { useToast } from "@chakra-ui/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
@@ -54,7 +54,7 @@ const SignIn = ({ redirect, callback, ismodal }) => {
   const dispatch = useDispatch();
   const [login] = useLoginMutation();
   const [fetchAuthMe] = useLazyAuthMeQuery();
-  const { userInfo } = useSelector(selectAuth);
+  const { userInfo } = useAuth();
 
   const googleCallback = searchParams.get("google_callback");
   const redirectTo = searchParams.get("redirect") || "/";

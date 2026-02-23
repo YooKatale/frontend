@@ -1,6 +1,6 @@
 "use client";
 
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
 
 const initialState = {
@@ -33,14 +33,17 @@ const authSlice = createSlice({
 
 export const { setCredentials, logout } = authSlice.actions;
 
-/** Safe selector: always returns { userInfo }. Prevents "Cannot destructure property 'auth' of undefined" when state is missing (e.g. during hydration or before Provider). */
+/** Safe selector: always returns { userInfo }. Memoized to avoid unnecessary rerenders. */
 const DEFAULT_AUTH = { userInfo: null };
-export const selectAuth = (state) => {
-  if (state == null || typeof state !== "object") return DEFAULT_AUTH;
-  const auth = state.auth;
-  if (auth == null || typeof auth !== "object") return DEFAULT_AUTH;
-  return { userInfo: auth.userInfo ?? null };
-};
+const selectAuthState = (state) => (state != null && typeof state === "object" ? state.auth : undefined);
+export const selectAuth = createSelector(
+  [selectAuthState],
+  (auth) => {
+    if (auth == null || typeof auth !== "object") return DEFAULT_AUTH;
+    const userInfo = auth.userInfo ?? null;
+    return userInfo === null ? DEFAULT_AUTH : { userInfo };
+  }
+);
 
 /** Safe hook: returns { userInfo } and never throws (e.g. when store is not in context yet). Use in layout/header to avoid hydration crashes. */
 export function useAuth() {

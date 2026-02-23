@@ -10,7 +10,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { SmallCloseIcon, CheckIcon } from "@chakra-ui/icons";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import React, { useEffect, useState } from "react";
 import MobileView from "@components/advertising/mobile-view";
 import {
@@ -30,7 +30,7 @@ const Advertising = () => {
   const [createAdvertisement] = useAdvertisementPostMutation();
   const [isLoading, setIsLoading] = useState(false);
   const [advertId, setAdvertId] = useState(null);
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
 
   // check if user logged in
   if (!userInfo || userInfo == {} || userInfo == "") {

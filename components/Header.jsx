@@ -57,7 +57,7 @@ import {
   FaWallet,
   FaHeart,
 } from "react-icons/fa";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useLogoutMutation } from "@slices/usersApiSlice";
 import { useCartMutation } from "@slices/productsApiSlice";
 import { logout, useAuth } from "@slices/authSlice";
@@ -215,6 +215,7 @@ const Header = () => {
             flexWrap="wrap"
           >
             {visibleNavLinks.map((link) => {
+              const href = link.href ?? "#";
               if (link.isInvite) {
                 return (
                   <Button
@@ -247,7 +248,7 @@ const Header = () => {
                   <Button
                     key="sell"
                     as={Link}
-                    href={link.href}
+                    href={href}
                     size="sm"
                     fontSize="0.9375rem"
                     fontWeight="700"
@@ -271,7 +272,7 @@ const Header = () => {
                 );
               }
               return (
-                <Link key={link.href} href={link.href}>
+                <Link key={href} href={href}>
                   <Box
                     as="span"
                     display="inline-flex"
@@ -772,6 +773,7 @@ const Header = () => {
               <VStack align="stretch" spacing={0}>
                 {visibleNavLinks.map((link, index) => {
                   const Icon = link.icon;
+                  const mobileHref = link.href ?? "#";
                   if (link.isInvite) {
                     return (
                       <Flex
@@ -815,7 +817,7 @@ const Header = () => {
                     return (
                       <Link
                         key="sell"
-                        href={link.href}
+                        href={mobileHref}
                         onClick={closeMobileNav}
                         display="block"
                         mx={4}
@@ -842,8 +844,8 @@ const Header = () => {
                   }
                   return (
                     <Link
-                      key={link.href}
-                      href={link.href}
+                      key={mobileHref}
+                      href={mobileHref}
                       onClick={closeMobileNav}
                     >
                       <Flex

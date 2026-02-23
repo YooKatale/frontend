@@ -13,8 +13,7 @@ import { ThemeColors } from "@constants/constants";
 import { useOrdersMutation } from "@slices/productsApiSlice";
 
 import { useEffect, useState, useRef } from "react";
-import { useSelector } from "react-redux";
-import { selectAuth } from "@slices/authSlice";
+import { useAuth } from "@slices/authSlice";
 import { ref, onValue, off } from "firebase/database";
 import { db as firebaseDb } from "@lib/firebase";
 
@@ -30,7 +29,7 @@ const OrdersTab = () => {
 
   const chakraToast = useToast();
 
-  const { userInfo } = useSelector(selectAuth);
+  const { userInfo } = useAuth();
 
   const fetchData = async () => {
     if (!userInfo?._id) return;

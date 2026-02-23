@@ -20,7 +20,7 @@ import {
   useProductsCategoryGetMutation,
 } from "@slices/productsApiSlice";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import ButtonComponent from "@components/Button";
 import { ShoppingCart } from "lucide-react";
 import { FormatCurr } from "@utils/utils";
@@ -30,7 +30,7 @@ import RatingAndComment from "@components/RatingAndComment";
 
 const Product = ({ params }) => {
   // get user information stored in the localstorage
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
 
   // create state to hold fetched Product information
   const [ProductData, setProductData] = useState({});

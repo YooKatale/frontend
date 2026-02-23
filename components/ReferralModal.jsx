@@ -26,7 +26,7 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { useCreateReferralCodeMutation } from "@slices/usersApiSlice";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import { useCallback, useEffect, useState } from "react";
 import {
   FacebookShareButton,
@@ -79,7 +79,7 @@ async function generateReferralCode(userId) {
 }
 
 export default function ReferralModal({ isOpen, onClose }) {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const chakraToast = useToast();
   const [referralCode, setReferralCode] = useState("");
   const [referralUrl, setReferralUrl] = useState("");

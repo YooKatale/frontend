@@ -12,7 +12,7 @@ import {
   SimpleGrid,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import { FiUser, FiMail, FiPhone, FiMapPin, FiShield } from "react-icons/fi";
 import { RiCakeLine, RiLeafLine } from "react-icons/ri";
 import UpdateAccount from "@components/modals/UpdateAccount";
@@ -36,7 +36,7 @@ const Field = ({ icon: IconComp, label, value, placeholder = "—" }) => (
 );
 
 const GeneralTab = () => {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const { isOpen: isUpdateOpen, onOpen: onUpdateOpen, onClose: onUpdateClose } = useDisclosure();
   const { isOpen: isPasswordOpen, onOpen: onPasswordOpen, onClose: onPasswordClose } = useDisclosure();
   const toast = useToast();

@@ -20,13 +20,13 @@ import {
   Text,
   Box,
 } from "@chakra-ui/react";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import { useState } from "react";
 import { DB_URL } from "@config/config";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const ChangePassword = ({ isOpen, onClose }) => {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const toast = useToast();
   const [isLoading, setLoading] = useState(false);
   const [showCurrent, setShowCurrent] = useState(false);

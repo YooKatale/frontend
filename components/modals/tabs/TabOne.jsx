@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import LocationSearchPicker from "@components/LocationSearchPicker";
 import { motion } from "framer-motion";
 import {
@@ -68,7 +68,7 @@ const themeBg = `${ThemeColors.primaryColor}08`;
 const themeBorder = `${ThemeColors.primaryColor}25`;
 
 const TabOne = ({ updateTabIndex, fetchData }) => {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const [isGuest, setIsGuest] = useState(!userInfo);
   const [activeStep, setActiveStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);

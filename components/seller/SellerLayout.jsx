@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import {
   Box,
   Flex,
@@ -45,7 +45,7 @@ const nav = [
 ];
 
 export default function SellerLayout({ children }) {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [lastSeen] = useLastSeenMutation();

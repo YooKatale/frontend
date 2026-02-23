@@ -18,6 +18,9 @@ export const ThemeColors = {
   lightColor: "#F0F0F0",
 };
 
+/** Client/vendor dashboard URL (e.g. seller app). Set NEXT_PUBLIC_CLIENT_DASHBOARD_URL in env or defaults to /sell. */
+export const CLIENT_DASHBOARD_URL =
+  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_CLIENT_DASHBOARD_URL) || "/sell";
 
 /** MTN & Airtel payment logos — use on cashout, payment page, and all payment UIs */
 export const PaymentLogos = {

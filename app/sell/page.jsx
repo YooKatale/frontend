@@ -11,11 +11,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import { ThemeColors } from "@constants/constants";
 
 export default function SellDashboardPage() {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const name =
     [userInfo?.firstname, userInfo?.lastname].filter(Boolean).join(" ") ||
     userInfo?.email ||

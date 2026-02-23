@@ -22,7 +22,7 @@ import {
   AlertIcon,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import {
   useCreateSellerRatingMutation,
   useGetSellerRatingsQuery,
@@ -32,7 +32,7 @@ import { ThemeColors } from "@constants/constants";
 import { RiStarFill, RiStarLine } from "react-icons/ri";
 
 export default function SellerRating({ sellerId }) {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const toast = useToast();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);

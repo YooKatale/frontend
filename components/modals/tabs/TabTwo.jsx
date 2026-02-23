@@ -24,7 +24,7 @@ import { useCartCheckoutMutation } from "@slices/productsApiSlice";
 import { FormatCurr } from "@utils/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -70,7 +70,7 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
   const [createCartCheckout] = useCartCheckoutMutation();
   const router = useRouter();
   const chakraToast = useToast();
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [receiptId, setReceiptId] = useState("");
   const [orderId, setOrderId] = useState("");

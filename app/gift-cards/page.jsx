@@ -40,7 +40,7 @@ import {
   usePurchaseGiftCardMutation,
   useUseGiftCardMutation,
 } from "@slices/usersApiSlice";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -49,7 +49,7 @@ import { FaTicketAlt, FaPlus, FaCopy, FaCheckCircle } from "react-icons/fa";
 const MotionCard = motion(Card);
 
 export default function GiftCardsPage() {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const router = useRouter();
   const toast = useToast();
   const { isOpen: isPurchaseOpen, onOpen: openPurchase, onClose: closePurchase } = useDisclosure();

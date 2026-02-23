@@ -14,7 +14,7 @@ import { FormatCurr } from "@utils/utils";
 import { Loader2, Check, Shield, CreditCard, Truck, Smartphone, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState, useCallback } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import { DB_URL } from "@config/config";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
@@ -48,7 +48,7 @@ const Payment = ({ params }) => {
   const [validateCoupon] = useValidateCouponMutation();
 
   const chakraToast = useToast();
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const router = useRouter();
 
   const handleDataFetch = useCallback(async () => {

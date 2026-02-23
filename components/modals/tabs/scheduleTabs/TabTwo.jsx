@@ -4,10 +4,10 @@ import { useToast } from "@chakra-ui/react";
 import ButtonComponent from "@components/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 
 const TabTwo = ({ updateTabIndex, fetchData }) => {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const [deliveryAddress, setDeliveryAddress] = useState({
     address1: "",
     address2: "",

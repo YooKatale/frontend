@@ -27,7 +27,7 @@ import {
   RiTruckLine,
   RiBox3Line,
 } from "react-icons/ri";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import { motion, AnimatePresence } from "framer-motion";
 import { useOrdersMutation } from "@slices/productsApiSlice";
 import GeneralTab from "@components/modals/tabs/settingsTabs/GeneralTab";
@@ -36,7 +36,7 @@ import SettingsTab from "@components/modals/tabs/settingsTabs/SettingsTab";
 import SubscriptionsTab from "@components/modals/tabs/settingsTabs/SubscriptionsTab";
 
 const Account = () => {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const [activeTab, setActiveTab] = useState("general");
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({

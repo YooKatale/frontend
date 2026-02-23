@@ -30,9 +30,9 @@ import { ThemeColors } from "@constants/constants";
 import Link from "next/link";
 import { useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useRegisterMutation } from "@slices/usersApiSlice";
-import { setCredentials, selectAuth } from "@slices/authSlice";
+import { setCredentials, useAuth } from "@slices/authSlice";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
@@ -65,7 +65,7 @@ const SignUp = () => {
   const dispatch = useDispatch();
   const [register] = useRegisterMutation();
   const [isGoogleLoading, setGoogleLoading] = useState(false);
-  const { userInfo } = useSelector(selectAuth);
+  const { userInfo } = useAuth();
   const redirectSell = searchParams.get("redirect") === "sell";
 
   useEffect(() => {

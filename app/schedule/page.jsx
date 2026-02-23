@@ -26,7 +26,7 @@ import { FormatCurr } from "@utils/utils";
 import { Loader2, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 // import React from "react";
 
 const ScheduleDelivery = () => {
@@ -54,7 +54,7 @@ const ScheduleDelivery = () => {
   // chakra functions for controlling modal display
   const { onOpen, onClose, isOpen } = useDisclosure();
 
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const router = useRouter();
   const [createSchedule] = useNewScheduleMutation();
   const chakraToast = useToast();

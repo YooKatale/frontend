@@ -17,14 +17,14 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
 import { DB_URL } from "@config/config";
-import { setCredentials } from "@slices/authSlice";
+import { setCredentials, useAuth } from "@slices/authSlice";
 import { ThemeColors } from "@constants/constants";
 
 const UpdateAccount = ({ isOpen, onClose }) => {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const dispatch = useDispatch();
   const toast = useToast();
   const [isLoading, setLoading] = useState(false);

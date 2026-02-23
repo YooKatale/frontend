@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import { Star, X, ExternalLink } from "lucide-react";
 import { useAppRatingCreateMutation } from "@slices/usersApiSlice";
 
@@ -30,7 +30,7 @@ const AppStoreRatingPrompt = () => {
   const [showStoreRedirect, setShowStoreRedirect] = useState(false);
   const [userAgent, setUserAgent] = useState("");
 
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const _toast = useToast();
   const chakraToast = typeof _toast === "function" ? _toast : (typeof _toast?.toast === "function" ? _toast.toast : () => {});
   const [createAppRating] = useAppRatingCreateMutation();

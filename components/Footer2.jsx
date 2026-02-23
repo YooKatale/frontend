@@ -54,12 +54,12 @@ import {
 } from "react-icons/ri";
 import { HiOutlineMailOpen, HiOutlineDeviceMobile } from "react-icons/hi";
 import { TbBrandGooglePlay, TbBrandAppstore } from "react-icons/tb";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 import NewsletterForm from "./NewsletterForm";
 import ReferralModal from "./ReferralModal";
 
 const Footer2 = () => {
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const [NewsletterEmail, setNewsletterEmail] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState("");

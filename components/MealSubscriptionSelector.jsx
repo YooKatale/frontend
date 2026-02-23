@@ -30,7 +30,7 @@ import { calculateMealTotal, formatPrice, getMealPricing } from "@lib/mealPricin
 import { useSubscriptionPostMutation } from "@slices/usersApiSlice";
 import { useNewScheduleMutation } from "@slices/productsApiSlice";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useAuth } from "@slices/authSlice";
 
 /**
  * Simplified Meal Subscription Selector
@@ -43,7 +43,7 @@ const MealSubscriptionSelector = ({ planType = "premium", incomeLevel: propIncom
   const [incomeLevel, setIncomeLevel] = useState(propIncomeLevel);
   const toast = useToast();
   const router = useRouter();
-  const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
+  const { userInfo } = useAuth();
   const [createSubscription] = useSubscriptionPostMutation();
   const [createSchedule] = useNewScheduleMutation();
 
