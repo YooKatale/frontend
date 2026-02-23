@@ -294,7 +294,6 @@ const Contact = () => {
                     href={card.href}
                     target={card.href?.startsWith("http") ? "_blank" : undefined}
                     rel={card.href?.startsWith("http") ? "noopener noreferrer" : undefined}
-                    _hover={card.href ? { textDecoration: "none" } : undefined}
                     p={6}
                     h="full"
                     bg="white"
@@ -304,6 +303,7 @@ const Contact = () => {
                     borderColor="gray.100"
                     transition="all 0.2s ease"
                     _hover={{
+                      ...(card.href ? { textDecoration: "none" } : {}),
                       borderColor: ThemeColors.primaryColor,
                       boxShadow: "md",
                       transform: "translateY(-2px)",
