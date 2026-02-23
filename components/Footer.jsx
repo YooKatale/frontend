@@ -56,8 +56,10 @@ const Footer = () => {
   const [emailError, setEmailError] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [createNewsletter] = useNewsletterPostMutation();
-  const chakraToast = useToast();
-  const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = useDisclosure();
+  const _toast = useToast();
+  const chakraToast = typeof _toast === "function" ? _toast : (typeof _toast?.toast === "function" ? _toast.toast : () => {});
+  const _disclosure = useDisclosure();
+  const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = _disclosure ?? { isOpen: false, onOpen: () => {}, onClose: () => {} };
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

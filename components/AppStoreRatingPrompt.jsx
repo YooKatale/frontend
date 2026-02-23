@@ -31,7 +31,8 @@ const AppStoreRatingPrompt = () => {
   const [userAgent, setUserAgent] = useState("");
 
   const { userInfo } = useSelector((state) => (state?.auth) ?? { userInfo: null });
-  const chakraToast = useToast();
+  const _toast = useToast();
+  const chakraToast = typeof _toast === "function" ? _toast : (typeof _toast?.toast === "function" ? _toast.toast : () => {});
   const [createAppRating] = useAppRatingCreateMutation();
 
   useEffect(() => {

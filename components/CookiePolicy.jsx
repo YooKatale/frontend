@@ -18,7 +18,8 @@ const CookiePolicy = () => {
   const [cookiePolicyViewed, setCookiePolicyViewed] = useState(true);
   const [cookiePolicyModal, setCookiePolicyModal] = useState(false);
 
-  const { onClose, onOpen, isOpen } = useDisclosure();
+  const _disclosure = useDisclosure();
+  const { onClose, onOpen, isOpen } = _disclosure ?? { onClose: () => {}, onOpen: () => {}, isOpen: false };
 
   useEffect(() => {
     typeof window !== "undefined"

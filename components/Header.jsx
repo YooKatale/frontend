@@ -69,13 +69,16 @@ const Header = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const [cartItemsCount, setCartItemsCount] = useState(0);
-  const { push } = useRouter();
-  const chakraToast = useToast();
+  const router = useRouter();
+  const push = router?.push ?? (() => {});
+  const _toast = useToast();
+  const chakraToast = typeof _toast === "function" ? _toast : (typeof _toast?.toast === "function" ? _toast.toast : () => {});
   const btnRef = useRef();
   const dispatch = useDispatch();
   const [logoutUser] = useLogoutMutation();
   const [fetchCart] = useCartMutation();
-  const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = useDisclosure();
+  const _disclosure = useDisclosure();
+  const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = _disclosure ?? { isOpen: false, onOpen: () => {}, onClose: () => {} };
 
   const userDisplayName = userInfo?.name || userInfo?.firstname || userInfo?.email || "Account";
 
