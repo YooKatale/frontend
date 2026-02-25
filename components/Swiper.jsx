@@ -56,7 +56,7 @@ export default function SwipperComponent({ Products, userInfo }) {
         modules={[Virtual, Navigation, Pagination]}
         onSwiper={setSwiperRef}
         navigation={productMap.length > 3}
-        pagination={{ clickable: true }}
+        pagination={false}
         parallax
         grabCursor
         breakpoints={sliderBreakPoint}

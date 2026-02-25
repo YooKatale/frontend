@@ -1,8 +1,6 @@
 import { Providers } from "./providers";
 import "./globals.css";
-import { Work_Sans } from "next/font/google";
-import { CacheProvider } from "@chakra-ui/next-js";
-import { ChakraProvider } from "@chakra-ui/react";
+import { Syne, DM_Sans } from "next/font/google";
 import dynamic from "next/dynamic";
 
 // Dynamically import ClientLayoutWrapper to avoid SSR issues (contains all client components)
@@ -11,8 +9,8 @@ const ClientLayoutWrapper = dynamic(() => import("@components/ClientLayoutWrappe
   loading: () => (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f7f7f7' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ width: '50px', height: '50px', border: '4px solid #e0e0e0', borderTop: '4px solid #185F2D', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }}></div>
-        <p style={{ color: '#666', fontSize: '14px' }}>Loading YooKatale...</p>
+        <div style={{ width: '50px', height: '50px', border: '4px solid #e0e0e0', borderTop: '4px solid #185f2d', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }}></div>
+        <p style={{ color: '#666', fontSize: '14px' }}>Loading Yookatale...</p>
       </div>
       <style>{`
         @keyframes spin {
@@ -24,18 +22,19 @@ const ClientLayoutWrapper = dynamic(() => import("@components/ClientLayoutWrappe
   ),
 });
 
-const WorkSans = Work_Sans({ subsets: ["latin"] });
+const syne = Syne({ subsets: ["latin"], variable: "--font-syne", display: "swap" });
+const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans", display: "swap" });
 
 export const metadata = {
-  title: "yookatale",
+  title: "Yookatale — Shop Fresh, Live Better",
   description:
     "YooKatale Uganda | Online Food shopping, Organic and Fresh Foods Mobile Market, Affordable, Reliable & Convenient",
   manifest: "/manifest.json",
-  themeColor: "#1a202c",
+  themeColor: "#0D0D0D",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "YooKatale",
+    title: "Yookatale",
   },
   viewport: {
     width: "device-width",
@@ -56,7 +55,7 @@ const RootLayout = ({ children }) => {
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
         />
       </head>
-      <body className={WorkSans.className} suppressHydrationWarning>
+      <body className={`${dmSans.variable} ${syne.variable} ${dmSans.className}`} suppressHydrationWarning>
           <Providers>
             <ClientLayoutWrapper>
               {children}

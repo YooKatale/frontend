@@ -12,6 +12,7 @@ import PlatformFeedbackModal from "@components/PlatformFeedbackModal";
 import dynamic from "next/dynamic";
 import LocationGate from "@components/LocationGate";
 import SupportChatWidget from "@components/SupportChatWidget";
+import MobileBottomNav from "@components/MobileBottomNav";
 
 const NO_NAVBAR_FOOTER = ["/signin", "/signup"];
 
@@ -32,6 +33,7 @@ export default function ClientLayoutWrapper({ children }) {
           {!hideNavAndFooter && <Header />}
           {children}
           {!hideNavAndFooter && <Footer />}
+          {!hideNavAndFooter && <MobileBottomNav />}
         </LocationGate>
       </Suspense>
       <CookiePolicy />

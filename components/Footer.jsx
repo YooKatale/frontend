@@ -30,6 +30,12 @@ import {
   FiUser,
   FiChevronRight,
   FiCheck,
+  FiTruck,
+  FiRefreshCw,
+  FiPhone,
+  FiCheckCircle,
+  FiSmartphone,
+  FiMapPin,
 } from "react-icons/fi";
 import {
   RiFacebookFill,
@@ -39,10 +45,7 @@ import {
   RiYoutubeFill,
   RiTiktokFill,
   RiSendPlaneFill,
-  RiShieldCheckFill,
-  RiGlobalLine,
-} from "react-icons/ri";
-import { HiOutlineDeviceMobile } from "react-icons/hi";
+  } from "react-icons/ri";
 import Image from "next/image";
 import { useAuth } from "@slices/authSlice";
 import NewsletterForm from "./NewsletterForm";
@@ -100,7 +103,7 @@ const Footer = () => {
         }
 
         chakraToast({
-          title: "Welcome to YooKatale! 🎉",
+          title: "Welcome to YooKatale!",
           description: "You've been subscribed to our premium newsletter.",
           status: "success",
           duration: 5000,
@@ -180,11 +183,14 @@ const Footer = () => {
     { icon: RiYoutubeFill, href: "https://youtube.com", label: "YouTube", color: "#FF0000" },
   ];
 
-  const trustBadges = [
-    { icon: RiShieldCheckFill, label: "Secure Payments", color: "green.500" },
-    { icon: FiCheck, label: "Quality Guaranteed", color: "blue.500" },
-    { icon: HiOutlineDeviceMobile, label: "Mobile First", color: "purple.500" },
-    { icon: RiGlobalLine, label: "Free delivery within 3km", color: "orange.500" },
+  // Trust strip – professional icons only (no emojis)
+  const footerTrustItems = [
+    { icon: FiTruck, title: "Fast Delivery", desc: "Same-day delivery available across Kampala" },
+    { icon: FiRefreshCw, title: "Easy Returns", desc: "30-day hassle-free returns on eligible orders" },
+    { icon: FiPhone, title: "24/7 Support", desc: "Always here to help via WhatsApp or call" },
+    { icon: FiCheckCircle, title: "Quality Guaranteed", desc: "" },
+    { icon: FiSmartphone, title: "Mobile First", desc: "" },
+    { icon: FiMapPin, title: "Free delivery within 3km", desc: "" },
   ];
 
   return (
@@ -192,6 +198,46 @@ const Footer = () => {
       <NewsletterForm />
 
       <Box as="footer" bg="gray.900" color="white" position="relative" overflow="hidden" id="refer">
+        {/* Trust strip – first thing in footer */}
+        <Box bg="var(--dark)" color="white" py={{ base: 6, md: 7 }} borderTop="3px solid var(--brand)">
+          <Container maxW="8xl">
+            <Flex
+              direction={{ base: "column", sm: "row" }}
+              wrap="wrap"
+              justify="space-between"
+              align="center"
+              gap={{ base: 5, md: 6 }}
+            >
+              {footerTrustItems.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                <Flex key={item.title} align="center" gap={4} flex="1" minW={{ base: "100%", sm: "140px", md: "auto" }}>
+                  <Box
+                    w="48px"
+                    h="48px"
+                    borderRadius="12px"
+                    bg="rgba(24, 95, 45, 0.35)"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    flexShrink={0}
+                  >
+                    <IconComponent size={24} color="rgba(255,255,255,0.95)" />
+                  </Box>
+                  <Box>
+                    <Text fontFamily="var(--font-syne), Syne, sans-serif" fontSize="14px" fontWeight="700" mb={item.desc ? 1 : 0}>
+                      {item.title}
+                    </Text>
+                    {item.desc && (
+                      <Text fontSize="12px" color="rgba(255,255,255,0.6)">{item.desc}</Text>
+                    )}
+                  </Box>
+                </Flex>
+              );})}
+            </Flex>
+          </Container>
+        </Box>
+
         <Box h="4px" bgGradient="linear(to-r, #38A169, #F6AD55, #805AD5)" w="full" />
 
         <Box
@@ -216,35 +262,6 @@ const Footer = () => {
         />
 
         <Container maxW="8xl" position="relative" zIndex={1}>
-          <Flex
-            justify="center"
-            align="center"
-            py={6}
-            borderBottom="1px solid"
-            borderColor="gray.800"
-            flexWrap="wrap"
-            gap={8}
-          >
-            {trustBadges.map((badge) => {
-              const BadgeIcon = badge.icon;
-              return (
-                <Flex key={badge.label} align="center" gap={2}>
-                  <Box
-                    p={2}
-                    borderRadius="lg"
-                    bg="whiteAlpha.100"
-                    border="1px solid"
-                    borderColor="whiteAlpha.200"
-                  >
-                    <BadgeIcon size={20} color={badge.color} />
-                  </Box>
-                  <Text fontSize="sm" fontWeight="500" color="gray.300">
-                    {badge.label}
-                  </Text>
-                </Flex>
-              );
-            })}
-          </Flex>
 
           <SimpleGrid
             columns={{ base: 1, md: 2, lg: 5 }}
@@ -253,9 +270,9 @@ const Footer = () => {
           >
             <VStack align="start" spacing={6}>
               <VStack align="start" spacing={3}>
-                <Heading size="lg" as="span" fontWeight="800" display="flex">
-                  <Text as="span" color="yellow.400">Yoo</Text>
-                  <Text as="span" color="green.400">Katale</Text>
+                <Heading size="lg" as="span" fontWeight="800" display="flex" fontFamily="var(--font-syne), Syne, sans-serif">
+                  <Text as="span" color="white">Yooka</Text>
+                  <Text as="span" color="var(--brand)">tale</Text>
                 </Heading>
                 <Text fontSize="sm" color="gray.400" lineHeight="tall">
                   Uganda's premium fresh produce marketplace. Farm to table, delivered fresh.

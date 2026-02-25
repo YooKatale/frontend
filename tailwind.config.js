@@ -18,14 +18,25 @@ module.exports = {
     colors: {
       transparent: "transparent",
       current: "currentColor",
-      primary: "#185f2d",
-      secondary: "#1f793a",
-      dark: "#185f2d",
-      light: "#f0f0f0",
-      white: "#ffffff",
+      // brand palette (CSS variables defined in globals.css)
+      brand: "var(--brand)",
+      "brand-dark": "var(--brand-dk)",
+      "brand-light": "var(--brand-lt)",
+      gold: "var(--gold)",
+      dark: "var(--dark)",
+      dark2: "var(--dark2)",
+      mid: "var(--mid)",
+      muted: "var(--muted)",
+      surface: "var(--surface)",
+      white: "var(--white)",
+      border: "var(--border)",
+      green: "var(--green)",
+      // legacy aliases (for older components still using them)
+      primary: "var(--brand)",
+      secondary: "var(--brand-dk)",
+      light: "var(--surface)",
       red: "#ff0000",
-      black: "#000",
-      green: "#008000"
+      black: "#000000"
     },
     extend: {
       keyframes: {

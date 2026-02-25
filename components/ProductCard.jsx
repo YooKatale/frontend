@@ -1,31 +1,23 @@
 "use client";
 
-import { useToast, Badge, Box, Heading, Text, useDisclosure } from "@chakra-ui/react";
+import { useToast, Box, Text, useDisclosure } from "@chakra-ui/react";
 import React, { useState } from "react";
 import Link from "next/link";
 import { useCartCreateMutation } from "@slices/productsApiSlice";
 import { FormatCurr } from "@utils/utils";
-import { Button } from "./ui/button";
-import { LoaderIcon, ShoppingCart } from "lucide-react";
+import { LoaderIcon, ShoppingCart, Heart } from "lucide-react";
+import { FiPackage } from "react-icons/fi";
 import Image from "next/image";
 import SignIn from "@app/signin/page";
-import { AiOutlineClose } from "react-icons/ai";
-import { useSelector } from "react-redux";
-
-import { Card } from 'antd';
-import Paragraph from "antd/es/skeleton/Paragraph";
-import { ShoppingCartOutlined } from "@ant-design/icons";
 import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-} from '@chakra-ui/react'
-import "antd/dist/reset.css";
-const { Meta } = Card;
+} from "@chakra-ui/react";
+import styles from "./ProductCard.module.css";
+
 const ProductCard = ({ product, userInfo }) => {
   const [addCartApi] = useCartCreateMutation();
   const [SignInStateModal, setSignInStateModal] = useState(false);
@@ -121,167 +113,69 @@ const ProductCard = ({ product, userInfo }) => {
 
 
 
-  const [isHovered, setIsHovered] = useState(false);
+  const discount = product.discountPercentage && product.discountPercentage !== "0" ? Number(product.discountPercentage) : 0;
+  const originalPrice = product.price;
+  const displayPrice = discount ? Math.round(originalPrice * (1 - discount / 100)) : originalPrice;
+  const hasWasPrice = discount > 0;
 
   return (
     <>
       <Box
-        position="relative"
-        bg="white"
-        borderRadius={{ base: "md", md: "lg" }}
-        overflow="hidden"
-        boxShadow={isHovered ? "lg" : "sm"}
-        transition="all 0.3s ease"
-        transform={isHovered ? "translateY(-4px)" : "translateY(0)"}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        border="1px solid"
-        borderColor={isHovered ? "green.300" : "gray.200"}
-        height="100%"
-        display="flex"
-        flexDirection="column"
+        className={styles.card}
+        onMouseEnter={() => {}}
+        onMouseLeave={() => {}}
       >
-        <Link href={`/product/${product._id}`}>
-          <Box position="relative" bg="gray.50" p={{ base: 2, sm: 3, md: 4 }}>
-            {product.discountPercentage && product.discountPercentage !== "0" && (
-              <Badge
-                colorScheme="red"
-                position="absolute"
-                top={{ base: 1, md: 2 }}
-                right={{ base: 1, md: 2 }}
-                zIndex="2"
-                fontSize={{ base: "2xs", md: "xs" }}
-                fontWeight="bold"
-                px={{ base: 1, md: 2 }}
-                py={{ base: 0.5, md: 1 }}
-                borderRadius="md"
-                boxShadow="sm"
-              >
-                -{product.discountPercentage}%
-              </Badge>
-            )}
-
-            {product?.type === "bulk" && (
-              <Badge
-                colorScheme="orange"
-                position="absolute"
-                top={{ base: 1, md: 2 }}
-                left={{ base: 1, md: 2 }}
-                zIndex="2"
-                fontSize={{ base: "2xs", md: "xs" }}
-                fontWeight="bold"
-                px={{ base: 1, md: 2 }}
-                py={{ base: 0.5, md: 1 }}
-                borderRadius="md"
-                boxShadow="sm"
-              >
-                BULK
-              </Badge>
-            )}
-
-            <Box
-              position="relative"
-              height={{ base: "100px", sm: "120px", md: "140px" }}
-              width="100%"
-            >
-              {product.images && product.images[0] ? (
-                <Image
-                  src={product.images[0]}
-                  alt={product.name ?? "Product"}
-                  fill
-                  sizes="(max-width: 480px) 50vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                  priority={false}
-                  style={{
-                    objectFit: 'cover',
-                    transition: 'transform 0.3s ease-in-out',
-                    transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                  }}
-                />
-              ) : (
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  height="100%"
-                  bg="gray.100"
-                >
-                  <Text fontSize={{ base: "2xl", md: "3xl" }} color="gray.400">
-                    📦
-                  </Text>
-                </Box>
-              )}
-            </Box>
-          </Box>
-        </Link>
-
-        <Box py={{ base: 2, md: 3 }} px={{ base: 2, md: 3 }} flex="1" display="flex" flexDirection="column">
-          <Text
-            fontWeight="600"
-            fontSize={{ base: "xs", sm: "sm", md: "md" }}
-            textTransform="capitalize"
-            noOfLines={2}
-            mb={{ base: 1, md: 2 }}
-            minH={{ base: "32px", md: "40px" }}
-            color="gray.700"
-            lineHeight="tight"
-          >
-            {product.name}
-          </Text>
-
-          <Box mt="auto">
-            <Heading
-              fontWeight="700"
-              fontSize={{ base: "md", sm: "lg", md: "xl" }}
-              color="green.600"
-              mb={1}
-            >
-              UGX {FormatCurr(product.price)}
-            </Heading>
-
-            {product.category === "grains and flour" && product.unit && (
-              <Text
-                fontSize={{ base: "2xs", md: "xs" }}
-                color="gray.500"
-                mb={{ base: 1, md: 2 }}
-              >
-                per {product.unit}
-              </Text>
-            )}
-
-            {product?.type === "bulk" && product?.description && (
-              <Text
-                fontSize={{ base: "2xs", md: "xs" }}
-                color="gray.600"
-                noOfLines={2}
-                mb={{ base: 1, md: 2 }}
-              >
-                {product?.description}
-              </Text>
-            )}
-          </Box>
-        </Box>
-
-        <Box px={{ base: 2, md: 3 }} pb={{ base: 2, md: 3 }}>
-          <Button
-            className="w-full text-white bg-green-600 hover:bg-green-700 gap-1 rounded-lg border-2 border-green-600 transition-all duration-300"
-            onClick={() => handleAddToCartBtnClick(product._id)}
-            style={{
-              fontSize: 'clamp(10px, 2.5vw, 14px)',
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 'clamp(6px, 1.5vw, 10px) clamp(8px, 2vw, 12px)',
-            }}
-          >
-            {isLoading ? (
-              <LoaderIcon size={16} className="animate-spin" />
+        <Box position="relative" className={styles.imgWrap} as="div">
+          <Link href={`/product/${product._id}`} display="block" position="absolute" inset={0} zIndex={0} sx={{ "&:focus": { outline: "none" } }}>
+            {product.images && product.images[0] ? (
+              <Image
+                src={product.images[0]}
+                alt={product.name ?? "Product"}
+                fill
+                sizes="(max-width: 480px) 50vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                loading="lazy"
+                style={{ objectFit: "cover" }}
+              />
             ) : (
-              <ShoppingCart size={16} />
+              <Box display="flex" alignItems="center" justifyContent="center" height="100%" bg="gray.100" color="gray.400">
+                <FiPackage size={48} strokeWidth={1.5} />
+              </Box>
             )}
-            <span className="hidden sm:inline">Add To Cart</span>
-            <span className="inline sm:hidden">Add</span>
-          </Button>
+          </Link>
+          {(discount > 0 || product?.type === "bulk") && (
+            <div className={styles.badges}>
+              {discount > 0 && <span className={`${styles.badge} ${styles.badgeRed}`}>-{discount}%</span>}
+              {product?.type === "bulk" && <span className={`${styles.badge} ${styles.badgeGold}`}>BULK</span>}
+            </div>
+          )}
+          <button type="button" className={styles.wishlistBtn} aria-label="Add to wishlist" onClick={(e) => e.preventDefault()}>
+            <Heart size={16} color="var(--brand)" strokeWidth={2} />
+          </button>
+          <button
+            type="button"
+            className={styles.quickAdd}
+            onClick={(e) => { e.preventDefault(); handleAddToCartBtnClick(product._id); }}
+          >
+            {isLoading ? <LoaderIcon size={14} className="animate-spin" /> : <ShoppingCart size={14} strokeWidth={2.5} />}
+            Add to Cart
+          </button>
+        </Box>
+        <Box className={styles.body}>
+          {product.category && (
+            <Text className={styles.brand} as="span">{String(product.category).toUpperCase()}</Text>
+          )}
+          <Text as="h3" className={styles.name}>{product.name}</Text>
+          {(product.rating != null || (product.reviewCount ?? 0) > 0) && (
+            <div className={styles.rating}>
+              <span className={styles.stars}>{"★".repeat(Math.min(5, Math.round(Number(product.rating) || 0)))}{"☆".repeat(5 - Math.min(5, Math.round(Number(product.rating) || 0)))}</span>
+              <span className={styles.ratingCount}>({product.reviewCount ?? 0})</span>
+            </div>
+          )}
+          <div className={styles.priceRow}>
+            <span className={styles.priceNow}>UGX {FormatCurr(displayPrice)}</span>
+            {hasWasPrice && <span className={styles.priceWas}>UGX {FormatCurr(originalPrice)}</span>}
+            {hasWasPrice && <span className={styles.priceSave}>Save {discount}%</span>}
+          </div>
         </Box>
       </Box>
       {/* Sign-in / Sign-up form */}

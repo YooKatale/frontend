@@ -11,11 +11,12 @@ import img3 from "@public/assets/images/img3.png";
 import img4 from "@public/assets/images/img4.png";
 import img5 from "@public/assets/images/img5.png";
 
+/** Yookatale theme — green brand. Used by Chakra and shared components. */
 export const ThemeColors = {
   primaryColor: "#185f2d",
   secondaryColor: "#1f793a",
   darkColor: "#185f2d",
-  lightColor: "#F0F0F0",
+  lightColor: "#e8f5ec",
 };
 
 /** Client/vendor dashboard URL (e.g. seller app). Set NEXT_PUBLIC_CLIENT_DASHBOARD_URL in env or defaults to /sell. */

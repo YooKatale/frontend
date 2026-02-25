@@ -7,7 +7,7 @@ import { useProductsGetMutation, useProductsCategoriesGetMutation } from "@slice
 import { useCommentsGetMutation } from "@slices/usersApiSlice";
 import dynamic from "next/dynamic";
 import { useEffect, useState, useMemo } from "react";
-import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
+import { AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineAppstore } from "react-icons/ai";
 import { useAuth } from "@slices/authSlice";
 import { motion } from "framer-motion";
 
@@ -15,18 +15,16 @@ import { Box, Skeleton, SkeletonText } from "@chakra-ui/react";
 import Hero from "@components/Hero";
 import CategoryCard from "@components/cards/CategoryCard";
 import ResponsiveBackground from "@components/cards/ResponsiveBackground";
-import Subscription from "@components/cards/SubscriptionSection";
 import SwipperComponent from "@components/Swiper";
 import LoaderSkeleton from "@components/LoaderSkeleton";
 
-const DynamicButton = dynamic(() => import("@components/Button"), {
-  loading: () => <p>Loading...</p>,
-});
 const DynamicSpecialProducts = dynamic(
   () => import("@components/SpecialProducts"),
-  {
-    loading: () => <p>Loading...</p>,
-  }
+  { loading: () => <Box py={8} px={4}><Skeleton h="200px" borderRadius="xl" /></Box>, ssr: false }
+);
+const DynamicSubscription = dynamic(
+  () => import("@components/cards/SubscriptionSection"),
+  { loading: () => <Box h="120px" bg="var(--brand-lt)" />, ssr: false }
 );
 
 // Animation variants
@@ -205,7 +203,7 @@ const Home = () => {
       width="100%"
       maxWidth="100%"
       margin="0 auto"
-      bg="white"
+      bg="green.50"
       minH="100vh"
     >
       {/* Hero Section with Animation */}
@@ -217,299 +215,296 @@ const Home = () => {
         <Hero />
       </motion.div>
 
-      {/* Categories Section - Glovo Style with YooKatale Colors */}
-      <Box pt={{ base: "2rem", md: "3rem", lg: "4rem" }} mx="auto" px={{ base: 4, md: 6, lg: 8 }} bg="white">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeInUp}
-        >
-          <Heading
-            as="h2"
-            fontSize={{ base: "1.75rem", md: "2.5rem", lg: "3rem" }}
-            fontWeight="800"
-            mb={3}
-            textAlign="center"
-            color="gray.900"
-            letterSpacing="-0.03em"
-          >
-            Shop by Category
-          </Heading>
-          <Box
-            height="4px"
-            width="100px"
-            margin="0 auto 2.5rem"
-            background="#185F2D"
-            borderRadius="full"
-            boxShadow="0 2px 8px rgba(24, 95, 45, 0.3)"
-          />
-        </motion.div>
-
-        {isLoading ? (
-          <Box
-            display="grid"
-            gridTemplateColumns={{
-              base: "repeat(2, 1fr)",
-              sm: "repeat(3, 1fr)",
-              md: "repeat(4, 1fr)",
-              lg: "repeat(6, 1fr)"
-            }}
-            gap={{ base: 4, md: 5, lg: 6 }}
-            py={8}
-          >
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item) => (
-              <Box key={item} borderRadius="xl" overflow="hidden">
-                <Skeleton height={{ base: "120px", md: "140px" }} borderRadius="lg" />
-                <SkeletonText mt="3" noOfLines={2} spacing="2" />
+      {/* Categories Section - pure green background */}
+      <Box pt={{ base: "1.5rem", md: "2rem", lg: "2.5rem" }} pb={{ base: "1rem", md: "1.5rem" }} bg="green.50" borderBottom="1px solid" borderColor="var(--border)">
+        <Box maxW="1280px" mx="auto" px={{ base: 4, md: 6, lg: 8 }}>
+          <Flex justify="space-between" align="center" flexWrap="wrap" gap={3} mb={{ base: 3, md: 4 }}>
+            <motion.div initial="hidden" animate="visible" variants={fadeInUp} style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                w={{ base: "44px", md: "48px" }}
+                h={{ base: "44px", md: "48px" }}
+                borderRadius="12px"
+                bg="gray.50"
+                color="var(--brand)"
+              >
+                <AiOutlineAppstore size={24} />
               </Box>
-            ))}
-          </Box>
-        ) : (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
+              <Box>
+                <Heading
+                  as="h2"
+                  fontFamily="var(--font-syne), Syne, sans-serif"
+                  fontSize={{ base: "1.4rem", md: "1.6rem", lg: "1.85rem" }}
+                  fontWeight="800"
+                  color="var(--dark)"
+                  letterSpacing="-0.03em"
+                >
+                  Shop by Category
+                </Heading>
+                <Box height="4px" width="60px" mt={2} background="var(--brand)" borderRadius="full" />
+              </Box>
+            </motion.div>
+            <Flex
+              as="a"
+              href="/products"
+              fontSize="13px"
+              fontWeight="700"
+              color={ThemeColors.primaryColor}
+              align="center"
+              gap={1}
+              _hover={{ textDecoration: "none", gap: 2 }}
+              transition="gap 0.2s"
+            >
+              View all categories
+              <AiOutlineArrowRight size={16} style={{ flexShrink: 0 }} />
+            </Flex>
+          </Flex>
+
+          {isLoading ? (
             <Box
               display="grid"
               gridTemplateColumns={{
                 base: "repeat(2, 1fr)",
                 sm: "repeat(3, 1fr)",
                 md: "repeat(4, 1fr)",
-                lg: "repeat(6, 1fr)"
+                lg: "repeat(6, 1fr)",
+                xl: "repeat(8, 1fr)"
               }}
-              gap={{ base: 4, md: 5, lg: 6 }}
-              py={8}
-              px={{ base: 2, md: 4 }}
-            >
-              {displayCategories.map((category, index) => {
-                const categoryName = typeof category === "string" ? category : category?.name || "";
-                const hasProducts = categoriesWithProductsSet.has((categoryName || "").toLowerCase().trim());
-                return (
-                  <motion.div
-                    key={category._id || index}
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.08, y: -8 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    style={{ willChange: "transform" }}
-                  >
-                    <CategoryCard
-                      category={categoryName}
-                      hasProducts={hasProducts}
-                    />
-                  </motion.div>
-                );
-              })}
+                gap={{ base: 3, md: 4 }}
+                py={4}
+              >
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+                <Box key={item} borderRadius="xl" overflow="hidden">
+                  <Skeleton height={{ base: "100px", md: "120px" }} borderRadius="lg" />
+                  <SkeletonText mt="3" noOfLines={2} spacing="2" />
+                </Box>
+              ))}
             </Box>
-          </motion.div>
-        )}
+          ) : (
+            <motion.div variants={containerVariants} initial="hidden" animate="visible">
+              <Box
+                display="grid"
+                gridTemplateColumns={{
+                  base: "repeat(2, 1fr)",
+                  sm: "repeat(3, 1fr)",
+                  md: "repeat(4, 1fr)",
+                  lg: "repeat(6, 1fr)",
+                  xl: "repeat(8, 1fr)"
+                }}
+                gap={{ base: 3, md: 4 }}
+                py={4}
+              >
+                {displayCategories.map((category, index) => {
+                  const categoryName = typeof category === "string" ? category : category?.name || "";
+                  const hasProducts = categoriesWithProductsSet.has((categoryName || "").toLowerCase().trim());
+                  return (
+                    <motion.div
+                      key={category._id || index}
+                      variants={itemVariants}
+                      whileHover={{ scale: 1.05, y: -4 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      style={{ willChange: "transform" }}
+                    >
+                      <CategoryCard
+                        category={categoryName}
+                        hasProducts={hasProducts}
+                      />
+                    </motion.div>
+                  );
+                })}
+              </Box>
+            </motion.div>
+          )}
+        </Box>
       </Box>
 
-      {/* Product Sections with Animations */}
-      {topDealsProducts.length > 0 && (
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={fadeInUp}
-        >
-          <Box pt="4rem" mx={2}>
-            <Flex direction="column" alignItems="center">
-              <Box mx="auto" width="100%">
-                <DynamicSpecialProducts
-                  Products={topDealsProducts}
-                  userInfo={userInfo}
-                  category="topdeals"
-                  text="bulk"
-                />
-              </Box>
-            </Flex>
-          </Box>
-        </motion.div>
-      )}
-      
-      <ResponsiveBackground url="/assets/images/new.jpeg" />
-
-      {popularProducts.length > 0 ? (
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={fadeInUp}
-        >
-          <Box pt="4rem" mx={2}>
-            <Flex direction="column" alignItems="center">
-              <Box width="100%">
-                <DynamicSpecialProducts
-                  Products={popularProducts}
-                  userInfo={userInfo}
-                  category="popular"
-                  text="popular"
-                />
-              </Box>
-            </Flex>
-          </Box>
-        </motion.div>
-      ) : (
-        <Heading
-          as="h2"
-          fontSize={{ base: "sm", md: "md" }}
-          fontWeight="600"
-          mb={4}
-          textAlign="center"
-          color="gray.500"
-        >
-          No Popular Products yet
-        </Heading>
-      )}
-      
-      <ResponsiveBackground url="/assets/images/b1.jpeg" />
-
-      {discoverProducts.length > 0 ? (
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={fadeInUp}
-        >
-          <Box pt="4rem" width="100%">
-            <Flex>
-              <Box width="100%" mx={2}>
-                <DynamicSpecialProducts
-                  Products={discoverProducts}
-                  userInfo={userInfo}
-                  category="discover"
-                  text="discover"
-                />
-              </Box>
-            </Flex>
-          </Box>
-        </motion.div>
-      ) : (
-        <Heading
-          as="h2"
-          fontSize={{ base: "sm", md: "md" }}
-          fontWeight="600"
-          mb={4}
-          textAlign="center"
-          color="gray.500"
-        >
-          No discovery products yet
-        </Heading>
-      )}
-      
-      <ResponsiveBackground url="/assets/images/b2.jpeg" />
-
-      {promotionalProducts.length > 0 ? (
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={fadeInUp}
-        >
-          <Box pt="4rem" width="100%">
-            <Flex>
-              <Box width="100%" mx={2}>
-                <DynamicSpecialProducts
-                  Products={promotionalProducts}
-                  userInfo={userInfo}
-                  category="promotional"
-                  text="promotional"
-                />
-              </Box>
-            </Flex>
-          </Box>
-        </motion.div>
-      ) : (
-        <Heading
-          as="h2"
-          fontSize={{ base: "sm", md: "md" }}
-          fontWeight="600"
-          mb={4}
-          textAlign="center"
-          color="gray.500"
-        >
-          No promotional products yet
-        </Heading>
-      )}
-      
-      <ResponsiveBackground url="/assets/images/banner2.jpeg" />
-
-      {recommendedProducts.length > 0 ? (
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={fadeInUp}
-        >
-          <Box pt={1} width="100%">
-            <Flex>
-              <Box mx={2} width="100%">
-                <DynamicSpecialProducts
-                  Products={recommendedProducts}
-                  userInfo={userInfo}
-                  category="recommended"
-                  text="recommended"
-                />
-              </Box>
-            </Flex>
-          </Box>
-        </motion.div>
-      ) : (
-        <Heading
-          as="h2"
-          fontSize={{ base: "md", md: "lg" }}
-          fontWeight="600"
-          mb={4}
-          textAlign="center"
-          color="gray.500"
-        >
-          No recommended products yet
-        </Heading>
-      )}
-      
-      <Box width="100%">
-        <Subscription />
-      </Box>
-
-      {otherProducts.length > 0 && otherProducts.map((product, index) => (
-        <React.Fragment key={product?.category}>
+      {/* Product Sections – pure green page bg, orange category headers, white product area */}
+      <Box bg="green.50" py={{ base: 2, md: 3 }}>
+        <Box maxW="1280px" mx="auto" px={{ base: 3, md: 5 }}>
+        {topDealsProducts.length > 0 && (
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
             variants={fadeInUp}
           >
-            <Box pt={2} mx={2}>
-              <Flex>
-                <Box width="100%" mx="auto">
-                  <DynamicSpecialProducts
-                    Products={product?.products}
-                    userInfo={userInfo}
-                    category={product?.category}
-                    text={product?.category}
-                  />
-                </Box>
-              </Flex>
+            <Box>
+              <DynamicSpecialProducts
+                Products={topDealsProducts}
+                userInfo={userInfo}
+                category="topdeals"
+                text="bulk"
+                headerBg="orange.500"
+              />
             </Box>
           </motion.div>
+        )}
+          <ResponsiveBackground url="/assets/images/new.jpeg" />
+        </Box>
+      </Box>
 
-          {index === 2 && (
-            <Box key={`banner2-${index}`}>
-              <ResponsiveBackground url="/assets/images/banner3.jpeg" />
+      <Box bg="green.50" py={{ base: 2, md: 3 }}>
+        <Box maxW="1280px" mx="auto" px={{ base: 3, md: 5 }}>
+        {popularProducts.length > 0 ? (
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={fadeInUp}
+          >
+            <Box>
+              <DynamicSpecialProducts
+                Products={popularProducts}
+                userInfo={userInfo}
+                category="popular"
+                text="popular"
+                headerBg="orange.500"
+              />
             </Box>
-          )}
+          </motion.div>
+        ) : (
+          <Heading as="h2" fontSize={{ base: "sm", md: "md" }} fontWeight="600" mb={3} textAlign="center" color="gray.500">
+            No Popular Products yet
+          </Heading>
+        )}
+          <ResponsiveBackground url="/assets/images/b1.jpeg" />
+        </Box>
+      </Box>
 
-          {index === otherProducts?.length - 7 && (
-            <Box key={`banner3-${index}`}>
-              <ResponsiveBackground url="/assets/images/banner2.jpeg" />
+      <Box bg="green.50" py={{ base: 2, md: 3 }}>
+        <Box maxW="1280px" mx="auto" px={{ base: 3, md: 5 }}>
+        {discoverProducts.length > 0 ? (
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={fadeInUp}
+          >
+            <Box>
+              <DynamicSpecialProducts
+                Products={discoverProducts}
+                userInfo={userInfo}
+                category="discover"
+                text="discover"
+                headerBg="orange.500"
+              />
             </Box>
-          )}
-        </React.Fragment>
-      ))}
+          </motion.div>
+        ) : (
+          <Heading as="h2" fontSize={{ base: "sm", md: "md" }} fontWeight="600" mb={3} textAlign="center" color="gray.500">
+            No discovery products yet
+          </Heading>
+        )}
+          <ResponsiveBackground url="/assets/images/b2.jpeg" />
+        </Box>
+      </Box>
+
+      <Box bg="green.50" py={{ base: 2, md: 3 }}>
+        <Box maxW="1280px" mx="auto" px={{ base: 3, md: 5 }}>
+        {promotionalProducts.length > 0 ? (
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={fadeInUp}
+          >
+            <Box>
+              <DynamicSpecialProducts
+                Products={promotionalProducts}
+                userInfo={userInfo}
+                category="promotional"
+                text="promotional"
+                headerBg="orange.500"
+              />
+            </Box>
+          </motion.div>
+        ) : (
+          <Heading as="h2" fontSize={{ base: "sm", md: "md" }} fontWeight="600" mb={3} textAlign="center" color="gray.500">
+            No promotional products yet
+          </Heading>
+        )}
+          <ResponsiveBackground url="/assets/images/banner2.jpeg" />
+        </Box>
+      </Box>
+
+      <Box bg="green.50" py={{ base: 2, md: 3 }}>
+        <Box maxW="1280px" mx="auto" px={{ base: 3, md: 5 }}>
+        {recommendedProducts.length > 0 ? (
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={fadeInUp}
+          >
+            <Box>
+              <DynamicSpecialProducts
+                Products={recommendedProducts}
+                userInfo={userInfo}
+                category="recommended"
+                text="recommended"
+                headerBg="orange.500"
+              />
+            </Box>
+          </motion.div>
+        ) : (
+          <Heading as="h2" fontSize={{ base: "md", md: "lg" }} fontWeight="600" mb={3} textAlign="center" color="gray.500">
+            No recommended products yet
+          </Heading>
+        )}
+        </Box>
+      </Box>
+
+      <Box width="100%">
+        <DynamicSubscription />
+      </Box>
+
+      {otherProducts.length > 0 && (() => {
+        return (
+        <Box width="100%" bg="green.50" py={{ base: 2, md: 3 }}>
+          {otherProducts.map((product, index) => (
+            <Box key={product?.category} mb={{ base: 2, md: 3 }}>
+              <Box maxW="1280px" mx="auto" px={{ base: 3, md: 5 }}>
+              <React.Fragment>
+                <motion.div
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
+                  variants={fadeInUp}
+                >
+                  <Box>
+                    <DynamicSpecialProducts
+                      Products={product?.products}
+                      userInfo={userInfo}
+                      category={product?.category}
+                      text={product?.category}
+                      headerBg="orange.500"
+                    />
+                  </Box>
+                </motion.div>
+
+                {index === 2 && (
+                  <Box key={`banner2-${index}`}>
+                    <ResponsiveBackground url="/assets/images/banner3.jpeg" />
+                  </Box>
+                )}
+                {index === otherProducts?.length - 7 && (
+                  <Box key={`banner3-${index}`}>
+                    <ResponsiveBackground url="/assets/images/banner2.jpeg" />
+                  </Box>
+                )}
+              </React.Fragment>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+        );
+      })()}
 
       {/* Testimonials Section with Animation */}
-      <Box>
+      <Box bg="green.50" py={{ base: 3, md: 4 }}>
+        <Box maxW="1280px" mx="auto" px={{ base: 4, md: 6 }}>
         {Comments?.length > 0 ? (
           <motion.div
             initial="hidden"
@@ -518,13 +513,12 @@ const Home = () => {
             variants={fadeInUp}
           >
             <Box
-              padding={{ base: "3rem 1rem", md: "4rem 2rem" }}
+              padding={{ base: "2rem 1rem", md: "3rem 2rem" }}
               borderBottom={"1.7px solid " + ThemeColors.lightColor}
-              position={"relative"}
+              position="relative"
               bg="white"
               borderRadius="xl"
-              mx={4}
-              my={8}
+              my={4}
               boxShadow="0 4px 6px rgba(0, 0, 0, 0.05)"
             >
               <Box padding={"2rem 0"}>
@@ -630,6 +624,7 @@ const Home = () => {
         ) : (
           ""
         )}
+        </Box>
       </Box>
     </Box>
   );
