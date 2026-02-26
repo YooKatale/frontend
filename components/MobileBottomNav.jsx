@@ -14,7 +14,7 @@ const NAV_ITEMS = [
   { href: "/", label: "Home", icon: AiOutlineHome },
   { href: "/subscription", label: "Subscribe", icon: RiHandHeartLine },
   { href: "/cart", label: "Cart", icon: AiOutlineShoppingCart, showBadge: true },
-  { href: "/account", label: "Wishlist", icon: FaHeart },
+  { href: "/wishlist", label: "Wishlist", icon: FaHeart },
   { href: "/account", label: "Account", icon: AiOutlineUser },
 ];
 

@@ -4,6 +4,7 @@ import { useToast, Box, Text, useDisclosure } from "@chakra-ui/react";
 import React, { useState } from "react";
 import Link from "next/link";
 import { useCartCreateMutation } from "@slices/productsApiSlice";
+import { useWishlist } from "@slices/wishlistSlice";
 import { FormatCurr } from "@utils/utils";
 import { LoaderIcon, ShoppingCart, Heart } from "lucide-react";
 import { FiPackage } from "react-icons/fi";
@@ -22,8 +23,10 @@ const ProductCard = ({ product, userInfo }) => {
   const [addCartApi] = useCartCreateMutation();
   const [SignInStateModal, setSignInStateModal] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const chakraToast = useToast();
+  const { isInWishlist, toggle: toggleWishlist } = useWishlist();
+  const inWishlist = product?._id ? isInWishlist(product._id) : false;
 
   // Function to calculate the discounted price
   const calculateDiscountedPrice = (originalPrice, discountPercentage) => {
@@ -148,8 +151,17 @@ const ProductCard = ({ product, userInfo }) => {
               {product?.type === "bulk" && <span className={`${styles.badge} ${styles.badgeGold}`}>BULK</span>}
             </div>
           )}
-          <button type="button" className={styles.wishlistBtn} aria-label="Add to wishlist" onClick={(e) => e.preventDefault()}>
-            <Heart size={16} color="var(--brand)" strokeWidth={2} />
+          <button
+            type="button"
+            className={styles.wishlistBtn}
+            aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (product?._id) toggleWishlist(product._id, product);
+            }}
+          >
+            <Heart size={16} color={inWishlist ? "var(--red, #ef4444)" : "var(--brand)"} strokeWidth={2} fill={inWishlist ? "var(--red, #ef4444)" : "none"} />
           </button>
           <button
             type="button"

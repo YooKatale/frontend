@@ -1,7 +1,8 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { useDispatch } from "react-redux";
 import Header from "@components/Header";
 import Footer from "@components/Footer";
 import ServiceWorker from "@components/ServiceWorker";
@@ -13,6 +14,7 @@ import dynamic from "next/dynamic";
 import LocationGate from "@components/LocationGate";
 import SupportChatWidget from "@components/SupportChatWidget";
 import MobileBottomNav from "@components/MobileBottomNav";
+import { hydrateWishlist } from "@slices/wishlistSlice";
 
 const NO_NAVBAR_FOOTER = ["/signin", "/signup"];
 
@@ -23,7 +25,12 @@ const NO_NAVBAR_FOOTER = ["/signin", "/signup"];
  */
 export default function ClientLayoutWrapper({ children }) {
   const pathname = usePathname();
+  const dispatch = useDispatch();
   const hideNavAndFooter = NO_NAVBAR_FOOTER.includes(pathname || "");
+
+  useEffect(() => {
+    dispatch(hydrateWishlist());
+  }, [dispatch]);
 
   return (
     <>

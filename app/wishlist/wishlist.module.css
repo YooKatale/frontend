@@ -1,0 +1,243 @@
+.root {
+  background: var(--bg, #f4f8f5);
+  min-height: 100vh;
+  padding: 16px;
+  padding-bottom: 100px;
+}
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.backBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text);
+}
+.backBtn svg {
+  width: 20px;
+  height: 20px;
+}
+.title {
+  font-family: var(--font-syne), sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--dark);
+}
+.sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.card {
+  background: var(--white);
+  border-radius: var(--radius, 16px);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(15, 40, 20, 0.07);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:active {
+  transform: scale(0.98);
+}
+.imgWrap {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--surface, #f0f0f0);
+}
+.imgWrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.removeBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: var(--muted);
+}
+.removeBtn:hover {
+  color: var(--red, #ef4444);
+  background: #fff;
+}
+.removeBtn svg {
+  width: 16px;
+  height: 16px;
+}
+.removeTextBtn {
+  align-self: flex-start;
+  margin: -4px 0 4px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.removeTextBtn:hover {
+  color: var(--red, #ef4444);
+}
+.body {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cat {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.name {
+  font-family: var(--font-syne), sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-decoration: none;
+}
+.name:hover {
+  color: var(--green);
+}
+.price {
+  font-family: var(--font-syne), sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--green);
+  margin-top: auto;
+}
+.addCartBtn {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--green);
+  color: white;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+.addCartBtn:active {
+  background: #145530;
+}
+.addCartBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.addCartBtn svg {
+  width: 16px;
+  height: 16px;
+}
+.emptyWrap {
+  text-align: center;
+  padding: 48px 24px;
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px dashed var(--border);
+  margin-top: 24px;
+}
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  color: var(--green-mid);
+}
+.emptyTitle {
+  font-family: var(--font-syne), sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+.emptySub {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.browseBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--green);
+  color: white;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.browseBtn:hover {
+  background: #145530;
+  color: white;
+}
+
+@media (min-width: 600px) {
+  .root {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+}
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: wishlistSpin 0.8s linear infinite;
+}
+@keyframes wishlistSpin {
+  to { transform: rotate(360deg); }
+}

@@ -66,7 +66,7 @@ import {
   FaHeart,
   FaTruck,
 } from "react-icons/fa";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLogoutMutation } from "@slices/usersApiSlice";
 import { useCartMutation } from "@slices/productsApiSlice";
 import { logout, useAuth } from "@slices/authSlice";
@@ -100,6 +100,8 @@ const Header = () => {
   const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = useDisclosure();
 
   const userDisplayName = userInfo?.name || userInfo?.firstname || userInfo?.email || "Account";
+  const wishlistItems = useSelector((s) => s.wishlist?.items ?? []);
+  const wishlistCount = Array.isArray(wishlistItems) ? wishlistItems.length : 0;
 
   const loadCartCount = useCallback(async () => {
     if (!userInfo?._id) {
@@ -657,6 +659,44 @@ const Header = () => {
                 <MenuItem as={Link} href="/account" py={2.5}>Track Order</MenuItem>
               </MenuList>
             </Menu>
+
+            {/* Wishlist – desktop */}
+            <Link href="/wishlist">
+              <Button
+                variant="ghost"
+                size="md"
+                h="44px"
+                px={3}
+                borderRadius="lg"
+                color="gray.700"
+                leftIcon={<FaHeart size={18} />}
+                fontWeight="600"
+                fontSize="0.875rem"
+                position="relative"
+                _hover={{ bg: "gray.50", color: ThemeColors.darkColor }}
+              >
+                Wishlist
+                {wishlistCount > 0 && (
+                  <Badge
+                    position="absolute"
+                    top="6px"
+                    right="2px"
+                    bg="red.500"
+                    color="white"
+                    borderRadius="full"
+                    fontSize="0.65rem"
+                    minW="18px"
+                    h="18px"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    fontWeight="700"
+                  >
+                    {wishlistCount > 99 ? "99+" : wishlistCount}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
 
             {/* Cart – icon + label + badge */}
             <Link href="/cart">
