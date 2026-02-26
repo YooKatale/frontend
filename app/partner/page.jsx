@@ -1,68 +1,12 @@
 "use client";
 
-import React, { useState } from 'react';
-import {
-  Box,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-  useToast,
-  VStack,
-  HStack,
-  Heading,
-  Text,
-  Card,
-  CardBody,
-  Container,
-  ScaleFade,
-  SlideFade,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
-  Button,
-} from '@chakra-ui/react';
-import ButtonComponent from '@components/Button';
-import { 
-  Loader, 
-  Store, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  CheckCircle, 
-  ChevronDown, 
-  ChevronUp, 
-  Sparkles,
-  Truck,
-  User,
-  Clock,
-  Building2,
-  Bike,
-  Car,
-  Motorcycle
-} from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@slices/authSlice';
-import { motion } from 'framer-motion';
-import { 
-  ShopOutlined,
-  CheckCircleOutlined,
-  UserOutlined,
-  EnvironmentOutlined,
-  PhoneOutlined,
-  MailOutlined,
-  ClockCircleOutlined,
-  CarOutlined
-} from '@ant-design/icons';
-import { ThemeColors } from '@constants/constants';
-import { useRegisterVendorMutation } from '@slices/vendorSlice';
-import { useSubmitDeliveryFormMutation } from '@slices/deliveryFormSlice';
-
-const MotionBox = motion(Box);
-const MotionCard = motion(Card);
+import React, { useState } from "react";
+import { useToast } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@slices/authSlice";
+import { useRegisterVendorMutation } from "@slices/vendorSlice";
+import { useSubmitDeliveryFormMutation } from "@slices/deliveryFormSlice";
+import styles from "./partner.module.css";
 
 const Partner = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -70,7 +14,6 @@ const Partner = () => {
   const router = useRouter();
   const { userInfo } = useAuth();
 
-  // Vendor Form State
   const [vendorFormData, setVendorFormData] = useState({
     name: '',
     address: '',
@@ -83,9 +26,9 @@ const Partner = () => {
   const [vendorFormStep, setVendorFormStep] = useState(1);
   const [isVendorLoading, setIsVendorLoading] = useState(false);
   const [vendorErrors, setVendorErrors] = useState({});
+  const [vendorSubmitted, setVendorSubmitted] = useState(false);
   const [registerVendor] = useRegisterVendorMutation();
 
-  // Delivery Form State
   const [deliveryFormData, setDeliveryFormData] = useState({
     fullname: '',
     phone: '',
@@ -101,13 +44,12 @@ const Partner = () => {
   });
   const [isDeliveryLoading, setIsDeliveryLoading] = useState(false);
   const [deliveryErrors, setDeliveryErrors] = useState({});
+  const [deliverySubmitted, setDeliverySubmitted] = useState(false);
   const [submitDeliveryForm] = useSubmitDeliveryFormMutation();
 
-  // FAQ State
   const [activeVendorQuestion, setActiveVendorQuestion] = useState(null);
   const [activeDeliveryQuestion, setActiveDeliveryQuestion] = useState(null);
 
-  // Vendor Form Handlers
   const validateVendorForm = () => {
     const newErrors = {};
     if (!vendorFormData.name.trim()) newErrors.name = 'Store name is required';
@@ -163,6 +105,7 @@ const Partner = () => {
       };
       const response = await registerVendor(data).unwrap();
       if (response.status === "Success") {
+        setVendorSubmitted(true);
         chakraToast({
           title: 'Application Submitted! 🎉',
           description: 'Your vendor application has been received. We\'ll review it within 24 hours.',
@@ -213,7 +156,6 @@ const Partner = () => {
     setVendorFormData({ ...vendorFormData, [name]: newValue });
   };
 
-  // Delivery Form Handlers
   const validateDeliveryForm = () => {
     const newErrors = {};
     if (!deliveryFormData.fullname.trim()) newErrors.fullname = 'Full name is required';
@@ -278,6 +220,7 @@ const Partner = () => {
         payload.numberPlate = deliveryFormData.numberPlate;
       }
       await submitDeliveryForm(payload).unwrap();
+      setDeliverySubmitted(true);
       chakraToast({
         title: 'Application Submitted! 🎉',
         description: 'Your delivery application has been received. We\'ll review it within 24 hours.',
@@ -324,7 +267,6 @@ const Partner = () => {
     setDeliveryFormData({ ...deliveryFormData, [name]: newValue });
   };
 
-  // FAQ Data
   const vendorFaqItems = [
     {
       question: 'How do I register my business on YooKatale?',
@@ -392,702 +334,634 @@ const Partner = () => {
     'Kitchen', 'Supplements', 'Gym', 'Sunna & steam', 'Hotel', 'Chef', 'Culinary',
   ];
 
-  const FormInput = ({ icon: Icon, label, name, type = 'text', placeholder, value, onChange, error, ...props }) => (
-    <MotionBox
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <FormControl className="mb-6" isInvalid={error}>
-        <FormLabel className="flex items-center gap-2 text-gray-700 font-semibold mb-2">
-          <Icon size={18} style={{ color: ThemeColors.primaryColor }} />
-          {label}
-        </FormLabel>
-        <Input
-          type={type}
-          name={name}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          required
-          className={`border-2 rounded-xl px-4 py-3 text-lg transition-all duration-300 w-full ${
-            error 
-              ? 'border-red-500 focus:border-red-600 focus:ring-red-500' 
-              : 'border-gray-200 hover:border-green-600 focus:border-green-600 focus:ring-2 focus:ring-green-600/20'
-          }`}
-          _focus={{
-            boxShadow: `0 0 0 3px ${ThemeColors.primaryColor}20`,
-            borderColor: ThemeColors.primaryColor,
-          }}
-          {...props}
-        />
-        {error && (
-          <Text className="text-red-500 text-sm mt-1 flex items-center gap-1">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
-            {error}
-          </Text>
-        )}
-      </FormControl>
-    </MotionBox>
-  );
-
   return (
-    <Container maxW="container.xl" className="py-8 md:py-12">
-      {/* Hero Section */}
-      <MotionBox
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-center mb-12"
-      >
-        <Box 
-          className="inline-block p-3 rounded-full mb-4"
-          style={{ backgroundColor: `${ThemeColors.primaryColor}15` }}
-        >
-          <Store className="w-12 h-12" style={{ color: ThemeColors.primaryColor }} />
-        </Box>
-        <Heading as="h1" className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
-          Partner with <span style={{ color: ThemeColors.primaryColor }}>YooKatale</span>
-        </Heading>
-        <Text className="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
-          Join thousands of vendors and delivery partners. Register your store or become a delivery driver today!
-        </Text>
-      </MotionBox>
+    <div className={styles.root}>
+      <div className={styles.bgOrbs} />
+      <div className={styles.page}>
+        <div className={styles.hero}>
+          <div className={styles.heroBadge}>
+            <div className={styles.heroBadgeDot} />
+            Now accepting partners
+          </div>
+          <h1 className={styles.heroTitle}>
+            Partner with
+            <br />
+            <span className={styles.heroTitleYoo}>Yoo</span>
+            <span className={styles.heroTitleBrand}>Katale</span>
+          </h1>
+          <p className={styles.heroSub}>
+            Join vendors and delivery partners. Grow your business with Uganda&apos;s freshest online
+            marketplace.
+          </p>
+        </div>
 
-      {/* Tabs for Vendor and Delivery Forms */}
-      <Tabs 
-        index={activeTab} 
-        onChange={setActiveTab}
-        colorScheme="green"
-        variant="enclosed"
-        className="mb-8"
-      >
-        <TabList className="flex flex-wrap justify-center gap-2 mb-8">
-          <Tab 
-            className="px-6 py-3 text-lg font-semibold rounded-t-xl"
-            _selected={{
-              color: 'white',
-              bg: ThemeColors.primaryColor,
-            }}
-            style={{
-              color: activeTab === 0 ? 'white' : ThemeColors.primaryColor,
-              backgroundColor: activeTab === 0 ? ThemeColors.primaryColor : 'transparent',
-            }}
+        <div className={styles.statsRow}>
+          <div className={styles.statCard}>
+            <div className={styles.statNum}>1K+</div>
+            <div className={styles.statLabel}>Active Vendors</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={`${styles.statNum} ${styles.statNumOrange}`}>24hr</div>
+            <div className={styles.statLabel}>Onboarding</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={`${styles.statNum} ${styles.statNumYellow}`}>Weekly</div>
+            <div className={styles.statLabel}>Payouts</div>
+          </div>
+        </div>
+
+        <div className={styles.tabWrap}>
+          <button
+            type="button"
+            className={`${styles.tabBtn} ${activeTab === 0 ? styles.tabBtnActive : ""}`}
+            onClick={() => setActiveTab(0)}
           >
-            <HStack>
-              <Store size={20} />
-              <Text>Vendor Registration</Text>
-            </HStack>
-          </Tab>
-          <Tab 
-            className="px-6 py-3 text-lg font-semibold rounded-t-xl"
-            _selected={{
-              color: 'white',
-              bg: ThemeColors.primaryColor,
-            }}
-            style={{
-              color: activeTab === 1 ? 'white' : ThemeColors.primaryColor,
-              backgroundColor: activeTab === 1 ? ThemeColors.primaryColor : 'transparent',
-            }}
+            <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            Vendor
+          </button>
+          <button
+            type="button"
+            className={`${styles.tabBtn} ${activeTab === 1 ? styles.tabBtnActive : ""}`}
+            onClick={() => setActiveTab(1)}
           >
-            <HStack>
-              <Truck size={20} />
-              <Text>Delivery Partner</Text>
-            </HStack>
-          </Tab>
-        </TabList>
+            <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <circle cx="5.5" cy="17.5" r="3.5" />
+              <circle cx="18.5" cy="17.5" r="3.5" />
+              <path d="M15 6h2l3 5.5M8 17.5h5.5L16 9H9L6.5 14M9 6l3 3.5" />
+            </svg>
+            Delivery Partner
+          </button>
+        </div>
 
-        <TabPanels>
-          {/* Vendor Registration Tab */}
-          <TabPanel>
-            <Box className="flex flex-col lg:flex-row gap-8">
-              {/* Vendor Form */}
-              <MotionCard
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                className="lg:w-2/3 shadow-2xl rounded-3xl border border-gray-100 overflow-hidden"
-                bg="white"
+        {/* Vendor Panel */}
+        <div className={`${styles.panel} ${activeTab === 0 ? styles.panelActive : ""}`}>
+          <div className={styles.steps}>
+            <div className={`${styles.step} ${styles.stepDone}`}>
+              <div className={styles.stepCircle}>
+                <svg fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div className={styles.stepLabel}>Choose</div>
+            </div>
+            <div className={styles.stepLine} />
+            <div className={`${styles.step} ${styles.stepCurrent}`}>
+              <div className={styles.stepCircle}>2</div>
+              <div className={styles.stepLabel}>Register</div>
+            </div>
+            <div className={styles.stepLine} />
+            <div className={styles.step}>
+              <div className={styles.stepCircle}>3</div>
+              <div className={styles.stepLabel}>Go Live</div>
+            </div>
+          </div>
+
+          <div className={styles.perksGrid}>
+            <div className={`${styles.perkCard} ${styles.perkCardFeatured}`}>
+              <div className={styles.perkIcon}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </div>
+              <div>
+                <div className={styles.perkName}>Quick Onboarding</div>
+                <div className={styles.perkDesc}>Get approved and start selling within 24 hours.</div>
+              </div>
+            </div>
+            <div className={styles.perkCard}>
+              <div className={styles.perkIcon}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <line x1="18" y1="20" x2="18" y2="10" />
+                  <line x1="12" y1="20" x2="12" y2="4" />
+                  <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+              </div>
+              <div className={styles.perkName}>Vendor Dashboard</div>
+              <div className={styles.perkDesc}>Manage orders and inventory in real-time.</div>
+            </div>
+            <div className={`${styles.perkCard} ${styles.perkCardOrange}`}>
+              <div className={styles.perkIcon}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <rect x="2" y="5" width="20" height="14" rx="2" />
+                  <line x1="2" y1="10" x2="22" y2="10" />
+                </svg>
+              </div>
+              <div className={styles.perkName}>Weekly Payouts</div>
+              <div className={styles.perkDesc}>
+                Reliable weekly payments via bank or Mobile Money.
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.orangeDivider} />
+
+          <div className={styles.formCard}>
+            <div className={styles.formCardHeader}>
+              <div className={`${styles.formCardIcon} ${styles.formCardIconGreen}`}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+              </div>
+              <div>
+                <div className={styles.formCardTitle}>Store Registration</div>
+                <div className={styles.formCardSubtitle}>Fill in your store details below.</div>
+              </div>
+            </div>
+
+            <div className={styles.formBody}>
+              <div
+                className={
+                  vendorSubmitted
+                    ? styles.formFieldsWrapHidden
+                    : ""
+                }
               >
-                <CardBody className="p-6 md:p-8">
-                  <Heading as="h2" className="text-2xl font-bold mb-6 flex items-center gap-3">
-                    <ShopOutlined style={{ color: ThemeColors.primaryColor }} />
-                    Store Registration Form
-                  </Heading>
+                <form onSubmit={handleVendorSubmit}>
+                  <div className={styles.fieldRow}>
+                    <div className={styles.fieldGroup}>
+                      <label className={styles.label}>Store Name *</label>
+                      <input
+                        type="text"
+                        name="name"
+                        className={styles.input}
+                        placeholder="e.g. Mama's Kitchen"
+                        value={vendorFormData.name}
+                        onChange={handleVendorChange}
+                      />
+                      {vendorErrors.name && (
+                        <div className={styles.errorText}>{vendorErrors.name}</div>
+                      )}
+                    </div>
+                    <div className={styles.fieldGroup}>
+                      <label className={styles.label}>Phone *</label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        className={styles.input}
+                        placeholder="+256 7XX XXX XXX"
+                        value={vendorFormData.phone}
+                        onChange={handleVendorChange}
+                      />
+                      {vendorErrors.phone && (
+                        <div className={styles.errorText}>{vendorErrors.phone}</div>
+                      )}
+                    </div>
+                  </div>
 
-                  <form onSubmit={handleVendorSubmit}>
-                    {vendorFormStep === 1 && (
-                      <SlideFade in={vendorFormStep === 1}>
-                        <VStack spacing={6}>
-                          <FormInput
-                            icon={Store}
-                            label="Store Name *"
-                            name="name"
-                            placeholder="Enter your store name"
-                            value={vendorFormData.name}
-                            onChange={handleVendorChange}
-                            error={vendorErrors.name}
-                          />
-                          
-                          <FormInput
-                            icon={MapPin}
-                            label="Store Address *"
-                            name="address"
-                            placeholder="Enter complete address"
-                            value={vendorFormData.address}
-                            onChange={handleVendorChange}
-                            error={vendorErrors.address}
-                          />
-                          
-                          <FormInput
-                            icon={Phone}
-                            label="Phone Number *"
-                            name="phone"
-                            type="tel"
-                            placeholder="+256 XXX XXX XXX"
-                            value={vendorFormData.phone}
-                            onChange={handleVendorChange}
-                            error={vendorErrors.phone}
-                          />
-                          
-                          <FormInput
-                            icon={Mail}
-                            label="Email Address *"
-                            name="email"
-                            type="email"
-                            placeholder="you@example.com"
-                            value={vendorFormData.email}
-                            onChange={handleVendorChange}
-                            error={vendorErrors.email}
-                          />
-                          
-                          <MotionBox className="w-full" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
-                            <FormControl isInvalid={vendorErrors.category}>
-                              <FormLabel className="flex items-center gap-2 text-gray-700 font-semibold mb-2">
-                                <Store size={18} style={{ color: ThemeColors.primaryColor }} />
-                                Business Category *
-                              </FormLabel>
-                              <Select
-                                name="category"
-                                value={vendorFormData.category}
-                                onChange={handleVendorChange}
-                                required
-                                className="border-2 rounded-xl px-4 py-3 text-lg border-gray-200 hover:border-green-600 focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-300"
-                                placeholder="Select your category"
-                                _focus={{
-                                  boxShadow: `0 0 0 3px ${ThemeColors.primaryColor}20`,
-                                  borderColor: ThemeColors.primaryColor,
-                                }}
-                              >
-                                {categories.map((cat) => (
-                                  <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                              </Select>
-                              {vendorErrors.category && (
-                                <Text className="text-red-500 text-sm mt-1">{vendorErrors.category}</Text>
-                              )}
-                            </FormControl>
-                          </MotionBox>
-                          
-                          <MotionBox className="w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.3 }}>
-                            <HStack className="p-4 bg-gray-50 rounded-xl">
-                              <input
-                                type="checkbox"
-                                name="vegan"
-                                id="vegan"
-                                checked={vendorFormData.vegan}
-                                onChange={handleVendorChange}
-                                className="w-5 h-5 rounded border-gray-300 focus:ring-green-600"
-                                style={{ accentColor: ThemeColors.primaryColor }}
-                              />
-                              <label htmlFor="vegan" className="text-gray-700 cursor-pointer">
-                                Our store offers vegetarian/vegan options
-                              </label>
-                            </HStack>
-                          </MotionBox>
-                          
-                          <MotionBox className="w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.4 }}>
-                            <ButtonComponent
-                              text="Next Step →"
-                              size="lg"
-                              type="button"
-                              onClick={() => setVendorFormStep(2)}
-                              className="w-full py-3 text-lg font-semibold"
-                            />
-                          </MotionBox>
-                        </VStack>
-                      </SlideFade>
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Store Address *</label>
+                    <input
+                      type="text"
+                      name="address"
+                      className={styles.input}
+                      placeholder="e.g. Plot 6, Kampala Road, Kampala"
+                      value={vendorFormData.address}
+                      onChange={handleVendorChange}
+                    />
+                    {vendorErrors.address && (
+                      <div className={styles.errorText}>{vendorErrors.address}</div>
                     )}
-                    
-                    {vendorFormStep === 2 && (
-                      <SlideFade in={vendorFormStep === 2}>
-                        <VStack spacing={6}>
-                          <Heading as="h2" className="text-2xl font-bold mb-6 flex items-center gap-3">
-                            <CheckCircleOutlined style={{ color: ThemeColors.primaryColor }} />
-                            Review & Submit
-                          </Heading>
-                          
-                          <MotionBox className="w-full p-6 rounded-xl" style={{ backgroundColor: `${ThemeColors.primaryColor}08` }}>
-                            <VStack spacing={4} align="start">
-                              <Text className="font-semibold text-gray-700">Review Your Information:</Text>
-                              <Box className="space-y-2">
-                                <Text><span className="font-medium">Store:</span> {vendorFormData.name || 'Not provided'}</Text>
-                                <Text><span className="font-medium">Category:</span> {vendorFormData.category || 'Not selected'}</Text>
-                                <Text><span className="font-medium">Phone:</span> {vendorFormData.phone || 'Not provided'}</Text>
-                                <Text><span className="font-medium">Email:</span> {vendorFormData.email || 'Not provided'}</Text>
-                                <Text><span className="font-medium">Address:</span> {vendorFormData.address || 'Not provided'}</Text>
-                              </Box>
-                            </VStack>
-                          </MotionBox>
-                          
-                          <MotionBox className="w-full">
-                            <HStack className="p-4 bg-gray-50 rounded-xl mb-4">
-                              <input
-                                type="checkbox"
-                                name="terms"
-                                id="vendor-terms"
-                                checked={vendorFormData.terms}
-                                onChange={handleVendorChange}
-                                className="w-5 h-5 rounded border-gray-300 focus:ring-green-600"
-                                style={{ accentColor: ThemeColors.primaryColor }}
-                              />
-                              <label htmlFor="vendor-terms" className="text-gray-700 cursor-pointer">
-                                I agree to the{' '}
-                                <Link href="/vendor-terms" className="font-semibold hover:underline" style={{ color: ThemeColors.primaryColor }}>
-                                  Terms & Conditions
-                                </Link>
-                                {' '}and{' '}
-                                <Link href="/privacy" className="font-semibold hover:underline" style={{ color: ThemeColors.primaryColor }}>
-                                  Privacy Policy
-                                </Link>
-                              </label>
-                            </HStack>
-                          </MotionBox>
-                          
-                          <MotionBox className="w-full flex gap-4">
-                            <ButtonComponent
-                              text="← Back"
-                              size="lg"
-                              type="button"
-                              variant="outline"
-                              onClick={() => setVendorFormStep(1)}
-                              className="flex-1 py-3 font-semibold"
-                            />
-                            <ButtonComponent
-                              text={isVendorLoading ? 'Submitting...' : 'Submit Application'}
-                              size="lg"
-                              type="submit"
-                              isLoading={isVendorLoading}
-                              loadingText="Processing..."
-                              leftIcon={!isVendorLoading && <Sparkles size={20} />}
-                              className="flex-1 py-3 font-semibold"
-                              style={{
-                                background: `linear-gradient(to right, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`,
-                                color: 'white',
-                              }}
-                            />
-                          </MotionBox>
-                        </VStack>
-                      </SlideFade>
-                    )}
-                  </form>
-                </CardBody>
-              </MotionCard>
+                  </div>
 
-              {/* Vendor FAQ */}
-              <MotionCard
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="lg:w-1/3 shadow-xl rounded-3xl border border-gray-100 h-fit"
-              >
-                <CardBody className="p-6">
-                  <Heading as="h3" className="text-2xl font-bold mb-6 flex items-center gap-3">
-                    <svg className="w-6 h-6" style={{ color: ThemeColors.primaryColor }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Email Address *</label>
+                    <input
+                      type="email"
+                      name="email"
+                      className={styles.input}
+                      placeholder="you@example.com"
+                      value={vendorFormData.email}
+                      onChange={handleVendorChange}
+                    />
+                    {vendorErrors.email && (
+                      <div className={styles.errorText}>{vendorErrors.email}</div>
+                    )}
+                  </div>
+
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Business Category *</label>
+                    <select
+                      name="category"
+                      className={styles.select}
+                      value={vendorFormData.category}
+                      onChange={handleVendorChange}
+                    >
+                      <option value="">Select your category</option>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                    {vendorErrors.category && (
+                      <div className={styles.errorText}>{vendorErrors.category}</div>
+                    )}
+                  </div>
+
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Brief Description</label>
+                    <textarea
+                      name="description"
+                      className={styles.textarea}
+                      placeholder="Tell customers what you sell and what makes your store special..."
+                      onChange={() => {}}
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    className={styles.toggleRow}
+                    onClick={() =>
+                      setVendorFormData((prev) => ({ ...prev, vegan: !prev.vegan }))
+                    }
+                  >
+                    <div className={styles.toggleRowLeft}>
+                      <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M17 8C8 10 5.9 16.17 3.82 19.25A13 13 0 0015 21c3.87 0 7-3.13 7-7 0-2.5-1-4.75-5-6z" />
+                        <path d="M3.82 19.25C6 14 9.5 11.5 14 10" />
+                      </svg>
+                      <div>
+                        <div className={styles.toggleLabel}>Vegetarian / Vegan options</div>
+                        <div className={styles.toggleSub}>
+                          We offer plant-based or vegetarian products.
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className={`${styles.toggle} ${
+                        vendorFormData.vegan ? styles.toggleOn : ""
+                      }`}
+                    />
+                  </button>
+
+                  <button type="submit" className={styles.submitBtn} disabled={isVendorLoading}>
+                    <svg
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
-                    Vendor FAQs
-                  </Heading>
-                  
-                  <VStack spacing={4} align="stretch">
-                    {vendorFaqItems.map((item, index) => (
-                      <MotionBox
-                        key={index}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.1 }}
-                      >
-                        <Box
-                          className={`p-4 rounded-xl cursor-pointer transition-all duration-300 ${
-                            activeVendorQuestion === index 
-                              ? 'border-l-4' 
-                              : 'bg-gray-50 hover:bg-gray-100'
-                          }`}
-                          style={activeVendorQuestion === index ? {
-                            backgroundColor: `${ThemeColors.primaryColor}10`,
-                            borderLeftColor: ThemeColors.primaryColor
-                          } : {}}
-                          onClick={() => setActiveVendorQuestion(activeVendorQuestion === index ? null : index)}
-                        >
-                          <HStack justify="space-between" className="mb-2">
-                            <Text className="font-semibold text-gray-800 pr-4 text-sm">
-                              {item.question}
-                            </Text>
-                            {activeVendorQuestion === index ? (
-                              <ChevronUp className="w-5 h-5 flex-shrink-0" style={{ color: ThemeColors.primaryColor }} />
-                            ) : (
-                              <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                            )}
-                          </HStack>
-                          
-                          <ScaleFade in={activeVendorQuestion === index}>
-                            {activeVendorQuestion === index && (
-                              <Text className="text-gray-600 mt-2 pl-2 border-l-2 text-sm" style={{ borderLeftColor: `${ThemeColors.primaryColor}50` }}>
-                                {item.answer}
-                              </Text>
-                            )}
-                          </ScaleFade>
-                        </Box>
-                      </MotionBox>
-                    ))}
-                  </VStack>
-                </CardBody>
-              </MotionCard>
-            </Box>
-          </TabPanel>
+                    {isVendorLoading ? "Submitting..." : "Register My Store"}
+                  </button>
+                </form>
+              </div>
 
-          {/* Delivery Partner Tab */}
-          <TabPanel>
-            <Box className="flex flex-col lg:flex-row gap-8">
-              {/* Delivery Form */}
-              <MotionCard
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                className="lg:w-2/3 shadow-2xl rounded-3xl border border-gray-100 overflow-hidden"
-                bg="white"
+              <div
+                className={`${styles.successState} ${
+                  vendorSubmitted ? styles.successStateShow : ""
+                }`}
               >
-                <CardBody className="p-6 md:p-8">
-                  <Heading as="h2" className="text-2xl font-bold mb-6 flex items-center gap-3">
-                    <Truck style={{ color: ThemeColors.primaryColor }} size={24} />
-                    Delivery Partner Registration
-                  </Heading>
+                <div className={styles.successIcon}>
+                  <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                </div>
+                <div className={styles.successTitle}>Application Received!</div>
+                <p className={styles.successSub}>
+                  We&apos;ll review your store and reach out within 24 hours to get you live on
+                  YooKatale.
+                </p>
+              </div>
+            </div>
+          </div>
 
-                  <form onSubmit={handleDeliverySubmit}>
-                    <VStack spacing={6}>
-                      <FormInput
-                        icon={User}
-                        label="Full Name *"
+          <div className={styles.sectionLabel}>Vendor FAQs</div>
+          <div className={styles.faqCard}>
+            {vendorFaqItems.map((item, index) => {
+              const open = index === activeVendorQuestion;
+              return (
+                <div
+                  key={item.question}
+                  className={`${styles.faqItem} ${open ? styles.faqItemOpen : ""}`}
+                >
+                  <button
+                    type="button"
+                    className={styles.faqQ}
+                    onClick={() =>
+                      setActiveVendorQuestion(open ? null : index)
+                    }
+                  >
+                    <span className={styles.faqQText}>{item.question}</span>
+                    <svg
+                      className={styles.faqChevron}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </button>
+                  <div className={styles.faqA}>
+                    <div className={styles.faqAInner}>{item.answer}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Delivery Panel */}
+        <div className={`${styles.panel} ${activeTab === 1 ? styles.panelActive : ""}`}>
+          <div className={styles.steps}>
+            <div className={`${styles.step} ${styles.stepDone}`}>
+              <div className={styles.stepCircle}>
+                <svg fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div className={styles.stepLabel}>Choose</div>
+            </div>
+            <div className={styles.stepLine} />
+            <div className={`${styles.step} ${styles.stepCurrent}`}>
+              <div className={styles.stepCircle}>2</div>
+              <div className={styles.stepLabel}>Apply</div>
+            </div>
+            <div className={styles.stepLine} />
+            <div className={styles.step}>
+              <div className={styles.stepCircle}>3</div>
+              <div className={styles.stepLabel}>Deliver</div>
+            </div>
+          </div>
+
+          <div className={styles.perksGrid}>
+            <div className={`${styles.perkCard} ${styles.perkCardDeliveryFeatured}`}>
+              <div className={styles.perkIcon}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              </div>
+              <div>
+                <div className={styles.perkName}>Earn on Your Schedule</div>
+                <div className={styles.perkDesc}>Flexible hours, tips, and weekly bonuses.</div>
+              </div>
+            </div>
+            <div className={`${styles.perkCard} ${styles.perkCardOrange}`}>
+              <div className={styles.perkIcon}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </div>
+              <div className={styles.perkName}>Instant Pickup</div>
+              <div className={styles.perkDesc}>Orders assigned to nearby riders fast.</div>
+            </div>
+            <div className={styles.perkCard}>
+              <div className={styles.perkIcon}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                  <circle cx="12" cy="9" r="2.5" />
+                </svg>
+              </div>
+              <div className={styles.perkName}>Greater Kampala</div>
+              <div className={styles.perkDesc}>Deliver across Kampala and nearby areas.</div>
+            </div>
+          </div>
+
+          <div className={styles.orangeDivider} />
+
+          <div className={styles.formCard}>
+            <div className={styles.formCardHeader}>
+              <div className={`${styles.formCardIcon} ${styles.formCardIconOrange}`}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="5.5" cy="17.5" r="3.5" />
+                  <circle cx="18.5" cy="17.5" r="3.5" />
+                  <path d="M15 6h2l3 5.5M8 17.5h5.5L16 9H9L6.5 14M9 6l3 3.5" />
+                </svg>
+              </div>
+              <div>
+                <div className={styles.formCardTitle}>Driver Application</div>
+                <div className={styles.formCardSubtitle}>Join our delivery fleet today.</div>
+              </div>
+            </div>
+
+            <div className={styles.formBody}>
+              <div
+                className={
+                  deliverySubmitted
+                    ? styles.formFieldsWrapHidden
+                    : ""
+                }
+              >
+                <form onSubmit={handleDeliverySubmit}>
+                  <div className={styles.fieldRow}>
+                    <div className={styles.fieldGroup}>
+                      <label className={styles.label}>Full Name *</label>
+                      <input
+                        type="text"
                         name="fullname"
-                        placeholder="Enter your full name"
+                        className={styles.input}
+                        placeholder="e.g. Okello James"
                         value={deliveryFormData.fullname}
                         onChange={handleDeliveryChange}
-                        error={deliveryErrors.fullname}
                       />
-                      
-                      <FormInput
-                        icon={Phone}
-                        label="Phone Number *"
-                        name="phone"
+                      {deliveryErrors.fullname && (
+                        <div className={styles.errorText}>{deliveryErrors.fullname}</div>
+                      )}
+                    </div>
+                    <div className={styles.fieldGroup}>
+                      <label className={styles.label}>Phone *</label>
+                      <input
                         type="tel"
-                        placeholder="+256 XXX XXX XXX"
+                        name="phone"
+                        className={styles.input}
+                        placeholder="+256 7XX XXX XXX"
                         value={deliveryFormData.phone}
                         onChange={handleDeliveryChange}
-                        error={deliveryErrors.phone}
                       />
-                      
-                      <FormInput
-                        icon={Mail}
-                        label="Email Address *"
-                        name="email"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={deliveryFormData.email}
-                        onChange={handleDeliveryChange}
-                        error={deliveryErrors.email}
-                      />
-                      
-                      <FormInput
-                        icon={MapPin}
-                        label="Location *"
+                      {deliveryErrors.phone && (
+                        <div className={styles.errorText}>{deliveryErrors.phone}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Email Address *</label>
+                    <input
+                      type="email"
+                      name="email"
+                      className={styles.input}
+                      placeholder="you@example.com"
+                      value={deliveryFormData.email}
+                      onChange={handleDeliveryChange}
+                    />
+                    {deliveryErrors.email && (
+                      <div className={styles.errorText}>{deliveryErrors.email}</div>
+                    )}
+                  </div>
+
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Vehicle Type *</label>
+                    <select
+                      name="transport"
+                      className={styles.select}
+                      value={deliveryFormData.transport}
+                      onChange={handleDeliveryChange}
+                    >
+                      <option value="bike">Motorcycle (Boda Boda)</option>
+                      <option value="bicycle">Bicycle</option>
+                      <option value="car">Car / Saloon</option>
+                      <option value="pickup">Pickup Truck</option>
+                      <option value="van">Mini Van</option>
+                    </select>
+                  </div>
+
+                  <div className={styles.fieldRow}>
+                    <div className={styles.fieldGroup}>
+                      <label className={styles.label}>Location / Area *</label>
+                      <input
+                        type="text"
                         name="location"
-                        placeholder="Enter your location"
+                        className={styles.input}
+                        placeholder="e.g. Ntinda, Kampala"
                         value={deliveryFormData.location}
                         onChange={handleDeliveryChange}
-                        error={deliveryErrors.location}
                       />
-                      
-                      <FormInput
-                        icon={Building2}
-                        label="Business Name *"
-                        name="businessName"
-                        placeholder="Enter your business name"
-                        value={deliveryFormData.businessName}
-                        onChange={handleDeliveryChange}
-                        error={deliveryErrors.businessName}
-                      />
-                      
-                      <FormInput
-                        icon={MapPin}
-                        label="Business Address *"
-                        name="businessAddress"
-                        placeholder="Enter business address"
-                        value={deliveryFormData.businessAddress}
-                        onChange={handleDeliveryChange}
-                        error={deliveryErrors.businessAddress}
-                      />
-                      
-                      <FormInput
-                        icon={Clock}
-                        label="Business Hours *"
-                        name="businessHours"
-                        placeholder="e.g., 8:00 AM - 6:00 PM"
-                        value={deliveryFormData.businessHours}
-                        onChange={handleDeliveryChange}
-                        error={deliveryErrors.businessHours}
-                      />
-                      
-                      <MotionBox className="w-full">
-                        <FormControl>
-                          <FormLabel className="flex items-center gap-2 text-gray-700 font-semibold mb-2">
-                            <CarOutlined style={{ color: ThemeColors.primaryColor }} />
-                            Transport Method *
-                          </FormLabel>
-                          <Select
-                            name="transport"
-                            value={deliveryFormData.transport}
-                            onChange={handleDeliveryChange}
-                            required
-                            className="border-2 rounded-xl px-4 py-3 text-lg border-gray-200 hover:border-green-600 focus:border-green-600 focus:ring-2 focus:ring-green-600/20 transition-all duration-300"
-                            _focus={{
-                              boxShadow: `0 0 0 3px ${ThemeColors.primaryColor}20`,
-                              borderColor: ThemeColors.primaryColor,
-                            }}
-                          >
-                            <option value="bike">Bike</option>
-                            <option value="motorcycle">Motorcycle</option>
-                            <option value="vehicle">Vehicle</option>
-                          </Select>
-                        </FormControl>
-                      </MotionBox>
-                      
-                      {deliveryFormData.transport !== 'bike' && (
-                        <MotionBox className="w-full" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} transition={{ duration: 0.3 }}>
-                          <FormInput
-                            icon={Car}
-                            label="Number Plate *"
-                            name="numberPlate"
-                            placeholder="Enter vehicle number plate"
-                            value={deliveryFormData.numberPlate}
-                            onChange={handleDeliveryChange}
-                            error={deliveryErrors.numberPlate}
-                          />
-                        </MotionBox>
+                      {deliveryErrors.location && (
+                        <div className={styles.errorText}>{deliveryErrors.location}</div>
                       )}
-                      
-                      <MotionBox className="w-full">
-                        <HStack className="p-4 bg-gray-50 rounded-xl">
-                          <input
-                            type="checkbox"
-                            name="vegan"
-                            id="delivery-vegan"
-                            checked={deliveryFormData.vegan}
-                            onChange={handleDeliveryChange}
-                            className="w-5 h-5 rounded border-gray-300 focus:ring-green-600"
-                            style={{ accentColor: ThemeColors.primaryColor }}
-                          />
-                          <label htmlFor="delivery-vegan" className="text-gray-700 cursor-pointer">
-                            Do you want to apply for a new Courier from YooKatale?
-                          </label>
-                        </HStack>
-                      </MotionBox>
-                      
-                      <MotionBox className="w-full">
-                        <HStack className="p-4 bg-gray-50 rounded-xl mb-4">
-                          <input
-                            type="checkbox"
-                            name="terms"
-                            id="delivery-terms"
-                            checked={deliveryFormData.terms}
-                            onChange={handleDeliveryChange}
-                            className="w-5 h-5 rounded border-gray-300 focus:ring-green-600"
-                            style={{ accentColor: ThemeColors.primaryColor }}
-                          />
-                          <label htmlFor="delivery-terms" className="text-gray-700 cursor-pointer">
-                            I agree to the{' '}
-                            <Link href="/vendor-terms" className="font-semibold hover:underline" style={{ color: ThemeColors.primaryColor }}>
-                              Terms & Conditions
-                            </Link>
-                            {' '}and{' '}
-                            <Link href="/privacy" className="font-semibold hover:underline" style={{ color: ThemeColors.primaryColor }}>
-                              Privacy Policy
-                            </Link>
-                          </label>
-                        </HStack>
-                      </MotionBox>
-                      
-                      <MotionBox className="w-full">
-                        <ButtonComponent
-                          text={isDeliveryLoading ? 'Submitting...' : 'Submit Application'}
-                          size="lg"
-                          type="submit"
-                          isLoading={isDeliveryLoading}
-                          loadingText="Processing..."
-                          leftIcon={!isDeliveryLoading && <Sparkles size={20} />}
-                          className="w-full py-3 text-lg font-semibold"
-                          style={{
-                            background: `linear-gradient(to right, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`,
-                            color: 'white',
-                          }}
-                        />
-                      </MotionBox>
-                    </VStack>
-                  </form>
-                </CardBody>
-              </MotionCard>
-
-              {/* Delivery FAQ */}
-              <MotionCard
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="lg:w-1/3 shadow-xl rounded-3xl border border-gray-100 h-fit"
-              >
-                <CardBody className="p-6">
-                  <Heading as="h3" className="text-2xl font-bold mb-6 flex items-center gap-3">
-                    <svg className="w-6 h-6" style={{ color: ThemeColors.primaryColor }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Delivery FAQs
-                  </Heading>
-                  
-                  <VStack spacing={4} align="stretch">
-                    {deliveryFaqItems.map((item, index) => (
-                      <MotionBox
-                        key={index}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                    </div>
+                    <div className={styles.fieldGroup}>
+                      <label className={styles.label}>Availability</label>
+                      <select
+                        name="availability"
+                        className={styles.select}
+                        onChange={() => {}}
                       >
-                        <Box
-                          className={`p-4 rounded-xl cursor-pointer transition-all duration-300 ${
-                            activeDeliveryQuestion === index 
-                              ? 'border-l-4' 
-                              : 'bg-gray-50 hover:bg-gray-100'
-                          }`}
-                          style={activeDeliveryQuestion === index ? {
-                            backgroundColor: `${ThemeColors.primaryColor}10`,
-                            borderLeftColor: ThemeColors.primaryColor
-                          } : {}}
-                          onClick={() => setActiveDeliveryQuestion(activeDeliveryQuestion === index ? null : index)}
-                        >
-                          <HStack justify="space-between" className="mb-2">
-                            <Text className="font-semibold text-gray-800 pr-4 text-sm">
-                              {item.question}
-                            </Text>
-                            {activeDeliveryQuestion === index ? (
-                              <ChevronUp className="w-5 h-5 flex-shrink-0" style={{ color: ThemeColors.primaryColor }} />
-                            ) : (
-                              <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                            )}
-                          </HStack>
-                          
-                          <ScaleFade in={activeDeliveryQuestion === index}>
-                            {activeDeliveryQuestion === index && (
-                              <Text className="text-gray-600 mt-2 pl-2 border-l-2 text-sm" style={{ borderLeftColor: `${ThemeColors.primaryColor}50` }}>
-                                {item.answer}
-                              </Text>
-                            )}
-                          </ScaleFade>
-                        </Box>
-                      </MotionBox>
-                    ))}
-                  </VStack>
-                  
-                  {/* Support Info */}
-                  <Box 
-                    className="mt-8 p-4 rounded-xl"
-                    style={{ 
-                      background: `linear-gradient(to right, ${ThemeColors.primaryColor}15, ${ThemeColors.secondaryColor}15)`
-                    }}
+                        <option>Full-time</option>
+                        <option>Part-time</option>
+                        <option>Weekends only</option>
+                        <option>Evenings only</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {deliveryFormData.transport !== "bike" && (
+                    <div className={styles.fieldGroup}>
+                      <label className={styles.label}>Number Plate *</label>
+                      <input
+                        type="text"
+                        name="numberPlate"
+                        className={styles.input}
+                        placeholder="Enter vehicle number plate"
+                        value={deliveryFormData.numberPlate}
+                        onChange={handleDeliveryChange}
+                      />
+                      {deliveryErrors.numberPlate && (
+                        <div className={styles.errorText}>{deliveryErrors.numberPlate}</div>
+                      )}
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    className={styles.toggleRow}
+                    onClick={() =>
+                      setDeliveryFormData((prev) => ({ ...prev, vegan: !prev.vegan }))
+                    }
                   >
-                    <Text className="font-semibold text-gray-800 mb-2">Need Help?</Text>
-                    <Text className="text-gray-600 mb-3 text-sm">
-                      Our support team is here to help you get started
-                    </Text>
-                    <HStack>
-                      <Phone size={16} style={{ color: ThemeColors.primaryColor }} />
-                      <Text className="font-medium text-sm">+256 700 123 456</Text>
-                    </HStack>
-                    <HStack className="mt-2">
-                      <Mail size={16} style={{ color: ThemeColors.primaryColor }} />
-                      <Text className="font-medium text-sm">delivery@yookatale.com</Text>
-                    </HStack>
-                  </Box>
-                </CardBody>
-              </MotionCard>
-            </Box>
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+                    <div className={styles.toggleRowLeft}>
+                      <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <circle cx="8" cy="12" r="2" />
+                        <path d="M13 9h5M13 12h3" />
+                      </svg>
+                      <div>
+                        <div className={styles.toggleLabel}>I have a valid driving permit</div>
+                        <div className={styles.toggleSub}>
+                          Required for motorcycle and car drivers.
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className={`${styles.toggle} ${
+                        deliveryFormData.vegan ? styles.toggleOn : ""
+                      }`}
+                    />
+                  </button>
 
-      {/* Benefits Section */}
-      <MotionBox
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6"
-      >
-        {[
-          {
-            icon: '🚀',
-            title: 'Quick Onboarding',
-            desc: 'Get approved and start within 24 hours'
-          },
-          {
-            icon: '📱',
-            title: 'Easy Management',
-            desc: 'Manage everything from your dashboard'
-          },
-          {
-            icon: '💰',
-            title: 'Weekly Payments',
-            desc: 'Reliable weekly payments to your bank'
-          }
-        ].map((benefit, idx) => (
-          <Box
-            key={idx}
-            className="p-6 bg-white rounded-xl border-2 border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-            style={{ borderColor: `${ThemeColors.primaryColor}20` }}
-          >
-            <Text className="text-4xl mb-3">{benefit.icon}</Text>
-            <Text className="font-bold text-gray-800 text-lg mb-2">{benefit.title}</Text>
-            <Text className="text-gray-600">{benefit.desc}</Text>
-          </Box>
-        ))}
-      </MotionBox>
+                  <button
+                    type="submit"
+                    className={`${styles.submitBtn} ${styles.submitBtnOrange}`}
+                    disabled={isDeliveryLoading}
+                  >
+                    <svg
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                    {isDeliveryLoading ? "Submitting..." : "Apply as Delivery Partner"}
+                  </button>
+                </form>
+              </div>
 
-      {/* Loading Overlay */}
-      {(isVendorLoading || isDeliveryLoading) && (
-        <MotionBox
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-        >
-          <MotionBox
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="bg-white p-8 rounded-3xl shadow-2xl text-center"
-          >
-            <Loader className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: ThemeColors.primaryColor }} />
-            <Text className="text-xl font-semibold">Processing your application...</Text>
-            <Text className="text-gray-600 mt-2">Please wait a moment</Text>
-          </MotionBox>
-        </MotionBox>
-      )}
-    </Container>
+              <div
+                className={`${styles.successState} ${
+                  deliverySubmitted ? styles.successStateShow : ""
+                }`}
+              >
+                <div className={styles.successIcon}>
+                  <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                </div>
+                <div className={styles.successTitle}>You&apos;re on the list!</div>
+                <p className={styles.successSub}>
+                  Our fleet team will reach out within 24 hours with next steps to get you on the
+                  road.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.sectionLabel}>Delivery Partner FAQs</div>
+          <div className={styles.faqCard}>
+            {deliveryFaqItems.map((item, index) => {
+              const open = index === activeDeliveryQuestion;
+              return (
+                <div
+                  key={item.question}
+                  className={`${styles.faqItem} ${open ? styles.faqItemOpen : ""}`}
+                >
+                  <button
+                    type="button"
+                    className={styles.faqQ}
+                    onClick={() =>
+                      setActiveDeliveryQuestion(open ? null : index)
+                    }
+                  >
+                    <span className={styles.faqQText}>{item.question}</span>
+                    <svg
+                      className={styles.faqChevron}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </button>
+                  <div className={styles.faqA}>
+                    <div className={styles.faqAInner}>{item.answer}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

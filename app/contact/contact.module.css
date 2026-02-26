@@ -1,0 +1,490 @@
+/* Contact YooKatale - match provided UI design */
+.root {
+  --green: #1a6b3a;
+  --green-light: #2d9556;
+  --green-pale: #e8f5ee;
+  --green-mid: #c5e8d3;
+  --dark: #0f1f14;
+  --text: #2a3d2f;
+  --muted: #6b8070;
+  --white: #ffffff;
+  --off-white: #f4f9f5;
+  --radius: 20px;
+  --yellow: #f5c800;
+  --orange: #f97316;
+  --orange-pale: #fff3ec;
+  --orange-mid: #ffd9bf;
+  background: var(--off-white);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+  font-family: var(--font-dm-sans), "DM Sans", sans-serif;
+}
+
+.page::before {
+  content: "";
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(45, 149, 86, 0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page::after {
+  content: "";
+  position: fixed;
+  bottom: -150px;
+  left: -150px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.09) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.header {
+  padding: 32px 0 28px;
+  text-align: center;
+}
+
+.label {
+  display: inline-block;
+  background: var(--green-pale);
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 100px;
+  margin-bottom: 14px;
+}
+
+.title {
+  font-family: var(--font-syne), "Syne", sans-serif;
+  font-size: clamp(32px, 9vw, 44px);
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--dark);
+}
+
+.titleGreen {
+  color: var(--green-light);
+}
+
+.titleEm {
+  color: var(--yellow);
+  font-style: normal;
+}
+
+.subtitle {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 300px;
+  margin-inline: auto;
+}
+
+.quickStrip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 22px 0;
+}
+
+.quickBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  border: none;
+}
+
+.quickBtn:active {
+  transform: scale(0.97);
+}
+
+.btnCall {
+  background: var(--green);
+  color: var(--white);
+  box-shadow: 0 4px 20px rgba(26, 107, 58, 0.35);
+}
+
+.btnWhatsapp {
+  background: #25d366;
+  color: var(--white);
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
+}
+
+.btnEmail {
+  grid-column: 1 / -1;
+  background: var(--white);
+  color: var(--text);
+  border: 1.5px solid var(--green-mid);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  font-size: 13px;
+}
+
+.quickBtn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.hoursBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--green-pale);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+.hoursDot {
+  width: 8px;
+  height: 8px;
+  background: #2d9556;
+  border-radius: 50%;
+  animation: contactPulse 2s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes contactPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(45, 149, 86, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(45, 149, 86, 0);
+  }
+}
+
+.hoursText {
+  font-size: 12px;
+  color: var(--green);
+  font-weight: 500;
+}
+
+.promoBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #fff3ec 0%, #ffe8d6 100%);
+  border: 1.5px solid var(--orange-mid);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 10px 0;
+}
+
+.promoIcon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.promoTitle {
+  font-family: var(--font-syne), "Syne", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #c2440a;
+}
+
+.promoText {
+  font-size: 11px;
+  color: #a0522d;
+  margin-top: 2px;
+}
+
+.infoCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.infoCard {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s;
+}
+
+.infoCard:active {
+  transform: scale(0.98);
+}
+
+.infoCardFull {
+  grid-column: 1 / -1;
+}
+
+.cardIcon {
+  width: 40px;
+  height: 40px;
+  background: var(--green-pale);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.cardIcon svg {
+  width: 20px;
+  height: 20px;
+  color: var(--green);
+}
+
+.cardTitle {
+  font-family: var(--font-syne), "Syne", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 4px;
+}
+
+.cardText {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.cardLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
+  text-decoration: none;
+}
+
+.cardLink:hover {
+  text-decoration: underline;
+}
+
+.infoCardOrange {
+  border-color: var(--orange-mid);
+  background: linear-gradient(135deg, #fff9f5 0%, #fff3ec 100%);
+}
+
+.infoCardOrange .cardIcon {
+  background: var(--orange-pale);
+}
+
+.infoCardOrange .cardIcon svg {
+  color: var(--orange);
+}
+
+.infoCardOrange .cardTitle {
+  color: #c2440a;
+}
+
+.formCard {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  margin-top: 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+.formTitle {
+  font-family: var(--font-syne), "Syne", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 6px;
+}
+
+.formSubtitle {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+.fieldInput,
+.fieldTextarea {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 12px;
+  border: 1.5px solid #e0ebe4;
+  background: var(--off-white);
+  font-family: var(--font-dm-sans), "DM Sans", sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  -webkit-appearance: none;
+}
+
+.fieldInput::placeholder,
+.fieldTextarea::placeholder {
+  color: #aabbb2;
+  font-size: 13px;
+}
+
+.fieldInput:focus,
+.fieldTextarea:focus {
+  border-color: var(--green-light);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(45, 149, 86, 0.1);
+}
+
+.fieldTextarea {
+  resize: none;
+  min-height: 100px;
+}
+
+.fieldError {
+  font-size: 12px;
+  color: #e53e3e;
+  margin-top: 2px;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 16px;
+  background: var(--green);
+  color: var(--white);
+  border: none;
+  border-radius: 14px;
+  font-family: var(--font-syne), "Syne", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(26, 107, 58, 0.3);
+  letter-spacing: 0.01em;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.submitBtn:active {
+  transform: scale(0.98);
+  background: #155830;
+}
+
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.submitBtn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.formFields {
+  /* default visible */
+}
+
+.formFieldsHidden {
+  display: none;
+}
+
+.successMsg {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 20px;
+  gap: 12px;
+}
+
+.successMsgShow {
+  display: flex;
+}
+
+.successIcon {
+  width: 64px;
+  height: 64px;
+  background: var(--green-pale);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.successIcon svg {
+  width: 32px;
+  height: 32px;
+  color: var(--green);
+}
+
+@keyframes contactFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  animation: contactFadeUp 0.5s ease both;
+}
+
+.quickStrip {
+  animation: contactFadeUp 0.5s 0.1s ease both;
+}
+
+.infoCards {
+  animation: contactFadeUp 0.5s 0.2s ease both;
+}
+
+.formCard {
+  animation: contactFadeUp 0.5s 0.3s ease both;
+}
