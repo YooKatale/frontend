@@ -25,7 +25,6 @@ const slugForBackend = (name) =>
     .toString()
     .trim()
     .toLowerCase()
-    .replace(/&/g, "and")
     .replace(/\s+/g, "-");
 
 const Products = () => {
@@ -61,8 +60,8 @@ const Products = () => {
     let cancelled = false;
 
     async function load() {
-      try {
-        setIsLoading(true);
+    try {
+      setIsLoading(true);
         const [productsRes, catsRes] = await Promise.allSettled([
           fetchProducts().unwrap(),
           fetchCategories().unwrap(),
@@ -99,17 +98,17 @@ const Products = () => {
             apiSlug: slugForBackend(c.name),
           }));
           setCategories(mapped);
-        }
-      } catch (error) {
+      }
+    } catch (error) {
         console.error("Error loading products:", error);
         toast({
-          title: "Error",
-          description: "Failed to load products",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      } finally {
+        title: "Error",
+        description: "Failed to load products",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
         if (!cancelled) setIsLoading(false);
       }
     }
@@ -146,14 +145,14 @@ const Products = () => {
         const list = Array.isArray(data) ? data : [];
         setProducts(list);
         setVisibleCount(12);
-      } catch (err) {
+    } catch (err) {
         if (cancelled) return;
         console.error("Error filtering products:", err);
         toast({
           title: "Filter error",
           description: err?.data?.message || err?.message || "Could not filter by category",
-          status: "error",
-          duration: 5000,
+        status: "error",
+        duration: 5000,
           isClosable: true,
         });
         setProducts(allProducts);
@@ -524,7 +523,7 @@ const Products = () => {
                   <line x1="8" y1="12" x2="16" y2="12" />
                   <line x1="11" y1="18" x2="13" y2="18" />
                 </svg>
-                Filters
+                      Filters
               </div>
               {activeFilterChips.length > 0 && (
                 <button type="button" className={styles.sheetClear} onClick={handleClearAllFilters}>
@@ -589,8 +588,8 @@ const Products = () => {
                 ) : visibleProducts.length ? (
                   visibleProducts.map((product) => (
                     <ProductCard key={product._id} product={product} userInfo={userInfo} />
-                  ))
-                ) : (
+                        ))
+                      ) : (
                   <div className={styles.emptyState}>
                     <div className={styles.emptyIcon}>
                       <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
