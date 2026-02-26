@@ -188,7 +188,7 @@ const ChangePassword = ({ isOpen, onClose }) => {
               </FormControl>
               <Box p={3} bg="blue.50" borderRadius="lg">
                 <Text fontSize="sm" color="blue.800">
-                  After changing your password, you’ll be signed out and must sign in again with the new password.
+                  After changing your password, you'll be signed out and must sign in again with the new password.
                 </Text>
               </Box>
             </VStack>

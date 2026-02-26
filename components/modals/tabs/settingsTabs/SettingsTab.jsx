@@ -1,6 +1,18 @@
 "use client";
 
-import { Box, Button, Flex, Text, useToast, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, useDisclosure } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Text,
+  useToast,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -21,24 +33,16 @@ const SettingsTab = () => {
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-      
-      // Call the logout API
       try {
         await logoutUser().unwrap();
       } catch (error) {
-        // Even if API call fails, proceed with local logout
         console.error("Logout API error:", error);
       }
-
-      // Clear local storage and Redux state
       dispatch(logout());
-      
-      // Clear any other stored data
       if (typeof window !== "undefined") {
         localStorage.removeItem("yookatale-app");
         sessionStorage.clear();
       }
-
       chakraToast({
         title: "Logged Out",
         description: "You have been successfully logged out.",
@@ -46,8 +50,6 @@ const SettingsTab = () => {
         duration: 3000,
         isClosable: true,
       });
-
-      // Redirect to home page
       router.push("/");
       onClose();
     } catch (error) {
@@ -96,9 +98,7 @@ const SettingsTab = () => {
               colorScheme="red"
               onClick={onOpen}
               size="md"
-              _hover={{
-                bg: "red.600",
-              }}
+              _hover={{ bg: "red.600" }}
             >
               Sign Out
             </Button>
@@ -106,23 +106,15 @@ const SettingsTab = () => {
         </Box>
       </Box>
 
-      {/* Logout Confirmation Dialog */}
-      <AlertDialog
-        isOpen={isOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={onClose}
-        isCentered
-      >
+      <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} isCentered>
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
               Confirm Sign Out
             </AlertDialogHeader>
-
             <AlertDialogBody>
               Are you sure you want to sign out? You will need to sign in again to access your account.
             </AlertDialogBody>
-
             <AlertDialogFooter>
               <Button ref={cancelRef} onClick={onClose} isDisabled={isLoggingOut}>
                 Cancel
