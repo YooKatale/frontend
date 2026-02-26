@@ -1,386 +1,854 @@
 "use client";
 
-import {
-  Box,
-  Checkbox,
-  Flex,
-  FormLabel,
-  Grid,
-  Heading,
-  Text,
-  useToast,
-  Button,
-  HStack,
-  VStack,
-  Divider,
-  Badge,
-  Icon,
-} from "@chakra-ui/react";
-import { CategoriesJson, ThemeColors } from "@constants/constants";
-import { FaArrowDown, FaArrowUp, FaFilter, FaTimes } from "react-icons/fa";
-
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useToast } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@slices/authSlice";
 import {
-  useProductsFilterGetMutation,
   useProductsGetMutation,
   useProductsCategoriesGetMutation,
+  useProductsFilterGetMutation,
 } from "@slices/productsApiSlice";
-
 import ProductCard from "@components/ProductCard";
-import LoaderSkeleton from "@components/LoaderSkeleton";
+import styles from "./products.module.css";
+
+const slugifyCategory = (name) =>
+  (name || "")
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/\s+/g, "-");
+
+const slugForBackend = (name) =>
+  (name || "")
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/\s+/g, "-");
 
 const Products = () => {
-  const [ProductsTitle, setProductsTitle] = useState("All Products");
-  const [Products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedFilters, setSelectedFilters] = useState([]);
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
-
+  const toast = useToast();
+  const router = useRouter();
   const { userInfo } = useAuth();
 
+  const [allProducts, setAllProducts] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFilterLoading, setIsFilterLoading] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activePill, setActivePill] = useState("all");
+  const [selectedCategorySlugs, setSelectedCategorySlugs] = useState([]);
+  const [sort, setSort] = useState("price-asc");
+
+  const [priceMin, setPriceMin] = useState(0);
+  const [priceMax, setPriceMax] = useState(100000);
+  const [priceBounds, setPriceBounds] = useState({ min: 0, max: 100000 });
+
+  const [visibleCount, setVisibleCount] = useState(12);
+
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [mobileSortOpen, setMobileSortOpen] = useState(false);
+
   const [fetchProducts] = useProductsGetMutation();
-  const [fetchProductsFilter] = useProductsFilterGetMutation();
   const [fetchCategories] = useProductsCategoriesGetMutation();
+  const [fetchProductsFilter] = useProductsFilterGetMutation();
 
-  const chakraToast = useToast();
-
-  const handleDataFetch = async () => {
-    try {
-      setIsLoading(true);
-      const res = await fetchProducts().unwrap();
-
-      if (res?.status && res?.status == "Success") {
-        setProducts(res?.data);
-        setProductsTitle("All Products");
-      }
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      chakraToast({
-        title: "Error",
-        description: "Failed to load products",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCategoriesFetch = async () => {
-    try {
-      const res = await fetchCategories().unwrap();
-      if (res?.success && res?.categories) {
-        setCategories(res.categories);
-      }
-    } catch (err) {
-      console.error("Error fetching categories:", err);
-    }
-  };
-
-  // fetch product categories
   useEffect(() => {
-    handleDataFetch();
-    handleCategoriesFetch();
-  }, []);
+    let cancelled = false;
 
-  // filter functions
-  const handleFilterFetch = async (param) => {
-    try {
-      setIsLoading(true);
-      const res = await fetchProductsFilter(param).unwrap();
+    async function load() {
+      try {
+        setIsLoading(true);
+        const [productsRes, catsRes] = await Promise.allSettled([
+          fetchProducts().unwrap(),
+          fetchCategories().unwrap(),
+        ]);
 
-      if (res?.status && res?.status == "Success") {
-        setProducts(res?.data?.Products ? res?.data?.Products : res?.data);
-        setProductsTitle(
-          res?.data?.title ? res?.data?.title : "Filter results"
-        );
+        if (cancelled) return;
+
+        if (productsRes.status === "fulfilled" && productsRes.value?.status === "Success") {
+          const data = Array.isArray(productsRes.value.data) ? productsRes.value.data : [];
+          setAllProducts(data);
+          setProducts(data);
+          if (data.length) {
+            const prices = data
+              .map((p) => Number(p.price) || 0)
+              .filter((n) => Number.isFinite(n) && n >= 0);
+            if (prices.length) {
+              const min = Math.min(...prices);
+              const max = Math.max(...prices);
+              setPriceBounds({ min, max });
+              setPriceMin(min);
+              setPriceMax(max);
+            }
+          }
+        } else if (productsRes.status === "rejected") {
+          throw productsRes.reason;
+        }
+
+        if (catsRes.status === "fulfilled" && catsRes.value?.success && catsRes.value?.categories) {
+          const mapped = catsRes.value.categories.map((c) => ({
+            id: c._id || c.id || c.name,
+            name: c.name,
+            count: c.count ?? c.total ?? undefined,
+            slug: slugifyCategory(c.name),
+            apiSlug: slugForBackend(c.name),
+          }));
+          setCategories(mapped);
+        }
+      } catch (error) {
+        console.error("Error loading products:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load products",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-    } catch (err) {
-      chakraToast({
-        title: "Error",
-        description: err?.message?.error || err?.error,
-        status: "error",
-        duration: 5000,
-        isClosable: false,
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchProducts, fetchCategories, toast]);
+
+  useEffect(() => {
+    if (selectedCategorySlugs.length === 0) {
+      setProducts(allProducts);
+      setVisibleCount(12);
+      return;
+    }
+
+    let cancelled = false;
+    const apiSlugs = selectedCategorySlugs
+      .map((slug) => categories.find((c) => c.slug === slug)?.apiSlug ?? slug)
+      .filter(Boolean);
+
+    if (apiSlugs.length === 0) {
+      setProducts(allProducts);
+      return;
+    }
+
+    async function loadFiltered() {
+      try {
+        setIsFilterLoading(true);
+        const res = await fetchProductsFilter(JSON.stringify(apiSlugs)).unwrap();
+        if (cancelled) return;
+        const data = res?.data?.Products ?? res?.data?.products ?? res?.data;
+        const list = Array.isArray(data) ? data : [];
+        setProducts(list);
+        setVisibleCount(12);
+      } catch (err) {
+        if (cancelled) return;
+        console.error("Error filtering products:", err);
+        toast({
+          title: "Filter error",
+          description: err?.data?.message || err?.message || "Could not filter by category",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        setProducts(allProducts);
+      } finally {
+        if (!cancelled) setIsFilterLoading(false);
+      }
+    }
+
+    loadFiltered();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedCategorySlugs, categories, fetchProductsFilter, toast, allProducts]);
+
+  const filteredProducts = useMemo(() => {
+    let list = Array.isArray(products) ? [...products] : [];
+
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      list = list.filter((p) => (p.name || "").toString().toLowerCase().includes(term));
+    }
+
+    list = list.filter((p) => {
+      const price = Number(p.price) || 0;
+      return price >= priceMin && price <= priceMax;
+    });
+
+    if (sort === "price-asc") {
+      list.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+    } else if (sort === "price-desc") {
+      list.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+    } else if (sort === "popular") {
+      list.sort(
+        (a, b) =>
+          (Number(b.ordersCount) || Number(b.reviewCount) || 0) -
+          (Number(a.ordersCount) || Number(a.reviewCount) || 0)
+      );
+    }
+
+    return list;
+  }, [products, searchTerm, priceMin, priceMax, sort]);
+
+  const visibleProducts = filteredProducts.slice(0, visibleCount);
+
+  const activeFilterChips = useMemo(() => {
+    const chips = [];
+    if (selectedCategorySlugs.length) {
+      const map = new Map(categories.map((c) => [c.slug, c.name]));
+      selectedCategorySlugs.forEach((slug) => {
+        const name = map.get(slug) || slug;
+        chips.push({ type: "category", value: slug, label: name });
       });
-    } finally {
-      setIsLoading(false);
+    }
+    if (sort === "price-asc") chips.push({ type: "sort", value: "price-asc", label: "Price: Low–High" });
+    else if (sort === "price-desc") chips.push({ type: "sort", value: "price-desc", label: "Price: High–Low" });
+    else if (sort === "popular") chips.push({ type: "sort", value: "popular", label: "Most Popular" });
+    if (priceMin > priceBounds.min || priceMax < priceBounds.max) {
+      chips.push({
+        type: "price",
+        value: "price-range",
+        label: `UGX ${priceMin.toLocaleString()}–${priceMax.toLocaleString()}`,
+      });
+    }
+    return chips;
+  }, [categories, selectedCategorySlugs, sort, priceMin, priceMax, priceBounds.min, priceBounds.max]);
+
+  const filterBadgeCount = activeFilterChips.length;
+
+  const handleBack = () => {
+    router.back();
+  };
+
+  const handlePillClick = (slug) => {
+    setActivePill(slug);
+    if (slug === "all") {
+      setSelectedCategorySlugs([]);
+    } else {
+      setSelectedCategorySlugs([slug]);
+    }
+    setVisibleCount(12);
+  };
+
+  const handleToggleCategory = (slug) => {
+    setSelectedCategorySlugs((prev) => {
+      const exists = prev.includes(slug);
+      const next = exists ? prev.filter((s) => s !== slug) : [...prev, slug];
+      if (next.length === 0) setActivePill("all");
+      else if (next.length === 1) setActivePill(next[0]);
+      else setActivePill("multi");
+      return next;
+    });
+    setVisibleCount(12);
+  };
+
+  const handleSortChange = (value) => {
+    setSort(value);
+  };
+
+  const handleClearAllFilters = () => {
+    setSelectedCategorySlugs([]);
+    setSort("price-asc");
+    setPriceMin(priceBounds.min);
+    setPriceMax(priceBounds.max);
+    setActivePill("all");
+    setVisibleCount(12);
+  };
+
+  const handleRemoveChip = (chip) => {
+    if (chip.type === "category") {
+      handleToggleCategory(chip.value);
+    } else if (chip.type === "sort") {
+      setSort("price-asc");
+    } else if (chip.type === "price") {
+      setPriceMin(priceBounds.min);
+      setPriceMax(priceBounds.max);
     }
   };
 
-  const clearFilters = () => {
-    setSelectedFilters([]);
-    const checkboxes = [...document.querySelectorAll("input.chakra-checkbox__input")];
-    checkboxes.forEach(checkbox => checkbox.checked = false);
-    handleDataFetch();
+  const handleRangeChange = (min, max) => {
+    const safeMin = Math.max(priceBounds.min, Math.min(min, max));
+    const safeMax = Math.min(priceBounds.max, Math.max(min, max));
+    setPriceMin(safeMin);
+    setPriceMax(safeMax);
+    setVisibleCount(12);
   };
 
-  const handleFilterApply = () => {
-    // productsFilter.push(filter);
-    const CheckedBoxesValues = [];
-
-    const Checkboxes = [
-      ...document.querySelectorAll("input.chakra-checkbox__input"),
-    ];
-
-    for (const checkbox of Checkboxes) {
-      if (checkbox.checked) {
-        CheckedBoxesValues.push(checkbox.value);
-      }
+  const handleDesktopRangeChange = (e, which) => {
+    const value = Number(e.target.value) || 0;
+    if (which === "min") {
+      handleRangeChange(value, priceMax);
+    } else {
+      handleRangeChange(priceMin, value);
     }
-
-    handleFilterFetch(JSON.stringify(CheckedBoxesValues));
   };
+
+  const handleMobileRangeChange = (e, which) => {
+    const value = Number(e.target.value) || 0;
+    if (which === "min") {
+      handleRangeChange(value, priceMax);
+    } else {
+      handleRangeChange(priceMin, value);
+    }
+  };
+
+  const priceToPercent = (value) => {
+    if (priceBounds.max === priceBounds.min) return 0;
+    return ((value - priceBounds.min) / (priceBounds.max - priceBounds.min)) * 100;
+  };
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 12);
+  };
+
+  const renderSidebarFilters = () => (
+    <>
+      <div className={styles.filterSection}>
+        <div className={styles.filterSectionTitle}>
+          <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <line x1="12" y1="1" x2="12" y2="23" />
+            <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+          </svg>
+          Price Range (UGX)
+        </div>
+        <div className={styles.priceRangeDisplay}>
+          <div className={styles.priceVal}>{priceMin.toLocaleString()}</div>
+          <div className={styles.priceVal}>{priceMax.toLocaleString()}</div>
+        </div>
+        <div className={styles.rangeWrap}>
+          <div className={styles.rangeTrack} />
+          <div
+            className={styles.rangeFill}
+            style={{
+              left: `${priceToPercent(priceMin)}%`,
+              right: `${100 - priceToPercent(priceMax)}%`,
+            }}
+          />
+          <input
+            type="range"
+            className={styles.rangeInput}
+            min={priceBounds.min}
+            max={priceBounds.max}
+            value={priceMin}
+            onChange={(e) => handleDesktopRangeChange(e, "min")}
+          />
+          <input
+            type="range"
+            className={styles.rangeInput}
+            min={priceBounds.min}
+            max={priceBounds.max}
+            value={priceMax}
+            onChange={(e) => handleDesktopRangeChange(e, "max")}
+          />
+        </div>
+      </div>
+
+      <div className={styles.filterSection}>
+        <div className={styles.filterSectionTitle}>
+          <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path d="M3 6h18M7 12h10M11 18h2" />
+          </svg>
+          Sort By
+        </div>
+        <div className={styles.sortOptions}>
+          {[
+            { value: "relevance", label: "Relevance" },
+            { value: "price-asc", label: "Price: Low to High" },
+            { value: "price-desc", label: "Price: High to Low" },
+            { value: "popular", label: "Most Popular" },
+          ].map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`${styles.sortOpt} ${sort === opt.value ? styles.sortOptActive : ""}`}
+              onClick={() => handleSortChange(opt.value)}
+            >
+              <span className={styles.sortOptLabel}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M3 3h18M8 12h13M13 21h8" />
+                </svg>
+                {opt.label}
+              </span>
+              <span className={styles.sortRadio}>
+                {sort === opt.value && <span className={styles.sortRadioInner} />}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.filterSection}>
+        <div className={styles.filterSectionTitle}>
+          <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+          Categories
+        </div>
+        <div className={styles.catList}>
+          {categories.map((cat) => {
+            const checked = selectedCategorySlugs.includes(cat.slug);
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                className={`${styles.catCheckItem} ${checked ? styles.catCheckItemChecked : ""}`}
+                onClick={() => handleToggleCategory(cat.slug)}
+              >
+                <div className={styles.catCheckLeft}>
+                  <div className={styles.catCheckIcon}>
+                    <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M17 8C8 10 5.9 16.17 3.82 19.25A13 13 0 0015 21c3.87 0 7-3.13 7-7 0-2.5-1-4.75-5-6z" />
+                    </svg>
+                  </div>
+                  <span className={styles.catCheckName}>{cat.name}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  {cat.count != null && <span className={styles.catCheckCount}>{cat.count}</span>}
+                  <span className={styles.checkbox}>
+                    {checked && (
+                      <svg
+                        className={styles.checkboxIcon}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        viewBox="0 0 24 24"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
 
   return (
-    <>
-      <Box bg="gray.50" minH="100vh">
-        <Box 
-          maxWidth="1400px" 
-          margin="0 auto" 
-          padding={{ base: "1rem", md: "2rem" }}
-        >
-          {/* Page Header */}
-          <Box mb={6} bg="white" p={6} borderRadius="lg" boxShadow="sm">
-            <Heading 
-              as="h1" 
-              size="xl" 
-              mb={2}
-              bgGradient="linear(to-r, green.400, green.600)"
-              bgClip="text"
-            >
-              All Categories
-            </Heading>
-            <Text color="gray.600" fontSize="md">
-              Browse our wide selection of products across all categories
-            </Text>
-          </Box>
+    <div className={styles.root}>
+      <div className={styles.page}>
+        <div className={styles.topbar}>
+          <button type="button" className={styles.topbarBack} onClick={handleBack} aria-label="Go back">
+            <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path d="M19 12H5M12 5l-7 7 7 7" />
+            </svg>
+          </button>
+          <div className={styles.topbarSearch}>
+            <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+              type="text"
+              className={styles.searchInput}
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setVisibleCount(12);
+              }}
+            />
+          </div>
+          <button
+            type="button"
+            className={`${styles.topbarFilterBtn} ${styles.mobileOnly}`}
+            onClick={() => setMobileFilterOpen(true)}
+          >
+            <svg fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <line x1="8" y1="12" x2="16" y2="12" />
+              <line x1="11" y1="18" x2="13" y2="18" />
+            </svg>
+            {filterBadgeCount > 0 && <span className={styles.filterBadge}>{filterBadgeCount}</span>}
+          </button>
+        </div>
 
-          {/* Mobile Filter Toggle */}
-          <Box display={{ base: "block", xl: "none" }} mb={4}>
-            <Button
-              leftIcon={<FaFilter />}
-              onClick={() => setShowMobileFilters(!showMobileFilters)}
-              colorScheme="green"
-              width="100%"
-              size="lg"
-            >
-              {showMobileFilters ? "Hide Filters" : "Show Filters"}
-            </Button>
-          </Box>
+        <div className={styles.heroStrip}>
+          <div className={styles.heroStripLabel}>YooKatale Market</div>
+          <div className={styles.heroStripTitle}>
+            All <span className={styles.heroStripTitleYoo}>Categories</span>
+          </div>
+          <div className={styles.heroStripSub}>
+            Browse {filteredProducts.length} fresh product{filteredProducts.length === 1 ? "" : "s"} across all
+            categories
+          </div>
+        </div>
 
-          <Flex direction={{ base: "column", md: "column", xl: "row" }} gap={6}>
-            {/* Filters Sidebar */}
-            <Box
-              width={{ base: "100%", md: "100%", xl: "280px" }}
-              display={{ base: showMobileFilters ? "block" : "none", xl: "block" }}
+        <div className={styles.catScrollWrap}>
+          <div className={styles.catScroll}>
+            <button
+              type="button"
+              className={`${styles.catPill} ${activePill === "all" ? styles.catPillActive : ""}`}
+              onClick={() => handlePillClick("all")}
             >
-              <Box
-                bg="white"
-                borderRadius="lg"
-                boxShadow="sm"
-                p={5}
-                position="sticky"
-                top="20px"
+              <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" />
+              </svg>
+              All
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`${styles.catPill} ${activePill === cat.slug ? styles.catPillActive : ""}`}
+                onClick={() => handlePillClick(cat.slug)}
               >
-                <Flex justify="space-between" align="center" mb={4}>
-                  <HStack>
-                    <Icon as={FaFilter} color="green.500" />
-                    <Heading as="h2" size="md" fontWeight="700">
-                      Filters
-                    </Heading>
-                  </HStack>
-                  {selectedFilters.length > 0 && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      colorScheme="red"
-                      onClick={clearFilters}
-                      leftIcon={<FaTimes />}
-                    >
-                      Clear
-                    </Button>
-                  )}
-                </Flex>
-                
-                <Divider mb={4} />
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </div>
 
-                {/* Price Filter */}
-                <VStack align="stretch" spacing={4}>
-                  <Box>
-                    <Text fontSize="md" fontWeight="600" mb={3}>
-                      Sort by Price
-                    </Text>
-                    <VStack align="stretch" spacing={2}>
-                      <Box
-                        p={3}
-                        borderRadius="md"
-                        border="1px solid"
-                        borderColor="gray.200"
-                        _hover={{ bg: "gray.50", borderColor: "green.300" }}
-                        transition="all 0.2s"
-                      >
-                        <Checkbox
-                          name="filterByLowPrice"
-                          id="filterByLowPrice"
-                          value="lowest"
-                          onChange={(e) => handleFilterApply(e.target.value)}
-                          colorScheme="green"
-                          size="lg"
-                        >
-                          <HStack spacing={2}>
-                            <Icon as={FaArrowDown} color="green.500" />
-                            <Text fontSize="sm" fontWeight="500">
-                              Price: Low to High
-                            </Text>
-                          </HStack>
-                        </Checkbox>
-                      </Box>
-                      
-                      <Box
-                        p={3}
-                        borderRadius="md"
-                        border="1px solid"
-                        borderColor="gray.200"
-                        _hover={{ bg: "gray.50", borderColor: "green.300" }}
-                        transition="all 0.2s"
-                      >
-                        <Checkbox
-                          name="filterByHighPrice"
-                          id="filterByHighPrice"
-                          value="highest"
-                          onChange={(e) => handleFilterApply(e.target.value)}
-                          colorScheme="green"
-                          size="lg"
-                        >
-                          <HStack spacing={2}>
-                            <Icon as={FaArrowUp} color="red.500" />
-                            <Text fontSize="sm" fontWeight="500">
-                              Price: High to Low
-                            </Text>
-                          </HStack>
-                        </Checkbox>
-                      </Box>
-                    </VStack>
-                  </Box>
+        <div className={styles.mainLayout}>
+          <aside className={styles.desktopSidebar}>
+            <div className={styles.sheetHeader}>
+              <div className={styles.sheetTitle}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                  <line x1="4" y1="6" x2="20" y2="6" />
+                  <line x1="8" y1="12" x2="16" y2="12" />
+                  <line x1="11" y1="18" x2="13" y2="18" />
+                </svg>
+                Filters
+              </div>
+              {activeFilterChips.length > 0 && (
+                <button type="button" className={styles.sheetClear} onClick={handleClearAllFilters}>
+                  Clear all
+                </button>
+              )}
+            </div>
+            <div className={styles.desktopSidebarBody}>{renderSidebarFilters()}</div>
+          </aside>
 
-                  <Divider />
+          <div>
+            <div className={styles.resultsBar}>
+              <div className={styles.resultsCount}>
+                All Products <span>{filteredProducts.length} found</span>
+              </div>
+              <button type="button" className={styles.sortBtn} onClick={() => setMobileSortOpen(true)}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M3 6h18M7 12h10M11 18h2" />
+                </svg>
+                Sort
+              </button>
+            </div>
 
-                  {/* Category Filter */}
-                  <Box>
-                    <Text fontSize="md" fontWeight="600" mb={3}>
-                      Categories
-                    </Text>
-                    <VStack align="stretch" spacing={2} maxH="400px" overflowY="auto">
-                      {categories.length > 0 ? (
-                        categories.map((category, index) => (
-                          <Box
-                            key={index}
-                            p={2}
-                            borderRadius="md"
-                            _hover={{ bg: "gray.50" }}
-                            transition="all 0.2s"
-                          >
-                            <Checkbox
-                              name="category"
-                              id={`category-${category._id}`}
-                              value={category.name.toLowerCase().replace(/\s+/g, '-')}
-                              onChange={(e) => handleFilterApply(e.target.value)}
-                              colorScheme="green"
-                            >
-                              <Text fontSize="sm" fontWeight="500" textTransform="capitalize">
-                                {category.name}
-                              </Text>
-                            </Checkbox>
-                          </Box>
-                        ))
-                      ) : (
-                        <Text fontSize="sm" color="gray.500" textAlign="center" py={4}>
-                          Loading categories...
-                        </Text>
-                      )}
-                    </VStack>
-                  </Box>
-                </VStack>
-              </Box>
-            </Box>
-            {/* Products Grid */}
-            <Box flex="1">
-              <Box bg="white" borderRadius="lg" boxShadow="sm" p={5}>
-                <Flex justify="space-between" align="center" mb={5}>
-                  <VStack align="start" spacing={1}>
-                    <Heading as="h2" size="lg" fontWeight="700">
-                      {ProductsTitle}
-                    </Heading>
-                    {Products?.length > 0 && (
-                      <Text fontSize="sm" color="gray.600">
-                        {Products.length} product{Products.length !== 1 ? 's' : ''} found
-                      </Text>
-                    )}
-                  </VStack>
-                </Flex>
-
-                {isLoading ? (
-                  <Grid
-                    gridTemplateColumns={{
-                      base: "repeat(2, 1fr)",
-                      md: "repeat(3, 1fr)",
-                      lg: "repeat(4, 1fr)",
-                    }}
-                    gap={4}
+            <div
+              className={`${styles.activeFilters} ${
+                activeFilterChips.length ? styles.activeFiltersShow : ""
+              }`}
+            >
+              {activeFilterChips.map((chip) => (
+                <div key={`${chip.type}-${chip.value}`} className={styles.afChip}>
+                  {chip.label}
+                  <svg
+                    onClick={() => handleRemoveChip(chip)}
+                    onKeyDown={(e) => e.key === "Enter" && handleRemoveChip(chip)}
+                    role="button"
+                    tabIndex={0}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    viewBox="0 0 24 24"
                   >
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-                      <LoaderSkeleton key={item} />
-                    ))}
-                  </Grid>
-                ) : Products?.length > 0 ? (
-                  <Grid
-                    gridTemplateColumns={{
-                      base: "repeat(2, 1fr)",
-                      md: "repeat(3, 1fr)",
-                      lg: "repeat(4, 1fr)",
-                    }}
-                    gap={4}
-                  >
-                    {Products.map((product, index) => (
-                      <ProductCard
-                        product={product}
-                        key={index}
-                        userInfo={userInfo}
-                      />
-                    ))}
-                  </Grid>
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </div>
+              ))}
+            </div>
+
+            <div className={styles.gridWrap}>
+              <div className={styles.productGrid}>
+                {isLoading || isFilterLoading ? (
+                  <div className={styles.emptyState}>
+                    <div className={styles.emptyIcon}>
+                      <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M8 12h8M8 16h5" />
+                      </svg>
+                    </div>
+                    <div className={styles.emptyTitle}>Loading products…</div>
+                    <div className={styles.emptySub}>Please wait while we fetch fresh items.</div>
+                  </div>
+                ) : visibleProducts.length ? (
+                  visibleProducts.map((product) => (
+                    <ProductCard key={product._id} product={product} userInfo={userInfo} />
+                  ))
                 ) : (
-                  <Box textAlign="center" py={20}>
-                    <Text fontSize="3xl" mb={2}>🛒</Text>
-                    <Heading as="h3" size="md" color="gray.600" mb={2}>
-                      No products found
-                    </Heading>
-                    <Text color="gray.500" mb={4}>
-                      Try adjusting your filters or browse our subscription plans for curated meals.
-                    </Text>
-                    <Flex justify="center" gap={3} wrap="wrap">
-                      {selectedFilters.length > 0 && (
-                        <Button colorScheme="green" onClick={clearFilters}>
-                          Clear All Filters
-                        </Button>
-                      )}
-                      <Button as={Link} href="/subscription" colorScheme="green" variant="outline">
-                        View Subscription Plans
-                      </Button>
-                    </Flex>
-                  </Box>
+                  <div className={styles.emptyState}>
+                    <div className={styles.emptyIcon}>
+                      <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M8 12h8M8 16h5" />
+                      </svg>
+                    </div>
+                    <div className={styles.emptyTitle}>No products found</div>
+                    <div className={styles.emptySub}>
+                      Try adjusting your search or filters to find what you need.
+                    </div>
+                  </div>
                 )}
-              </Box>
-            </Box>
-          </Flex>
-        </Box>
-      </Box>
-    </>
+              </div>
+            </div>
+
+            {!isLoading && visibleProducts.length < filteredProducts.length && (
+              <div className={styles.loadMoreWrap}>
+                <button type="button" className={styles.loadMoreBtn} onClick={handleLoadMore}>
+                  <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <polyline points="1 4 1 10 7 10" />
+                    <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
+                  </svg>
+                  Load more products
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile filter bottom sheet */}
+        <div
+          className={`${styles.filterOverlay} ${mobileFilterOpen ? styles.filterOverlayOpen : ""}`}
+          onClick={() => setMobileFilterOpen(false)}
+          onKeyDown={(e) => e.key === "Escape" && setMobileFilterOpen(false)}
+          role="button"
+          tabIndex={0}
+          aria-label="Close filters"
+        />
+        <div className={`${styles.filterSheet} ${mobileFilterOpen ? styles.filterSheetOpen : ""}`}>
+          <div className={styles.sheetHandle} />
+          <div className={styles.sheetHeader}>
+            <div className={styles.sheetTitle}>
+              <svg fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+                <line x1="11" y1="18" x2="13" y2="18" />
+              </svg>
+              Filters &amp; Sort
+            </div>
+            {activeFilterChips.length > 0 && (
+              <button type="button" className={styles.sheetClear} onClick={handleClearAllFilters}>
+                Clear all
+              </button>
+            )}
+          </div>
+          <div className={styles.sheetBody}>
+            <div className={styles.filterSection}>
+              <div className={styles.filterSectionTitle}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M3 6h18M7 12h10M11 18h2" />
+                </svg>
+                Sort By
+              </div>
+              <div className={styles.sortOptions}>
+                {[
+                  { value: "relevance", label: "Relevance" },
+                  { value: "price-asc", label: "Price: Low to High" },
+                  { value: "price-desc", label: "Price: High to Low" },
+                  { value: "popular", label: "Most Popular" },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    className={`${styles.sortOpt} ${sort === opt.value ? styles.sortOptActive : ""}`}
+                    onClick={() => handleSortChange(opt.value)}
+                  >
+                    <span className={styles.sortOptLabel}>
+                      <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M3 3h18M8 12h13M13 21h8" />
+                      </svg>
+                      {opt.label}
+                    </span>
+                    <span className={styles.sortRadio}>
+                      {sort === opt.value && <span className={styles.sortRadioInner} />}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.filterSection}>
+              <div className={styles.filterSectionTitle}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <line x1="12" y1="1" x2="12" y2="23" />
+                  <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                </svg>
+                Price Range (UGX)
+              </div>
+              <div className={styles.priceRangeDisplay}>
+                <div className={styles.priceVal}>{priceMin.toLocaleString()}</div>
+                <div className={styles.priceVal}>{priceMax.toLocaleString()}</div>
+              </div>
+              <div className={styles.rangeWrap}>
+                <div className={styles.rangeTrack} />
+                <div
+                  className={styles.rangeFill}
+                  style={{
+                    left: `${priceToPercent(priceMin)}%`,
+                    right: `${100 - priceToPercent(priceMax)}%`,
+                  }}
+                />
+                <input
+                  type="range"
+                  className={styles.rangeInput}
+                  min={priceBounds.min}
+                  max={priceBounds.max}
+                  value={priceMin}
+                  onChange={(e) => handleMobileRangeChange(e, "min")}
+                />
+                <input
+                  type="range"
+                  className={styles.rangeInput}
+                  min={priceBounds.min}
+                  max={priceBounds.max}
+                  value={priceMax}
+                  onChange={(e) => handleMobileRangeChange(e, "max")}
+                />
+              </div>
+            </div>
+
+            <div className={styles.filterSection}>
+              <div className={styles.filterSectionTitle}>
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                </svg>
+                Categories
+              </div>
+              <div className={styles.catList}>
+                {categories.map((cat) => {
+                  const checked = selectedCategorySlugs.includes(cat.slug);
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      className={`${styles.catCheckItem} ${checked ? styles.catCheckItemChecked : ""}`}
+                      onClick={() => handleToggleCategory(cat.slug)}
+                    >
+                      <div className={styles.catCheckLeft}>
+                        <div className={styles.catCheckIcon}>
+                          <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path d="M17 8C8 10 5.9 16.17 3.82 19.25A13 13 0 0015 21c3.87 0 7-3.13 7-7 0-2.5-1-4.75-5-6z" />
+                          </svg>
+                        </div>
+                        <span className={styles.catCheckName}>{cat.name}</span>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        {cat.count != null && <span className={styles.catCheckCount}>{cat.count}</span>}
+                        <span className={styles.checkbox}>
+                          {checked && (
+                            <svg
+                              className={styles.checkboxIcon}
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                              viewBox="0 0 24 24"
+                            >
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <div className={styles.sheetFooter}>
+            <button type="button" className={styles.btnOutline} onClick={() => setMobileFilterOpen(false)}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              className={styles.btnApply}
+              onClick={() => setMobileFilterOpen(false)}
+            >
+              Show {filteredProducts.length} Results
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile sort sheet */}
+        <div
+          className={`${styles.filterOverlay} ${mobileSortOpen ? styles.filterOverlayOpen : ""}`}
+          onClick={() => setMobileSortOpen(false)}
+          onKeyDown={(e) => e.key === "Escape" && setMobileSortOpen(false)}
+          role="button"
+          tabIndex={0}
+          aria-label="Close sort"
+        />
+        <div className={`${styles.sortSheet} ${mobileSortOpen ? styles.sortSheetOpen : ""}`}>
+          <div className={styles.sheetHandle} style={{ marginBottom: 16 }} />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, padding: "0 2px" }}>
+            <h2 className={styles.sheetTitle} style={{ margin: 0 }}>
+              Sort Products
+            </h2>
+            <button
+              type="button"
+              className={styles.sheetCloseBtn}
+              onClick={() => setMobileSortOpen(false)}
+              aria-label="Close sort"
+            >
+              <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+          <div className={styles.sortOptions}>
+            {[
+              { value: "relevance", label: "Relevance" },
+              { value: "price-asc", label: "Price: Low to High" },
+              { value: "price-desc", label: "Price: High to Low" },
+              { value: "popular", label: "Most Popular" },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                className={`${styles.sortOpt} ${sort === opt.value ? styles.sortOptActive : ""}`}
+                onClick={() => handleSortChange(opt.value)}
+              >
+                <span className={styles.sortOptLabel}>
+                  <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{ width: 16, height: 16 }}>
+                    <path d="M3 3h18M8 12h13M13 21h8" />
+                  </svg>
+                  {opt.label}
+                </span>
+                <span className={styles.sortRadio}>
+                  {sort === opt.value && <span className={styles.sortRadioInner} />}
+                </span>
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            className={styles.btnApply}
+            style={{ marginTop: 16, marginBottom: 16, width: "100%" }}
+            onClick={() => setMobileSortOpen(false)}
+          >
+            Apply Sort
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
