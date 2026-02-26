@@ -34,7 +34,7 @@ import {
 } from "@chakra-ui/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
   AiOutlineClose,
@@ -48,10 +48,10 @@ import {
   AiOutlineContacts,
   AiOutlineLogin,
   AiOutlineAppstore,
-  AiOutlineCreditCard,
   AiOutlineLogout,
   AiOutlineQuestionCircle,
   AiOutlineInfoCircle,
+  AiOutlineBarChart,
 } from "react-icons/ai";
 import {
   FaShoppingBag,
@@ -65,6 +65,7 @@ import {
   FaWallet,
   FaHeart,
   FaTruck,
+  FaBolt,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useLogoutMutation } from "@slices/usersApiSlice";
@@ -92,6 +93,7 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const mobileSearchRef = useRef(null);
   const { push } = useRouter();
+  const pathname = usePathname() ?? "";
   const chakraToast = useToast();
   const btnRef = useRef();
   const dispatch = useDispatch();
@@ -158,6 +160,7 @@ const Header = () => {
   const closeMobileNav = () => setMobileNavOpen(false);
 
   const handleLogout = async () => {
+    closeMobileNav();
     try {
       try {
         await logoutUser().unwrap();
@@ -194,14 +197,15 @@ const Header = () => {
   const navLinks = [
     { label: "Home", href: "/", icon: AiOutlineHome },
     { label: "Categories", href: "/products", icon: AiOutlineAppstore },
-    { label: "Marketplace", href: "/marketplace", icon: FaStore },
+    { label: "Marketplace", href: "/marketplace", icon: FaShoppingBag, badge: "New" },
+    { label: "Promotions", href: "/search?q=promotions", icon: FaBolt, badge: "HOT" },
     { label: "SELL", href: CLIENT_DASHBOARD_URL, icon: FaStore, isSell: true },
-    { label: "About", href: "/about", icon: AiOutlineTeam },
+    { label: "About", href: "/about", icon: AiOutlineInfoCircle },
     { label: "Blog", href: "/news", icon: FaBlog },
-    { label: "Careers", href: "/careers", icon: FaBriefcase },
+    { label: "Careers", href: "/careers", icon: FaBriefcase, badge: "Hiring" },
     { label: "Contact", href: "/contact", icon: AiOutlineContacts },
     { label: "Partner", href: "/partner", icon: FaHandshake },
-    { label: "Subscribe", href: "/subscription", icon: AiOutlineCreditCard },
+    { label: "Subscribe", href: "/subscription", icon: AiOutlineBarChart },
     { label: "Cashout", href: "/cashout", icon: FaWallet },
     { label: "Invite a friend", href: "/#refer", icon: FaGift, isInvite: true },
     { label: "Sign Up", href: "/signup", icon: AiOutlineLogin, hideWhenLoggedIn: true },
@@ -247,9 +251,9 @@ const Header = () => {
           _hover={{ bg: "gray.900" }}
           transition="background 0.2s"
         >
-          <Text as="span">Download the Yookatale mobile app</Text>
-          <Text as="span" color="orange.400" mx={2}>•</Text>
-          <Text as="span">Free delivery within 3km distance</Text>
+          <Text as="span">DOWNLOAD YOOKATALE APP</Text>
+          <Text as="span" color="orange.400" mx={2}>·</Text>
+          <Text as="span">FREE DELIVERY WITHIN 3KM</Text>
         </Box>
 
         {/* Top bar – Sell / Help / FAQs / Track Order – orange, icon spacing, star for Sell */}
@@ -295,64 +299,21 @@ const Header = () => {
           h={{ base: "56px", md: "64px" }}
           minH={{ base: "56px", md: "64px" }}
         >
-          {/* Left: Menu button first (last on left = leftmost), then Logo */}
-          <HStack spacing={{ base: 2, md: 3 }} flexShrink={0}>
-            {/* Desktop: Hamburger menu – opens dropdown */}
-            <Box display={{ base: "none", md: "block" }}>
-              <Menu placement="bottom-start" gutter={0}>
-                <MenuButton
-                  as={IconButton}
-                  aria-label="Menu"
-                  icon={<AiOutlineMenu size={22} />}
-                  variant="ghost"
-                  size="lg"
-                  h="44px"
-                  w="44px"
-                  borderRadius="lg"
-                  color="gray.700"
-                  _hover={{ bg: "gray.50", color: ThemeColors.primaryColor }}
-                  _expanded={{ bg: "gray.50", color: ThemeColors.primaryColor }}
-                />
-              <MenuList
-                minW="280px"
-                maxH="85vh"
-                overflowY="auto"
-                py={0}
-                borderRadius="var(--radius)"
-                borderWidth="2px"
-                borderColor="var(--border)"
-                boxShadow="var(--shadow-lg)"
-              >
-                <MenuGroup title="Shop" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="wider" color="gray.500" pt={3} pb={1} px={4}>
-                  <MenuItem as={Link} href="/" fontSize="14px" fontWeight="500" py={2.5}>Home</MenuItem>
-                  <MenuItem as={Link} href="/products" fontSize="14px" fontWeight="500" py={2.5}>Categories</MenuItem>
-                  <MenuItem as={Link} href="/marketplace" fontSize="14px" fontWeight="500" py={2.5}>Marketplace</MenuItem>
-                </MenuGroup>
-                <MenuDivider />
-                <MenuItem as={Link} href={CLIENT_DASHBOARD_URL} fontSize="14px" fontWeight="700" py={3} color={ThemeColors.primaryColor}>
-                  SELL on Yookatale
-                </MenuItem>
-                <MenuDivider />
-                <MenuGroup title="Company" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="wider" color="gray.500" pt={2} pb={1} px={4}>
-                  <MenuItem as={Link} href="/about" fontSize="14px" fontWeight="500" py={2.5}>About</MenuItem>
-                  <MenuItem as={Link} href="/news" fontSize="14px" fontWeight="500" py={2.5}>Blog</MenuItem>
-                  <MenuItem as={Link} href="/careers" fontSize="14px" fontWeight="500" py={2.5}>Careers</MenuItem>
-                  <MenuItem as={Link} href="/contact" fontSize="14px" fontWeight="500" py={2.5}>Contact</MenuItem>
-                  <MenuItem as={Link} href="/partner" fontSize="14px" fontWeight="500" py={2.5}>Partner</MenuItem>
-                </MenuGroup>
-                <MenuDivider />
-                <MenuGroup title="Account" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="wider" color="gray.500" pt={2} pb={1} px={4}>
-                  <MenuItem as={Link} href="/subscription" fontSize="14px" fontWeight="500" py={2.5}>Subscribe</MenuItem>
-                  <MenuItem as={Link} href="/cashout" fontSize="14px" fontWeight="500" py={2.5}>Cashout</MenuItem>
-                  <MenuItem fontSize="14px" fontWeight="500" py={2.5} onClick={openReferral}>Invite a friend</MenuItem>
-                  {!userInfo && (
-                    <MenuItem as={Link} href="/signup" fontSize="14px" fontWeight="600" py={2.5} color={ThemeColors.primaryColor}>Sign Up</MenuItem>
-                  )}
-                </MenuGroup>
-                <Box pb={3} />
-              </MenuList>
-            </Menu>
-            </Box>
+          {/* Left: Desktop only – same sidebar toggle + Logo (opens same drawer as mobile) */}
+          <HStack spacing={{ base: 2, md: 3 }} flexShrink={0} display={{ base: "none", md: "flex" }}>
+            <IconButton
+              aria-label="Menu"
+              icon={mobileNavOpen ? <AiOutlineClose size={22} /> : <AiOutlineMenu size={22} />}
+              variant="ghost"
+              size="lg"
+              h="44px"
+              w="44px"
+              borderRadius="lg"
+              color="gray.700"
+              _hover={{ bg: "gray.50", color: ThemeColors.primaryColor }}
+              _active={{ bg: "gray.100" }}
+              onClick={toggleMobileNav}
+            />
 
             {/* Logo – to the right of menu */}
             <Flex align="center" minW={0}>
@@ -379,58 +340,60 @@ const Header = () => {
             </Flex>
           </HStack>
 
-          {/* Mobile: inline search on same bar – compact, expands on focus */}
+          {/* Mobile: Menu toggle – extreme left */}
+          <Box display={{ base: "block", md: "none" }} flexShrink={0}>
+            <IconButton
+              ref={btnRef}
+              aria-label="Menu"
+              icon={mobileNavOpen ? <AiOutlineClose size={24} /> : <AiOutlineMenu size={24} />}
+              variant="ghost"
+              size="lg"
+              h="48px"
+              w="48px"
+              minW="48px"
+              borderRadius="lg"
+              color="gray.700"
+              _hover={{ bg: "gray.50", color: ThemeColors.darkColor }}
+              _active={{ bg: "gray.100" }}
+              onClick={toggleMobileNav}
+            />
+          </Box>
+
+          {/* Mobile: search bar always visible – orange border, magnifying glass, placeholder (same as image) */}
           <Flex
             as="form"
-            onSubmit={(e) => { handleSearchFormSubmit(e); setMobileSearchExpanded(false); }}
+            onSubmit={handleSearchFormSubmit}
             display={{ base: "flex", md: "none" }}
-            flex={mobileSearchExpanded ? 1 : "0 0 auto"}
-            minW={mobileSearchExpanded ? 0 : "44px"}
-            maxW={mobileSearchExpanded ? "100%" : "44px"}
+            flex="1"
+            minW={0}
             mx={1}
             align="center"
-            h="44px"
+            h="48px"
             borderRadius="lg"
-            bg="gray.100"
-            borderWidth="1px"
-            borderColor={mobileSearchExpanded ? "orange.400" : "transparent"}
+            bg="white"
+            borderWidth="2px"
+            borderColor="orange.400"
             overflow="hidden"
-            transition="all 0.25s ease"
-            _focusWithin={{ boxShadow: "0 0 0 2px var(--chakra-colors-orange-200)" }}
+            _focusWithin={{ borderColor: "orange.500", boxShadow: "0 0 0 2px rgba(249, 115, 22, 0.25)" }}
           >
-            {!mobileSearchExpanded ? (
-              <IconButton
-                aria-label="Search"
-                icon={<AiOutlineSearch size={20} />}
-                variant="ghost"
-                size="lg"
-                h="44px"
-                w="44px"
-                minW="44px"
-                color="gray.600"
-                onClick={() => { setMobileSearchExpanded(true); setTimeout(() => mobileSearchRef.current?.focus(), 100); }}
+            <InputGroup size="md" flex="1" minW={0}>
+              <InputLeftElement h="48px" pl={3} pointerEvents="none">
+                <AiOutlineSearch size={18} color="#637568" />
+              </InputLeftElement>
+              <Input
+                ref={mobileSearchRef}
+                type="search"
+                placeholder="Search products..."
+                value={searchParam}
+                onChange={(e) => setSearchParam(e.target.value)}
+                variant="unstyled"
+                pl="2.5rem"
+                pr={2}
+                h="48px"
+                fontSize="0.9375rem"
+                _placeholder={{ color: "gray.500" }}
               />
-            ) : (
-              <InputGroup size="md" flex="1" minW={0}>
-                <InputLeftElement h="44px" pl={3} pointerEvents="none">
-                  <AiOutlineSearch size={18} color="var(--muted)" />
-                </InputLeftElement>
-                <Input
-                  ref={mobileSearchRef}
-                  type="search"
-                  placeholder="Search products..."
-                  value={searchParam}
-                  onChange={(e) => setSearchParam(e.target.value)}
-                  variant="unstyled"
-                  pl="2.5rem"
-                  pr={2}
-                  h="44px"
-                  fontSize="0.9375rem"
-                  _placeholder={{ color: "gray.500" }}
-                  onBlur={() => setTimeout(() => setMobileSearchExpanded(false), 200)}
-                />
-              </InputGroup>
-            )}
+            </InputGroup>
           </Flex>
 
           {/* Desktop Search Bar – balanced width, not stretching into gap */}
@@ -737,59 +700,30 @@ const Header = () => {
             </Link>
           </HStack>
 
-          {/* Mobile Right Actions - compact, clear touch targets */}
+          {/* Mobile Right – Logo only (cart removed from top bar on mobile) */}
           <HStack spacing={0} display={{ base: "flex", md: "none" }} flexShrink={0}>
-            <Link href="/cart">
-              <Box position="relative" as="span" display="inline-block">
-                <IconButton
-                  aria-label="Cart"
-                  icon={<AiOutlineShoppingCart size={22} />}
-                  variant="ghost"
-                  size="lg"
-                  h="44px"
-                  w="44px"
-                  minW="44px"
-                  borderRadius="lg"
-                  color="gray.700"
-                  _hover={{ bg: "gray.50", color: ThemeColors.darkColor }}
-                  _active={{ bg: "gray.100" }}
+            <Link href="/">
+              <Box
+                as="span"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                h="48px"
+                w="48px"
+                minW="48px"
+                transition="all 0.2s"
+                _hover={{ transform: "scale(1.02)" }}
+                _active={{ transform: "scale(0.98)" }}
+              >
+                <Image
+                  src="/assets/icons/logo2.png"
+                  alt="Yookatale"
+                  width={48}
+                  height={48}
+                  style={{ width: "auto", height: "100%", maxWidth: "120px", objectFit: "contain" }}
                 />
-                {cartItemsCount > 0 && (
-                  <Badge
-                    position="absolute"
-                    top="2px"
-                    right="2px"
-                    bg="var(--brand)"
-                    color="white"
-                    borderRadius="full"
-                    fontSize="0.65rem"
-                    minW="18px"
-                    h="18px"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontWeight="700"
-                  >
-                    {cartItemsCount > 99 ? "99+" : cartItemsCount}
-                  </Badge>
-                )}
               </Box>
             </Link>
-            <IconButton
-              ref={btnRef}
-              aria-label="Menu"
-              icon={mobileNavOpen ? <AiOutlineClose size={22} /> : <AiOutlineMenu size={22} />}
-              variant="ghost"
-              size="lg"
-              h="44px"
-              w="44px"
-              minW="44px"
-              borderRadius="lg"
-              color="gray.700"
-              _hover={{ bg: "gray.50", color: ThemeColors.darkColor }}
-              _active={{ bg: "gray.100" }}
-              onClick={toggleMobileNav}
-            />
           </HStack>
         </Flex>
 
@@ -839,321 +773,244 @@ const Header = () => {
           </Flex>
         </Box>
 
-        {/* Mobile Drawer – modern, professional */}
+        {/* Mobile Drawer – left sidebar, YooKatale design */}
         <Drawer
           isOpen={mobileNavOpen}
-          placement="right"
+          placement="left"
           onClose={closeMobileNav}
           finalFocusRef={btnRef}
-          size="sm"
+          size="xs"
         >
-          <DrawerOverlay bg="blackAlpha.600" backdropFilter="blur(8px)" />
-          <DrawerContent borderLeftRadius="2xl" maxW="min(360px, 100vw)">
-            <DrawerCloseButton
-              size="lg"
-              top={4}
-              right={4}
-              borderRadius="full"
-              bg="gray.100"
-              _hover={{ bg: "gray.200" }}
-              zIndex={2}
-            />
-            <DrawerHeader pt={8} pb={4} px={6} borderBottomWidth="1px" borderColor="gray.100">
-              <Flex align="center" justify="space-between">
-                <Text fontFamily="var(--font-syne), Syne, sans-serif" fontSize="1.25rem" fontWeight="800" color="var(--dark)">
-                  Menu
-                </Text>
+          <DrawerOverlay bg="rgba(0,0,0,0.45)" backdropFilter="blur(3px)" />
+          <DrawerContent maxW="290px" maxH="100vh" h="100%" bg="white" boxShadow="2xl" display="flex" flexDirection="column">
+            {/* Top accent */}
+            <Box h="3px" bg="linear-gradient(90deg, #1a6b3a 0%, #2d9556 50%, #f5c800 100%)" flexShrink={0} />
+
+            {/* User header – green gradient */}
+            <Box
+              px="18px"
+              pt="18px"
+              pb="14px"
+              bg="linear-gradient(135deg, #0f3d20 0%, #1a6b3a 100%)"
+              position="relative"
+              overflow="hidden"
+            >
+              <Box position="absolute" top="-40px" right="-40px" w="140px" h="140px" bg="radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)" borderRadius="full" />
+              <Box position="absolute" bottom="-30px" left="-20px" w="100px" h="100px" bg="radial-gradient(circle, rgba(245,200,0,0.07) 0%, transparent 70%)" borderRadius="full" />
+              <Flex justify="space-between" align="flex-start" mb="14px">
                 {userInfo ? (
-                  <HStack spacing={3}>
-                    <Avatar size="sm" name={userDisplayName} bg={ThemeColors.darkColor} color="white" fontWeight="700" />
-                    <Box textAlign="left">
-                      <Text fontSize="0.875rem" fontWeight="700" color="gray.800" noOfLines={1}>{userDisplayName}</Text>
-                      <Text fontSize="0.75rem" color="gray.500" noOfLines={1}>{userInfo?.email}</Text>
+                  <HStack spacing={2.5} flex={1} minW={0}>
+                    <Flex w="44px" h="44px" borderRadius="full" bg="#f5c800" align="center" justify="center" fontFamily="Syne, sans-serif" fontSize="16px" fontWeight="800" color="#0c1a10" border="2.5px solid rgba(255,255,255,0.3)" flexShrink={0}>
+                      {(userDisplayName || "A").slice(0, 2).toUpperCase()}
+                    </Flex>
+                    <Box minW={0}>
+                      <Text fontFamily="Syne, sans-serif" fontSize="15px" fontWeight="700" color="white" lineHeight="1" mb="3px" noOfLines={1}>{userDisplayName}</Text>
+                      <Text fontSize="11px" color="rgba(255,255,255,0.6)" noOfLines={1}>{userInfo?.email}</Text>
                     </Box>
                   </HStack>
                 ) : (
                   <Link href="/signin" onClick={closeMobileNav}>
-                    <Button size="sm" colorScheme="green" fontWeight="600">Sign In</Button>
+                    <Button size="sm" colorScheme="green" fontWeight="700">Sign In</Button>
                   </Link>
                 )}
+                <IconButton
+                  aria-label="Close menu"
+                  icon={<AiOutlineClose size={16} />}
+                  size="sm"
+                  w="30px"
+                  h="30px"
+                  borderRadius="lg"
+                  bg="rgba(255,255,255,0.1)"
+                  color="white"
+                  _hover={{ bg: "rgba(255,255,255,0.2)" }}
+                  onClick={closeMobileNav}
+                  flexShrink={0}
+                />
               </Flex>
-            </DrawerHeader>
+              {userInfo && (
+                <Flex gridTemplateColumns="repeat(3,1fr)" gap={0} bg="rgba(255,255,255,0.06)" borderRadius="12px" overflow="hidden" as="div" display="grid">
+                  <Box py="9px" textAlign="center" borderRight="1px solid rgba(255,255,255,0.08)">
+                    <Text fontFamily="Syne, sans-serif" fontSize="14px" fontWeight="800" color="white">0</Text>
+                    <Text fontSize="9px" color="rgba(255,255,255,0.55)" textTransform="uppercase" letterSpacing="0.05em" mt="1px">Orders</Text>
+                  </Box>
+                  <Box py="9px" textAlign="center" borderRight="1px solid rgba(255,255,255,0.08)">
+                    <Text fontFamily="Syne, sans-serif" fontSize="14px" fontWeight="800" color="white">{wishlistCount}</Text>
+                    <Text fontSize="9px" color="rgba(255,255,255,0.55)" textTransform="uppercase" letterSpacing="0.05em" mt="1px">Wishlist</Text>
+                  </Box>
+                  <Box py="9px" textAlign="center">
+                    <Text fontFamily="Syne, sans-serif" fontSize="14px" fontWeight="800" color="white">UGX 0</Text>
+                    <Text fontSize="9px" color="rgba(255,255,255,0.55)" textTransform="uppercase" letterSpacing="0.05em" mt="1px">Wallet</Text>
+                  </Box>
+                </Flex>
+              )}
+            </Box>
 
-            <DrawerBody px={0} py={0} overflowY="auto" display="flex" flexDirection="column">
-              <Box px={6} py={3} bg="gray.50">
-                <Text fontSize="0.7rem" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="wider">
-                  Shop & Explore
-                </Text>
+            <DrawerBody px={0} py={0} flex="1" minH={0} display="flex" flexDirection="column" overflow="hidden">
+              {/* Scrollable area – only this scrolls; Call + Logout stay fixed at bottom */}
+              <Box flex="1" minH={0} overflowY="auto" overflowX="hidden" sx={{ "&::-webkit-scrollbar": { display: "none" }, scrollbarWidth: "none" }} pt="8px">
+              {/* Sell CTA – HTML exact: orange gradient, house icon, arrow */}
+              <Link href={CLIENT_DASHBOARD_URL} onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
+                <Flex mx="14px" mt="12px" mb="8px" align="center" gap="10px" p="12px 14px" borderRadius="12px" bg="linear-gradient(135deg, #f97316 0%, #ea580c 100%)" boxShadow="0 3px 12px rgba(249,115,22,0.3)" _active={{ transform: "scale(0.98)" }} transition="transform 0.15s">
+                  <Flex w="36px" h="36px" borderRadius="10px" bg="rgba(255,255,255,0.2)" align="center" justify="center" flexShrink={0}>
+                    <AiOutlineHome size={18} color="white" />
+                  </Flex>
+                  <Box flex={1}>
+                    <Text fontFamily="Syne, sans-serif" fontSize="13px" fontWeight="800" color="white">Start Selling Today</Text>
+                    <Text fontSize="10px" color="rgba(255,255,255,0.75)" mt="1px">List your products on YooKatale</Text>
+                  </Box>
+                  <Box><FaChevronDown size={16} style={{ transform: "rotate(-90deg)", color: "rgba(255,255,255,0.8)" }} /></Box>
+                </Flex>
+              </Link>
+
+              {/* Shop & Explore – HTML: section label #637568, nav-icon bg #f4f8f5, nav-label #1e2d22, chevron #c0cfc4 */}
+              <Text fontSize="9.5px" fontWeight="700" textTransform="uppercase" letterSpacing="0.12em" color="#637568" px="18px" pt="14px" pb="6px">Shop &amp; Explore</Text>
+              {visibleNavLinks.filter((l) => ["/", "/products", "/marketplace"].includes(l.href) || (l.href && l.href.startsWith("/search") && l.label === "Promotions")).map((link) => {
+                const Icon = link.icon;
+                const isActive = pathname === (link.href ?? "") || (link.href?.startsWith("/search") && pathname.startsWith("/search"));
+                const badge = link.badge;
+                const badgeBg = badge === "New" ? "#1a6b3a" : badge === "HOT" ? "#f5c800" : "#f97316";
+                const badgeColor = badge === "HOT" ? "#0c1a10" : "white";
+                return (
+                  <Link key={String(link.href) + link.label} href={link.href ?? "#"} onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
+                    <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={isActive ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} _active={{ bg: "#e8f5ee" }} transition="background 0.12s">
+                      {isActive && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
+                      <Flex w="34px" h="34px" borderRadius="10px" bg={isActive ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}>
+                        <Icon size={17} color={isActive ? "#1a6b3a" : "#637568"} />
+                      </Flex>
+                      <Text fontSize="13px" fontWeight={isActive ? 700 : 500} color={isActive ? "#1a6b3a" : "#1e2d22"} flex={1}>{link.label}</Text>
+                      {badge && <Badge fontSize="9px" fontWeight="800" px="7px" py="2px" borderRadius="full" bg={badgeBg} color={badgeColor} flexShrink={0}>{badge}</Badge>}
+                      <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
+                    </Flex>
+                  </Link>
+                );
+              })}
+
+              {/* Company */}
+              <Divider my="6px" mx="14px" borderColor="#e8f0eb" />
+              <Text fontSize="9.5px" fontWeight="700" textTransform="uppercase" letterSpacing="0.12em" color="#637568" px="18px" pt="14px" pb="6px">Company</Text>
+              {visibleNavLinks.filter((l) => ["/about", "/news", "/careers", "/contact", "/partner", "/subscription"].includes(l.href)).map((link) => {
+                const Icon = link.icon;
+                const isActive = pathname === (link.href ?? "");
+                const badge = link.badge;
+                const badgeBg = badge === "Hiring" ? "#f97316" : "#1a6b3a";
+                return (
+                  <Link key={link.href} href={link.href ?? "#"} onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
+                    <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={isActive ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} _active={{ bg: "#e8f5ee" }} transition="background 0.12s">
+                      {isActive && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
+                      <Flex w="34px" h="34px" borderRadius="10px" bg={isActive ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}>
+                        <Icon size={17} color={isActive ? "#1a6b3a" : "#637568"} />
+                      </Flex>
+                      <Text fontSize="13px" fontWeight={isActive ? 700 : 500} color={isActive ? "#1a6b3a" : "#1e2d22"} flex={1}>{link.label}</Text>
+                      {badge && <Badge fontSize="9px" fontWeight="800" px="7px" py="2px" borderRadius="full" bg={badgeBg} color="white" flexShrink={0}>{badge}</Badge>}
+                      <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
+                    </Flex>
+                  </Link>
+                );
+              })}
+
+              {/* My Account – HTML colors */}
+              <Divider my="6px" mx="14px" borderColor="#e8f0eb" />
+              <Text fontSize="9.5px" fontWeight="700" textTransform="uppercase" letterSpacing="0.12em" color="#637568" px="18px" pt="14px" pb="6px">My Account</Text>
+              {userInfo && (
+                <>
+                  <Link href="/account" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
+                    <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/account" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
+                      {pathname === "/account" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
+                      <Flex w="34px" h="34px" borderRadius="10px" bg={pathname === "/account" ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}><AiOutlineUser size={17} color={pathname === "/account" ? "#1a6b3a" : "#637568"} /></Flex>
+                      <Text fontSize="13px" fontWeight={pathname === "/account" ? 700 : 500} color={pathname === "/account" ? "#1a6b3a" : "#1e2d22"} flex={1}>My Profile</Text>
+                      <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
+                    </Flex>
+                  </Link>
+                  <Link href="/invoices" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
+                    <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/invoices" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
+                      {pathname === "/invoices" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
+                      <Flex w="34px" h="34px" borderRadius="10px" bg={pathname === "/invoices" ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}><FaShoppingBag size={17} color={pathname === "/invoices" ? "#1a6b3a" : "#637568"} /></Flex>
+                      <Text fontSize="13px" fontWeight={pathname === "/invoices" ? 700 : 500} color={pathname === "/invoices" ? "#1a6b3a" : "#1e2d22"} flex={1}>My Orders</Text>
+                      <Badge fontSize="9px" fontWeight="800" px="7px" py="2px" borderRadius="full" bg="#1a6b3a" color="white">0</Badge>
+                      <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
+                    </Flex>
+                  </Link>
+                  <Link href="/wishlist" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
+                    <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/wishlist" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
+                      {pathname === "/wishlist" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
+                      <Flex w="34px" h="34px" borderRadius="10px" bg={pathname === "/wishlist" ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}><FaHeart size={17} color={pathname === "/wishlist" ? "#1a6b3a" : "#637568"} /></Flex>
+                      <Text fontSize="13px" fontWeight={pathname === "/wishlist" ? 700 : 500} color={pathname === "/wishlist" ? "#1a6b3a" : "#1e2d22"} flex={1}>Wishlist</Text>
+                      {wishlistCount > 0 && <Badge fontSize="9px" fontWeight="800" px="7px" py="2px" borderRadius="full" bg="#f97316" color="white">{wishlistCount}</Badge>}
+                      <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
+                    </Flex>
+                  </Link>
+                </>
+              )}
+              <Link href="/cashout" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
+                <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/cashout" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
+                  {pathname === "/cashout" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
+                  <Flex w="34px" h="34px" borderRadius="10px" bg={pathname === "/cashout" ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}><FaWallet size={17} color={pathname === "/cashout" ? "#1a6b3a" : "#637568"} /></Flex>
+                  <Text fontSize="13px" fontWeight={pathname === "/cashout" ? 700 : 500} color={pathname === "/cashout" ? "#1a6b3a" : "#1e2d22"} flex={1}>Cashout</Text>
+                  <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
+                </Flex>
+              </Link>
+              <Flex as="button" type="button" align="center" gap="12px" py="11px" px="18px" w="100%" textAlign="left" bg="transparent" _hover={{ bg: "#e8f5ee" }} _active={{ bg: "#e8f5ee" }} onClick={openInviteModal} transition="background 0.12s">
+                <Flex w="34px" h="34px" borderRadius="10px" bg="#f4f8f5" align="center" justify="center" flexShrink={0}><FaGift size={17} color="#637568" /></Flex>
+                <Text fontSize="13px" fontWeight="500" color="#1e2d22" flex={1}>Invite a Friend</Text>
+                <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
+              </Flex>
+              {!userInfo && (
+                <Link href="/signup" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
+                  <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/signup" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
+                    {pathname === "/signup" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
+                    <Flex w="34px" h="34px" borderRadius="10px" bg={pathname === "/signup" ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}><AiOutlineLogin size={17} color={pathname === "/signup" ? "#1a6b3a" : "#637568"} /></Flex>
+                    <Text fontSize="13px" fontWeight={pathname === "/signup" ? 700 : 500} color={pathname === "/signup" ? "#1a6b3a" : "#1e2d22"} flex={1}>Sign Up</Text>
+                    <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
+                  </Flex>
+                </Link>
+              )}
+
+              <Box h="16px" />
               </Box>
-              <VStack align="stretch" spacing={0} flex="1">
-                {visibleNavLinks.map((link, index) => {
-                  const Icon = link.icon;
-                  const mobileHref = link.href ?? "#";
-                  if (link.isInvite) {
-                    return (
-                      <Flex
-                        key="invite"
-                        as="button"
-                        type="button"
-                        align="center"
-                        px={6}
-                        py={4}
-                        w="full"
-                        textAlign="left"
-                        borderBottomWidth="1px"
-                        borderColor="gray.100"
-                        transition="all 0.2s"
-                        _hover={{
-                          bg: "green.50",
-                          pl: 7,
-                        }}
-                        _active={{ bg: "green.100" }}
-                        onClick={openInviteModal}
-                      >
-                        <Flex
-                          align="center"
-                          justify="center"
-                          w="36px"
-                          h="36px"
-                          borderRadius="lg"
-                          bg="green.50"
-                          color={ThemeColors.darkColor}
-                          mr={3}
-                        >
-                          <Icon size={18} />
-                        </Flex>
-                        <Text fontSize="0.9375rem" fontWeight="600" color="gray.700">
-                          {link.label}
-                        </Text>
-                      </Flex>
-                    );
-                  }
-                  if (link.isSell) {
-                    return (
-                      <Link
-                        key="sell"
-                        href={mobileHref}
-                        onClick={closeMobileNav}
-                        display="block"
-                        mx={4}
-                        mt={3}
-                        mb={2}
-                      >
-                        <Flex
-                          align="center"
-                          justify="center"
-                          px={6}
-                          py={4}
-                          borderRadius="xl"
-                          bg={ThemeColors.primaryColor}
-                          color="white"
-                          fontWeight="700"
-                          fontSize="1rem"
-                          transition="all 0.2s"
-                          _active={{ bg: ThemeColors.secondaryColor }}
-                        >
-                          {link.label}
-                        </Flex>
-                      </Link>
-                    );
-                  }
-                  return (
-                    <Link
-                      key={mobileHref}
-                      href={mobileHref}
-                      onClick={closeMobileNav}
-                    >
-                      <Flex
-                        align="center"
-                        px={6}
-                        py={4}
-                        minH="56px"
-                        borderBottomWidth="1px"
-                        borderColor="gray.100"
-                        transition="all 0.2s"
-                        _hover={{
-                          bg: "gray.50",
-                          pl: 7,
-                        }}
-                        _active={{ bg: "green.50" }}
-                      >
-                        <Flex
-                          align="center"
-                          justify="center"
-                          w="40px"
-                          h="40px"
-                          borderRadius="xl"
-                          bg="white"
-                          borderWidth="1px"
-                          borderColor="gray.200"
-                          color="var(--brand)"
-                          mr={4}
-                        >
-                          <Icon size={20} />
-                        </Flex>
-                        <Text fontSize="1rem" fontWeight="600" color="gray.800">
-                          {link.label}
-                        </Text>
-                      </Flex>
-                    </Link>
-                  );
-                })}
 
-                {/* Mobile Account Section */}
+              {/* Footer – fixed at bottom when scrolling (Call + Logout + version) */}
+              <Box px="14px" py="14px" pb="28px" borderTop="1px solid" borderColor="#e8f0eb" bg="white" flexShrink={0}>
+                <Button
+                  as="a"
+                  href="tel:+256786118137"
+                  w="full"
+                  h="52px"
+                  leftIcon={<AiOutlinePhone size={16} />}
+                  bg={ThemeColors.primaryColor}
+                  color="white"
+                  fontFamily="Syne, sans-serif"
+                  fontSize="13px"
+                  fontWeight="700"
+                  borderRadius="12px"
+                  mb="8px"
+                  boxShadow="0 3px 12px rgba(26,107,58,0.3)"
+                  _active={{ bg: "#145530", transform: "scale(0.98)" }}
+                  onClick={closeMobileNav}
+                >
+                  Call +256 786 118137
+                </Button>
                 {userInfo && (
-                  <>
-                    <Box px={6} py={3} bg="gray.50" mt={2}>
-                      <Text fontSize="0.75rem" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="wider">
-                        My Account
-                      </Text>
-                    </Box>
-                    <Link href="/account" onClick={closeMobileNav}>
-                      <Flex
-                        align="center"
-                        px={6}
-                        py={4}
-                        borderBottomWidth="1px"
-                        borderColor="gray.100"
-                        transition="all 0.2s"
-                        _hover={{
-                          bg: "green.50",
-                          pl: 7,
-                        }}
-                      >
-                        <Flex
-                          align="center"
-                          justify="center"
-                          w="36px"
-                          h="36px"
-                          borderRadius="lg"
-                          bg="blue.50"
-                          color="blue.500"
-                          mr={3}
-                        >
-                          <AiOutlineUser size={18} />
-                        </Flex>
-                        <Text fontSize="0.9375rem" fontWeight="600" color="gray.700">
-                          Profile
-                        </Text>
-                      </Flex>
-                    </Link>
-                    <Link href="/invoices" onClick={closeMobileNav}>
-                      <Flex
-                        align="center"
-                        px={6}
-                        py={4}
-                        borderBottomWidth="1px"
-                        borderColor="gray.100"
-                        transition="all 0.2s"
-                        _hover={{
-                          bg: "green.50",
-                          pl: 7,
-                        }}
-                      >
-                        <Flex
-                          align="center"
-                          justify="center"
-                          w="36px"
-                          h="36px"
-                          borderRadius="lg"
-                          bg="purple.50"
-                          color="purple.500"
-                          mr={3}
-                        >
-                          <FaShoppingBag size={16} />
-                        </Flex>
-                        <Text fontSize="0.9375rem" fontWeight="600" color="gray.700">
-                          My Orders
-                        </Text>
-                      </Flex>
-                    </Link>
-                    <Link href="/cashout" onClick={closeMobileNav}>
-                      <Flex
-                        align="center"
-                        px={6}
-                        py={4}
-                        borderBottomWidth="1px"
-                        borderColor="gray.100"
-                        transition="all 0.2s"
-                        _hover={{
-                          bg: "green.50",
-                          pl: 7,
-                        }}
-                      >
-                        <Flex
-                          align="center"
-                          justify="center"
-                          w="36px"
-                          h="36px"
-                          borderRadius="lg"
-                          bg="green.50"
-                          color={ThemeColors.darkColor}
-                          mr={3}
-                        >
-                          <FaWallet size={16} />
-                        </Flex>
-                        <Text fontSize="0.9375rem" fontWeight="600" color="gray.700">
-                          Cashout
-                        </Text>
-                      </Flex>
-                    </Link>
-                  </>
-                )}
-
-                {/* Call Button in Mobile */}
-                <Box px={6} py={6} bg="gray.50" mt="auto">
                   <Button
-                    as="a"
-                    href="tel:+256786118137"
                     w="full"
-                    h="56px"
-                    leftIcon={<AiOutlinePhone size={20} />}
-                    bg="linear-gradient(135deg, #F6AD55 0%, #ED8936 100%)"
-                    color="white"
-                    fontSize="1rem"
+                    h="48px"
+                    leftIcon={<AiOutlineLogout size={16} />}
+                    variant="outline"
+                    borderColor="red.200"
+                    borderWidth="1.5px"
+                    color="red.500"
+                    fontFamily="Syne, sans-serif"
+                    fontSize="13px"
                     fontWeight="700"
-                    borderRadius="xl"
-                    boxShadow="0 4px 12px rgba(246, 173, 85, 0.3)"
-                    transition="all 0.2s"
-                    _hover={{
-                      transform: "translateY(-2px)",
-                      boxShadow: "0 6px 20px rgba(246, 173, 85, 0.4)",
-                    }}
-                    _active={{
-                      transform: "translateY(0)",
-                    }}
-                    onClick={closeMobileNav}
+                    borderRadius="12px"
+                    _hover={{ bg: "red.50" }}
+                    _active={{ bg: "red.50" }}
+                    onClick={handleLogout}
                   >
-                    Call +256 786 118137
+                    Logout
                   </Button>
-
-                  {userInfo && (
-                    <Button
-                      w="full"
-                      h="52px"
-                      mt={3}
-                      leftIcon={<AiOutlineLogout size={18} />}
-                      variant="outline"
-                      colorScheme="red"
-                      fontSize="0.9375rem"
-                      fontWeight="600"
-                      borderRadius="xl"
-                      borderWidth="2px"
-                      transition="all 0.2s"
-                      _hover={{
-                        bg: "red.50",
-                        transform: "translateY(-1px)",
-                      }}
-                      _active={{
-                        transform: "translateY(0)",
-                      }}
-                      onClick={handleLogout}
-                    >
-                      Logout
-                    </Button>
-                  )}
-                </Box>
-              </VStack>
+                )}
+                <Text textAlign="center" mt="10px" fontSize="10px" color="gray.500">YooKatale · <Text as="span" color={ThemeColors.primaryColor} fontWeight="600">fresh produce &amp; groceries, Kampala</Text></Text>
+              </Box>
             </DrawerBody>
           </DrawerContent>
         </Drawer>
