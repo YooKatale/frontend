@@ -4,11 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@slices/authSlice";
-import {
-  useProductsGetMutation,
-  useProductsCategoriesGetMutation,
-  useProductsFilterGetMutation,
-} from "@slices/productsApiSlice";
+import { useProductsGetMutation, useProductsCategoriesGetMutation } from "@slices/productsApiSlice";
 import ProductCard from "@components/ProductCard";
 import styles from "./products.module.css";
 
@@ -36,8 +32,6 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFilterLoading, setIsFilterLoading] = useState(false);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activePill, setActivePill] = useState("all");
   const [selectedCategorySlugs, setSelectedCategorySlugs] = useState([]);
@@ -54,7 +48,6 @@ const Products = () => {
 
   const [fetchProducts] = useProductsGetMutation();
   const [fetchCategories] = useProductsCategoriesGetMutation();
-  const [fetchProductsFilter] = useProductsFilterGetMutation();
 
   useEffect(() => {
     let cancelled = false;
@@ -119,60 +112,19 @@ const Products = () => {
     };
   }, [fetchProducts, fetchCategories, toast]);
 
-  useEffect(() => {
-    if (selectedCategorySlugs.length === 0) {
-      setProducts(allProducts);
-      setVisibleCount(12);
-      return;
-    }
-
-    let cancelled = false;
-    const apiSlugs = selectedCategorySlugs
-      .map((slug) => categories.find((c) => c.slug === slug)?.apiSlug ?? slug)
-      .filter(Boolean);
-
-    if (apiSlugs.length === 0) {
-      setProducts(allProducts);
-      return;
-    }
-
-    async function loadFiltered() {
-      try {
-        setIsFilterLoading(true);
-        const res = await fetchProductsFilter(JSON.stringify(apiSlugs)).unwrap();
-        if (cancelled) return;
-        const data = res?.data?.Products ?? res?.data?.products ?? res?.data;
-        const list = Array.isArray(data) ? data : [];
-        setProducts(list);
-        setVisibleCount(12);
-    } catch (err) {
-        if (cancelled) return;
-        console.error("Error filtering products:", err);
-        toast({
-          title: "Filter error",
-          description: err?.data?.message || err?.message || "Could not filter by category",
-        status: "error",
-        duration: 5000,
-          isClosable: true,
-        });
-        setProducts(allProducts);
-      } finally {
-        if (!cancelled) setIsFilterLoading(false);
-      }
-    }
-
-    loadFiltered();
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedCategorySlugs, categories, fetchProductsFilter, toast, allProducts]);
-
   const filteredProducts = useMemo(() => {
     let list = Array.isArray(products) ? [...products] : [];
 
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       list = list.filter((p) => (p.name || "").toString().toLowerCase().includes(term));
+    }
+
+    if (selectedCategorySlugs.length) {
+      list = list.filter((p) => {
+        const slug = slugifyCategory(p.category || p.categoryName || "");
+        return selectedCategorySlugs.includes(slug);
+      });
     }
 
     list = list.filter((p) => {
@@ -193,7 +145,7 @@ const Products = () => {
     }
 
     return list;
-  }, [products, searchTerm, priceMin, priceMax, sort]);
+  }, [products, searchTerm, selectedCategorySlugs, priceMin, priceMax, sort]);
 
   const visibleProducts = filteredProducts.slice(0, visibleCount);
 
@@ -574,7 +526,7 @@ const Products = () => {
 
             <div className={styles.gridWrap}>
               <div className={styles.productGrid}>
-                {isLoading || isFilterLoading ? (
+                {isLoading ? (
                   <div className={styles.emptyState}>
                     <div className={styles.emptyIcon}>
                       <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

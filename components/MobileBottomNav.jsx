@@ -6,17 +6,13 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@slices/authSlice";
 import { useCartMutation } from "@slices/productsApiSlice";
 import { useState, useEffect, useCallback } from "react";
-import {
-  AiOutlineHome,
-  AiOutlineShoppingCart,
-  AiOutlineUser,
-} from "react-icons/ai";
-import { MdCardMembership } from "react-icons/md";
+import { AiOutlineHome, AiOutlineShoppingCart, AiOutlineUser } from "react-icons/ai";
+import { RiHandHeartLine } from "react-icons/ri";
 import { FaHeart } from "react-icons/fa";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home", icon: AiOutlineHome },
-  { href: "/subscription", label: "Subscribe", icon: MdCardMembership },
+  { href: "/subscription", label: "Subscribe", icon: RiHandHeartLine },
   { href: "/cart", label: "Cart", icon: AiOutlineShoppingCart, showBadge: true },
   { href: "/account", label: "Wishlist", icon: FaHeart },
   { href: "/account", label: "Account", icon: AiOutlineUser },
