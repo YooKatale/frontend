@@ -322,7 +322,8 @@ const V4_CSS = `
 .yookatale-v4-page .m-banner{position:relative;width:100%;height:clamp(240px,55vw,340px);flex-shrink:0;overflow:hidden;background:linear-gradient(135deg,#0e1e0e,#1a5c1a);}
 @media(min-width:600px){.yookatale-v4-page .m-banner{height:320px;}}
 .yookatale-v4-page .m-banner img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02);}
-.yookatale-v4-page .m-banner-shade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.08) 0%,transparent 35%,transparent 45%,rgba(0,0,0,.82) 100%);}
+.yookatale-v4-page .m-banner-img{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;display:block;}
+.yookatale-v4-page .m-banner-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(0,0,0,.08) 0%,transparent 35%,transparent 45%,rgba(0,0,0,.82) 100%);}
 .yookatale-v4-page .m-handle{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:36px;height:4px;background:rgba(255,255,255,.35);border-radius:2px;z-index:10;}
 @media(min-width:600px){.yookatale-v4-page .m-handle{display:none;}}
 .yookatale-v4-page .m-banner-info{position:absolute;bottom:0;left:0;right:0;z-index:5;padding:16px 20px;display:flex;align-items:flex-end;gap:12px;}
@@ -616,7 +617,6 @@ export default function Home() {
             <div className="country-grid">
               {(countries.length ? countries : [{ code: "UG", name: "Uganda", flag: "https://flagcdn.com/w160/ug.png", isDefault: true }]).map((c) => (
                 <div key={c.code} role="button" tabIndex={0} className={`c-btn${c.isDefault ? " dflt" : ""}`} onClick={() => setModal(c)} onKeyDown={(e) => e.key === "Enter" && setModal(c)}>
-                  {c.isDefault && <span className="c-default-label">Default</span>}
                   {c.isDefault && <span className="c-default-ring" aria-hidden />}
                   <div className="c-flag-wrap"><img src={c.flag || `https://flagcdn.com/w160/${(c.code || "").toLowerCase()}.png`} alt={c.name} loading="lazy" onError={(e) => { e.target.style.opacity = "0"; }} /></div>
                   <span className="c-name">{c.name}</span>
@@ -711,7 +711,14 @@ export default function Home() {
           <div className="m-sheet">
             <div className="m-banner">
               <div className="m-handle" aria-hidden />
-              {modal.imageUrl && <img src={getImageUrl(modal.imageUrl)} alt={modal.name} onError={(e) => { e.target.style.display = "none"; }} />}
+              {(modal.imageUrl || modal.bannerImageUrl || modal.image) && (
+                <img
+                  className="m-banner-img"
+                  src={getImageUrl(modal.imageUrl || modal.bannerImageUrl || modal.image)}
+                  alt={modal.menuName || modal.name || ""}
+                  onError={(e) => { e.target.style.display = "none"; }}
+                />
+              )}
               <div className="m-banner-shade" />
               <div className="m-banner-info">
                 <img className="m-flag" src={modal.flag || `https://flagcdn.com/w160/${(modal.code || "").toLowerCase()}.png`} alt="" onError={(e) => { e.target.style.display = "none"; }} />
