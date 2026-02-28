@@ -296,7 +296,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         const formData = new FormData();
         if (file) formData.append("avatar", file);
         return {
-          url: `${DB_URL}/users/${userId}/avatar`,
+          url: `/api/users/${userId}/avatar`,
           method: "PUT",
           body: formData,
         };
