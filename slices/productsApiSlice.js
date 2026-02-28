@@ -116,6 +116,15 @@ export const productsApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    getCountryCuisines: builder.query({
+      query: () => ({ url: `${DB_URL.replace(/\/api\/?$/, "")}/api/country-cuisines`, method: "GET" }),
+    }),
+    getCountryCuisineByCode: builder.query({
+      query: (code) => ({ url: `${DB_URL.replace(/\/api\/?$/, "")}/api/country-cuisines/${encodeURIComponent(code)}`, method: "GET" }),
+    }),
+    getHomepageConfig: builder.query({
+      query: () => ({ url: `${DB_URL.replace(/\/api\/?$/, "")}/api/homepage-config`, method: "GET" }),
+    }),
   }),
 });
 
@@ -137,4 +146,7 @@ export const {
   useOrderUpdateMutation,
   useCartCheckoutMutation,
   useValidateCouponMutation,
+  useGetCountryCuisinesQuery,
+  useGetCountryCuisineByCodeQuery,
+  useGetHomepageConfigQuery,
 } = productsApiSlice;

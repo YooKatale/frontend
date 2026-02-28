@@ -73,6 +73,7 @@ import { useCartMutation } from "@slices/productsApiSlice";
 import { logout, useAuth } from "@slices/authSlice";
 import { ThemeColors, CLIENT_DASHBOARD_URL, CategoriesJson, getUserAvatarUrl } from "@constants/constants";
 import ReferralModal from "@components/ReferralModal";
+import PreNavbar from "@components/PreNavbar";
 
 // Categories to hide from the navbar strip (case-insensitive)
 const NAVBAR_HIDDEN_CATEGORIES = [
@@ -222,6 +223,7 @@ const Header = () => {
 
   return (
     <>
+      <PreNavbar />
       {/* Sticky nav: search, logo, toggle (+ account/cart on desktop) */}
       <Box
         as="header"
