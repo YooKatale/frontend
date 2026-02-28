@@ -71,8 +71,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLogoutMutation } from "@slices/usersApiSlice";
 import { useCartMutation } from "@slices/productsApiSlice";
 import { logout, useAuth } from "@slices/authSlice";
-import { ThemeColors, CLIENT_DASHBOARD_URL, CategoriesJson } from "@constants/constants";
+import { ThemeColors, CLIENT_DASHBOARD_URL, CategoriesJson, getUserAvatarUrl } from "@constants/constants";
 import ReferralModal from "@components/ReferralModal";
+import PreNavbar from "@components/PreNavbar";
 
 // Categories to hide from the navbar strip (case-insensitive)
 const NAVBAR_HIDDEN_CATEGORIES = [
@@ -222,6 +223,10 @@ const Header = () => {
 
   return (
     <>
+      {/* PreNavbar: promo banner, ticker, util bar — scrolls away */}
+      <PreNavbar />
+
+      {/* Sticky nav: only search, logo, toggle (+ account/cart on desktop) stay visible when scrolling */}
       <Box
         as="header"
         bg="white"
@@ -231,61 +236,10 @@ const Header = () => {
         boxShadow={scrolled ? "0 4px 20px rgba(0,0,0,0.08)" : "0 2px 8px rgba(0,0,0,0.04)"}
         backdropFilter="blur(10px)"
         borderBottom="1px solid"
-        borderColor="gray.100"
+        borderColor="rgba(0,0,0,0.06)"
         transition="box-shadow var(--transition, 0.2s ease)"
+        fontFamily="'Sora', sans-serif"
       >
-        {/* Black banner: Download app + Free delivery – orange accent */}
-        <Box
-          as="a"
-          href={PLAY_STORE_APP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          display="block"
-          bg="black"
-          color="white"
-          py={{ base: 1.5, md: 2 }}
-          px={{ base: 3, md: 4 }}
-          textAlign="center"
-          fontSize={{ base: "0.7rem", sm: "0.8125rem" }}
-          fontWeight="600"
-          _hover={{ bg: "gray.900" }}
-          transition="background 0.2s"
-        >
-          <Text as="span">DOWNLOAD YOOKATALE APP</Text>
-          <Text as="span" color="orange.400" mx={2}>·</Text>
-          <Text as="span">FREE DELIVERY WITHIN 3KM</Text>
-        </Box>
-
-        {/* Top bar – Sell / Help / FAQs / Track Order – orange, icon spacing, star for Sell */}
-        <Box
-          bg="gray.50"
-          borderBottom="1px solid"
-          borderColor="gray.200"
-          py={{ base: 1.5, md: 2 }}
-          px={{ base: 3, md: 4 }}
-        >
-          <Flex maxW="1400px" mx="auto" justify="space-between" align="center" fontSize={{ base: "0.75rem", sm: "0.8125rem" }} flexWrap="wrap" gap={{ base: 2, md: 0 }}>
-            <Link href={CLIENT_DASHBOARD_URL} display="flex" alignItems="center" gap={2.5} fontWeight="700" color="orange.500" _hover={{ color: "orange.600" }}>
-              <Icon as={FaStar} boxSize={4} flexShrink={0} />
-              Sell on Yookatale
-            </Link>
-            <HStack spacing={{ base: 4, sm: 6 }} color="gray.600">
-              <Link href="/contact" display="flex" alignItems="center" gap={2.5} color="orange.500" _hover={{ color: "orange.600" }}>
-                <Icon as={AiOutlineQuestionCircle} boxSize={4} flexShrink={0} />
-                Help
-              </Link>
-              <Link href="/faqs" display="flex" alignItems="center" gap={2.5} color="orange.500" _hover={{ color: "orange.600" }}>
-                <Icon as={AiOutlineInfoCircle} boxSize={4} flexShrink={0} />
-                FAQs
-              </Link>
-              <Link href="/account" display="flex" alignItems="center" gap={2.5} color="orange.500" _hover={{ color: "orange.600" }}>
-                <Icon as={FaTruck} boxSize={4} flexShrink={0} />
-                Track Order
-              </Link>
-            </HStack>
-          </Flex>
-        </Box>
-
         {/* Main Navigation Bar */}
         <Flex
           as="nav"
@@ -369,12 +323,12 @@ const Header = () => {
             mx={1}
             align="center"
             h="48px"
-            borderRadius="lg"
-            bg="white"
-            borderWidth="2px"
-            borderColor="orange.400"
+            borderRadius="12px"
+            bg="#edf0ea"
+            borderWidth="1.5px"
+            borderColor="#1a5c1a"
             overflow="hidden"
-            _focusWithin={{ borderColor: "orange.500", boxShadow: "0 0 0 2px rgba(249, 115, 22, 0.25)" }}
+            _focusWithin={{ borderColor: "#2d8c2d", boxShadow: "0 0 0 2px rgba(26, 92, 26, 0.2)" }}
           >
             <InputGroup size="md" flex="1" minW={0}>
               <InputLeftElement h="48px" pl={3} pointerEvents="none">
@@ -413,8 +367,8 @@ const Header = () => {
             overflow="hidden"
             transition="all 0.2s"
             _focusWithin={{
-              borderColor: ThemeColors.primaryColor,
-              boxShadow: `0 0 0 2px ${ThemeColors.primaryColor}25`,
+              borderColor: "#1a5c1a",
+              boxShadow: "0 0 0 2px rgba(26, 92, 26, 0.2)",
             }}
           >
             <InputGroup flex="1" size="lg">
@@ -438,12 +392,12 @@ const Header = () => {
               type="submit"
               h="48px"
               px={6}
-              bg="orange.500"
+              bg="#1a5c1a"
               color="white"
               fontWeight="700"
               fontSize="0.9375rem"
               borderRadius="0"
-              _hover={{ bg: "orange.600" }}
+              _hover={{ bg: "#2d8c2d" }}
             >
               Search
             </Button>
@@ -462,10 +416,24 @@ const Header = () => {
                 borderRadius="lg"
                 color="gray.700"
                 rightIcon={<FaChevronDown size={10} />}
-                leftIcon={<AiOutlineUser size={18} />}
+                leftIcon={
+                  getUserAvatarUrl(userInfo) ? (
+                    <Avatar
+                      size="xs"
+                      name={userDisplayName}
+                      src={getUserAvatarUrl(userInfo)}
+                      bg="green.100"
+                      color="gray.700"
+                      flexShrink={0}
+                      objectFit="cover"
+                    />
+                  ) : (
+                    <AiOutlineUser size={18} />
+                  )
+                }
                 fontWeight="600"
                 fontSize="0.875rem"
-                _hover={{ bg: "gray.50", color: ThemeColors.darkColor }}
+                _hover={{ bg: "gray.50", color: "#1a5c1a" }}
               >
                 Account
               </MenuButton>
@@ -481,17 +449,32 @@ const Header = () => {
                 {userInfo ? (
                   <>
                     <Box px={4} py={3} bg="gray.50">
-                      <Text fontSize="0.75rem" color="gray.500" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
-                        Account
-                      </Text>
-                      <Text fontSize="0.9375rem" fontWeight="600" color="gray.800" mt={1}>
-                        {userDisplayName}
-                      </Text>
-                      {userInfo?.email && (
-                        <Text fontSize="0.8125rem" color="gray.500" mt={0.5}>
-                          {userInfo.email}
-                        </Text>
-                      )}
+                      <HStack spacing={3} mb={2}>
+                        {getUserAvatarUrl(userInfo) && (
+                          <Avatar
+                            size="sm"
+                            name={userDisplayName}
+                            src={getUserAvatarUrl(userInfo)}
+                            bg="green.100"
+                            color="gray.700"
+                            flexShrink={0}
+                            objectFit="cover"
+                          />
+                        )}
+                        <VStack align="flex-start" spacing={0} flex={1} minW={0}>
+                          <Text fontSize="0.75rem" color="gray.500" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
+                            Account
+                          </Text>
+                          <Text fontSize="0.9375rem" fontWeight="600" color="gray.800" mt={1} noOfLines={1}>
+                            {userDisplayName}
+                          </Text>
+                          {userInfo?.email && (
+                            <Text fontSize="0.8125rem" color="gray.500" mt={0.5} noOfLines={1}>
+                              {userInfo.email}
+                            </Text>
+                          )}
+                        </VStack>
+                      </HStack>
                     </Box>
                     <Divider />
                     <MenuItem
@@ -503,10 +486,10 @@ const Header = () => {
                       fontWeight="500"
                       icon={<AiOutlineUser size={18} />}
                       transition="all 0.2s"
-                      _hover={{
-                        bg: "green.50",
-                        color: ThemeColors.darkColor,
-                      }}
+                _hover={{
+                    bg: "#e6f0e6",
+                    color: "#1a5c1a",
+                  }}
                     >
                       My Account
                     </MenuItem>
@@ -519,10 +502,10 @@ const Header = () => {
                       fontWeight="500"
                       icon={<FaShoppingBag size={16} />}
                       transition="all 0.2s"
-                      _hover={{
-                        bg: "green.50",
-                        color: ThemeColors.darkColor,
-                      }}
+                _hover={{
+                    bg: "#e6f0e6",
+                    color: "#1a5c1a",
+                  }}
                     >
                       My Orders
                     </MenuItem>
@@ -535,10 +518,10 @@ const Header = () => {
                       fontWeight="500"
                       icon={<FaWallet size={16} />}
                       transition="all 0.2s"
-                      _hover={{
-                        bg: "green.50",
-                        color: ThemeColors.darkColor,
-                      }}
+                _hover={{
+                    bg: "#e6f0e6",
+                    color: "#1a5c1a",
+                  }}
                     >
                       Cashout
                     </MenuItem>
@@ -571,10 +554,10 @@ const Header = () => {
                       fontWeight="500"
                       icon={<AiOutlineLogin size={18} />}
                       transition="all 0.2s"
-                      _hover={{
-                        bg: "green.50",
-                        color: ThemeColors.darkColor,
-                      }}
+                _hover={{
+                    bg: "#e6f0e6",
+                    color: "#1a5c1a",
+                  }}
                     >
                       Sign In
                     </MenuItem>
@@ -586,10 +569,10 @@ const Header = () => {
                       fontSize="0.9375rem"
                       fontWeight="500"
                       transition="all 0.2s"
-                      _hover={{
-                        bg: "green.50",
-                        color: ThemeColors.darkColor,
-                      }}
+                _hover={{
+                    bg: "#e6f0e6",
+                    color: "#1a5c1a",
+                  }}
                     >
                       Create Account
                     </MenuItem>
@@ -612,7 +595,7 @@ const Header = () => {
                 leftIcon={<AiOutlineQuestionCircle size={18} />}
                 fontWeight="600"
                 fontSize="0.875rem"
-                _hover={{ bg: "gray.50", color: ThemeColors.darkColor }}
+                _hover={{ bg: "gray.50", color: "#1a5c1a" }}
               >
                 Help
               </MenuButton>
@@ -636,7 +619,7 @@ const Header = () => {
                 fontWeight="600"
                 fontSize="0.875rem"
                 position="relative"
-                _hover={{ bg: "gray.50", color: ThemeColors.darkColor }}
+                _hover={{ bg: "gray.50", color: "#1a5c1a" }}
               >
                 Wishlist
                 {wishlistCount > 0 && (
@@ -674,7 +657,7 @@ const Header = () => {
                 fontWeight="600"
                 fontSize="0.875rem"
                 position="relative"
-                _hover={{ bg: "gray.50", color: ThemeColors.darkColor }}
+                _hover={{ bg: "gray.50", color: "#1a5c1a" }}
               >
                 Cart
                 {cartItemsCount > 0 && (
@@ -800,9 +783,24 @@ const Header = () => {
               <Flex justify="space-between" align="flex-start" mb="14px">
                 {userInfo ? (
                   <HStack spacing={2.5} flex={1} minW={0}>
-                    <Flex w="44px" h="44px" borderRadius="full" bg="#f5c800" align="center" justify="center" fontFamily="Syne, sans-serif" fontSize="16px" fontWeight="800" color="#0c1a10" border="2.5px solid rgba(255,255,255,0.3)" flexShrink={0}>
-                      {(userDisplayName || "A").slice(0, 2).toUpperCase()}
-                    </Flex>
+                    {getUserAvatarUrl(userInfo) ? (
+                      <Avatar
+                        size="md"
+                        w="44px"
+                        h="44px"
+                        name={userDisplayName}
+                        src={getUserAvatarUrl(userInfo)}
+                        border="2.5px solid rgba(255,255,255,0.3)"
+                        flexShrink={0}
+                        bg="#f5c800"
+                        color="#0c1a10"
+                        objectFit="cover"
+                      />
+                    ) : (
+                      <Flex w="44px" h="44px" borderRadius="full" bg="#f5c800" align="center" justify="center" fontFamily="Syne, sans-serif" fontSize="16px" fontWeight="800" color="#0c1a10" border="2.5px solid rgba(255,255,255,0.3)" flexShrink={0}>
+                        {(userDisplayName || "A").slice(0, 2).toUpperCase()}
+                      </Flex>
+                    )}
                     <Box minW={0}>
                       <Text fontFamily="Syne, sans-serif" fontSize="15px" fontWeight="700" color="white" lineHeight="1" mb="3px" noOfLines={1}>{userDisplayName}</Text>
                       <Text fontSize="11px" color="rgba(255,255,255,0.6)" noOfLines={1}>{userInfo?.email}</Text>

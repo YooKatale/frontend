@@ -16,7 +16,7 @@ import {
   CardBody,
   Heading,
 } from "@chakra-ui/react";
-import { ThemeColors } from "@constants/constants";
+import { ThemeColors, getUserAvatarUrl } from "@constants/constants";
 import { useState, useEffect } from "react";
 import { FiUser } from "react-icons/fi";
 import {
@@ -251,7 +251,7 @@ const Account = () => {
                     <Avatar
                       size={{ base: "xl", md: "2xl" }}
                       name={`${userInfo?.firstname || ""} ${userInfo?.lastname || ""}`.trim() || userInfo?.email}
-                      src={userInfo?.avatar}
+                      src={getUserAvatarUrl(userInfo)}
                       bg="whiteAlpha.300"
                       border="4px solid"
                       borderColor="whiteAlpha.400"
@@ -259,6 +259,7 @@ const Account = () => {
                       fontSize={{ base: "2xl", md: "3xl" }}
                       fontWeight="bold"
                       cursor="pointer"
+                      objectFit="cover"
                     />
                   </motion.div>
 

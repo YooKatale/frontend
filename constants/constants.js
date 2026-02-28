@@ -19,6 +19,28 @@ export const ThemeColors = {
   lightColor: "#e8f5ec",
 };
 
+/** Resolve avatar or any backend image URL: if already absolute use as-is, else prepend API origin (for /images/uploads/...). */
+export function getAvatarUrl(avatar) {
+  if (!avatar || typeof avatar !== "string") return undefined;
+  const s = avatar.trim();
+  if (!s) return undefined;
+  if (s.startsWith("http://") || s.startsWith("https://")) return s;
+  const origin = (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_ORIGIN) || "https://yookatale-server.onrender.com";
+  return origin.replace(/\/$/, "") + (s.startsWith("/") ? s : "/" + s);
+}
+
+/** Get user avatar URL from user object (handles avatar, profilePic, profile_pic). */
+export function getUserAvatarUrl(user) {
+  if (!user || typeof user !== "object") return undefined;
+  const url = user.avatar || user.profilePic || user.profile_pic || user.profileImage;
+  return getAvatarUrl(url);
+}
+
+/** Alias for backend image URLs (categories, country cuisine banners, etc.). */
+export function getImageUrl(url) {
+  return getAvatarUrl(url);
+}
+
 /** Client/vendor dashboard URL (e.g. seller app). Set NEXT_PUBLIC_CLIENT_DASHBOARD_URL in env or defaults to /sell. */
 export const CLIENT_DASHBOARD_URL =
   (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_CLIENT_DASHBOARD_URL) || "/sell";
