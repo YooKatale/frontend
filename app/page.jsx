@@ -312,7 +312,7 @@ const V4_CSS = `
 .yookatale-v4-page .cat-label{position:absolute;bottom:0;left:0;right:0;padding:5px 7px;font-size:9.5px;font-weight:700;color:#fff;text-align:center;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,.5);}
 .yookatale-v4-page .shimmer-tile{animation:shimmer 1.7s infinite;background:linear-gradient(90deg,#d4dcd4 25%,#c2cec2 50%,#d4dcd4 75%);background-size:300% 100%;}
 @keyframes shimmer{from{background-position:300% 0}to{background-position:-300% 0}}
-.yookatale-v4-page .m-overlay{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;animation:fadeBlur .22s ease;}
+.yookatale-v4-page .m-overlay{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;animation:fadeBlur .22s ease;}
 @media(min-width:600px){.yookatale-v4-page .m-overlay{align-items:center;padding:24px;}}
 @keyframes fadeBlur{from{opacity:0}to{opacity:1}}
 .yookatale-v4-page .m-sheet{background:#000;border-radius:24px 24px 0 0;width:100%;max-width:500px;overflow:hidden;animation:slideUp .32s cubic-bezier(.32,.72,0,1);position:relative;max-height:95vh;display:flex;flex-direction:column;}
@@ -333,6 +333,7 @@ const V4_CSS = `
 .yookatale-v4-page .m-close{position:absolute;top:14px;right:14px;z-index:10;width:32px;height:32px;border-radius:50%;border:none;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;}
 .yookatale-v4-page .m-close:hover{background:rgba(0,0,0,.75);}
 .yookatale-v4-page .m-body{background:var(--surf);padding:12px 16px 16px;flex:1;overflow-y:auto;}
+@media(max-width:599px){.yookatale-v4-page .m-body{padding-bottom:max(24px, env(safe-area-inset-bottom) + 80px);}}
 .yookatale-v4-page .sub-btn{width:100%;border:none;cursor:pointer;padding:0;border-radius:14px;overflow:hidden;position:relative;box-shadow:0 8px 32px rgba(26,92,26,.38);transition:transform .16s,box-shadow .22s;font-family:'Sora',sans-serif;}
 .yookatale-v4-page .sub-btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(26,92,26,.48);}
 .yookatale-v4-page .sub-btn-bg{background:linear-gradient(130deg,#0e2e0e 0%,#1a5c1a 45%,#2d8c2d 100%);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;overflow:hidden;}

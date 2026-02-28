@@ -13,7 +13,9 @@ import PlatformFeedbackModal from "@components/PlatformFeedbackModal";
 import dynamic from "next/dynamic";
 import LocationGate from "@components/LocationGate";
 import SupportChatWidget from "@components/SupportChatWidget";
+import YooKataleChatbot from "@components/YooKataleChatbot";
 import MobileBottomNav from "@components/MobileBottomNav";
+import GlobalErrorHandler from "@components/GlobalErrorHandler";
 import { hydrateWishlist } from "@slices/wishlistSlice";
 
 const NO_NAVBAR_FOOTER = ["/signin", "/signup"];
@@ -34,6 +36,7 @@ export default function ClientLayoutWrapper({ children }) {
 
   return (
     <>
+      <GlobalErrorHandler />
       <Suspense fallback={<div>Loading...</div>}>
         <ServiceWorker />
         <LocationGate>
@@ -48,6 +51,7 @@ export default function ClientLayoutWrapper({ children }) {
       <AppStoreRatingPrompt />
       <PlatformFeedbackModal />
       <SupportChatWidget />
+      <YooKataleChatbot />
     </>
   );
 }

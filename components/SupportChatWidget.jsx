@@ -285,22 +285,49 @@ export default function SupportChatWidget() {
     inputRef.current?.focus();
   };
 
-  const addFileChip = () => {
-    setAttachments((prev) => [
-      ...prev,
-      { id: Date.now(), type: "file", label: `document_${Math.floor(Math.random() * 100)}.pdf` },
-    ]);
-  };
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef(null);
 
-  const addVoiceChip = () => {
-    setAttachments((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        type: "voice",
-        label: `voice note (0:${String(Math.floor(Math.random() * 60)).padStart(2, "0")})`,
-      },
-    ]);
+  const startVoiceInput = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setMessages((prev) => [...prev, { role: "assistant", content: "Speech recognition is not supported in your browser. Try Chrome or Edge.", time: formatTime() }]);
+      return;
+    }
+    if (isRecording) {
+      try {
+        recognitionRef.current?.stop();
+      } catch {}
+      setIsRecording(false);
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+    recognitionRef.current = recognition;
+    recognition.onresult = (event) => {
+      let transcript = "";
+      for (let i = 0; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      if (transcript.trim()) {
+        setInput((prev) => (prev ? `${prev} ${transcript}` : transcript).trim());
+      }
+    };
+    recognition.onend = () => setIsRecording(false);
+    recognition.onerror = (e) => {
+      if (e.error !== "aborted") {
+        setMessages((prev) => [...prev, { role: "assistant", content: "Could not hear you. Please try again.", time: formatTime() }]);
+      }
+      setIsRecording(false);
+    };
+    try {
+      recognition.start();
+      setIsRecording(true);
+    } catch (err) {
+      setIsRecording(false);
+    }
   };
 
   const removeAttachment = (id) => setAttachments((prev) => prev.filter((a) => a.id !== id));
@@ -425,20 +452,25 @@ export default function SupportChatWidget() {
             <button type="button" className={styles.actionBtn} onClick={addEmoji} title="Add emoji">
               <i className="fa-regular fa-face-smile" />
             </button>
-            <button type="button" className={styles.actionBtn} onClick={addFileChip} title="Attach file">
-              <i className="fa-solid fa-paperclip" />
-            </button>
-            <button type="button" className={styles.actionBtn} onClick={addVoiceChip} title="Voice note">
+            <button
+              type="button"
+              className={`${styles.actionBtn} ${isRecording ? styles.actionBtnRecording : ""}`}
+              onClick={startVoiceInput}
+              title={isRecording ? "Stop recording" : "Voice input (speech to text)"}
+            >
               <i className="fa-solid fa-microphone" />
             </button>
             <button
               type="button"
-              className={`${styles.actionBtn} ${styles.actionBtnOrange}`}
+              className={`${styles.actionBtn} ${styles.actionBtnSend}`}
               onClick={sendMessage}
               disabled={sending}
               title="Send"
             >
-              <i className="fa-regular fa-paper-plane" />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 2L11 13" />
+                <path d="M22 2L15 22L11 13L2 9L22 2Z" />
+              </svg>
             </button>
           </div>
           {!withAgent && (

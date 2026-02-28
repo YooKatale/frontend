@@ -128,7 +128,7 @@ export default function MobileBottomNav() {
                     <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
                   )}
                 </Box>
-                <span>{item.label}</span>
+                <span>{isAccount && userInfo?.firstname ? userInfo.firstname : item.label}</span>
               </Flex>
             </Link>
           );
