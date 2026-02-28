@@ -412,7 +412,7 @@ export default function Home() {
   const sideCards = useMemo(() => homepageConfigData?.data?.sideCards ?? DEFAULT_CARDS, [homepageConfigData]);
   const promoBanners = useMemo(() => {
     const list = homepageConfigData?.data?.promoBanners;
-    return Array.isArray(list) && list.length > 0 ? list.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)) : DEFAULT_PROMO_BANNERS;
+    return Array.isArray(list) && list.length > 0 ? [...list].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)) : DEFAULT_PROMO_BANNERS;
   }, [homepageConfigData]);
 
   const [addCartApi] = useCartCreateMutation();
