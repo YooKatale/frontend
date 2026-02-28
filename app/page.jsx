@@ -65,13 +65,13 @@ const DEFAULT_SLIDES = [
 
 const DEFAULT_CARDS = [
   { eyebrow: "Occasion", title: "Mother's Day Special Offers", ctaText: "Shop now", link: "/search?q=promotions", gradientColors: ["#1a0510", "#5c0a30"] },
-  { eyebrow: "Free Delivery", title: "Orders over UGX 50,000", ctaText: "See details", link: "/subscription", gradientColors: ["#001a2e", "#003d6b"] },
+  { eyebrow: "Free Delivery", title: "Free delivery within 3km", ctaText: "See details", link: "/subscription", gradientColors: ["#001a2e", "#003d6b"] },
   { eyebrow: "Download", title: "Yookatale App — Android & iOS", ctaText: "Get the app", link: PLAY_STORE_APP_URL, gradientColors: ["#0a1a00", "#294d00"] },
 ];
 
 const DEFAULT_PROMO_BANNERS = [
   { title: "Discover meals & cuisines everyday", sub: "Authentic recipes from 21 countries — delivered fresh to your door", cta: "Explore Now", ctaColor: "#e07820", link: "/subscription", bg: "linear-gradient(120deg, #0e1e0e 0%, #1a5c1a 50%, #2d8c2d 100%)", order: 0 },
-  { title: "Flexible Payment Options", sub: "Pay later · Credit line · Mobile money · Visa & Mastercard accepted", cta: "Learn More", ctaColor: "#f0c020", link: "/search?q=promotions", bg: "linear-gradient(120deg, #0a1628 0%, #1a3a6b 55%, #2a5a9b 100%)", order: 1 },
+  { title: "Flexible Payment Options", sub: "Mobile money · Visa & Mastercard accepted", cta: "Learn More", ctaColor: "#f0c020", link: "/search?q=promotions", bg: "linear-gradient(120deg, #0a1628 0%, #1a3a6b 55%, #2a5a9b 100%)", order: 1 },
   { title: "Get Yookatale Boda Loan", sub: "Instant delivery credit for boda boda riders — apply in 2 minutes", cta: "Apply Now", ctaColor: "#f0c020", link: "/subscription", bg: "linear-gradient(120deg, #1a0a00 0%, #4a1a00 50%, #7a2e00 100%)", order: 2 },
 ];
 

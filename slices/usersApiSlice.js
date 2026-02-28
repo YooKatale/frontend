@@ -284,6 +284,24 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     getWithdrawals: builder.mutation({
       query: () => ({ url: `${DB_URL}/cashout/withdrawals`, method: "GET" }),
     }),
+    updateUserProfile: builder.mutation({
+      query: ({ userId, ...body }) => ({
+        url: `${DB_URL}/users/${userId}`,
+        method: "PUT",
+        body,
+      }),
+    }),
+    updateUserAvatar: builder.mutation({
+      query: ({ userId, file }) => {
+        const formData = new FormData();
+        if (file) formData.append("avatar", file);
+        return {
+          url: `${DB_URL}/users/${userId}/avatar`,
+          method: "PUT",
+          body: formData,
+        };
+      },
+    }),
   }),
 });
 
@@ -334,4 +352,6 @@ export const {
   useValidateGiftCardMutation,
   useWithdrawFundsMutation,
   useGetWithdrawalsMutation,
+  useUpdateUserProfileMutation,
+  useUpdateUserAvatarMutation,
 } = usersApiSlice;

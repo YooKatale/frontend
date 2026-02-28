@@ -248,7 +248,6 @@ export default function PreNavbar() {
               <Link href="/search?q=promotions" className="prenav-ann-item prenav-ann-link" style={{ color: "#f9a8d4" }}>Women&apos;s Day — Up to 40% off until March 8</Link><span className="prenav-ann-dot" />
               <span className="prenav-ann-item">Same-day delivery across Kampala</span><span className="prenav-ann-dot" />
               <span className="prenav-ann-item" style={{ color: "#f0c020" }}>Earn loyalty points on every order</span><span className="prenav-ann-dot" />
-              <span className="prenav-ann-item">Pay Later — Credit line available</span><span className="prenav-ann-dot" />
             </span>
           ))}
         </div>

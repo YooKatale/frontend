@@ -357,16 +357,16 @@ const Partner = () => {
 
         <div className={styles.statsRow}>
           <div className={styles.statCard}>
-            <div className={styles.statNum}>1K+</div>
-            <div className={styles.statLabel}>Active Vendors</div>
+            <div className={styles.statNum}>45,290</div>
+            <div className={styles.statLabel}>Users</div>
           </div>
           <div className={styles.statCard}>
-            <div className={`${styles.statNum} ${styles.statNumOrange}`}>24hr</div>
-            <div className={styles.statLabel}>Onboarding</div>
+            <div className={`${styles.statNum} ${styles.statNumOrange}`}>4K</div>
+            <div className={styles.statLabel}>Drivers</div>
           </div>
           <div className={styles.statCard}>
-            <div className={`${styles.statNum} ${styles.statNumYellow}`}>Weekly</div>
-            <div className={styles.statLabel}>Payouts</div>
+            <div className={`${styles.statNum} ${styles.statNumYellow}`}>3.5K</div>
+            <div className={styles.statLabel}>Stores</div>
           </div>
         </div>
 
@@ -480,17 +480,17 @@ const Partner = () => {
                     : ""
                 }
               >
-                <form onSubmit={handleVendorSubmit}>
+                  <form onSubmit={handleVendorSubmit}>
                   <div className={styles.fieldRow}>
                     <div className={styles.fieldGroup}>
                       <label className={styles.label}>Store Name *</label>
                       <input
                         type="text"
-                        name="name"
+                            name="name"
                         className={styles.input}
                         placeholder="e.g. Mama's Kitchen"
-                        value={vendorFormData.name}
-                        onChange={handleVendorChange}
+                            value={vendorFormData.name}
+                            onChange={handleVendorChange}
                       />
                       {vendorErrors.name && (
                         <div className={styles.errorText}>{vendorErrors.name}</div>
@@ -516,11 +516,11 @@ const Partner = () => {
                     <label className={styles.label}>Store Address *</label>
                     <input
                       type="text"
-                      name="address"
+                            name="address"
                       className={styles.input}
                       placeholder="e.g. Plot 6, Kampala Road, Kampala"
-                      value={vendorFormData.address}
-                      onChange={handleVendorChange}
+                            value={vendorFormData.address}
+                            onChange={handleVendorChange}
                     />
                     {vendorErrors.address && (
                       <div className={styles.errorText}>{vendorErrors.address}</div>
@@ -530,12 +530,12 @@ const Partner = () => {
                   <div className={styles.fieldGroup}>
                     <label className={styles.label}>Email Address *</label>
                     <input
-                      type="email"
+                            type="email"
                       name="email"
                       className={styles.input}
-                      placeholder="you@example.com"
-                      value={vendorFormData.email}
-                      onChange={handleVendorChange}
+                            placeholder="you@example.com"
+                            value={vendorFormData.email}
+                            onChange={handleVendorChange}
                     />
                     {vendorErrors.email && (
                       <div className={styles.errorText}>{vendorErrors.email}</div>
@@ -545,19 +545,19 @@ const Partner = () => {
                   <div className={styles.fieldGroup}>
                     <label className={styles.label}>Business Category *</label>
                     <select
-                      name="category"
+                                name="category"
                       className={styles.select}
-                      value={vendorFormData.category}
-                      onChange={handleVendorChange}
+                                value={vendorFormData.category}
+                                onChange={handleVendorChange}
                     >
                       <option value="">Select your category</option>
-                      {categories.map((cat) => (
+                                {categories.map((cat) => (
                         <option key={cat} value={cat}>
                           {cat}
                         </option>
-                      ))}
+                                ))}
                     </select>
-                    {vendorErrors.category && (
+                              {vendorErrors.category && (
                       <div className={styles.errorText}>{vendorErrors.category}</div>
                     )}
                   </div>
@@ -573,7 +573,7 @@ const Partner = () => {
                   </div>
 
                   <button
-                    type="button"
+                              type="button"
                     className={styles.toggleRow}
                     onClick={() =>
                       setVendorFormData((prev) => ({ ...prev, vegan: !prev.vegan }))
@@ -609,7 +609,7 @@ const Partner = () => {
                     </svg>
                     {isVendorLoading ? "Submitting..." : "Register My Store"}
                   </button>
-                </form>
+                  </form>
               </div>
 
               <div
@@ -621,7 +621,7 @@ const Partner = () => {
                   <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
                     <polyline points="22 4 12 14.01 9 11.01" />
-                  </svg>
+                    </svg>
                 </div>
                 <div className={styles.successTitle}>Application Received!</div>
                 <p className={styles.successSub}>
@@ -750,7 +750,7 @@ const Partner = () => {
                     : ""
                 }
               >
-                <form onSubmit={handleDeliverySubmit}>
+                  <form onSubmit={handleDeliverySubmit}>
                   <div className={styles.fieldRow}>
                     <div className={styles.fieldGroup}>
                       <label className={styles.label}>Full Name *</label>
@@ -785,12 +785,12 @@ const Partner = () => {
                   <div className={styles.fieldGroup}>
                     <label className={styles.label}>Email Address *</label>
                     <input
-                      type="email"
+                        type="email"
                       name="email"
                       className={styles.input}
-                      placeholder="you@example.com"
-                      value={deliveryFormData.email}
-                      onChange={handleDeliveryChange}
+                        placeholder="you@example.com"
+                        value={deliveryFormData.email}
+                        onChange={handleDeliveryChange}
                     />
                     {deliveryErrors.email && (
                       <div className={styles.errorText}>{deliveryErrors.email}</div>
@@ -848,11 +848,11 @@ const Partner = () => {
                       <label className={styles.label}>Number Plate *</label>
                       <input
                         type="text"
-                        name="numberPlate"
+                            name="numberPlate"
                         className={styles.input}
-                        placeholder="Enter vehicle number plate"
-                        value={deliveryFormData.numberPlate}
-                        onChange={handleDeliveryChange}
+                            placeholder="Enter vehicle number plate"
+                            value={deliveryFormData.numberPlate}
+                            onChange={handleDeliveryChange}
                       />
                       {deliveryErrors.numberPlate && (
                         <div className={styles.errorText}>{deliveryErrors.numberPlate}</div>
@@ -888,7 +888,7 @@ const Partner = () => {
                   </button>
 
                   <button
-                    type="submit"
+                          type="submit"
                     className={`${styles.submitBtn} ${styles.submitBtnOrange}`}
                     disabled={isDeliveryLoading}
                   >
