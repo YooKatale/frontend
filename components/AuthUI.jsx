@@ -301,6 +301,35 @@ const AUTH_CSS = `
 @keyframes spin{to{transform:rotate(360deg)}}
 `;
 
+/** Normalize backend auth response: supports { data: { user, token } }, { user, token }, { token }, etc. */
+function normalizeAuthResponse(res) {
+  if (!res || typeof res !== "object") return null;
+  const data = res.data ?? res;
+  const token = data?.token ?? data?.accessToken ?? res?.token;
+  const user = data?.user ?? data ?? res?.user;
+  if (token || user?._id || user?.id) {
+    return { ...(typeof user === "object" && user ? user : {}), ...(token ? { token } : {}), ...(data && typeof data === "object" && data !== user ? data : {}) };
+  }
+  return null;
+}
+
+/** Get user-friendly error message from RTK/API error (status + message). */
+function getAuthErrorMessage(err) {
+  if (!err) return "Something went wrong. Please try again.";
+  const status = err?.status ?? err?.data?.status ?? err?.response?.status;
+  const msg = err?.data?.message ?? err?.data?.error ?? err?.message ?? err?.error ?? "";
+  const str = String(msg).trim();
+  if (status === 400) return str || "Invalid request. Check your details and try again.";
+  if (status === 401) return str || "Invalid email or password.";
+  if (status === 403) return str || "Access denied. Contact support if this persists.";
+  if (status === 404) return str || "No account found with this email.";
+  if (status === 409) return str || "This email is already registered. Sign in or use Google.";
+  if (status === 422) return str || "Validation failed. Check your details.";
+  if (status >= 500) return str || "Server error. Please try again in a few minutes.";
+  if (err?.error === "FETCH_ERROR" || err?.error === "PARSING_ERROR" || /network|failed to fetch/i.test(str)) return "Connection failed. Check your internet and try again.";
+  return str || "Something went wrong. Please try again.";
+}
+
 async function fetchAuthMeAndMerge(dispatch, setCredentials, data, onSuccess) {
   const token = data?.token ?? data?.accessToken;
   if (!token) {
@@ -342,20 +371,32 @@ export function SignInForm({ onSuccess, onSwitch, compact, inModal, returnUrl })
   };
 
   const handleSubmit = async () => {
-    if (!email?.trim() || !pw) return;
+    const trimmedEmail = email?.trim();
+    if (!trimmedEmail) {
+      toast({ title: "Email required", description: "Please enter your email address.", status: "warning", duration: 4000, isClosable: true });
+      return;
+    }
+    if (!pw) {
+      toast({ title: "Password required", description: "Please enter your password.", status: "warning", duration: 4000, isClosable: true });
+      return;
+    }
     try {
-      const res = await login({ email: email.trim(), password: pw }).unwrap();
-      const data = res?.data ?? res;
+      const res = await login({ email: trimmedEmail, password: pw }).unwrap();
+      const data = normalizeAuthResponse(res);
       if (data?.token != null || data?._id != null) {
         dispatch(setCredentials(data));
+        toast({ title: "Signed in successfully", description: "Welcome back! Loading your account…", status: "success", duration: 2500, isClosable: true });
         await fetchAuthMeAndMerge(dispatch, setCredentials, data, onSuccessWithReturn);
+      } else {
+        toast({ title: "Sign in incomplete", description: "Server did not return session. Please try again.", status: "warning", duration: 4000, isClosable: true });
       }
     } catch (err) {
+      const description = getAuthErrorMessage(err);
       toast({
         title: "Sign in failed",
-        description: err?.data?.message || err?.message || "Invalid email or password",
+        description,
         status: "error",
-        duration: 4000,
+        duration: 5000,
         isClosable: true,
       });
     }
@@ -434,32 +475,72 @@ export function SignUpForm({ onSuccess, onSwitch, inModal, stable = false, retur
     window.location.href = url;
   };
 
+  const validateStep1 = () => {
+    if (!form.email?.trim()) {
+      toast({ title: "Email required", description: "Please enter your email address.", status: "warning", duration: 4000, isClosable: true });
+      return false;
+    }
+    if (form.password.length < 6) {
+      toast({ title: "Password too short", description: "Use at least 6 characters for your password.", status: "warning", duration: 4000, isClosable: true });
+      return false;
+    }
+    if (form.password !== form.confirm) {
+      toast({ title: "Passwords don't match", description: "Please make sure both password fields match.", status: "warning", duration: 4000, isClosable: true });
+      return false;
+    }
+    return true;
+  };
+
+  const onStep1Continue = () => {
+    if (!validateStep1()) return;
+    toast({ title: "Step 1 complete", description: "Great! Now add your name and phone.", status: "success", duration: 2000, isClosable: true });
+    setStep(2);
+  };
+
+  const onStep2Continue = () => {
+    if (!form.firstName?.trim() || !form.lastName?.trim()) {
+      toast({ title: "Name required", description: "Please enter your first and last name.", status: "warning", duration: 4000, isClosable: true });
+      return;
+    }
+    toast({ title: "Step 2 complete", description: "Almost there! Add your delivery details (optional).", status: "success", duration: 2000, isClosable: true });
+    setStep(3);
+  };
+
+  const onStep3Continue = () => {
+    toast({ title: "Step 3 complete", description: "Review and accept the terms to create your account.", status: "success", duration: 2000, isClosable: true });
+    setStep(4);
+  };
+
   const handleSubmit = async () => {
-    if (!form.agree) return;
+    if (!form.agree) {
+      toast({ title: "Terms required", description: "Please agree to the Terms of Service and Privacy Policy to continue.", status: "warning", duration: 4000, isClosable: true });
+      return;
+    }
     try {
       const payload = {
-        email: form.email,
+        email: form.email?.trim(),
         password: form.password,
-        name: [form.firstName, form.lastName].filter(Boolean).join(" ") || form.email,
-        phone: form.phone || undefined,
-        address: form.address || undefined,
-        city: form.city || undefined,
-        district: form.district || undefined,
+        name: [form.firstName, form.lastName].filter(Boolean).join(" ").trim() || form.email?.trim(),
+        phone: form.phone?.trim() || undefined,
+        address: form.address?.trim() || undefined,
+        city: form.city?.trim() || undefined,
+        district: form.district?.trim() || undefined,
       };
       const res = await register(payload).unwrap();
-      const data = res?.data ?? res;
+      const data = normalizeAuthResponse(res);
       if (data?.token != null || data?._id != null) {
         dispatch(setCredentials(data));
+        toast({ title: "Account created", description: "Welcome to YooKatale! Setting up your profile…", status: "success", duration: 3000, isClosable: true });
         await fetchAuthMeAndMerge(dispatch, setCredentials, data, onSuccessWithReturn);
+      } else {
+        toast({ title: "Sign up incomplete", description: "Account may have been created but we couldn't sign you in. Try signing in.", status: "warning", duration: 5000, isClosable: true });
       }
     } catch (err) {
-      const msg = err?.data?.message || err?.message || "Please try again";
-      const isEmailExists = /already|exist|registered|in use/i.test(String(msg));
+      const description = getAuthErrorMessage(err);
+      const isEmailExists = /already|exist|registered|in use/i.test(description);
       toast({
         title: isEmailExists ? "Email already registered" : "Sign up failed",
-        description: isEmailExists
-          ? "This email is already in use. Sign in instead or use Continue with Google."
-          : msg,
+        description: isEmailExists ? "This email is already in use. Sign in instead or use Continue with Google." : description,
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -504,7 +585,7 @@ export function SignUpForm({ onSuccess, onSwitch, inModal, stable = false, retur
             <FInput label="Confirm password" type={showConfirm ? "text" : "password"} value={form.confirm} onChange={(e) => set("confirm", e.target.value)}
               Left={ic.Lock(16)} Right={showConfirm ? ic.EyeOff(16) : ic.Eye(16)} onRight={() => setShowConfirm((v) => !v)} />
             {form.confirm && form.password !== form.confirm && <p style={{ fontSize: 11, color: "#ef4444", fontWeight: 700, marginTop: -8 }}>Passwords do not match</p>}
-            <Btn onClick={() => setStep(2)} disabled={!validStep1} icon={ic.ChevR(16)}>Continue</Btn>
+            <Btn onClick={onStep1Continue} disabled={!validStep1} icon={ic.ChevR(16)}>Continue</Btn>
           </div>
         )}
         {step === 2 && (
@@ -516,7 +597,7 @@ export function SignUpForm({ onSuccess, onSwitch, inModal, stable = false, retur
             <FInput label="Phone" type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} Left={ic.Phone(16)} />
             <div style={{ display: "flex", gap: 10 }}>
               <Ghost onClick={() => setStep(1)} icon={ic.ChevL(16)}>Back</Ghost>
-              <div style={{ flex: 1 }}><Btn onClick={() => setStep(3)} disabled={!form.firstName || !form.lastName} icon={ic.ChevR(16)}>Continue</Btn></div>
+              <div style={{ flex: 1 }}><Btn onClick={onStep2Continue} disabled={!form.firstName?.trim() || !form.lastName?.trim()} icon={ic.ChevR(16)}>Continue</Btn></div>
             </div>
           </div>
         )}
@@ -529,7 +610,7 @@ export function SignUpForm({ onSuccess, onSwitch, inModal, stable = false, retur
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               <Ghost onClick={() => setStep(2)} icon={ic.ChevL(16)}>Back</Ghost>
-              <div style={{ flex: 1 }}><Btn onClick={() => setStep(4)} icon={ic.ChevR(16)}>Continue</Btn></div>
+              <div style={{ flex: 1 }}><Btn onClick={onStep3Continue} icon={ic.ChevR(16)}>Continue</Btn></div>
             </div>
           </div>
         )}

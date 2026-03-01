@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback } from "react";
-import { useToast } from "@chakra-ui/react";
 import { SignInForm, SignUpForm } from "@components/AuthUI";
 
 const AuthModalContext = createContext({ openAuthModal: () => {}, closeAuthModal: () => {} });
@@ -14,7 +13,6 @@ export function useAuthModal() {
 export function AuthModalProvider({ children }) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState("signin");
-  const toast = useToast();
 
   const openAuthModal = useCallback((initialView = "signin") => {
     setView(initialView === "signup" ? "signup" : "signin");
@@ -27,8 +25,8 @@ export function AuthModalProvider({ children }) {
 
   const handleSuccess = useCallback(() => {
     setOpen(false);
-    toast({ title: "Signed in successfully", status: "success", duration: 2000, isClosable: true });
-  }, [toast]);
+    // Success message is shown by the auth form (SignInForm/SignUpForm)
+  }, []);
 
   return (
     <AuthModalContext.Provider value={{ openAuthModal, closeAuthModal }}>
