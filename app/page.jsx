@@ -694,15 +694,18 @@ export default function Home() {
       })}
       <div className="pg-spacer" />
 
-      {modal && (
+      {modal && (() => {
+        const bannerImg = modal.imageUrl || modal.bannerImageUrl || modal.image || modal.banner_image_url || modal.menuImage || modal.bannerUrl || modal.menu_image_url || modal.banner;
+        const bannerSrc = bannerImg ? (getOptimizedImageUrl(getImageUrl(bannerImg)) ?? getImageUrl(bannerImg)) : null;
+        return (
         <div className="m-overlay" onClick={(e) => { if (e.target === e.currentTarget) setModal(null); }} role="dialog" aria-modal="true">
           <div className="m-sheet">
             <div className="m-banner">
               <div className="m-handle" aria-hidden />
-              {(modal.imageUrl || modal.bannerImageUrl || modal.image) && (
+              {bannerSrc && (
                 <img
                   className="m-banner-img"
-                  src={getOptimizedImageUrl(getImageUrl(modal.imageUrl || modal.bannerImageUrl || modal.image)) ?? getImageUrl(modal.imageUrl || modal.bannerImageUrl || modal.image)}
+                  src={bannerSrc}
                   alt={modal.menuName || modal.name || ""}
                   loading="lazy"
                   decoding="async"
@@ -711,7 +714,7 @@ export default function Home() {
               )}
               <div className="m-banner-shade" />
               <div className="m-banner-info">
-                {!(modal.imageUrl || modal.bannerImageUrl || modal.image) && (
+                {!bannerSrc && (
                   <img className="m-flag" src={getOptimizedImageUrl(modal.flag || `https://flagcdn.com/w160/${(modal.code || "").toLowerCase()}.png`) || modal.flag || `https://flagcdn.com/w160/${(modal.code || "").toLowerCase()}.png`} alt="" loading="lazy" decoding="async" onError={(e) => { e.target.style.display = "none"; }} />
                 )}
                 <div className="m-title-block">
@@ -734,7 +737,8 @@ export default function Home() {
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
     </>
   );
 }

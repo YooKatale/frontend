@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { useAuth } from "@slices/authSlice";
 import { setCredentials } from "@slices/authSlice";
 import { SignInForm, Bg } from "@components/AuthUI";
+import { DB_URL } from "@config/config";
 
 const AUTH_PAGE_CSS = `
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800;900&display=swap');
@@ -26,14 +27,27 @@ export default function SignInPage() {
     const token = searchParams?.get("token");
     const user = searchParams?.get("user");
     if (token || user) {
-      try {
-        const data = user ? JSON.parse(decodeURIComponent(user)) : { token };
-        if (data?.token != null || data?._id != null) {
-          dispatch(setCredentials(data));
-          window.history.replaceState({}, "", window.location.pathname);
-          router.replace("/");
-        }
-      } catch (_) {}
+      (async () => {
+        try {
+          const data = user ? JSON.parse(decodeURIComponent(user)) : { token };
+          if (data?.token != null || data?._id != null) {
+            dispatch(setCredentials(data));
+            const t = data?.token ?? data?.accessToken;
+            if (t) {
+              try {
+                const base = DB_URL.replace(/\/api\/?$/, "");
+                const res = await fetch(`${base}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` }, credentials: "include" });
+                const json = await res.json().catch(() => ({}));
+                const fullUser = json?.data ?? json?.user ?? json;
+                if (fullUser && (fullUser._id || fullUser.id)) dispatch(setCredentials({ ...data, ...fullUser }));
+              } catch (_) {}
+            }
+            const returnUrl = searchParams?.get("returnUrl") || "/";
+            window.history.replaceState({}, "", window.location.pathname);
+            router.replace(returnUrl.startsWith("/") ? returnUrl : "/");
+          }
+        } catch (_) {}
+      })();
     }
   }, [searchParams, dispatch, router]);
 
@@ -49,7 +63,8 @@ export default function SignInPage() {
       <Bg />
       <div className="wrap-auth">
         <SignInForm
-          onSuccess={() => router.replace("/")}
+          returnUrl={searchParams?.get("returnUrl") || undefined}
+          onSuccess={(returnUrl) => router.replace(returnUrl || "/")}
           onSwitch={() => router.push("/signup")}
         />
       </div>

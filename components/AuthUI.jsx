@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { useToast } from "@chakra-ui/react";
 import { setCredentials } from "@slices/authSlice";
 import { useLoginMutation, useRegisterMutation } from "@slices/usersApiSlice";
-import { DB_URL } from "@config/config";
+import { DB_URL, API_ORIGIN } from "@config/config";
 import { Images, getOptimizedImageUrl } from "@constants/constants";
 
 const Svg = ({ s = 18, vb = "0 0 24 24", fill = "none", stroke = "currentColor", sw = 1.8, children }) => (
@@ -69,12 +69,13 @@ const Logo = ({ scale = 1, useOriginal = true }) => {
   );
 };
 
-const Bg = () => (
+/** stable: no floating animations (use on signup page to prevent layout shake) */
+const Bg = ({ stable = false }) => (
   <div style={{ position: "fixed", inset: 0, zIndex: 0, overflow: "hidden", pointerEvents: "none" }}>
     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(150deg,#edf5ed 0%,#f6f9f6 50%,#eef7ee 100%)" }}/>
-    <div style={{ position: "absolute", top: "-18%", left: "-12%", width: 650, height: 650, borderRadius: "50%", background: "radial-gradient(circle,rgba(26,92,26,.09) 0%,transparent 65%)", animation: "oFloat 14s ease-in-out infinite" }}/>
-    <div style={{ position: "absolute", bottom: "-20%", right: "-12%", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle,rgba(212,160,23,.08) 0%,transparent 65%)", animation: "oFloat 18s ease-in-out infinite reverse" }}/>
-    <div style={{ position: "absolute", top: "35%", right: "8%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle,rgba(45,140,45,.06) 0%,transparent 70%)", animation: "oFloat 11s ease-in-out infinite 2s" }}/>
+    <div style={{ position: "absolute", top: "-18%", left: "-12%", width: 650, height: 650, borderRadius: "50%", background: "radial-gradient(circle,rgba(26,92,26,.09) 0%,transparent 65%)", ...(stable ? {} : { animation: "oFloat 14s ease-in-out infinite" }) }}/>
+    <div style={{ position: "absolute", bottom: "-20%", right: "-12%", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle,rgba(212,160,23,.08) 0%,transparent 65%)", ...(stable ? {} : { animation: "oFloat 18s ease-in-out infinite reverse" }) }}/>
+    <div style={{ position: "absolute", top: "35%", right: "8%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle,rgba(45,140,45,.06) 0%,transparent 70%)", ...(stable ? {} : { animation: "oFloat 11s ease-in-out infinite 2s" }) }}/>
     <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(26,92,26,.07) 1px, transparent 1px)", backgroundSize: "30px 30px" }}/>
   </div>
 );
@@ -278,15 +279,15 @@ const StepBar = ({ cur }) => (
   </div>
 );
 
-const Card = ({ children, mw = 440 }) => (
+const Card = ({ children, mw = 440, noAnimation = false }) => (
   <div style={{
     background: "rgba(255,255,255,.96)", backdropFilter: "blur(28px)",
     borderRadius: 28, border: "1px solid rgba(26,92,26,.09)",
     padding: "36px 30px 30px", width: "100%", maxWidth: mw, position: "relative", overflow: "hidden",
     boxShadow: "0 8px 48px rgba(26,92,26,.1), 0 2px 12px rgba(0,0,0,.04), inset 0 1px 0 rgba(255,255,255,.9)",
-    animation: "cardIn .45s cubic-bezier(.22,.84,.44,1) both",
+    ...(noAnimation ? {} : { animation: "cardIn .45s cubic-bezier(.22,.84,.44,1) both" }),
   }}>
-    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3.5, background: "linear-gradient(90deg,#1a5c1a,#2d8c2d 30%,#d4a017 50%,#2d8c2d 70%,#1a5c1a)", backgroundSize: "200% 100%", animation: "shimH 5s linear infinite" }}/>
+    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3.5, background: "linear-gradient(90deg,#1a5c1a,#2d8c2d 30%,#d4a017 50%,#2d8c2d 70%,#1a5c1a)", backgroundSize: "200% 100%", ...(noAnimation ? {} : { animation: "shimH 5s linear infinite" }) }}/>
     {children}
   </div>
 );
@@ -300,17 +301,43 @@ const AUTH_CSS = `
 @keyframes spin{to{transform:rotate(360deg)}}
 `;
 
-export function SignInForm({ onSuccess, onSwitch, compact }) {
+async function fetchAuthMeAndMerge(dispatch, setCredentials, data, onSuccess) {
+  const token = data?.token ?? data?.accessToken;
+  if (!token) {
+    onSuccess?.();
+    return;
+  }
+  try {
+    const base = DB_URL.replace(/\/api\/?$/, "");
+    const res = await fetch(`${base}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
+    });
+    const json = await res.json().catch(() => ({}));
+    const user = json?.data ?? json?.user ?? json;
+    if (user && (user._id || user.id)) {
+      dispatch(setCredentials({ ...data, ...user }));
+    }
+  } catch (_) {}
+  onSuccess?.();
+}
+
+export function SignInForm({ onSuccess, onSwitch, compact, inModal, returnUrl }) {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [show, setShow] = useState(false);
   const dispatch = useDispatch();
   const toast = useToast();
   const [login, { isLoading }] = useLoginMutation();
+  const onSuccessWithReturn = (url) => onSuccess?.(url ?? returnUrl);
 
   const handleContinueWithGoogle = () => {
-    const redirectUrl = typeof window !== "undefined" ? `${window.location.origin}/signin` : "";
-    const url = `${DB_URL}/auth/google${redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : ""}`;
+    if (typeof window === "undefined") return;
+    const returnPath = window.location.pathname + window.location.search;
+    const signinPath = "/signin" + (returnPath && returnPath !== "/" && returnPath !== "/signin" ? "?returnUrl=" + encodeURIComponent(returnPath) : "");
+    const redirectUrl = window.location.origin + signinPath;
+    const base = API_ORIGIN || DB_URL.replace(/\/api\/?$/, "");
+    const url = `${base}/api/auth/google?redirect=${encodeURIComponent(redirectUrl)}`;
     window.location.href = url;
   };
 
@@ -321,7 +348,7 @@ export function SignInForm({ onSuccess, onSwitch, compact }) {
       const data = res?.data ?? res;
       if (data?.token != null || data?._id != null) {
         dispatch(setCredentials(data));
-        onSuccess?.();
+        await fetchAuthMeAndMerge(dispatch, setCredentials, data, onSuccessWithReturn);
       }
     } catch (err) {
       toast({
@@ -334,14 +361,15 @@ export function SignInForm({ onSuccess, onSwitch, compact }) {
     }
   };
 
+  const cardMw = inModal ? 460 : (compact ? 380 : 420);
   return (
     <>
       <style>{AUTH_CSS}</style>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Card mw={compact ? 380 : 420}>
-          <div style={{ textAlign: "center", marginBottom: compact ? 18 : 26 }}>
-            <Logo scale={compact ? 0.9 : 1} />
-            <h1 style={{ fontFamily: "'DM Serif Display',serif", fontSize: compact ? 24 : 30, color: "#0e1e0e", lineHeight: 1.1, marginTop: compact ? 12 : 18, marginBottom: 6 }}>Welcome back</h1>
+        <Card mw={cardMw}>
+            <div style={{ textAlign: "center", marginBottom: (compact && !inModal) ? 18 : 26 }}>
+            <Logo scale={(compact && !inModal) ? 0.9 : 1} />
+            <h1 style={{ fontFamily: "'DM Serif Display',serif", fontSize: (compact && !inModal) ? 24 : 30, color: "#0e1e0e", lineHeight: 1.1, marginTop: (compact && !inModal) ? 12 : 18, marginBottom: 6 }}>Welcome back</h1>
             <p style={{ fontSize: 13, color: "#7a9a7a", fontWeight: 600 }}>Sign in to continue shopping fresh</p>
           </div>
           <div style={{ display: "flex", justifyContent: "center", gap: 18, marginBottom: 22 }}>
@@ -380,8 +408,10 @@ const SMETA = [
   { title: "Your preferences", sub: "Make it yours" },
 ];
 
-export function SignUpForm({ onSuccess, onSwitch }) {
+export function SignUpForm({ onSuccess, onSwitch, inModal, stable = false, returnUrl }) {
   const [step, setStep] = useState(1);
+  const [showPw, setShowPw] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [form, setForm] = useState({
     email: "", password: "", confirm: "",
     firstName: "", lastName: "", phone: "", dob: "", gender: "",
@@ -392,10 +422,15 @@ export function SignUpForm({ onSuccess, onSwitch }) {
   const toast = useToast();
   const [register, { isLoading }] = useRegisterMutation();
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  const onSuccessWithReturn = (url) => onSuccess?.(url ?? returnUrl);
 
   const handleContinueWithGoogle = () => {
-    const redirectUrl = typeof window !== "undefined" ? `${window.location.origin}/signup` : "";
-    const url = `${DB_URL}/auth/google${redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : ""}`;
+    if (typeof window === "undefined") return;
+    const returnPath = window.location.pathname + window.location.search;
+    const signupPath = "/signup" + (returnPath && returnPath !== "/" && returnPath !== "/signup" ? "?returnUrl=" + encodeURIComponent(returnPath) : "");
+    const redirectUrl = window.location.origin + signupPath;
+    const base = API_ORIGIN || DB_URL.replace(/\/api\/?$/, "");
+    const url = `${base}/api/auth/google?redirect=${encodeURIComponent(redirectUrl)}`;
     window.location.href = url;
   };
 
@@ -415,118 +450,116 @@ export function SignUpForm({ onSuccess, onSwitch }) {
       const data = res?.data ?? res;
       if (data?.token != null || data?._id != null) {
         dispatch(setCredentials(data));
-        onSuccess?.();
+        await fetchAuthMeAndMerge(dispatch, setCredentials, data, onSuccessWithReturn);
       }
     } catch (err) {
+      const msg = err?.data?.message || err?.message || "Please try again";
+      const isEmailExists = /already|exist|registered|in use/i.test(String(msg));
       toast({
-        title: "Sign up failed",
-        description: err?.data?.message || err?.message || "Please try again",
+        title: isEmailExists ? "Email already registered" : "Sign up failed",
+        description: isEmailExists
+          ? "This email is already in use. Sign in instead or use Continue with Google."
+          : msg,
         status: "error",
-        duration: 4000,
+        duration: 5000,
         isClosable: true,
       });
     }
   };
 
   const meta = SMETA[step - 1];
-  const S1 = () => {
-    const [sp, setSp] = useState(false);
-    const [sc, setSc] = useState(false);
-    const str = form.password.length;
-    const strength = str === 0 ? 0 : str < 5 ? 1 : str < 8 ? 2 : str < 12 ? 3 : 4;
-    const strColor = ["#e0eae0", "#ef4444", "#f59e0b", "#3b82f6", "#16a34a"][strength];
-    const strLabel = ["", "Too short", "Weak", "Good", "Strong"][strength];
-    const valid = form.email && form.password.length >= 6 && form.password === form.confirm;
-    return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 13, animation: "sIn .3s ease both" }}>
-        <GoogleBtn label="Sign up with Google" onClick={handleContinueWithGoogle} />
-        <Or t="or create with email" />
-        <FInput label="Email address" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} Left={ic.Mail(16)} required autoFocus />
-        <FInput label="Create password" type={sp ? "text" : "password"} value={form.password} onChange={(e) => set("password", e.target.value)}
-          Left={ic.Lock(16)} Right={sp ? ic.EyeOff(16) : ic.Eye(16)} onRight={() => setSp((v) => !v)} required />
-        {form.password.length > 0 && (
-          <div style={{ marginTop: -6, padding: "0 2px" }}>
-            <div style={{ display: "flex", gap: 3, marginBottom: 4 }}>
-              {[1, 2, 3, 4].map((i) => <div key={i} style={{ flex: 1, height: 3, borderRadius: 100, background: i <= strength ? strColor : "#e0eae0", transition: "background .3s" }}/>)}
-            </div>
-            <span style={{ fontSize: 10, fontWeight: 800, color: strColor }}>{strLabel}</span>
-          </div>
-        )}
-        <FInput label="Confirm password" type={sc ? "text" : "password"} value={form.confirm} onChange={(e) => set("confirm", e.target.value)}
-          Left={ic.Lock(16)} Right={sc ? ic.EyeOff(16) : ic.Eye(16)} onRight={() => setSc((v) => !v)} />
-        {form.confirm && form.password !== form.confirm && <p style={{ fontSize: 11, color: "#ef4444", fontWeight: 700, marginTop: -8 }}>Passwords do not match</p>}
-        <Btn onClick={() => setStep(2)} disabled={!valid} icon={ic.ChevR(16)}>Continue</Btn>
-      </div>
-    );
-  };
-  const S2 = () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: 13, animation: "sIn .3s ease both" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <FInput label="First name" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} Left={ic.User(16)} required autoFocus />
-        <FInput label="Last name" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} Left={ic.User(16)} required />
-      </div>
-      <FInput label="Phone" type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} Left={ic.Phone(16)} />
-      <div style={{ display: "flex", gap: 10 }}>
-        <Ghost onClick={() => setStep(1)} icon={ic.ChevL(16)}>Back</Ghost>
-        <div style={{ flex: 1 }}><Btn onClick={() => setStep(3)} disabled={!form.firstName || !form.lastName} icon={ic.ChevR(16)}>Continue</Btn></div>
-      </div>
-    </div>
-  );
-  const S3 = () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: 13, animation: "sIn .3s ease both" }}>
-      <FInput label="Street / Area" value={form.address} onChange={(e) => set("address", e.target.value)} Left={ic.Pin(16)} autoFocus />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <FInput label="City" value={form.city} onChange={(e) => set("city", e.target.value)} />
-        <FInput label="District" value={form.district} onChange={(e) => set("district", e.target.value)} />
-      </div>
-      <div style={{ display: "flex", gap: 10 }}>
-        <Ghost onClick={() => setStep(2)} icon={ic.ChevL(16)}>Back</Ghost>
-        <div style={{ flex: 1 }}><Btn onClick={() => setStep(4)} icon={ic.ChevR(16)}>Continue</Btn></div>
-      </div>
-    </div>
-  );
-  const S4 = () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: 13, animation: "sIn .3s ease both" }}>
-      <div style={{ background: "#f8fdf8", borderRadius: 16, padding: "14px 16px", border: "1px solid #cce8cc" }}>
-        <div style={{ fontSize: 11, fontWeight: 900, color: "#1a5c1a", textTransform: "uppercase", letterSpacing: 0.9, marginBottom: 8 }}>Notifications</div>
-        <Chk on={form.notifEmail} onChange={(v) => set("notifEmail", v)} icon={ic.Mail(14)} ic2="#3b82f6" label="Email" />
-      </div>
-      <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", padding: "4px 0", userSelect: "none" }}>
-        <div style={{
-          width: 22, height: 22, borderRadius: 7, flexShrink: 0, marginTop: 1,
-          border: `2px solid ${form.agree ? "#1a5c1a" : "#ccd8cc"}`,
-          background: form.agree ? "linear-gradient(135deg,#1a5c1a,#2d8c2d)" : "#fff",
-          display: "flex", alignItems: "center", justifyContent: "center", transition: "all .18s",
-          boxShadow: form.agree ? "0 2px 8px rgba(26,92,26,.22)" : "none",
-        }}>
-          {form.agree && <span style={{ color: "#fff" }}>{ic.Check(12)}</span>}
-        </div>
-        <input type="checkbox" checked={form.agree} onChange={(e) => set("agree", e.target.checked)} style={{ display: "none" }}/>
-        <p style={{ fontSize: 13, color: "#4a6a4a", fontWeight: 500, lineHeight: 1.6 }}>
-          I agree to the Terms of Service and Privacy Policy
-        </p>
-      </label>
-      <div style={{ display: "flex", gap: 10 }}>
-        <Ghost onClick={() => setStep(3)} icon={ic.ChevL(16)}>Back</Ghost>
-        <div style={{ flex: 1 }}><Btn onClick={handleSubmit} disabled={!form.agree || isLoading} icon={isLoading ? <div style={{ width: 16, height: 16, border: "2.5px solid rgba(255,255,255,.35)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin .7s linear infinite" }}/> : ic.Arrow(16)}>Create account</Btn></div>
-      </div>
-    </div>
-  );
+  const str = form.password.length;
+  const strength = str === 0 ? 0 : str < 5 ? 1 : str < 8 ? 2 : str < 12 ? 3 : 4;
+  const strColor = ["#e0eae0", "#ef4444", "#f59e0b", "#3b82f6", "#16a34a"][strength];
+  const strLabel = ["", "Too short", "Weak", "Good", "Strong"][strength];
+  const validStep1 = form.email && form.password.length >= 6 && form.password === form.confirm;
+  const stepContentStyle = { display: "flex", flexDirection: "column", gap: 13 };
+  const signUpCardMw = inModal ? 520 : 480;
 
   return (
     <>
       <style>{AUTH_CSS}</style>
-      <Card mw={480}>
+      <Card mw={signUpCardMw} noAnimation={stable}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <Logo />
           <h1 style={{ fontFamily: "'DM Serif Display',serif", fontSize: 26, color: "#0e1e0e", lineHeight: 1.1, marginTop: 16 }}>{meta.title}</h1>
           <p style={{ fontSize: 13, color: "#7a9a7a", fontWeight: 600, marginTop: 5 }}>{meta.sub}</p>
         </div>
         <StepBar cur={step} />
-        {step === 1 && <S1 />}
-        {step === 2 && <S2 />}
-        {step === 3 && <S3 />}
-        {step === 4 && <S4 />}
+        {step === 1 && (
+          <div style={stepContentStyle}>
+            <GoogleBtn label="Sign up with Google" onClick={handleContinueWithGoogle} />
+            <Or t="or create with email" />
+            <FInput label="Email address" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} Left={ic.Mail(16)} required autoFocus />
+            <FInput label="Create password" type={showPw ? "text" : "password"} value={form.password} onChange={(e) => set("password", e.target.value)}
+              Left={ic.Lock(16)} Right={showPw ? ic.EyeOff(16) : ic.Eye(16)} onRight={() => setShowPw((v) => !v)} required />
+            {form.password.length > 0 && (
+              <div style={{ marginTop: -6, padding: "0 2px" }}>
+                <div style={{ display: "flex", gap: 3, marginBottom: 4 }}>
+                  {[1, 2, 3, 4].map((i) => <div key={i} style={{ flex: 1, height: 3, borderRadius: 100, background: i <= strength ? strColor : "#e0eae0", transition: "background .3s" }}/>)}
+                </div>
+                <span style={{ fontSize: 10, fontWeight: 800, color: strColor }}>{strLabel}</span>
+              </div>
+            )}
+            <FInput label="Confirm password" type={showConfirm ? "text" : "password"} value={form.confirm} onChange={(e) => set("confirm", e.target.value)}
+              Left={ic.Lock(16)} Right={showConfirm ? ic.EyeOff(16) : ic.Eye(16)} onRight={() => setShowConfirm((v) => !v)} />
+            {form.confirm && form.password !== form.confirm && <p style={{ fontSize: 11, color: "#ef4444", fontWeight: 700, marginTop: -8 }}>Passwords do not match</p>}
+            <Btn onClick={() => setStep(2)} disabled={!validStep1} icon={ic.ChevR(16)}>Continue</Btn>
+          </div>
+        )}
+        {step === 2 && (
+          <div style={stepContentStyle}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <FInput label="First name" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} Left={ic.User(16)} required autoFocus />
+              <FInput label="Last name" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} Left={ic.User(16)} required />
+            </div>
+            <FInput label="Phone" type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} Left={ic.Phone(16)} />
+            <div style={{ display: "flex", gap: 10 }}>
+              <Ghost onClick={() => setStep(1)} icon={ic.ChevL(16)}>Back</Ghost>
+              <div style={{ flex: 1 }}><Btn onClick={() => setStep(3)} disabled={!form.firstName || !form.lastName} icon={ic.ChevR(16)}>Continue</Btn></div>
+            </div>
+          </div>
+        )}
+        {step === 3 && (
+          <div style={stepContentStyle}>
+            <FInput label="Street / Area" value={form.address} onChange={(e) => set("address", e.target.value)} Left={ic.Pin(16)} autoFocus />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <FInput label="City" value={form.city} onChange={(e) => set("city", e.target.value)} />
+              <FInput label="District" value={form.district} onChange={(e) => set("district", e.target.value)} />
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <Ghost onClick={() => setStep(2)} icon={ic.ChevL(16)}>Back</Ghost>
+              <div style={{ flex: 1 }}><Btn onClick={() => setStep(4)} icon={ic.ChevR(16)}>Continue</Btn></div>
+            </div>
+          </div>
+        )}
+        {step === 4 && (
+          <div style={stepContentStyle}>
+            <div style={{ background: "#f8fdf8", borderRadius: 16, padding: "14px 16px", border: "1px solid #cce8cc" }}>
+              <div style={{ fontSize: 11, fontWeight: 900, color: "#1a5c1a", textTransform: "uppercase", letterSpacing: 0.9, marginBottom: 8 }}>Notifications</div>
+              <Chk on={form.notifEmail} onChange={(v) => set("notifEmail", v)} icon={ic.Mail(14)} ic2="#3b82f6" label="Email" />
+            </div>
+            <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", padding: "4px 0", userSelect: "none" }}>
+              <div style={{
+                width: 22, height: 22, borderRadius: 7, flexShrink: 0, marginTop: 1,
+                border: `2px solid ${form.agree ? "#1a5c1a" : "#ccd8cc"}`,
+                background: form.agree ? "linear-gradient(135deg,#1a5c1a,#2d8c2d)" : "#fff",
+                display: "flex", alignItems: "center", justifyContent: "center", transition: "all .18s",
+                boxShadow: form.agree ? "0 2px 8px rgba(26,92,26,.22)" : "none",
+              }}>
+                {form.agree && <span style={{ color: "#fff" }}>{ic.Check(12)}</span>}
+              </div>
+              <input type="checkbox" checked={form.agree} onChange={(e) => set("agree", e.target.checked)} style={{ display: "none" }}/>
+              <p style={{ fontSize: 13, color: "#4a6a4a", fontWeight: 500, lineHeight: 1.6 }}>
+                I agree to the Terms of Service and Privacy Policy
+              </p>
+            </label>
+            <div style={{ display: "flex", gap: 10 }}>
+              <Ghost onClick={() => setStep(3)} icon={ic.ChevL(16)}>Back</Ghost>
+              <div style={{ flex: 1 }}><Btn onClick={handleSubmit} disabled={!form.agree || isLoading} icon={isLoading ? <div style={{ width: 16, height: 16, border: "2.5px solid rgba(255,255,255,.35)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin .7s linear infinite" }}/> : ic.Arrow(16)}>Create account</Btn></div>
+            </div>
+          </div>
+        )}
         {onSwitch && (
           <p style={{ textAlign: "center", fontSize: 13, color: "#7a9a7a", fontWeight: 600, marginTop: 18 }}>
             Already have an account? <button onClick={onSwitch} type="button" style={{ background: "none", border: "none", color: "#1a5c1a", fontWeight: 900, cursor: "pointer", fontSize: 13 }}>Sign in</button>

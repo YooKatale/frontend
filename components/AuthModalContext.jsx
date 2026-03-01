@@ -53,7 +53,7 @@ export function AuthModalProvider({ children }) {
           onClick={(e) => e.target === e.currentTarget && closeAuthModal()}
         >
           <style>{`@keyframes fadeIn{from{opacity:0}to{opacity:1}}`}</style>
-          <div style={{ position: "relative", maxHeight: "90vh", overflow: "auto", borderRadius: 28 }} onClick={(e) => e.stopPropagation()}>
+          <div style={{ position: "relative", minWidth: 380, maxWidth: 520, width: "100%", maxHeight: "92vh", overflow: "auto", borderRadius: 28 }} onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
               aria-label="Close"
@@ -78,12 +78,13 @@ export function AuthModalProvider({ children }) {
             </button>
             {view === "signin" ? (
               <SignInForm
-                compact
+                inModal
                 onSuccess={handleSuccess}
                 onSwitch={() => setView("signup")}
               />
             ) : (
               <SignUpForm
+                inModal
                 onSuccess={handleSuccess}
                 onSwitch={() => setView("signin")}
               />

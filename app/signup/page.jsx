@@ -6,14 +6,15 @@ import { useDispatch } from "react-redux";
 import { useAuth } from "@slices/authSlice";
 import { setCredentials } from "@slices/authSlice";
 import { SignUpForm, Bg } from "@components/AuthUI";
+import { DB_URL } from "@config/config";
 
 const AUTH_PAGE_CSS = `
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800;900&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{min-height:100dvh}
+html,body{min-height:100dvh;overflow-x:hidden}
 body{font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased;background:#edf5ed}
 button,input,select{font-family:'Nunito',sans-serif}
-.wrap-auth{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 16px;position:relative;z-index:1}
+.wrap-auth{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 16px;position:relative;z-index:1;overflow-x:hidden;width:100%}
 `;
 
 export default function SignUpPage() {
@@ -26,14 +27,27 @@ export default function SignUpPage() {
     const token = searchParams?.get("token");
     const user = searchParams?.get("user");
     if (token || user) {
-      try {
-        const data = user ? JSON.parse(decodeURIComponent(user)) : { token };
-        if (data?.token != null || data?._id != null) {
-          dispatch(setCredentials(data));
-          window.history.replaceState({}, "", window.location.pathname);
-          router.replace("/");
-        }
-      } catch (_) {}
+      (async () => {
+        try {
+          const data = user ? JSON.parse(decodeURIComponent(user)) : { token };
+          if (data?.token != null || data?._id != null) {
+            dispatch(setCredentials(data));
+            const t = data?.token ?? data?.accessToken;
+            if (t) {
+              try {
+                const base = DB_URL.replace(/\/api\/?$/, "");
+                const res = await fetch(`${base}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` }, credentials: "include" });
+                const json = await res.json().catch(() => ({}));
+                const fullUser = json?.data ?? json?.user ?? json;
+                if (fullUser && (fullUser._id || fullUser.id)) dispatch(setCredentials({ ...data, ...fullUser }));
+              } catch (_) {}
+            }
+            const returnUrl = searchParams?.get("returnUrl") || "/";
+            window.history.replaceState({}, "", window.location.pathname);
+            router.replace(returnUrl.startsWith("/") ? returnUrl : "/");
+          }
+        } catch (_) {}
+      })();
     }
   }, [searchParams, dispatch, router]);
 
@@ -46,10 +60,12 @@ export default function SignUpPage() {
   return (
     <>
       <style>{AUTH_PAGE_CSS}</style>
-      <Bg />
+      <Bg stable />
       <div className="wrap-auth">
         <SignUpForm
-          onSuccess={() => router.replace("/")}
+          stable
+          returnUrl={searchParams?.get("returnUrl") || undefined}
+          onSuccess={(returnUrl) => router.replace(returnUrl || "/")}
           onSwitch={() => router.push("/signin")}
         />
       </div>
