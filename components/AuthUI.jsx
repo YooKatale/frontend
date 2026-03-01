@@ -516,11 +516,22 @@ export function SignUpForm({ onSuccess, onSwitch, inModal, stable = false, retur
       toast({ title: "Terms required", description: "Please agree to the Terms of Service and Privacy Policy to continue.", status: "warning", duration: 4000, isClosable: true });
       return;
     }
+    const firstName = (form.firstName ?? "").toString().trim();
+    const lastName = (form.lastName ?? "").toString().trim();
+    if (!firstName || !lastName) {
+      toast({ title: "Name required", description: "Please enter your first and last name.", status: "warning", duration: 4000, isClosable: true });
+      return;
+    }
     try {
+      const fullName = [firstName, lastName].filter(Boolean).join(" ").trim() || form.email?.trim() || "";
       const payload = {
         email: form.email?.trim(),
         password: form.password,
-        name: [form.firstName, form.lastName].filter(Boolean).join(" ").trim() || form.email?.trim(),
+        name: fullName,
+        firstName,
+        lastName,
+        first_name: firstName,
+        last_name: lastName,
         phone: form.phone?.trim() || undefined,
         address: form.address?.trim() || undefined,
         city: form.city?.trim() || undefined,
@@ -591,8 +602,8 @@ export function SignUpForm({ onSuccess, onSwitch, inModal, stable = false, retur
         {step === 2 && (
           <div style={stepContentStyle}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              <FInput label="First name" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} Left={ic.User(16)} required autoFocus />
-              <FInput label="Last name" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} Left={ic.User(16)} required />
+              <FInput label="First name" value={form.firstName ?? ""} onChange={(e) => set("firstName", e.target.value)} Left={ic.User(16)} required autoFocus />
+              <FInput label="Last name" value={form.lastName ?? ""} onChange={(e) => set("lastName", e.target.value)} Left={ic.User(16)} required />
             </div>
             <FInput label="Phone" type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} Left={ic.Phone(16)} />
             <div style={{ display: "flex", gap: 10 }}>

@@ -24,13 +24,24 @@ export default function SignInPage() {
   const { userInfo } = useAuth();
 
   useEffect(() => {
-    const token = searchParams?.get("token");
-    const user = searchParams?.get("user");
-    if (token || user) {
+    const q = searchParams;
+    const tokenFromQuery = q?.get("token") ?? q?.get("access_token") ?? q?.get("accessToken");
+    const userParam = q?.get("user");
+    const hash = typeof window !== "undefined" ? window.location.hash : "";
+    const tokenFromHash = hash ? (hash.match(/[#&]access_token=([^&]+)/) || [])[1] : null;
+    const token = tokenFromQuery || tokenFromHash;
+    if (token || userParam) {
       (async () => {
         try {
-          const data = user ? JSON.parse(decodeURIComponent(user)) : { token };
-          if (data?.token != null || data?._id != null) {
+          let data = {};
+          if (userParam) {
+            try {
+              data = JSON.parse(decodeURIComponent(userParam));
+            } catch (_) {}
+          }
+          if (token) data = { ...data, token };
+          if (!data?.token && !data?.accessToken) data.token = token;
+          if (data?.token != null || data?._id != null || data?.id != null) {
             dispatch(setCredentials(data));
             const t = data?.token ?? data?.accessToken;
             if (t) {
@@ -42,7 +53,7 @@ export default function SignInPage() {
                 if (fullUser && (fullUser._id || fullUser.id)) dispatch(setCredentials({ ...data, ...fullUser }));
               } catch (_) {}
             }
-            const returnUrl = searchParams?.get("returnUrl") || "/";
+            const returnUrl = q?.get("returnUrl") || "/";
             window.history.replaceState({}, "", window.location.pathname);
             router.replace(returnUrl.startsWith("/") ? returnUrl : "/");
           }
@@ -52,10 +63,11 @@ export default function SignInPage() {
   }, [searchParams, dispatch, router]);
 
   useEffect(() => {
+    if (searchParams?.get("token") || searchParams?.get("user") || searchParams?.get("access_token") || searchParams?.get("accessToken")) return;
     if (userInfo && typeof userInfo === "object" && Object.keys(userInfo).length > 0) {
-      router.replace("/");
+      router.replace(searchParams?.get("returnUrl") || "/");
     }
-  }, [userInfo, router]);
+  }, [userInfo, router, searchParams]);
 
   return (
     <>
