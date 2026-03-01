@@ -239,15 +239,15 @@ const Header = () => {
         fontFamily="'Sora', sans-serif"
       >
         {/* Main Navigation Bar */}
-        <Flex
-          as="nav"
-          align="center"
+          <Flex
+            as="nav"
+            align="center"
           justify="space-between"
           gap={{ base: 2, md: 4 }}
-          maxW="1400px"
+            maxW="1400px"
           px={{ base: 3, md: 6 }}
           py={{ base: 2, md: 0 }}
-          mx="auto"
+            mx="auto"
           h={{ base: "56px", md: "64px" }}
           minH={{ base: "56px", md: "64px" }}
         >
@@ -256,12 +256,12 @@ const Header = () => {
             <IconButton
               aria-label="Menu"
               icon={mobileNavOpen ? <AiOutlineClose size={22} /> : <AiOutlineMenu size={22} />}
-              variant="ghost"
+                    variant="ghost"
               size="lg"
               h="44px"
               w="44px"
-              borderRadius="lg"
-              color="gray.700"
+                    borderRadius="lg"
+                    color="gray.700"
               _hover={{ bg: "gray.50", color: ThemeColors.primaryColor }}
               _active={{ bg: "gray.100" }}
               onClick={toggleMobileNav}
@@ -269,27 +269,27 @@ const Header = () => {
 
             {/* Logo – to the right of menu */}
             <Flex align="center" minW={0}>
-              <Link href="/">
-                <Box
-                  as="span"
-                  display="flex"
-                  alignItems="center"
+            <Link href="/">
+              <Box
+                as="span"
+                display="flex"
+                alignItems="center"
                   w={{ base: "100px", sm: "120px", md: "140px" }}
-                  transition="all 0.2s"
-                  _hover={{ transform: "scale(1.02)" }}
-                  _active={{ transform: "scale(0.98)" }}
-                >
-                  <Image
-                    src="/assets/icons/logo2.png"
+                transition="all 0.2s"
+                _hover={{ transform: "scale(1.02)" }}
+                _active={{ transform: "scale(0.98)" }}
+              >
+                <Image
+                  src="/assets/icons/logo2.png"
                     alt="Yookatale"
                     width={140}
                     height={48}
-                    priority
+                  priority
                     style={{ width: "100%", height: "auto", objectFit: "contain" }}
-                  />
-                </Box>
-              </Link>
-            </Flex>
+                />
+              </Box>
+            </Link>
+          </Flex>
           </HStack>
 
           {/* Mobile: Menu toggle – extreme left */}
@@ -331,21 +331,21 @@ const Header = () => {
             <InputGroup size="md" flex="1" minW={0}>
               <InputLeftElement h="48px" pl={3} pointerEvents="none">
                 <AiOutlineSearch size={18} color="#637568" />
-              </InputLeftElement>
-              <Input
+                </InputLeftElement>
+                <Input
                 ref={mobileSearchRef}
                 type="search"
                 placeholder="Search products..."
-                value={searchParam}
-                onChange={(e) => setSearchParam(e.target.value)}
+                  value={searchParam}
+                  onChange={(e) => setSearchParam(e.target.value)}
                 variant="unstyled"
                 pl="2.5rem"
                 pr={2}
                 h="48px"
-                fontSize="0.9375rem"
+                  fontSize="0.9375rem"
                 _placeholder={{ color: "gray.500" }}
-              />
-            </InputGroup>
+                />
+              </InputGroup>
           </Flex>
 
           {/* Desktop Search Bar – balanced width, not stretching into gap */}
@@ -382,17 +382,17 @@ const Header = () => {
                 fontSize="14px"
                 pl="3rem"
                 pr={4}
-                h="48px"
+              h="48px"
                 _placeholder={{ color: "gray.500" }}
               />
             </InputGroup>
             <Button
               type="submit"
-              h="48px"
+                  h="48px"
               px={6}
               bg="#1a5c1a"
-              color="white"
-              fontWeight="700"
+                    color="white"
+                    fontWeight="700"
               fontSize="0.9375rem"
               borderRadius="0"
               _hover={{ bg: "#2d8c2d" }}
@@ -416,9 +416,9 @@ const Header = () => {
                 rightIcon={<FaChevronDown size={10} />}
                 leftIcon={
                   getUserAvatarUrl(userInfo) ? (
-                    <Avatar
+                  <Avatar
                       size="xs"
-                      name={userDisplayName}
+                    name={userDisplayName}
                       src={getUserAvatarUrl(userInfo)}
                       bg="green.100"
                       color="gray.700"
@@ -460,17 +460,17 @@ const Header = () => {
                           />
                         )}
                         <VStack align="flex-start" spacing={0} flex={1} minW={0}>
-                          <Text fontSize="0.75rem" color="gray.500" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
-                            Account
-                          </Text>
+                      <Text fontSize="0.75rem" color="gray.500" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
+                        Account
+                      </Text>
                           <Text fontSize="0.9375rem" fontWeight="600" color="gray.800" mt={1} noOfLines={1}>
-                            {userDisplayName}
-                          </Text>
-                          {userInfo?.email && (
+                        {userDisplayName}
+                      </Text>
+                      {userInfo?.email && (
                             <Text fontSize="0.8125rem" color="gray.500" mt={0.5} noOfLines={1}>
-                              {userInfo.email}
-                            </Text>
-                          )}
+                          {userInfo.email}
+                        </Text>
+                      )}
                         </VStack>
                       </HStack>
                     </Box>
@@ -484,10 +484,10 @@ const Header = () => {
                       fontWeight="500"
                       icon={<AiOutlineUser size={18} />}
                       transition="all 0.2s"
-                _hover={{
+                      _hover={{
                     bg: "#e6f0e6",
                     color: "#1a5c1a",
-                  }}
+                      }}
                     >
                       My Account
                     </MenuItem>
@@ -500,10 +500,10 @@ const Header = () => {
                       fontWeight="500"
                       icon={<FaShoppingBag size={16} />}
                       transition="all 0.2s"
-                _hover={{
+                      _hover={{
                     bg: "#e6f0e6",
                     color: "#1a5c1a",
-                  }}
+                      }}
                     >
                       My Orders
                     </MenuItem>
@@ -552,10 +552,10 @@ const Header = () => {
                       fontWeight="500"
                       icon={<AiOutlineLogin size={18} />}
                       transition="all 0.2s"
-                _hover={{
+                      _hover={{
                     bg: "#e6f0e6",
                     color: "#1a5c1a",
-                  }}
+                      }}
                     >
                       Sign In
                     </MenuItem>
@@ -567,10 +567,10 @@ const Header = () => {
                       fontSize="0.9375rem"
                       fontWeight="500"
                       transition="all 0.2s"
-                _hover={{
+                      _hover={{
                     bg: "#e6f0e6",
                     color: "#1a5c1a",
-                  }}
+                      }}
                     >
                       Create Account
                     </MenuItem>
@@ -583,9 +583,9 @@ const Header = () => {
             <Menu>
               <MenuButton
                 as={Button}
-                variant="ghost"
+                  variant="ghost"
                 size="md"
-                h="44px"
+                  h="44px"
                 px={3}
                 borderRadius="lg"
                 color="gray.700"
@@ -645,12 +645,12 @@ const Header = () => {
             {/* Cart – icon + label + badge */}
             <Link href="/cart">
               <Button
-                variant="ghost"
+              variant="ghost"
                 size="md"
-                h="44px"
+              h="44px"
                 px={3}
                 borderRadius="lg"
-                color="gray.700"
+              color="gray.700"
                 leftIcon={<AiOutlineShoppingCart size={20} />}
                 fontWeight="600"
                 fontSize="0.875rem"
@@ -692,7 +692,7 @@ const Header = () => {
                 h="48px"
                 w="48px"
                 minW="48px"
-                transition="all 0.2s"
+              transition="all 0.2s"
                 _hover={{ transform: "scale(1.02)" }}
                 _active={{ transform: "scale(0.98)" }}
               >
@@ -741,7 +741,7 @@ const Header = () => {
                   fontSize="0.8125rem"
                   fontWeight="600"
                   color="gray.600"
-                  transition="all 0.2s"
+                transition="all 0.2s"
                   _hover={{
                     bg: ThemeColors.lightColor,
                     color: ThemeColors.primaryColor,
@@ -779,14 +779,14 @@ const Header = () => {
               <Box position="absolute" top="-40px" right="-40px" w="140px" h="140px" bg="radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)" borderRadius="full" />
               <Box position="absolute" bottom="-30px" left="-20px" w="100px" h="100px" bg="radial-gradient(circle, rgba(245,200,0,0.07) 0%, transparent 70%)" borderRadius="full" />
               <Flex justify="space-between" align="flex-start" mb="14px">
-                {userInfo ? (
+              {userInfo ? (
                   <HStack spacing={2.5} flex={1} minW={0}>
                     {getUserAvatarUrl(userInfo) ? (
-                      <Avatar
-                        size="md"
+                  <Avatar
+                    size="md"
                         w="44px"
                         h="44px"
-                        name={userDisplayName}
+                    name={userDisplayName}
                         src={getUserAvatarUrl(userInfo)}
                         border="2.5px solid rgba(255,255,255,0.3)"
                         flexShrink={0}
@@ -802,9 +802,9 @@ const Header = () => {
                     <Box minW={0}>
                       <Text fontFamily="Syne, sans-serif" fontSize="15px" fontWeight="700" color="white" lineHeight="1" mb="3px" noOfLines={1}>{userDisplayName}</Text>
                       <Text fontSize="11px" color="rgba(255,255,255,0.6)" noOfLines={1}>{userInfo?.email}</Text>
-                    </Box>
-                  </HStack>
-                ) : (
+                  </Box>
+                </HStack>
+              ) : (
                   <Link href="/signin" onClick={closeMobileNav}>
                     <Button size="sm" colorScheme="green" fontWeight="700">Sign In</Button>
                   </Link>
@@ -849,13 +849,13 @@ const Header = () => {
                 <Flex mx="14px" mt="12px" mb="8px" align="center" gap="10px" p="12px 14px" borderRadius="12px" bg="linear-gradient(135deg, #f97316 0%, #ea580c 100%)" boxShadow="0 3px 12px rgba(249,115,22,0.3)" _active={{ transform: "scale(0.98)" }} transition="transform 0.15s">
                   <Flex w="36px" h="36px" borderRadius="10px" bg="rgba(255,255,255,0.2)" align="center" justify="center" flexShrink={0}>
                     <AiOutlineHome size={18} color="white" />
-                  </Flex>
+                        </Flex>
                   <Box flex={1}>
                     <Text fontFamily="Syne, sans-serif" fontSize="13px" fontWeight="800" color="white">Start Selling Today</Text>
                     <Text fontSize="10px" color="rgba(255,255,255,0.75)" mt="1px">List your products on YooKatale</Text>
                   </Box>
                   <Box><FaChevronDown size={16} style={{ transform: "rotate(-90deg)", color: "rgba(255,255,255,0.8)" }} /></Box>
-                </Flex>
+                      </Flex>
               </Link>
 
               {/* Shop & Explore – HTML: section label #637568, nav-icon bg #f4f8f5, nav-label #1e2d22, chevron #c0cfc4 */}
@@ -866,7 +866,7 @@ const Header = () => {
                 const badge = link.badge;
                 const badgeBg = badge === "New" ? "#1a6b3a" : badge === "HOT" ? "#f5c800" : "#f97316";
                 const badgeColor = badge === "HOT" ? "#0c1a10" : "white";
-                return (
+                    return (
                   <Link key={String(link.href) + link.label} href={link.href ?? "#"} onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
                     <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={isActive ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} _active={{ bg: "#e8f5ee" }} transition="background 0.12s">
                       {isActive && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
@@ -876,9 +876,9 @@ const Header = () => {
                       <Text fontSize="13px" fontWeight={isActive ? 700 : 500} color={isActive ? "#1a6b3a" : "#1e2d22"} flex={1}>{link.label}</Text>
                       {badge && <Badge fontSize="9px" fontWeight="800" px="7px" py="2px" borderRadius="full" bg={badgeBg} color={badgeColor} flexShrink={0}>{badge}</Badge>}
                       <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
-                    </Flex>
-                  </Link>
-                );
+                        </Flex>
+                      </Link>
+                    );
               })}
 
               {/* Company */}
@@ -889,33 +889,33 @@ const Header = () => {
                 const isActive = pathname === (link.href ?? "");
                 const badge = link.badge;
                 const badgeBg = badge === "Hiring" ? "#f97316" : "#1a6b3a";
-                return (
+                  return (
                   <Link key={link.href} href={link.href ?? "#"} onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
                     <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={isActive ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} _active={{ bg: "#e8f5ee" }} transition="background 0.12s">
                       {isActive && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
                       <Flex w="34px" h="34px" borderRadius="10px" bg={isActive ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}>
                         <Icon size={17} color={isActive ? "#1a6b3a" : "#637568"} />
-                      </Flex>
+                        </Flex>
                       <Text fontSize="13px" fontWeight={isActive ? 700 : 500} color={isActive ? "#1a6b3a" : "#1e2d22"} flex={1}>{link.label}</Text>
                       {badge && <Badge fontSize="9px" fontWeight="800" px="7px" py="2px" borderRadius="full" bg={badgeBg} color="white" flexShrink={0}>{badge}</Badge>}
                       <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
-                    </Flex>
-                  </Link>
-                );
-              })}
+                      </Flex>
+                    </Link>
+                  );
+                })}
 
               {/* My Account – HTML colors */}
               <Divider my="6px" mx="14px" borderColor="#e8f0eb" />
               <Text fontSize="9.5px" fontWeight="700" textTransform="uppercase" letterSpacing="0.12em" color="#637568" px="18px" pt="14px" pb="6px">My Account</Text>
-              {userInfo && (
-                <>
+                {userInfo && (
+                  <>
                   <Link href="/account" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
                     <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/account" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
                       {pathname === "/account" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
                       <Flex w="34px" h="34px" borderRadius="10px" bg={pathname === "/account" ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}><AiOutlineUser size={17} color={pathname === "/account" ? "#1a6b3a" : "#637568"} /></Flex>
                       <Text fontSize="13px" fontWeight={pathname === "/account" ? 700 : 500} color={pathname === "/account" ? "#1a6b3a" : "#1e2d22"} flex={1}>My Profile</Text>
                       <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
-                    </Flex>
+                        </Flex>
                   </Link>
                   <Link href="/invoices" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
                     <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/invoices" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
@@ -924,8 +924,8 @@ const Header = () => {
                       <Text fontSize="13px" fontWeight={pathname === "/invoices" ? 700 : 500} color={pathname === "/invoices" ? "#1a6b3a" : "#1e2d22"} flex={1}>My Orders</Text>
                       <Badge fontSize="9px" fontWeight="800" px="7px" py="2px" borderRadius="full" bg="#1a6b3a" color="white">0</Badge>
                       <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
-                    </Flex>
-                  </Link>
+                      </Flex>
+                    </Link>
                   <Link href="/wishlist" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
                     <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/wishlist" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
                       {pathname === "/wishlist" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
@@ -933,10 +933,10 @@ const Header = () => {
                       <Text fontSize="13px" fontWeight={pathname === "/wishlist" ? 700 : 500} color={pathname === "/wishlist" ? "#1a6b3a" : "#1e2d22"} flex={1}>Wishlist</Text>
                       {wishlistCount > 0 && <Badge fontSize="9px" fontWeight="800" px="7px" py="2px" borderRadius="full" bg="#f97316" color="white">{wishlistCount}</Badge>}
                       <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
-                    </Flex>
-                  </Link>
-                </>
-              )}
+                      </Flex>
+                    </Link>
+                  </>
+                )}
               <Link href="/cashout" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
                 <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/cashout" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
                   {pathname === "/cashout" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
@@ -966,31 +966,31 @@ const Header = () => {
 
               {/* Footer – fixed at bottom when scrolling (Call + Logout + version) */}
               <Box px="14px" py="14px" pb="28px" borderTop="1px solid" borderColor="#e8f0eb" bg="white" flexShrink={0}>
-                <Button
-                  as="a"
-                  href="tel:+256786118137"
-                  w="full"
+                  <Button
+                    as="a"
+                    href="tel:+256786118137"
+                    w="full"
                   h="52px"
                   leftIcon={<AiOutlinePhone size={16} />}
                   bg={ThemeColors.primaryColor}
-                  color="white"
+                    color="white"
                   fontFamily="Syne, sans-serif"
                   fontSize="13px"
-                  fontWeight="700"
+                    fontWeight="700"
                   borderRadius="12px"
                   mb="8px"
                   boxShadow="0 3px 12px rgba(26,107,58,0.3)"
                   _active={{ bg: "#145530", transform: "scale(0.98)" }}
-                  onClick={closeMobileNav}
-                >
-                  Call +256 786 118137
-                </Button>
-                {userInfo && (
-                  <Button
-                    w="full"
+                    onClick={closeMobileNav}
+                  >
+                    Call +256 786 118137
+                  </Button>
+                  {userInfo && (
+                    <Button
+                      w="full"
                     h="48px"
                     leftIcon={<AiOutlineLogout size={16} />}
-                    variant="outline"
+                      variant="outline"
                     borderColor="red.200"
                     borderWidth="1.5px"
                     color="red.500"
@@ -1000,13 +1000,13 @@ const Header = () => {
                     borderRadius="12px"
                     _hover={{ bg: "red.50" }}
                     _active={{ bg: "red.50" }}
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </Button>
-                )}
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </Button>
+                  )}
                 <Text textAlign="center" mt="10px" fontSize="10px" color="gray.500">YooKatale · <Text as="span" color={ThemeColors.primaryColor} fontWeight="600">fresh produce &amp; groceries, Kampala</Text></Text>
-              </Box>
+                </Box>
             </DrawerBody>
           </DrawerContent>
         </Drawer>

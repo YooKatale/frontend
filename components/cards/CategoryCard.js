@@ -1,7 +1,8 @@
-import { Box, Text, VStack } from '@chakra-ui/react';
+import { Box, Text, VStack, Icon } from '@chakra-ui/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { AiOutlineShoppingCart } from 'react-icons/ai';
 
 /**
  * Normalize category name to match actual image filename
@@ -124,15 +125,7 @@ const CategoryCard = ({ category, hasProducts = true }) => {
                 height="100%"
                 bgGradient="linear(to-br, #185F2D10, #185F2D05)"
               >
-                <Box
-                  p={4}
-                  borderRadius="full"
-                  bg="#185F2D"
-                  color="white"
-                  fontSize="2xl"
-                >
-                  🛒
-                </Box>
+                <Icon as={AiOutlineShoppingCart} boxSize={8} color="white" />
               </Box>
             )}
             

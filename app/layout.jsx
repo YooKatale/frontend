@@ -2,6 +2,7 @@ import { Providers } from "./providers";
 import "./globals.css";
 import { Syne, DM_Sans } from "next/font/google";
 import dynamic from "next/dynamic";
+import { V4_CSS } from "@lib/v4Styles";
 
 // Dynamically import ClientLayoutWrapper to avoid SSR issues (contains all client components)
 const ClientLayoutWrapper = dynamic(() => import("@components/ClientLayoutWrapper"), {
@@ -54,9 +55,12 @@ const RootLayout = ({ children }) => {
         />
       </head>
       <body className={`${dmSans.variable} ${syne.variable} ${dmSans.className}`} suppressHydrationWarning>
+          <style dangerouslySetInnerHTML={{ __html: V4_CSS }} />
           <Providers>
             <ClientLayoutWrapper>
-              {children}
+              <div className="yookatale-v4-page">
+                {children}
+              </div>
             </ClientLayoutWrapper>
           </Providers>
           {/* <ScriptTag /> */} 

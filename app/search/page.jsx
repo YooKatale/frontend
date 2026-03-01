@@ -48,52 +48,46 @@ const Search = () => {
   }, [param]);
 
   return (
-    <>
-      <div>
-        <div className="lg:py-8 lg:px-20 sm:px-12 px-8">
-          <h3 className="text-lg flex">
-            Showing results for:
-            <h3 className="text-lg text-primary mx-2">{param}</h3>
-          </h3>
-        </div>
-        <div className="flex">
-          <div className="m-auto lg:w-[85%] w-full">
-            {Products ? (
-              Products.length > 0 ? (
-                <div className="grid lg:grid-cols-5 sm:grid-cols-3 grid-cols-1 gap-4">
-                  {Products.map((product, index) => (
-                    <ProductCard
-                      key={index}
-                      userInfo={userInfo}
-                      width={false}
-                      product={product}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <Box className={"lg:py-12 py-8 lg:px-0 px-8"} padding={{ base: "2rem", md: "2rem", xl: "3rem 0" }} textAlign="center">
-                  <Text fontSize="xl" mb={2}>No products currently</Text>
-                  <Text color="gray.600" mb={4}>Explore our meal subscription plans for curated meals delivered to you.</Text>
-                  <Link href="/subscription">
-                    <Button colorScheme="green" size="md">View Subscription Plans</Button>
-                  </Link>
-                </Box>
-              )
-            ) : (
-              <div className="grid grid-cols-5 gap-4">
-                {[1, 2, 3, 4].map((item) => (
-                  <div key={item}>
-                    <LoaderSkeleton />
-                  </div>
-                ))}
-              </div>
-            )}
+    <div className="page page-max">
+      <div className="section-wrap">
+        <div className="sec-head">
+          <div className="sec-head-left">
+            <span className="sec-head-label">Showing results for: {param || "Search"}</span>
           </div>
         </div>
-
-        <div className="py-12"></div>
+        {Products ? (
+          Products.length > 0 ? (
+            <div className="prod-grid">
+              {Products.map((product, index) => (
+                <ProductCard
+                  key={product._id || index}
+                  userInfo={userInfo}
+                  product={product}
+                  variant="v4"
+                />
+              ))}
+            </div>
+          ) : (
+            <Box className="section-wrap" padding={{ base: "2rem", md: "2rem", xl: "3rem 0" }} textAlign="center">
+              <Text fontSize="xl" mb={2} color="var(--dark)">No products currently</Text>
+              <Text color="var(--mid)" mb={4}>Explore our meal subscription plans for curated meals delivered to you.</Text>
+              <Link href="/subscription">
+                <Button colorScheme="green" size="md">View Subscription Plans</Button>
+              </Link>
+            </Box>
+          )
+        ) : (
+          <div className="prod-grid">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <div key={item}>
+                <LoaderSkeleton />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-    </>
+      <div className="pg-spacer" />
+    </div>
   );
 };
 

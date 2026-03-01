@@ -166,39 +166,39 @@ const Hero = () => {
                     minH={{ base: "320px", sm: "380px", md: "420px" }}
                     display="flex"
                     alignItems="center"
-                    position="relative"
-                    overflow="hidden"
-                  >
+        position="relative"
+        overflow="hidden"
+      >
                     <Box position="absolute" inset={0} bg={slide.bg} />
                     <Box position="absolute" inset={0} bg={slide.overlay} />
                     <Box position="relative" zIndex={1} px={{ base: 6, md: 10 }} py={10} maxW="500px">
                       {/* Location badge - only on first slide */}
                       {i === 0 && (
                         <Box mb={4}>
-                          <Box
-                            as="button"
-                            onClick={() => setShowLocationPicker(true)}
-                            display="flex"
-                            alignItems="center"
-                            gap={2}
-                            px={4}
-                            py={2.5}
-                            bg="white"
-                            borderRadius="full"
-                            boxShadow="0 4px 12px rgba(0,0,0,0.15)"
-                            _hover={{
+          <Box
+            as="button"
+            onClick={() => setShowLocationPicker(true)}
+            display="flex"
+            alignItems="center"
+            gap={2}
+            px={4}
+            py={2.5}
+            bg="white"
+            borderRadius="full"
+            boxShadow="0 4px 12px rgba(0,0,0,0.15)"
+            _hover={{
                               transform: "translateY(-2px)",
                               boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
-                            }}
-                            transition="all 0.2s"
-                          >
-                            <MapPin size={18} color="#185F2D" />
+            }}
+            transition="all 0.2s"
+          >
+            <MapPin size={18} color="#185F2D" />
                             <Text fontSize="13px" fontWeight="600" color="gray.800" noOfLines={1} maxW="200px">
                               {deliveryLocation?.address || "Select location"}
-                            </Text>
-                            <Text fontSize="20px" color="gray.400">›</Text>
-                          </Box>
-                        </Box>
+            </Text>
+            <Text fontSize="20px" color="gray.400">›</Text>
+          </Box>
+        </Box>
                       )}
                       <Flex
                         as="span"

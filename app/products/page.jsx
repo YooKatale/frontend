@@ -525,7 +525,7 @@ const Products = () => {
             </div>
 
             <div className={styles.gridWrap}>
-              <div className={styles.productGrid}>
+              <div className={`${styles.productGrid} prod-grid`}>
                 {isLoading ? (
                   <div className={styles.emptyState}>
                     <div className={styles.emptyIcon}>
@@ -539,7 +539,7 @@ const Products = () => {
                   </div>
                 ) : visibleProducts.length ? (
                   visibleProducts.map((product) => (
-                    <ProductCard key={product._id} product={product} userInfo={userInfo} />
+                    <ProductCard key={product._id} product={product} userInfo={userInfo} variant="v4" />
                         ))
                       ) : (
                   <div className={styles.emptyState}>

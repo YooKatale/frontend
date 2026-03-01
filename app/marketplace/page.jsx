@@ -230,7 +230,7 @@ export default function MarketplacePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <ProductCard product={product} userInfo={userInfo} />
+                <ProductCard product={product} userInfo={userInfo} variant="v4" />
               </motion.div>
             ))}
             {sellerListings.map((listing, index) => (

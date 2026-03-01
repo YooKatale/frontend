@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useCartCreateMutation } from "@slices/productsApiSlice";
 import { useWishlist } from "@slices/wishlistSlice";
 import { FormatCurr } from "@utils/utils";
+import { getImageUrl } from "@constants/constants";
 import { LoaderIcon, ShoppingCart, Heart } from "lucide-react";
 import { FiPackage } from "react-icons/fi";
 import Image from "next/image";
@@ -19,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import styles from "./ProductCard.module.css";
 
-const ProductCard = ({ product, userInfo }) => {
+const ProductCard = ({ product, userInfo, variant }) => {
   const [addCartApi] = useCartCreateMutation();
   const [SignInStateModal, setSignInStateModal] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -120,6 +121,63 @@ const ProductCard = ({ product, userInfo }) => {
   const originalPrice = product.price;
   const displayPrice = discount ? Math.round(originalPrice * (1 - discount / 100)) : originalPrice;
   const hasWasPrice = discount > 0;
+  const fmt = (n) => `UGX ${Number(n).toLocaleString()}`;
+  const tag = (product?.category || "Product").toUpperCase();
+  const imgSrc = product?.images?.[0] ? getImageUrl(product.images[0]) : null;
+
+  if (variant === "v4") {
+    return (
+      <>
+        <Link href={`/product/${product?._id}`} className="pcard">
+          <div className="pcard-img">
+            {imgSrc ? (
+              <img src={imgSrc} alt={product?.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            ) : (
+              <div style={{ position: "absolute", inset: 0, background: "#d0d8cc", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <FiPackage size={32} style={{ color: "#8a9e87" }} />
+              </div>
+            )}
+            <div className="pcard-tag">{tag}</div>
+            {discount > 0 && <div className="pcard-discount">-{discount}%</div>}
+            <button
+              type="button"
+              className={`pcard-wish${inWishlist ? " wished" : ""}`}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (product?._id) toggleWishlist(product._id, product); }}
+              aria-label="Wishlist"
+            >
+              <Heart size={13} strokeWidth={2} fill={inWishlist ? "#e07820" : "none"} color={inWishlist ? "#e07820" : "currentColor"} />
+            </button>
+            <div className="pcard-sweep" />
+          </div>
+          <div className="pcard-body">
+            <div className="pcard-name">{product?.name}</div>
+            <div className="pcard-meta">
+              <span className="pcard-rating">★ {Number(product?.rating) || 4.5}</span>
+              <span className="pcard-sold">{product?.reviewCount ?? 0} sold</span>
+            </div>
+            <div className="pcard-price-row">
+              <div>
+                <span className="pcard-price">{fmt(displayPrice)}</span>
+                {discount > 0 && <span className="pcard-old">{fmt(originalPrice)}</span>}
+              </div>
+              <button type="button" className="pcard-add" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCartBtnClick(product._id); }} aria-label="Add to cart">
+                {isLoading ? <LoaderIcon size={13} className="animate-spin" /> : <ShoppingCart size={13} strokeWidth={2.5} />}
+              </button>
+            </div>
+          </div>
+        </Link>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent className="bg-light" maxW="800px">
+            <ModalCloseButton />
+            <ModalBody>
+              <SignIn redirect={null} callback={handleListeningToSignIn} ismodal={true} />
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      </>
+    );
+  }
 
   return (
     <>

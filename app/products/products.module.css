@@ -20,6 +20,13 @@
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  width: 100%;
+  margin: 0 auto;
+}
+@media (min-width: 1024px) {
+  .root {
+    max-width: 90%;
+  }
 }
 
 .page {
