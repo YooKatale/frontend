@@ -394,10 +394,11 @@ export function SignInForm({ onSuccess, onSwitch, compact, inModal, returnUrl })
       const description = getAuthErrorMessage(err);
       toast({
         title: "Sign in failed",
-        description,
+        description: description || "Invalid email or password. Please try again.",
         status: "error",
-        duration: 5000,
+        duration: 6000,
         isClosable: true,
+        position: inModal ? "top" : "top",
       });
     }
   };

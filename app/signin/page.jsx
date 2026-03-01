@@ -30,6 +30,8 @@ export default function SignInPage() {
     const hash = typeof window !== "undefined" ? window.location.hash : "";
     const tokenFromHash = hash ? (hash.match(/[#&]access_token=([^&]+)/) || [])[1] : null;
     const token = tokenFromQuery || tokenFromHash;
+    const googleCallback = q?.get("google_callback") === "1" || q?.get("google_callback") === "true";
+
     if (token || userParam) {
       (async () => {
         try {
@@ -53,9 +55,32 @@ export default function SignInPage() {
                 if (fullUser && (fullUser._id || fullUser.id)) dispatch(setCredentials({ ...data, ...fullUser }));
               } catch (_) {}
             }
-            const returnUrl = q?.get("returnUrl") || "/";
+            let returnUrl = q?.get("returnUrl") || q?.get("redirect") || "/";
+            try { returnUrl = decodeURIComponent(returnUrl); } catch (_) {}
+            if (!returnUrl.startsWith("/")) returnUrl = "/";
             window.history.replaceState({}, "", window.location.pathname);
-            router.replace(returnUrl.startsWith("/") ? returnUrl : "/");
+            router.replace(returnUrl);
+          }
+        } catch (_) {}
+      })();
+      return;
+    }
+
+    if (googleCallback && !token && !userParam) {
+      (async () => {
+        try {
+          const base = DB_URL.replace(/\/api\/?$/, "");
+          const res = await fetch(`${base}/api/auth/me`, { credentials: "include" });
+          const json = await res.json().catch(() => ({}));
+          const user = json?.data ?? json?.user ?? json;
+          const tokenFromMe = json?.token ?? json?.data?.token ?? user?.token;
+          if ((user && (user._id || user.id)) || tokenFromMe) {
+            dispatch(setCredentials({ ...user, token: tokenFromMe ?? user?.token }));
+            let returnUrl = q?.get("redirect") || q?.get("returnUrl") || "/";
+            try { returnUrl = decodeURIComponent(returnUrl); } catch (_) {}
+            if (!returnUrl.startsWith("/")) returnUrl = "/";
+            window.history.replaceState({}, "", window.location.pathname);
+            router.replace(returnUrl);
           }
         } catch (_) {}
       })();
@@ -65,20 +90,37 @@ export default function SignInPage() {
   useEffect(() => {
     if (searchParams?.get("token") || searchParams?.get("user") || searchParams?.get("access_token") || searchParams?.get("accessToken")) return;
     if (userInfo && typeof userInfo === "object" && Object.keys(userInfo).length > 0) {
-      router.replace(searchParams?.get("returnUrl") || "/");
+      let returnUrl = searchParams?.get("returnUrl") || searchParams?.get("redirect") || "/";
+      try { returnUrl = decodeURIComponent(returnUrl); } catch (_) {}
+      router.replace(returnUrl.startsWith("/") ? returnUrl : "/");
     }
   }, [userInfo, router, searchParams]);
+
+  const isGoogleCallback = searchParams?.get("google_callback") === "1" || searchParams?.get("google_callback") === "true";
+  const hasAuthParams = searchParams?.get("token") || searchParams?.get("user") || searchParams?.get("access_token");
 
   return (
     <>
       <style>{AUTH_PAGE_CSS}</style>
       <Bg />
       <div className="wrap-auth">
+        {isGoogleCallback && !hasAuthParams ? (
+          <div style={{ textAlign: "center", padding: 48 }}>
+            <p style={{ fontSize: 18, fontWeight: 700, color: "#1a5c1a", marginBottom: 8 }}>Completing sign in…</p>
+            <p style={{ fontSize: 14, color: "#6a8a6a" }}>If you are not redirected, try signing in below.</p>
+            <SignInForm
+              returnUrl={searchParams?.get("returnUrl") || searchParams?.get("redirect") || undefined}
+              onSuccess={(returnUrl) => router.replace(returnUrl || "/")}
+              onSwitch={() => router.push("/signup")}
+            />
+          </div>
+        ) : (
         <SignInForm
           returnUrl={searchParams?.get("returnUrl") || undefined}
           onSuccess={(returnUrl) => router.replace(returnUrl || "/")}
           onSwitch={() => router.push("/signup")}
         />
+        )}
       </div>
     </>
   );
