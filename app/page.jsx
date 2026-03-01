@@ -312,16 +312,21 @@ const V4_CSS = `
 .yookatale-v4-page .cat-label{position:absolute;bottom:0;left:0;right:0;padding:5px 7px;font-size:9.5px;font-weight:700;color:#fff;text-align:center;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,.5);}
 .yookatale-v4-page .shimmer-tile{animation:shimmer 1.7s infinite;background:linear-gradient(90deg,#d4dcd4 25%,#c2cec2 50%,#d4dcd4 75%);background-size:300% 100%;}
 @keyframes shimmer{from{background-position:300% 0}to{background-position:-300% 0}}
+.yookatale-v4-page .budget-wrap{margin-bottom:20px;}
+.yookatale-v4-page .budget-head-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--dark);margin-bottom:12px;}
+.yookatale-v4-page .budget-pills{display:flex;flex-wrap:wrap;gap:10px;}
+.yookatale-v4-page .budget-pill{font-family:'Sora',sans-serif;font-size:13px;font-weight:600;color:var(--mid);background:var(--surf);border:2px solid rgba(26,92,26,.2);border-radius:100px;padding:10px 20px;cursor:pointer;transition:background .2s,border-color .2s,color .2s;}
+.yookatale-v4-page .budget-pill:hover{background:var(--gp);border-color:var(--g);color:var(--dark);}
+.yookatale-v4-page .budget-pill.active{background:var(--g);border-color:var(--g);color:#fff;}
 .yookatale-v4-page .m-overlay{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;animation:fadeBlur .22s ease;}
 @media(min-width:600px){.yookatale-v4-page .m-overlay{align-items:center;padding:24px;}}
 @keyframes fadeBlur{from{opacity:0}to{opacity:1}}
-.yookatale-v4-page .m-sheet{background:#000;border-radius:24px 24px 0 0;width:100%;max-width:500px;overflow:hidden;animation:slideUp .32s cubic-bezier(.32,.72,0,1);position:relative;max-height:95vh;display:flex;flex-direction:column;}
-@media(min-width:600px){.yookatale-v4-page .m-sheet{border-radius:24px;animation:scaleIn .28s cubic-bezier(.34,1.4,.64,1);}}
+.yookatale-v4-page .m-sheet{background:#000;border-radius:24px 24px 0 0;width:100%;max-width:100%;overflow:hidden;animation:slideUp .32s cubic-bezier(.32,.72,0,1);position:relative;max-height:95vh;display:flex;flex-direction:column;}
+@media(min-width:600px){.yookatale-v4-page .m-sheet{max-width:500px;border-radius:24px;animation:scaleIn .28s cubic-bezier(.34,1.4,.64,1);}}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 @keyframes scaleIn{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
-.yookatale-v4-page .m-banner{position:relative;width:100%;height:clamp(240px,55vw,340px);flex-shrink:0;overflow:hidden;background:linear-gradient(135deg,#0e1e0e,#1a5c1a);}
-@media(min-width:600px){.yookatale-v4-page .m-banner{height:320px;}}
-.yookatale-v4-page .m-banner img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02);}
+.yookatale-v4-page .m-banner{position:relative;width:100%;min-height:clamp(200px,50vmin,380px);aspect-ratio:16/10;flex-shrink:0;overflow:hidden;background:linear-gradient(135deg,#0e1e0e,#1a5c1a);}
+@media(min-width:600px){.yookatale-v4-page .m-banner{aspect-ratio:16/10;min-height:280px;max-height:380px;}}
 .yookatale-v4-page .m-banner-img{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;display:block;}
 .yookatale-v4-page .m-banner-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(0,0,0,.08) 0%,transparent 35%,transparent 45%,rgba(0,0,0,.82) 100%);}
 .yookatale-v4-page .m-handle{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:36px;height:4px;background:rgba(255,255,255,.35);border-radius:2px;z-index:10;}
@@ -394,6 +399,7 @@ export default function Home() {
   const { userInfo } = useAuth();
   const [slideIdx, setSlideIdx] = useState(0);
   const [modal, setModal] = useState(null);
+  const [budget, setBudget] = useState("");
   const [products, setProducts] = useState([]);
   const [apiCategories, setApiCategories] = useState([]);
   const [productsLoading, setProductsLoading] = useState(true);
@@ -438,7 +444,7 @@ export default function Home() {
     (async () => {
       setProductsLoading(true);
       try {
-        const res = await fetchProducts().unwrap();
+      const res = await fetchProducts().unwrap();
         setProducts(Array.isArray(res?.data) ? res.data : []);
       } catch { setProducts([]); }
       finally { setProductsLoading(false); }
@@ -448,8 +454,8 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       setCategoriesLoading(true);
-      try {
-        const res = await fetchCategories().unwrap();
+    try {
+      const res = await fetchCategories().unwrap();
         if (res?.success && Array.isArray(res?.categories)) setApiCategories(res.categories);
         else if (res?.data && Array.isArray(res.data)) setApiCategories(res.data);
         else setApiCategories([]);
@@ -627,16 +633,29 @@ export default function Home() {
         </div>
 
         <div className="section-wrap">
+          <div className="budget-wrap">
+            <div className="budget-head-title">Budget</div>
+            <div className="budget-pills">
+              {["low", "middle", "high"].map((b) => (
+                <button key={b} type="button" className={`budget-pill${budget === b ? " active" : ""}`} onClick={() => setBudget(b === budget ? "" : b)}>
+                  {b.charAt(0).toUpperCase() + b.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="section-wrap">
           <div className="cat-head-row">
             <div className="cat-head-title">Shop by Category</div>
-            <button type="button" className="btn-viewall" onClick={() => router.push("/search?q=categories")}>View all <ChevRight s={13} /></button>
+            <button type="button" className="btn-viewall" onClick={() => router.push(`/search?q=categories${budget ? `&budget=${budget}` : ""}`)}>View all <ChevRight s={13} /></button>
           </div>
           {categoriesLoading ? <LoaderSkeleton /> : (
             <div className="cat-grid">
               {displayCategories.map((cat, i) => {
                 const imgSrc = getCategoryImageSrc(cat);
                 return (
-                  <a key={`${cat.name}-${i}`} href={`/search?q=${encodeURIComponent(cat.name)}`} className={`cat-tile${!imgSrc ? " shimmer-tile" : ""}`} style={{ animationDelay: `${i * 25}ms` }}>
+                  <a key={`${cat.name}-${i}`} href={`/search?q=${encodeURIComponent(cat.name)}${budget ? `&budget=${budget}` : ""}`} className={`cat-tile${!imgSrc ? " shimmer-tile" : ""}`} style={{ animationDelay: `${i * 25}ms` }}>
                     <CatPlaceholder col={cat.col || CAT_COLORS[i % CAT_COLORS.length]} name={cat.name} />
                     {imgSrc && <img src={imgSrc} alt={cat.name} loading="lazy" onError={(e) => { e.target.onerror = null; e.target.style.display = "none"; }} />}
                     <div className="cat-shade" />
@@ -687,7 +706,7 @@ export default function Home() {
                       <V4ProductCard
                         key={product._id || product.id}
                         product={product}
-                        userInfo={userInfo}
+                  userInfo={userInfo}
                         categoryTag={sec.label}
                         onAddCart={handleAddToCart}
                       />
@@ -721,7 +740,9 @@ export default function Home() {
               )}
               <div className="m-banner-shade" />
               <div className="m-banner-info">
-                <img className="m-flag" src={modal.flag || `https://flagcdn.com/w160/${(modal.code || "").toLowerCase()}.png`} alt="" onError={(e) => { e.target.style.display = "none"; }} />
+                {!(modal.imageUrl || modal.bannerImageUrl || modal.image) && (
+                  <img className="m-flag" src={modal.flag || `https://flagcdn.com/w160/${(modal.code || "").toLowerCase()}.png`} alt="" onError={(e) => { e.target.style.display = "none"; }} />
+                )}
                 <div className="m-title-block">
                   <div className="m-country-name">{modal.menuName || `${modal.name} Menu`}</div>
                   <div className="m-specialty">{modal.specialty}</div>
