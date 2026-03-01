@@ -74,6 +74,7 @@ import { logout, useAuth } from "@slices/authSlice";
 import { ThemeColors, CLIENT_DASHBOARD_URL, CategoriesJson, getUserAvatarUrl } from "@constants/constants";
 import ReferralModal from "@components/ReferralModal";
 import PreNavbar from "@components/PreNavbar";
+import { useAuthModal } from "@components/AuthModalContext";
 
 // Categories to hide from the navbar strip (case-insensitive)
 const NAVBAR_HIDDEN_CATEGORIES = [
@@ -86,6 +87,7 @@ const PLAY_STORE_APP_URL = "https://play.google.com/store/apps/details?id=com.yo
 
 const Header = () => {
   const { userInfo } = useAuth();
+  const { openAuthModal } = useAuthModal();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [mobileSearchExpanded, setMobileSearchExpanded] = useState(false);
   const [searchParam, setSearchParam] = useState("");
@@ -544,8 +546,7 @@ const Header = () => {
                 ) : (
                   <>
                     <MenuItem
-                      as={Link}
-                      href="/signin"
+                      as="button"
                       py={3}
                       px={4}
                       fontSize="0.9375rem"
@@ -556,12 +557,12 @@ const Header = () => {
                     bg: "#e6f0e6",
                     color: "#1a5c1a",
                       }}
+                      onClick={() => openAuthModal("signin")}
                     >
                       Sign In
                     </MenuItem>
                     <MenuItem
-                      as={Link}
-                      href="/signup"
+                      as="button"
                       py={3}
                       px={4}
                       fontSize="0.9375rem"
@@ -571,6 +572,7 @@ const Header = () => {
                     bg: "#e6f0e6",
                     color: "#1a5c1a",
                       }}
+                      onClick={() => openAuthModal("signup")}
                     >
                       Create Account
                     </MenuItem>
@@ -805,9 +807,7 @@ const Header = () => {
                   </Box>
                 </HStack>
               ) : (
-                  <Link href="/signin" onClick={closeMobileNav}>
-                    <Button size="sm" colorScheme="green" fontWeight="700">Sign In</Button>
-                  </Link>
+                  <Button size="sm" colorScheme="green" fontWeight="700" onClick={() => { closeMobileNav(); openAuthModal("signin"); }}>Sign In</Button>
                 )}
                 <IconButton
                   aria-label="Close menu"
@@ -951,14 +951,25 @@ const Header = () => {
                 <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
               </Flex>
               {!userInfo && (
-                <Link href="/signup" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
-                  <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/signup" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
-                    {pathname === "/signup" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
-                    <Flex w="34px" h="34px" borderRadius="10px" bg={pathname === "/signup" ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}><AiOutlineLogin size={17} color={pathname === "/signup" ? "#1a6b3a" : "#637568"} /></Flex>
-                    <Text fontSize="13px" fontWeight={pathname === "/signup" ? 700 : 500} color={pathname === "/signup" ? "#1a6b3a" : "#1e2d22"} flex={1}>Sign Up</Text>
-                    <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
-                  </Flex>
-                </Link>
+                <Flex
+                  as="button"
+                  type="button"
+                  align="center"
+                  gap="12px"
+                  py="11px"
+                  px="18px"
+                  w="100%"
+                  textAlign="left"
+                  position="relative"
+                  bg="transparent"
+                  _hover={{ bg: "#e8f5ee" }}
+                  transition="background 0.12s"
+                  onClick={() => { closeMobileNav(); openAuthModal("signup"); }}
+                >
+                  <Flex w="34px" h="34px" borderRadius="10px" bg="#f4f8f5" align="center" justify="center" flexShrink={0}><AiOutlineLogin size={17} color="#637568" /></Flex>
+                  <Text fontSize="13px" fontWeight={500} color="#1e2d22" flex={1}>Sign Up</Text>
+                  <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
+                </Flex>
               )}
 
               <Box h="16px" />

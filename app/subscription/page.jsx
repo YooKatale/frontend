@@ -21,6 +21,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useAuth } from "@slices/authSlice";
+import { useAuthModal } from "@components/AuthModalContext";
 import {
   useSubscriptionPackageGetMutation,
   useSubscriptionPostMutation,
@@ -28,7 +29,6 @@ import {
 } from "@slices/usersApiSlice";
 import MealPlanCalendarNew from "@components/MealPlanCalendarNew";
 import SubscriptionTerms from "@components/SubscriptionTerms";
-import InviteFriendModal from "@components/InviteFriendModal";
 import { FormatCurr } from "@utils/utils";
 import { FaAppleAlt, FaUsers, FaChartLine, FaHeart } from "react-icons/fa";
 
@@ -372,7 +372,6 @@ export default function SubscriptionPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const { isOpen: isTncOpen, onOpen: onTncOpen, onClose: onTncClose } = useDisclosure();
-  const { isOpen: isInviteOpen, onOpen: onInviteOpen, onClose: onInviteClose } = useDisclosure();
 
   const { data: ratingPremium } = useGetPlanRatingsQuery(
     { planType: "premium", context: "subscription" },
@@ -400,13 +399,7 @@ export default function SubscriptionPage() {
   const [fetchPackages] = useSubscriptionPackageGetMutation();
   const [createSubscription] = useSubscriptionPostMutation();
   const { userInfo } = useAuth();
-
-  useEffect(() => {
-    if (!userInfo || typeof userInfo !== "object" || Object.keys(userInfo).length === 0) {
-      router.push("/signin");
-      return;
-    }
-  }, [userInfo, router]);
+  const { openAuthModal } = useAuthModal();
 
   const handleSubscriptionCardFetch = async () => {
     try {
@@ -433,7 +426,7 @@ export default function SubscriptionPage() {
 
   const handleSubmit = async (packageId) => {
     if (!userInfo?._id) {
-      router.push("/signin");
+      openAuthModal();
       return;
     }
     setIsLoading(true);
@@ -459,6 +452,30 @@ export default function SubscriptionPage() {
   };
 
   const handlePlanSelect = (planType) => setSelectedPlan(planType);
+
+  const handleInviteShare = async () => {
+    const url = typeof window !== "undefined" ? `${window.location.origin}/signup` : "";
+    const title = "Try Yookatale – Fresh meals & groceries";
+    const text = "Join me on Yookatale for fresh groceries and meal plans delivered to your door.";
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share({ title, url, text });
+        chakraToast({ title: "Shared!", status: "success", duration: 2000, isClosable: true });
+      } else {
+        await navigator.clipboard?.writeText(url);
+        chakraToast({ title: "Link copied! Share with friends.", status: "success", duration: 2000, isClosable: true });
+      }
+    } catch (e) {
+      if (e?.name !== "AbortError") {
+        try {
+          await navigator.clipboard?.writeText(url);
+          chakraToast({ title: "Link copied!", status: "success", duration: 2000, isClosable: true });
+        } catch {
+          chakraToast({ title: "Could not share", status: "error", duration: 3000, isClosable: true });
+        }
+      }
+    }
+  };
 
   // Merge API packages with PLAN_CONFIG (keep original wording; use API price when available)
   const plansForDisplay = subscriptionPackages.map((pkg) => {
@@ -508,8 +525,6 @@ export default function SubscriptionPage() {
           </ModalBody>
         </ModalContent>
       </Modal>
-      <InviteFriendModal isOpen={isInviteOpen} onClose={onInviteClose} />
-
       <div className="sub-page">
         <div className="promo-bar">
           <div className="promo-left">
@@ -544,7 +559,7 @@ export default function SubscriptionPage() {
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
                 onTnc={onTncOpen}
-                onInvite={onInviteOpen}
+                onInvite={handleInviteShare}
               />
             ))}
           </div>

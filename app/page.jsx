@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@slices/authSlice";
+import { useAuthModal } from "@components/AuthModalContext";
 import {
   useProductsGetMutation,
   useProductsCategoriesGetMutation,
@@ -11,7 +12,9 @@ import {
   useGetHomepageConfigQuery,
   useCartCreateMutation,
 } from "@slices/productsApiSlice";
-import { CategoriesJson, getImageUrl } from "@constants/constants";
+import { useMealSlotsPublicGetMutation, useMealCalendarOverridesGetMutation } from "@slices/usersApiSlice";
+import { CategoriesJson, getImageUrl, getOptimizedImageUrl } from "@constants/constants";
+import { getMealForDay } from "@lib/mealMenuConfig";
 import LoaderSkeleton from "@components/LoaderSkeleton";
 
 /** Same as CategoryCard: normalize category name to match /public/assets/images/categories/ filenames */
@@ -56,6 +59,52 @@ const TagIcon = ({ s = 10 }) => <Svg size={s}><path d="M12 2H2v10l9.29 9.29a1 1 
 const DownloadIcon = ({ s = 16, c = "currentColor" }) => <Svg size={s} stroke={c}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></Svg>;
 const GiftIcon = ({ s = 16, c = "currentColor" }) => <Svg size={s} stroke={c}><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></Svg>;
 const TruckIcon = ({ s = 16, c = "currentColor" }) => <Svg size={s} stroke={c}><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></Svg>;
+const BowlIcon = ({ s = 14 }) => <Svg size={s}><path d="M12 2a10 10 0 0 1 10 10H2A10 10 0 0 1 12 2z"/><path d="M5 12c0 3.87 3.13 7 7 7s7-3.13 7-7"/></Svg>;
+const SunIcon = ({ s = 14 }) => <Svg size={s}><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></Svg>;
+const MoonIcon = ({ s = 14 }) => <Svg size={s}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></Svg>;
+
+/** Resolve meal image: full URL (http), same-origin /assets, or backend path via getImageUrl */
+function resolveMealImage(url) {
+  if (!url || typeof url !== "string") return null;
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/assets")) return url;
+  return getImageUrl(url);
+}
+
+/** Meal card for homepage: shows meal from calendar config, click -> subscription */
+function HomeMealCard({ item }) {
+  const router = useRouter();
+  const raw = resolveMealImage(item?.image);
+  const imgSrc = raw ? (getOptimizedImageUrl(raw) ?? raw) : null;
+  const prepLabel = item?.prepType === "ready-to-cook" ? "Ready to cook" : "Ready to eat";
+  const col = PLACEHOLDER_COLS[(item?.meal?.length || 0) % PLACEHOLDER_COLS.length];
+  return (
+    <div
+      className="pcard"
+      role="button"
+      tabIndex={0}
+      onClick={() => router.push("/subscription")}
+      onKeyDown={(e) => e.key === "Enter" && router.push("/subscription")}
+      style={{ cursor: "pointer" }}
+    >
+      <div className="pcard-img">
+        {imgSrc ? <img src={imgSrc} alt={item?.meal} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} /> : <PcardImgPlaceholder col={col} name={item?.meal} />}
+        <div className="pcard-tag" style={{ textTransform: "none", fontSize: 10 }}>{prepLabel}</div>
+        <div className="pcard-sweep" />
+      </div>
+      <div className="pcard-body">
+        <div className="pcard-name" style={{ fontSize: 13, lineHeight: 1.3 }}>{item?.meal || "Meal"}</div>
+        <div className="pcard-meta" style={{ marginTop: 4 }}>
+          <span className="pcard-sold" style={{ fontSize: 11 }}>Subscribe to get this</span>
+        </div>
+        <div className="pcard-price-row" style={{ marginTop: 6 }}>
+          <span className="pcard-price" style={{ fontSize: 12, fontWeight: 700, color: "#1a5c1a" }}>View plans</span>
+          <ChevRight s={12} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const DEFAULT_SLIDES = [
   { tag: "YOOKATALE APP", title: "Fresh Groceries", accent: "Delivered Fast", desc: "Farm-fresh produce at your door in under 2 hours. Track in real-time on Android & iOS.", cta: "Download App", ctaSec: "Browse Web", accentColor: "#f0c020", bg: ["#061806", "#1a5c1a"] },
@@ -127,7 +176,8 @@ function V4ProductCard({ product, userInfo, categoryTag, onAddCart }) {
   const discount = product?.discountPercentage ? Number(product.discountPercentage) : 0;
   const originalPrice = product?.price ?? 0;
   const displayPrice = discount ? Math.round(originalPrice * (1 - discount / 100)) : originalPrice;
-  const imgSrc = product?.images?.[0] ? getImageUrl(product.images[0]) : null;
+  const rawImg = product?.images?.[0] ? getImageUrl(product.images[0]) : null;
+  const imgSrc = rawImg ? (getOptimizedImageUrl(rawImg) ?? rawImg) : null;
   const col = PLACEHOLDER_COLS[(product?.name?.length || 0) % PLACEHOLDER_COLS.length];
   const tag = (categoryTag || product?.category || "Product").toUpperCase();
   const fmt = (n) => `UGX ${Number(n).toLocaleString()}`;
@@ -141,7 +191,7 @@ function V4ProductCard({ product, userInfo, categoryTag, onAddCart }) {
   return (
     <Link href={`/product/${product?._id}`} className="pcard">
       <div className="pcard-img">
-        {imgSrc ? <img src={imgSrc} alt={product?.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} /> : <PcardImgPlaceholder col={col} name={product?.name} />}
+        {imgSrc ? <img src={imgSrc} alt={product?.name} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} /> : <PcardImgPlaceholder col={col} name={product?.name} />}
         <div className="pcard-tag">{tag}</div>
         {discount > 0 && <div className="pcard-discount">-{discount}%</div>}
         <button type="button" className={`pcard-wish${wished ? " wished" : ""}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setWished((w) => !w); }} aria-label="Wishlist"><HeartIcon s={13} /></button>
@@ -166,8 +216,13 @@ function V4ProductCard({ product, userInfo, categoryTag, onAddCart }) {
   );
 }
 
-function SectionHeader({ icon, label, color, searchQuery, onPrev, onNext, canPrev, canNext }) {
+function SectionHeader({ icon, label, color, searchQuery, seeAllToSubscription, onPrev, onNext, canPrev, canNext }) {
   const router = useRouter();
+  const handleSeeAll = (e) => {
+    e.preventDefault();
+    if (seeAllToSubscription) router.push("/subscription");
+    else if (searchQuery) router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+  };
   return (
     <div className="sec-head">
       <div className="sec-head-left">
@@ -175,7 +230,7 @@ function SectionHeader({ icon, label, color, searchQuery, onPrev, onNext, canPre
         <span className="sec-head-label">{label}</span>
       </div>
       <div className="sec-head-right">
-        <a className="sec-see-all" href={searchQuery ? `/search?q=${encodeURIComponent(searchQuery)}` : "#"} onClick={(e) => { e.preventDefault(); if (searchQuery) router.push(`/search?q=${encodeURIComponent(searchQuery)}`); }}>See all <ChevRight s={12} /></a>
+        <a className="sec-see-all" href={seeAllToSubscription ? "/subscription" : (searchQuery ? `/search?q=${encodeURIComponent(searchQuery)}` : "#")} onClick={handleSeeAll}>See all <ChevRight s={12} /></a>
         <div className="sec-nav-btns">
           <button type="button" className={`sec-nav-btn${canPrev ? "" : " disabled"}`} onClick={onPrev} disabled={!canPrev} aria-label="Previous"><ChevLeft s={14} /></button>
           <button type="button" className={`sec-nav-btn${canNext ? "" : " disabled"}`} onClick={onNext} disabled={!canNext} aria-label="Next"><ChevRight s={14} /></button>
@@ -194,9 +249,10 @@ function PromoBannerBlock({ banner }) {
     if (href.startsWith("http")) window.open(href, "_blank"); else router.push(href);
   };
   if (imageUrl && !title && !cta) {
+    const src = getOptimizedImageUrl(getImageUrl(imageUrl)) ?? getImageUrl(imageUrl);
     return (
       <div className="promo-banner" style={{ minHeight: 120 }} onClick={handleClick} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && handleClick()}>
-        <div className="promo-banner-img"><img src={getImageUrl(imageUrl)} alt="" /></div>
+        <div className="promo-banner-img"><img src={src} alt="" loading="lazy" decoding="async" /></div>
       </div>
     );
   }
@@ -224,9 +280,13 @@ export default function Home() {
   const [apiCategories, setApiCategories] = useState([]);
   const [productsLoading, setProductsLoading] = useState(true);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [mealSlots, setMealSlots] = useState([]);
+  const [mealOverrides, setMealOverrides] = useState([]);
 
   const [fetchProducts] = useProductsGetMutation();
   const [fetchCategories] = useProductsCategoriesGetMutation();
+  const [fetchSlots] = useMealSlotsPublicGetMutation();
+  const [fetchOverrides] = useMealCalendarOverridesGetMutation();
   const { data: countryCuisinesData } = useGetCountryCuisinesQuery(undefined, { skip: false });
   const { data: homepageConfigData } = useGetHomepageConfigQuery(undefined, { skip: false });
 
@@ -243,8 +303,9 @@ export default function Home() {
   }, [homepageConfigData]);
 
   const [addCartApi] = useCartCreateMutation();
+  const { openAuthModal } = useAuthModal();
   const handleAddToCart = (product) => {
-    if (!userInfo) { router.push("/signin"); return; }
+    if (!userInfo) { openAuthModal(); return; }
     const discount = product?.discountPercentage ? Number(product.discountPercentage) : 0;
     const discountedPrice = discount ? Math.round((product?.price ?? 0) * (1 - discount / 100)) : (product?.price ?? 0);
     addCartApi({ productId: product._id, userId: userInfo._id, discountedPrice }).unwrap().catch(() => {});
@@ -285,6 +346,17 @@ export default function Home() {
   }, [fetchCategories]);
 
   useEffect(() => {
+    fetchSlots().unwrap().then((res) => {
+      if (res?.status === "Success" && Array.isArray(res?.data)) setMealSlots(res.data);
+    }).catch(() => {});
+  }, [fetchSlots]);
+  useEffect(() => {
+    fetchOverrides().unwrap().then((res) => {
+      if (res?.status === "Success" && Array.isArray(res?.data)) setMealOverrides(res.data);
+    }).catch(() => {});
+  }, [fetchOverrides]);
+
+  useEffect(() => {
     const t = setInterval(() => setSlideIdx((s) => (s + 1) % (slides.length || 1)), 5500);
     return () => clearInterval(t);
   }, [slides.length]);
@@ -308,11 +380,68 @@ export default function Home() {
     else router.push("/subscription");
   };
 
-  // Priority order for known categories; others sorted alphabetically after
+  const MEAL_PREP_TYPES = ["ready-to-eat", "ready-to-cook"];
+  const MEAL_SECTION_CONFIG = [
+    { key: "breakfast", label: "Breakfast", color: "#e07820", icon: <SunIcon key="sun" s={15} /> },
+    { key: "lunch", label: "Lunch", color: "#1a5c1a", icon: <BowlIcon key="bowl" s={15} /> },
+    { key: "supper", label: "Supper", color: "#7c3aed", icon: <MoonIcon key="moon" s={15} /> },
+  ];
+
+  const [currentDay, setCurrentDay] = useState("monday");
+  useEffect(() => {
+    const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    setCurrentDay(dayNames[new Date().getDay()]);
+  }, []);
+
+  const MEAL_SECTIONS = useMemo(() => {
+    const incomeLevel = "middle";
+    const getSlot = (day, mealTypeId, prepTypeId) =>
+      mealSlots.find(
+        (s) => s.incomeLevel === incomeLevel && s.prepType === prepTypeId && s.day === day && s.mealType === mealTypeId
+      );
+    const getMealImage = (day, mealTypeId, prepTypeId) => {
+      const slot = getSlot(day, mealTypeId, prepTypeId);
+      if (slot?.imageUrl) return getImageUrl(slot.imageUrl);
+      const override = mealOverrides.find(
+        (o) => o.incomeLevel === incomeLevel && o.prepType === prepTypeId && o.day === day && o.mealType === mealTypeId
+      );
+      return override?.imageUrl ? getImageUrl(override.imageUrl) : null;
+    };
+    return MEAL_SECTION_CONFIG.map(({ key: mealType, label, color, icon }) => {
+      const items = [];
+      MEAL_PREP_TYPES.forEach((prepType) => {
+        const slot = getSlot(currentDay, mealType, prepType);
+        const configMeal = getMealForDay(currentDay, mealType, incomeLevel, prepType);
+        const img = getMealImage(currentDay, mealType, prepType) || configMeal?.image;
+        if (slot) {
+          items.push({
+            meal: slot.mealName || configMeal?.meal || "",
+            description: slot.description || configMeal?.description || "",
+            quantity: slot.quantity || configMeal?.quantity || "—",
+            image: img || configMeal?.image,
+            id: `${mealType}-${currentDay}-${prepType}`,
+            mealType,
+            day: currentDay,
+            prepType,
+          });
+        } else if (configMeal) {
+          items.push({
+            ...configMeal,
+            image: img || configMeal.image,
+            id: `${mealType}-${currentDay}-${prepType}`,
+            mealType,
+            day: currentDay,
+            prepType,
+          });
+        }
+      });
+      return { key: mealType, label, color, icon, items };
+    });
+  }, [currentDay, mealSlots, mealOverrides]);
+
   const CATEGORY_PRIORITY = ["popular", "discover", "promotional", "recommended", "topdeals"];
   const SECTION_COLORS = ["#e07820", "#1a5c1a", "#8a1a5c", "#1a5c1a", "#e07820"];
   const SECTION_ICONS = [<FlameIcon key="f" s={15} />, <CompassIcon key="c" s={15} />, <TagIcon key="t" s={15} />, <TagIcon key="t2" s={15} />, <FlameIcon key="f2" s={15} />];
-
   const SECTIONS = useMemo(() => {
     const byCat = {};
     products.forEach((p) => {
@@ -340,6 +469,7 @@ export default function Home() {
   }, [products]);
 
   const sectionRefs = useRef([]);
+  const totalSectionCount = SECTIONS.length + MEAL_SECTIONS.length;
   const [scrollState, setScrollState] = useState({});
   const handleScroll = (idx) => {
     const el = sectionRefs.current[idx];
@@ -354,6 +484,24 @@ export default function Home() {
     if (!el) return;
     el.scrollBy({ left: dir * (el.offsetWidth * 0.72), behavior: "smooth" });
   };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (!isMobile) return;
+    const step = () => {
+      sectionRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const maxScroll = el.scrollWidth - el.clientWidth;
+        if (maxScroll <= 0) return;
+        let next = el.scrollLeft + el.offsetWidth * 0.4;
+        if (next >= maxScroll) next = 0;
+        el.scrollTo({ left: next, behavior: "smooth" });
+      });
+    };
+    const t = setInterval(step, 4500);
+    return () => clearInterval(t);
+  }, [totalSectionCount]);
 
   return (
     <>
@@ -415,7 +563,7 @@ export default function Home() {
               {(countries.length ? countries : [{ code: "UG", name: "Uganda", flag: "https://flagcdn.com/w160/ug.png", isDefault: true }]).map((c) => (
                 <div key={c.code} role="button" tabIndex={0} className={`c-btn${c.isDefault ? " dflt" : ""}`} onClick={() => setModal(c)} onKeyDown={(e) => e.key === "Enter" && setModal(c)}>
                   {c.isDefault && <span className="c-default-ring" aria-hidden />}
-                  <div className="c-flag-wrap"><img src={c.flag || `https://flagcdn.com/w160/${(c.code || "").toLowerCase()}.png`} alt={c.name} loading="lazy" onError={(e) => { e.target.style.opacity = "0"; }} /></div>
+                  <div className="c-flag-wrap"><img src={getOptimizedImageUrl(c.flag || `https://flagcdn.com/w160/${(c.code || "").toLowerCase()}.png`) || c.flag || `https://flagcdn.com/w160/${(c.code || "").toLowerCase()}.png`} alt={c.name} loading="lazy" decoding="async" onError={(e) => { e.target.style.opacity = "0"; }} /></div>
                   <span className="c-name">{c.name}</span>
                 </div>
               ))}
@@ -444,11 +592,12 @@ export default function Home() {
           {categoriesLoading ? <LoaderSkeleton /> : (
             <div className="cat-grid">
               {displayCategories.map((cat, i) => {
-                const imgSrc = getCategoryImageSrc(cat);
+                const rawCatImg = getCategoryImageSrc(cat);
+                const imgSrc = rawCatImg ? (getOptimizedImageUrl(rawCatImg) ?? rawCatImg) : null;
                 return (
                   <a key={`${cat.name}-${i}`} href={`/search?q=${encodeURIComponent(cat.name)}${budget ? `&budget=${budget}` : ""}`} className={`cat-tile${!imgSrc ? " shimmer-tile" : ""}`} style={{ animationDelay: `${i * 25}ms` }}>
                     <CatPlaceholder col={cat.col || CAT_COLORS[i % CAT_COLORS.length]} name={cat.name} />
-                    {imgSrc && <img src={imgSrc} alt={cat.name} loading="lazy" onError={(e) => { e.target.onerror = null; e.target.style.display = "none"; }} />}
+                    {imgSrc && <img src={imgSrc} alt={cat.name} loading="lazy" decoding="async" onError={(e) => { e.target.onerror = null; e.target.style.display = "none"; }} />}
                     <div className="cat-shade" />
                     <div className="cat-label">{cat.name}</div>
                   </a>
@@ -461,57 +610,89 @@ export default function Home() {
         <div className="pb" />
       </div>
 
-      {!productsLoading && (
-        <>
-          {promoBanners[0] && (
-            <div className="sec-wrap">
-              <PromoBannerBlock banner={promoBanners[0]} />
-            </div>
-          )}
-          {SECTIONS.map((sec, i) => {
-            if (!sec.items?.length) return null;
-            const state = scrollState[i] ?? { canPrev: false, canNext: true };
-            const bannerAfter = promoBanners[i % promoBanners.length];
-            return (
-              <div key={sec.key}>
-                <div className="sec-wrap">
-                  <SectionHeader
-                    icon={sec.icon}
-                    label={sec.label}
-                    color={sec.color}
-                    searchQuery={sec.key}
-                    onPrev={() => scrollRow(i, -1)}
-                    onNext={() => scrollRow(i, 1)}
-                    canPrev={state.canPrev}
-                    canNext={state.canNext}
-                  />
-                  <div
-                    className="prod-row"
-                    ref={(el) => { sectionRefs.current[i] = el; }}
-                    onScroll={() => handleScroll(i)}
-                  >
-                    {sec.items.map((product) => (
-                      <V4ProductCard
-                        key={product._id || product.id}
-                        product={product}
-                  userInfo={userInfo}
-                        categoryTag={sec.label}
-                        onAddCart={handleAddToCart}
-                      />
-                    ))}
-                  </div>
-                </div>
-                {bannerAfter && (
-                  <div className="sec-wrap">
-                    <PromoBannerBlock banner={bannerAfter} />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-          <div className="pg-spacer" />
-        </>
+      {promoBanners[0] && (
+        <div className="sec-wrap">
+          <PromoBannerBlock banner={promoBanners[0]} />
+        </div>
       )}
+      {!productsLoading && SECTIONS.map((sec, idx) => {
+        if (!sec.items?.length) return null;
+        const state = scrollState[idx] ?? { canPrev: false, canNext: true };
+        const bannerAfter = promoBanners[idx % promoBanners.length];
+        return (
+          <div key={`cat-${sec.key}`}>
+            <div className="sec-wrap">
+              <SectionHeader
+                icon={sec.icon}
+                label={sec.label}
+                color={sec.color}
+                searchQuery={sec.key}
+                onPrev={() => scrollRow(idx, -1)}
+                onNext={() => scrollRow(idx, 1)}
+                canPrev={state.canPrev}
+                canNext={state.canNext}
+              />
+              <div
+                className="prod-row"
+                ref={(el) => { sectionRefs.current[idx] = el; }}
+                onScroll={() => handleScroll(idx)}
+              >
+                {sec.items.map((product) => (
+                  <V4ProductCard
+                    key={product._id || product.id}
+                    product={product}
+                    userInfo={userInfo}
+                    categoryTag={sec.label}
+                    onAddCart={handleAddToCart}
+                  />
+                ))}
+              </div>
+            </div>
+            {bannerAfter && (
+              <div className="sec-wrap">
+                <PromoBannerBlock banner={bannerAfter} />
+              </div>
+            )}
+          </div>
+        );
+      })}
+      {MEAL_SECTIONS.map((sec, idx) => {
+        const i = SECTIONS.length + idx;
+        if (!sec.items?.length) return null;
+        const state = scrollState[i] ?? { canPrev: false, canNext: true };
+        const bannerAfter = promoBanners[i % promoBanners.length];
+        return (
+          <div key={`meal-${sec.key}`}>
+            <div className="sec-wrap">
+              <SectionHeader
+                icon={sec.icon}
+                label={sec.label}
+                color={sec.color}
+                seeAllToSubscription
+                onPrev={() => scrollRow(i, -1)}
+                onNext={() => scrollRow(i, 1)}
+                canPrev={state.canPrev}
+                canNext={state.canNext}
+              />
+              <div
+                className="prod-row"
+                ref={(el) => { sectionRefs.current[i] = el; }}
+                onScroll={() => handleScroll(i)}
+              >
+                {sec.items.map((item) => (
+                  <HomeMealCard key={item.id} item={item} />
+                ))}
+              </div>
+            </div>
+            {bannerAfter && (
+              <div className="sec-wrap">
+                <PromoBannerBlock banner={bannerAfter} />
+              </div>
+            )}
+          </div>
+        );
+      })}
+      <div className="pg-spacer" />
 
       {modal && (
         <div className="m-overlay" onClick={(e) => { if (e.target === e.currentTarget) setModal(null); }} role="dialog" aria-modal="true">
@@ -521,15 +702,17 @@ export default function Home() {
               {(modal.imageUrl || modal.bannerImageUrl || modal.image) && (
                 <img
                   className="m-banner-img"
-                  src={getImageUrl(modal.imageUrl || modal.bannerImageUrl || modal.image)}
+                  src={getOptimizedImageUrl(getImageUrl(modal.imageUrl || modal.bannerImageUrl || modal.image)) ?? getImageUrl(modal.imageUrl || modal.bannerImageUrl || modal.image)}
                   alt={modal.menuName || modal.name || ""}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => { e.target.style.display = "none"; }}
                 />
               )}
               <div className="m-banner-shade" />
               <div className="m-banner-info">
                 {!(modal.imageUrl || modal.bannerImageUrl || modal.image) && (
-                  <img className="m-flag" src={modal.flag || `https://flagcdn.com/w160/${(modal.code || "").toLowerCase()}.png`} alt="" onError={(e) => { e.target.style.display = "none"; }} />
+                  <img className="m-flag" src={getOptimizedImageUrl(modal.flag || `https://flagcdn.com/w160/${(modal.code || "").toLowerCase()}.png`) || modal.flag || `https://flagcdn.com/w160/${(modal.code || "").toLowerCase()}.png`} alt="" loading="lazy" decoding="async" onError={(e) => { e.target.style.display = "none"; }} />
                 )}
                 <div className="m-title-block">
                   <div className="m-country-name">{modal.menuName || `${modal.name} Menu`}</div>

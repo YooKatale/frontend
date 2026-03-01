@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "@slices/authSlice";
 import { useOrdersMutation } from "@slices/productsApiSlice";
 import { useUpdateUserAvatarMutation } from "@slices/usersApiSlice";
-import { getUserAvatarUrl } from "@constants/constants";
+import { getUserAvatarUrl, getOptimizedImageUrl } from "@constants/constants";
 import UpdateAccount from "@components/modals/UpdateAccount";
 import ChangePassword from "@components/modals/ChangePassword";
 import OrdersTab from "@components/modals/tabs/settingsTabs/OrdersTab";
@@ -402,7 +402,7 @@ export default function AccountPage() {
                     <Avatar
                       name={displayName}
                       size={70}
-                      src={getUserAvatarUrl(userInfo)}
+                      src={getOptimizedImageUrl(getUserAvatarUrl(userInfo)) ?? getUserAvatarUrl(userInfo)}
                     />
                   </div>
                 </div>
@@ -493,7 +493,7 @@ export default function AccountPage() {
                     <div className="acc-av-sec">
                       <div className="acc-av-ring" style={{ background: "linear-gradient(135deg,#f0c020,#4cd964)" }}>
                         <div className="acc-av-inner">
-                          <Avatar name={displayName} size={66} src={getUserAvatarUrl(userInfo)} />
+                          <Avatar name={displayName} size={66} src={getOptimizedImageUrl(getUserAvatarUrl(userInfo)) ?? getUserAvatarUrl(userInfo)} />
                         </div>
                       </div>
                       <div>

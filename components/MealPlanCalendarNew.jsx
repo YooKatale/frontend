@@ -13,6 +13,8 @@ import {
   useMealSlotsPublicGetMutation,
 } from "@slices/usersApiSlice";
 import { useAuth } from "@slices/authSlice";
+import { useAuthModal } from "@components/AuthModalContext";
+import { getOptimizedImageUrl } from "@constants/constants";
 
 /* ─── SVG ICON SYSTEM ─────────────────────────────────────────────────────── */
 const Ico = ({ d, s = 16, sw = 1.8, fill = "none", stroke = "currentColor", vb = "0 0 24 24", children }) => (
@@ -85,7 +87,7 @@ function MealCard({ item, mode, onAdd, isSelected }) {
     >
       <div style={{ position: "relative", height: 180, overflow: "hidden", background: col.light, flexShrink: 0 }}>
         {item.img ? (
-          <img src={item.img} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          <img src={getOptimizedImageUrl(item.img) ?? item.img} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
         ) : (
           <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
             <div style={{ width: 52, height: 52, borderRadius: 14, background: `${col.accent}18`, display: "flex", alignItems: "center", justifyContent: "center", color: col.accent }}>
@@ -238,6 +240,7 @@ export default function MealPlanCalendarNew({ planType = "premium", subscription
   const toast = useToast();
   const router = useRouter();
   const { userInfo } = useAuth();
+  const { openAuthModal } = useAuthModal();
   const [createSchedule] = useNewScheduleMutation();
   const [createPlanRating] = usePlanRatingCreateMutation();
   const [fetchOverrides] = useMealCalendarOverridesGetMutation();
@@ -388,7 +391,7 @@ export default function MealPlanCalendarNew({ planType = "premium", subscription
     if (planRating < 1) return;
     if (!userInfo?._id) {
       toast({ title: "Login required to rate", status: "warning", duration: 3000, isClosable: true });
-      router.push("/signin");
+      openAuthModal();
       return;
     }
     try {
@@ -411,7 +414,7 @@ export default function MealPlanCalendarNew({ planType = "premium", subscription
   const handleViewCart = () => {
     if (!userInfo?._id) {
       toast({ title: "Please sign in to continue", status: "info", duration: 3000, isClosable: true });
-      router.push("/signin");
+      openAuthModal();
       return;
     }
     if (selectedMeals.length === 0) {
@@ -423,7 +426,7 @@ export default function MealPlanCalendarNew({ planType = "premium", subscription
 
   const handleSubscribe = async () => {
     if (!userInfo?._id) {
-      router.push("/signin");
+      openAuthModal();
       return;
     }
     if (selectedMeals.length === 0) return;
@@ -546,7 +549,7 @@ export default function MealPlanCalendarNew({ planType = "premium", subscription
                 ))}
                 <span className="rate-label">Rate this plan</span>
               </div>
-              {totalRatings > 0 && <span className="rate-label">({Number(avgRating).toFixed(1)} · {totalRatings})</span>}
+              {totalRatings > 0 && <span className="rate-label">({Number(avgRating).toFixed(1)} · {totalRatings} reviews)</span>}
               <button
                 type="button"
                 style={{ marginLeft: 8, padding: "4px 10px", borderRadius: 100, border: "1px solid #1a5c1a", background: "#1a5c1a", color: "#fff", fontSize: 11, fontWeight: 800 }}

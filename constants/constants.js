@@ -41,6 +41,28 @@ export function getImageUrl(url) {
   return getAvatarUrl(url);
 }
 
+/**
+ * Returns a URL that serves the image as WebP via /api/image (smaller size, faster load).
+ * Use for any image (backend, /assets, or external allowed origin) to save data.
+ * - data: URLs are returned as-is (no proxy).
+ * - /assets/... paths are passed as path for same-origin read.
+ * - Other relative paths (e.g. /images/uploads/...) are resolved with getImageUrl then proxied.
+ * - /_next/... (Next.js static) are not proxied (returns undefined).
+ */
+export function getOptimizedImageUrl(url) {
+  if (!url || typeof url !== "string") return undefined;
+  const s = url.trim();
+  if (!s) return undefined;
+  if (s.startsWith("data:")) return s;
+  if (s.startsWith("/_next")) return undefined;
+  const resolved =
+    s.startsWith("http") ? s
+    : s.startsWith("/assets") ? s
+    : getAvatarUrl(s);
+  if (!resolved) return undefined;
+  return `/api/image?url=${encodeURIComponent(resolved)}`;
+}
+
 /** Client/vendor dashboard URL (e.g. seller app). Set NEXT_PUBLIC_CLIENT_DASHBOARD_URL in env or defaults to /sell. */
 export const CLIENT_DASHBOARD_URL =
   (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_CLIENT_DASHBOARD_URL) || "/sell";

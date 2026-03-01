@@ -6,6 +6,19 @@
 // const bundleAnalyzer = withBundleAnalyzer({ enabled: true });
 
 const nextConfig = {
+  // Prevent browser from using stale HTML/chunks (fixes 404s for layout.css, main-app.js, etc.)
+  async headers() {
+    return process.env.NODE_ENV === "development"
+      ? [
+          {
+            source: "/:path*",
+            headers: [
+              { key: "Cache-Control", value: "no-store, no-cache, must-revalidate" },
+            ],
+          },
+        ]
+      : [];
+  },
   images: {
     // Allow images from these remote domains
     remotePatterns: [

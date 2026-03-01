@@ -1,52 +1,17 @@
 "use client";
 
 /**
- * Cashout & Rewards — Cash earned, invites, loyalty, rewards, gift cards,
- * invite feature, games, payment methods (mobile money & card) saved to backend.
- * UI: Jumia/Glovo-style, ThemeColors, animations.
+ * Cashout & Rewards — UI: lucide + floating labels, animations.
+ * Backend: stats, payout methods, withdraw, withdrawals (unchanged).
  */
 
-import {
-  Badge,
-  Box,
-  Button,
-  Card,
-  CardBody,
-  Container,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormHelperText,
-  FormLabel,
-  Heading,
-  HStack,
-  Icon,
-  IconButton,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
-  SimpleGrid,
-  Skeleton,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  useDisclosure,
-  useToast,
-  VStack,
-} from "@chakra-ui/react";
-import { ThemeColors } from "@constants/constants";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useToast, useDisclosure } from "@chakra-ui/react";
+import { useAuth } from "@slices/authSlice";
 import ReferralModal from "@components/ReferralModal";
+import PaymentProviderLogo from "@components/PaymentProviderLogo";
 import {
   useGetCashoutStatsMutation,
   useGetPayoutMethodsMutation,
@@ -56,58 +21,84 @@ import {
   useWithdrawFundsMutation,
   useGetWithdrawalsMutation,
 } from "@slices/usersApiSlice";
-import { useAuth } from "@slices/authSlice";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
 import {
-  FaWallet,
-  FaUsers,
-  FaStar,
-  FaGift,
-  FaShareAlt,
-  FaGamepad,
-  FaMobileAlt,
-  FaCreditCard,
-  FaCoins,
-  FaTicketAlt,
-  FaTrash,
-  FaCheck,
-  FaLock,
-  FaArrowDown,
-} from "react-icons/fa";
-import { RiSecurePaymentLine } from "react-icons/ri";
-import { SiVisa, SiMastercard } from "react-icons/si";
-import PaymentProviderLogo from "@components/PaymentProviderLogo";
-import { PaymentLogos } from "@constants/constants";
+  StatCard,
+  SCard,
+  SHead,
+  PBtn,
+  GBtn,
+  FInput,
+  FSelect,
+  TxBadge,
+  WithdrawModal,
+  CashoutGlobalStyles,
+  Wallet,
+  ArrowDownToLine,
+  Users,
+  BadgePercent,
+  Gift,
+  CreditCard,
+  Share2,
+  Gamepad2,
+  Sparkles,
+  Zap,
+  Landmark,
+  Shield,
+  Smartphone,
+  Info,
+  CheckCircle2,
+  Plus,
+  Lock,
+  Trash2,
+  ArrowRight,
+  CalendarClock,
+  Eye,
+  EyeOff,
+  TrendingUp,
+  Copy,
+  Check,
+  CircleDollarSign,
+} from "./CashoutUI";
+
+async function generateReferralCode(userId) {
+  if (typeof crypto !== "undefined" && crypto.subtle) {
+    const enc = new TextEncoder().encode(userId);
+    const hash = await crypto.subtle.digest("SHA-256", enc);
+    const hex = Array.from(new Uint8Array(hash)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    return hex.substring(0, 8);
+  }
+  let h = 0;
+  const s = String(userId);
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h).toString(16).slice(0, 8);
+}
 
 export default function CashoutPage() {
   const { userInfo } = useAuth();
   const router = useRouter();
   const toast = useToast();
   const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = useDisclosure();
-  const { isOpen: isWithdrawOpen, onOpen: openWithdraw, onClose: closeWithdraw } = useDisclosure();
-  const { isOpen: isHistoryOpen, onOpen: openHistory, onClose: closeHistory } = useDisclosure();
 
-  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [showWithdraw, setShowWithdraw] = useState(false);
   const [selectedPayoutMethod, setSelectedPayoutMethod] = useState(null);
-  const [withdrawals, setWithdrawals] = useState([]);
-  const [loadingWithdrawals, setLoadingWithdrawals] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-
-  const [stats, setStats] = useState({ cash: 0, invites: 0, loyalty: 0 });
-  const [payoutMethods, setPayoutMethods] = useState([]);
-  const [loadingStats, setLoadingStats] = useState(true);
-  const [loadingMethods, setLoadingMethods] = useState(true);
-
-  const [mmProvider, setMmProvider] = useState("");
-  const [mmPhone, setMmPhone] = useState("");
-  const [mmError, setMmError] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [balVis, setBalVis] = useState(true);
+  const [referralUrl, setReferralUrl] = useState("");
+  const [payTab, setPayTab] = useState("momo");
+  const [provider, setProvider] = useState("");
+  const [phone, setPhone] = useState("");
   const [cardLast4, setCardLast4] = useState("");
   const [cardBrand, setCardBrand] = useState("");
   const [cardName, setCardName] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
-  const [cardError, setCardError] = useState("");
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  const [stats, setStats] = useState({ cash: 0, invites: 0, loyalty: 0 });
+  const [payoutMethods, setPayoutMethods] = useState([]);
+  const [withdrawals, setWithdrawals] = useState([]);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [loadingMethods, setLoadingMethods] = useState(true);
+  const [loadingWithdrawals, setLoadingWithdrawals] = useState(false);
 
   const [getCashoutStats] = useGetCashoutStatsMutation();
   const [getPayoutMethods] = useGetPayoutMethodsMutation();
@@ -117,18 +108,10 @@ export default function CashoutPage() {
   const [withdrawFunds, { isLoading: withdrawing }] = useWithdrawFundsMutation();
   const [getWithdrawals] = useGetWithdrawalsMutation();
 
-  // Safe theme color access with fallbacks - simple constants to avoid initialization issues
-  const primaryColor = ThemeColors?.primaryColor || "#185f2d";
-  const secondaryColor = ThemeColors?.secondaryColor || "#2d8659";
-  const themeBg = `${primaryColor}12`;
-  
-  // Stat cards array
-  const statCards = [
-    { key: "cash", label: "Cash Earned", sub: "Available to withdraw", icon: FaCoins, gradient: "linear(to-br, green.400, green.700)" },
-    { key: "invites", label: "Total Invites", sub: "Friends referred", icon: FaUsers, gradient: "linear(to-br, blue.400, blue.700)" },
-    { key: "loyalty", label: "Loyalty Points", sub: "Points to redeem", icon: FaStar, gradient: "linear(to-br, yellow.400, orange.500)" },
-  ];
-  
+  useEffect(() => {
+    if (!userInfo?._id) return;
+    generateReferralCode(userInfo._id).then((code) => setReferralUrl(`https://yookatale.app/signup?ref=${code}`));
+  }, [userInfo?._id]);
 
   const loadStats = useCallback(async () => {
     try {
@@ -182,35 +165,40 @@ export default function CashoutPage() {
   }, [userInfo, router, loadStats, loadMethods, loadWithdrawals]);
 
   const handleSaveMobileMoney = async () => {
-    setMmError("");
-    const provider = mmProvider?.toUpperCase();
-    const phone = (mmPhone || "").trim();
-    if (!provider || !["MTN", "AIRTEL"].includes(provider)) {
-      setMmError("Select MTN or Airtel");
+    const prov = (provider || "").toUpperCase();
+    const ph = (phone || "").trim().replace(/^0/, "").replace(/^256/, "");
+    if (!prov || !["MTN", "AIRTEL"].includes(prov)) {
+      toast({ title: "Select MTN or Airtel", status: "warning", duration: 3000, isClosable: true });
       return;
     }
-    if (!phone || phone.length < 9) {
-      setMmError("Enter a valid phone (e.g. 0712345678 or 256712345678)");
+    if (!ph || ph.length < 9) {
+      toast({ title: "Enter a valid phone (e.g. 0712345678 or 256712345678)", status: "warning", duration: 4000, isClosable: true });
       return;
     }
     try {
-      await addPayoutMethod({ type: "mobile_money", provider, phone }).unwrap();
+      await addPayoutMethod({ type: "mobile_money", provider: prov, phone: ph.length === 9 ? `256${ph}` : ph }).unwrap();
       toast({ title: "Saved", description: "Mobile money added for payouts.", status: "success", duration: 4000, isClosable: true });
-      setMmProvider("");
-      setMmPhone("");
+      setProvider("");
+      setPhone("");
       loadMethods();
     } catch (e) {
-      const errMsg = e?.data?.message || e?.message || "Failed to save. Use 0XXXXXXXX or 256XXXXXXXX.";
-      setMmError(errMsg);
+      const errMsg = e?.data?.message || e?.message || "Failed to save.";
       toast({ title: "Error", description: errMsg, status: "error", duration: 5000, isClosable: true });
     }
   };
 
+  const handleCopy = () => {
+    if (referralUrl) {
+      navigator.clipboard.writeText(referralUrl).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2400); });
+    } else {
+      openReferral();
+    }
+  };
+
   const handleSaveCard = async () => {
-    setCardError("");
     const last4 = (cardLast4 || "").replace(/\D/g, "").slice(-4);
     if (last4.length !== 4) {
-      setCardError("Enter the last 4 digits of your card");
+      toast({ title: "Enter the last 4 digits of your card", status: "warning", duration: 3000, isClosable: true });
       return;
     }
     let expiryMonth = "";
@@ -237,7 +225,6 @@ export default function CashoutPage() {
       loadMethods();
     } catch (e) {
       const errMsg = e?.data?.message || e?.message || "Failed to save card.";
-      setCardError(errMsg);
       toast({ title: "Error", description: errMsg, status: "error", duration: 5000, isClosable: true });
     }
   };
@@ -264,30 +251,24 @@ export default function CashoutPage() {
 
   const handleWithdraw = () => {
     const defaultMethod = payoutMethods.find((m) => m.isDefault && m.type === "mobile_money");
-    if (!defaultMethod && payoutMethods.length > 0) {
-      const firstMobile = payoutMethods.find((m) => m.type === "mobile_money");
-      if (firstMobile) {
-        setSelectedPayoutMethod(firstMobile);
-      } else {
-        toast({ title: "No Mobile Money", description: "Add a mobile money payout method first.", status: "warning", duration: 4000, isClosable: true });
-        return;
-      }
-    } else if (!defaultMethod) {
-      toast({ title: "No Payout Method", description: "Add a mobile money payout method to withdraw.", status: "warning", duration: 4000, isClosable: true });
-      return;
-    } else {
+    const firstMobile = payoutMethods.find((m) => m.type === "mobile_money");
+    if (defaultMethod) {
       setSelectedPayoutMethod(defaultMethod);
+      setShowWithdraw(true);
+    } else if (firstMobile) {
+      setSelectedPayoutMethod(firstMobile);
+      setShowWithdraw(true);
+    } else {
+      toast({ title: "No Mobile Money", description: "Add a mobile money payout method first.", status: "warning", duration: 4000, isClosable: true });
     }
-    setWithdrawAmount("");
-    openWithdraw();
   };
 
-  const confirmWithdraw = async () => {
+  const confirmWithdraw = async (amountFromModal) => {
+    const amt = Number(amountFromModal);
     if (!selectedPayoutMethod) {
       toast({ title: "Error", description: "Select a payout method.", status: "error", duration: 4000, isClosable: true });
       return;
     }
-    const amt = Number(withdrawAmount);
     if (!Number.isFinite(amt) || amt < 1000) {
       toast({ title: "Invalid Amount", description: "Minimum withdrawal is UGX 1,000.", status: "error", duration: 4000, isClosable: true });
       return;
@@ -299,8 +280,7 @@ export default function CashoutPage() {
     try {
       const res = await withdrawFunds({ amount: amt, payoutMethodId: selectedPayoutMethod._id }).unwrap();
       toast({ title: "Withdrawal Initiated", description: res?.message || `UGX ${amt.toLocaleString()} withdrawal processing...`, status: "success", duration: 5000, isClosable: true });
-      closeWithdraw();
-      setWithdrawAmount("");
+      setShowWithdraw(false);
       setSelectedPayoutMethod(null);
       loadStats();
       loadWithdrawals();
@@ -309,531 +289,225 @@ export default function CashoutPage() {
     }
   };
 
-  const getPaymentIcon = (method) => {
-    if (!method || !method.type) return FaCreditCard;
-    if (method.type === "mobile_money") {
-      // MTN and Airtel icons don't exist in react-icons, using FaMobileAlt with custom styling
-      return FaMobileAlt;
-    }
-    if (method.type === "card") {
-      if (method.brand === "Visa") return SiVisa;
-      if (method.brand === "Mastercard") return SiMastercard;
-      return FaCreditCard;
-    }
-    return FaCreditCard;
-  };
+  const defaultMethod = payoutMethods.find((m) => m.isDefault && m.type === "mobile_money") || payoutMethods.find((m) => m.type === "mobile_money");
+  const defaultMethodDisplay = defaultMethod
+    ? defaultMethod.type === "mobile_money"
+      ? `Sending to default ${defaultMethod.provider} •••${String(defaultMethod.phone || "").slice(-4)}`
+      : `Sending to default Card •••• ${defaultMethod.last4}`
+    : null;
 
 
-  // Show loading state while checking authentication
-  if (isCheckingAuth || !userInfo || typeof userInfo !== "object" || Object.keys(userInfo).length === 0) {
+  const fmt = (n) => "UGX " + Number(n).toLocaleString();
+
+  if (isCheckingAuth || !userInfo?._id) {
     return (
-      <Box minH="100vh" bg="gray.50" display="flex" alignItems="center" justifyContent="center">
-        <VStack spacing={4}>
-          <Skeleton h="40px" w="200px" />
-          <Skeleton h="20px" w="150px" />
-        </VStack>
-      </Box>
+      <div style={{ minHeight: "100vh", background: "#f2f6f2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: 200, height: 40, background: "#e0e8e0", borderRadius: 12 }} />
+      </div>
     );
   }
 
   return (
-      <Box minH="100vh" bg="gray.50" fontFamily="body" pb={16}>
-        <ReferralModal isOpen={isReferralOpen} onClose={closeReferral} />
+    <>
+      <CashoutGlobalStyles />
+      <ReferralModal isOpen={isReferralOpen} onClose={closeReferral} />
+      {showWithdraw && (
+        <WithdrawModal
+          onClose={() => { setShowWithdraw(false); setSelectedPayoutMethod(null); }}
+          balance={stats.cash || 0}
+          defaultMethodDisplay={defaultMethodDisplay}
+          onConfirm={confirmWithdraw}
+          loading={withdrawing}
+        />
+      )}
 
-      {/* Hero */}
-      <Box
-        bgGradient={`linear(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`}
-        color="white"
-        py={{ base: 8, md: 10 }}
-        position="relative"
-        overflow="hidden"
-      >
-        <Box position="absolute" inset={0} bgImage="radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%)" pointerEvents="none" />
-        <Container maxW="container.xl" position="relative">
-          <Box>
-            <HStack spacing={3} mb={2}>
-              <Icon as={FaWallet} boxSize={8} />
-              <Heading size="xl" letterSpacing="tight" fontWeight="800">Cashout & Rewards</Heading>
-            </HStack>
-            <Text fontSize="lg" opacity={0.95}>Manage earnings, invites, loyalty points, and where to receive payouts.</Text>
-          </Box>
-        </Container>
-      </Box>
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 16px 80px" }}>
+        {/* Hero */}
+        <div style={{ animation: "fadeUp .4s ease both" }}>
+          <div style={{ background: "linear-gradient(135deg,#0a1f0a 0%,#1a5c1a 50%,#2d8c2d 100%)", borderRadius: "0 0 28px 28px", padding: "30px 26px 34px", position: "relative", overflow: "hidden", marginBottom: 22 }}>
+            <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+            <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Wallet size={20} strokeWidth={1.8} color="#fff" />
+                  </div>
+                  <h1 style={{ fontFamily: "'DM Serif Display',serif", fontSize: 26, color: "#fff", fontStyle: "italic" }}>Cashout &amp; Rewards</h1>
+                </div>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,.6)", fontWeight: 600 }}>Manage earnings, invites, loyalty points &amp; payouts</p>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ background: "rgba(255,255,255,.1)", borderRadius: 10, padding: "8px 14px", display: "flex", alignItems: "center", gap: 6 }}>
+                  <TrendingUp size={14} strokeWidth={2} color="rgba(255,255,255,.8)" />
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,.8)", fontWeight: 700 }}>Earning active</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <Container maxW="container.xl" px={{ base: 4, md: 6 }} py={8}>
-        <Box>
-          {/* Stats */}
-          <SimpleGrid columns={{ base: 1, sm: 3 }} spacing={5} mb={10}>
-            {statCards.map((s) => (
-              <Card key={s.key} bg="white" borderRadius="xl" overflow="hidden" boxShadow="md" borderWidth="1px" borderColor="gray.100" _hover={{ boxShadow: "xl", transform: "translateY(-4px)" }} transition="all 0.3s">
-                <CardBody>
-                  <Flex align="flex-start" justify="space-between">
-                    <VStack align="start" spacing={1}>
-                      <Text fontSize="sm" color="gray.500" fontWeight="600">{s.label}</Text>
-                      {loadingStats ? (
-                        <Skeleton h="28px" w="80px" />
-                      ) : (
-                        <Heading size="lg" bgGradient={s.gradient} bgClip="text" fontWeight="800">
-                          {s.key === "cash" && `UGX ${(stats.cash || 0).toLocaleString()}`}
-                          {s.key === "invites" && String(stats.invites || 0)}
-                          {s.key === "loyalty" && String(stats.loyalty || 0)}
-                        </Heading>
-                      )}
-                      <HStack spacing={2}>
-                        <Text fontSize="xs" color="gray.500">{s.sub}</Text>
-                        {s.key === "cash" && (stats.cash || 0) > 0 && (
-                          <Button
-                            size="xs"
-                            leftIcon={<FaArrowDown />}
-                            colorScheme="green"
-                            bg={primaryColor}
-                            _hover={{ bg: secondaryColor }}
-                            onClick={handleWithdraw}
-                            variant="solid"
-                          >
-                            Withdraw
-                          </Button>
-                        )}
-                      </HStack>
-                    </VStack>
-                    <Box p={3} borderRadius="xl" bgGradient={s.gradient} color="white">
-                      <Icon as={s.icon} boxSize={6} />
-                    </Box>
-                  </Flex>
-                </CardBody>
-              </Card>
-            ))}
-          </SimpleGrid>
+        {/* Stat cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 14, marginBottom: 18 }}>
+          <StatCard
+            label="Cash Earned"
+            delay={0}
+            Icon={CircleDollarSign}
+            value={
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {loadingStats ? "—" : balVis ? fmt(stats.cash || 0) : "UGX •••••"}
+                <button type="button" onClick={() => setBalVis((v) => !v)} style={{ background: "none", border: "none", cursor: "pointer", color: "#1a5c1a", padding: 0, marginTop: 2 }}>
+                  {balVis ? <EyeOff size={16} strokeWidth={2} /> : <Eye size={16} strokeWidth={2} />}
+                </button>
+              </span>
+            }
+            sub="Available to withdraw"
+            accent="#1a5c1a"
+            gradient="linear-gradient(135deg,#1a5c1a,#2d8c2d)"
+            cta={<PBtn Icon={ArrowDownToLine} small onClick={handleWithdraw}>Withdraw</PBtn>}
+          />
+          <StatCard label="Total Invites" delay={80} Icon={Users} value={loadingStats ? "—" : String(stats.invites || 0)} sub="Friends referred" accent="#0284c7" gradient="linear-gradient(135deg,#075985,#0284c7)" />
+          <StatCard label="Loyalty Points" delay={160} Icon={BadgePercent} value={loadingStats ? "—" : String(stats.loyalty || 0)} sub="Points to redeem" accent="#c2620a" gradient="linear-gradient(135deg,#9a3412,#ea580c)" />
+        </div>
 
-          <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={6} mb={8}>
-            <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
-              <CardBody>
-                <HStack mb={4}>
-                  <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={FaGift} color={primaryColor} boxSize={5} /></Box>
-                  <Heading size="md" color="gray.800">Rewards</Heading>
-                </HStack>
-                <Text color="gray.600" fontSize="sm" mb={4}>Redeem loyalty points for discounts, free delivery, or exclusive offers.</Text>
-                <Link href="/rewards">
-                  <Button size="sm" colorScheme="green" bg={primaryColor} _hover={{ bg: secondaryColor }} leftIcon={<FaGift />} w="full">View Rewards</Button>
-                </Link>
-              </CardBody>
-            </Card>
-            <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
-              <CardBody>
-                <HStack mb={4}>
-                  <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={FaTicketAlt} color={primaryColor} boxSize={5} /></Box>
-                  <Heading size="md" color="gray.800">Gift Cards</Heading>
-                </HStack>
-                <Text color="gray.600" fontSize="sm" mb={4}>Use or purchase gift cards for yourself or to send to friends.</Text>
-                <Link href="/gift-cards">
-                  <Button size="sm" variant="outline" colorScheme="green" borderColor={primaryColor} leftIcon={<FaTicketAlt />} w="full">My Gift Cards</Button>
-                </Link>
-              </CardBody>
-            </Card>
-          </SimpleGrid>
+        {/* Rewards + Gift cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(270px,1fr))", gap: 14, marginBottom: 14 }}>
+          <SCard delay={220}>
+            <SHead Icon={Gift} title="Rewards" />
+            <div style={{ padding: "18px 22px 22px" }}>
+              <p style={{ fontSize: 13, color: "#5a7a5a", fontWeight: 600, lineHeight: 1.7, marginBottom: 16 }}>Redeem loyalty points for discounts, free delivery, or exclusive offers.</p>
+              <Link href="/rewards" style={{ display: "block" }}><PBtn Icon={Sparkles} full>View Rewards</PBtn></Link>
+            </div>
+          </SCard>
+          <SCard delay={280}>
+            <SHead Icon={CreditCard} title="Gift Cards" />
+            <div style={{ padding: "18px 22px 22px" }}>
+              <p style={{ fontSize: 13, color: "#5a7a5a", fontWeight: 600, lineHeight: 1.7, marginBottom: 16 }}>Use or purchase gift cards for yourself or to send to friends.</p>
+              <Link href="/gift-cards" style={{ display: "block" }}><GBtn Icon={CreditCard} onClick={() => {}}>My Gift Cards</GBtn></Link>
+            </div>
+          </SCard>
+        </div>
 
-          <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={6} mb={8}>
-            <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
-              <CardBody>
-                <HStack mb={4}>
-                  <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={FaShareAlt} color={primaryColor} boxSize={5} /></Box>
-                  <Heading size="md" color="gray.800">Invite a Friend</Heading>
-                </HStack>
-                <Text color="gray.600" fontSize="sm" mb={4}>Earn up to UGX 50,000 for every friend who signs up with your link.</Text>
-                <Button size="sm" colorScheme="green" bg={primaryColor} _hover={{ bg: secondaryColor }} leftIcon={<FaShareAlt />} onClick={openReferral}>Get Referral Link</Button>
-              </CardBody>
-            </Card>
-            <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
-              <CardBody>
-                <HStack mb={4}>
-                  <Box p={2} bg="gray.100" borderRadius="lg"><Icon as={FaGamepad} color="gray.500" boxSize={5} /></Box>
-                  <Heading size="md" color="gray.800">Games</Heading>
-                  <Badge ml={2} colorScheme="orange" borderRadius="full" fontSize="xs">Coming soon</Badge>
-                </HStack>
-                <Text color="gray.600" fontSize="sm">Play games to earn extra points and rewards.</Text>
-              </CardBody>
-            </Card>
-          </SimpleGrid>
+        {/* Invite + Games */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(270px,1fr))", gap: 14, marginBottom: 14 }}>
+          <SCard delay={340}>
+            <SHead Icon={Share2} title="Invite a Friend" />
+            <div style={{ padding: "18px 22px 22px", display: "flex", flexDirection: "column", gap: 16 }}>
+              <p style={{ fontSize: 13, color: "#5a7a5a", fontWeight: 600, lineHeight: 1.7 }}>Earn up to <strong style={{ color: "#1a5c1a" }}>UGX 50,000</strong> for every friend who signs up with your link.</p>
+              <div style={{ background: "#f0f7f0", borderRadius: 13, padding: "11px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, border: "1.5px solid #c6e4c6" }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#2d6a2d", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{referralUrl || "Get your link below"}</span>
+                <button type="button" onClick={handleCopy} style={{ display: "flex", alignItems: "center", gap: 5, flexShrink: 0, background: copied ? "#1a5c1a" : "#fff", color: copied ? "#fff" : "#1a5c1a", border: "1.5px solid #1a5c1a", borderRadius: 8, padding: "5px 11px", fontSize: 11, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>
+                  {copied ? <><Check size={11} strokeWidth={2.5} />Copied!</> : <><Copy size={11} strokeWidth={2.2} />Copy</>}
+                </button>
+              </div>
+              <PBtn Icon={Share2} full onClick={openReferral}>Get Referral Link</PBtn>
+            </div>
+          </SCard>
+          <SCard delay={400}>
+            <SHead Icon={Gamepad2} title="Games" badge="Coming Soon" />
+            <div style={{ padding: "18px 22px 22px" }}>
+              <div style={{ background: "linear-gradient(135deg,#f8f4ff,#ede9ff)", borderRadius: 16, padding: "28px 20px", textAlign: "center", border: "1.5px dashed #c4b5fd", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 52, height: 52, borderRadius: 16, background: "linear-gradient(135deg,#6d28d9,#7c3aed)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 18px rgba(109,40,217,.3)" }}><Gamepad2 size={26} strokeWidth={1.8} color="#fff" /></div>
+                <p style={{ fontSize: 13, color: "#5b21b6", fontWeight: 800 }}>Play to earn rewards</p>
+                <p style={{ fontSize: 11, color: "#8b5cf6", fontWeight: 600, marginTop: 3 }}>Launching soon — stay tuned!</p>
+                <span style={{ background: "#ede9fe", color: "#6d28d9", fontSize: 9, fontWeight: 900, padding: "4px 10px", borderRadius: 100, letterSpacing: 0.8, textTransform: "uppercase", display: "flex", alignItems: "center", gap: 4 }}><Zap size={9} strokeWidth={2.5} fill="#6d28d9" /> Coming Soon</span>
+              </div>
+            </div>
+          </SCard>
+        </div>
 
-          {/* Payment / Payout methods — Jumia/Glovo style */}
-          <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
-            <CardBody>
-              <HStack mb={2}>
-                <Box p={2} bg={themeBg} borderRadius="lg"><Icon as={RiSecurePaymentLine} color={primaryColor} boxSize={5} /></Box>
-                <Heading size="md" color="gray.800">Where to receive payouts</Heading>
-              </HStack>
-              <HStack spacing={4} mb={6} color="gray.500" fontSize="sm" flexWrap="wrap">
-                <HStack><Icon as={FaLock} /><Text>MTN & Airtel supported. Card for records.</Text></HStack>
-                <HStack spacing={2}>
-                  <Box as="img" src={PaymentLogos.mtn} alt="MTN Mobile Money" w="28px" h="28px" objectFit="contain" />
-                  <Box as="img" src={PaymentLogos.airtel} alt="Airtel Money" w="28px" h="28px" objectFit="contain" />
-                </HStack>
-              </HStack>
-
-              {/* Saved methods */}
-              {loadingMethods ? (
-                <Skeleton h="80px" borderRadius="md" mb={6} />
-              ) : payoutMethods.length > 0 ? (
-                <Box mb={6}>
-                  <Text fontWeight="600" mb={3} color="gray.700">Saved payout methods</Text>
-                  <VStack align="stretch" spacing={3}>
-                    {payoutMethods.map((m) => (
-                      <Flex
-                        key={m._id}
-                        p={4}
-                        borderRadius="lg"
-                        borderWidth="1px"
-                        borderColor={m.isDefault ? primaryColor : "gray.200"}
-                        bg={m.isDefault ? `${primaryColor}08` : "gray.50"}
-                        align="center"
-                        justify="space-between"
-                        flexWrap="wrap"
-                        gap={2}
-                      >
-                        <HStack spacing={3}>
-                          <Box
-                            p={2}
-                            borderRadius="lg"
-                            bg={`${primaryColor}10`}
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                          >
-                            {m.type === "mobile_money" && m.provider && ["MTN", "AIRTEL"].includes(m.provider) ? (
-                              <PaymentProviderLogo provider={m.provider} size={28} />
-                            ) : m.type === "mobile_money" ? (
-                              <Icon as={FaMobileAlt} boxSize={6} color={primaryColor} />
-                            ) : m.type === "card" ? (
-                              <Icon as={getPaymentIcon(m)} boxSize={6} color={primaryColor} />
-                            ) : (
-                              <Icon as={FaMobileAlt} boxSize={6} color={primaryColor} />
-                            )}
-                          </Box>
-                          <Box>
-                            {m.type === "mobile_money" && (
-                              <HStack>
-                                <Text fontWeight="600">{m.provider}</Text>
-                                <Text color="gray.500">•</Text>
-                                <Text fontWeight="500" fontSize="sm">***{String(m.phone || "").slice(-4)}</Text>
-                              </HStack>
-                            )}
-                            {m.type === "card" && (
-                              <HStack>
-                                <Text fontWeight="600">•••• {m.last4}</Text>
-                                {m.brand && (
-                                  <>
-                                    <Text color="gray.500">•</Text>
-                                    <Text fontWeight="500" fontSize="sm">{m.brand}</Text>
-                                  </>
-                                )}
-                              </HStack>
-                            )}
-                            {m.isDefault && <Badge size="sm" colorScheme="green" mt={1}>Default</Badge>}
-                          </Box>
-                        </HStack>
-                        <HStack>
-                          {!m.isDefault && (
-                            <Button size="sm" variant="ghost" leftIcon={<FaCheck />} onClick={() => handleSetDefault(m._id)} isLoading={settingDefault}>Set default</Button>
-                          )}
-                          <IconButton aria-label="Remove" icon={<FaTrash />} size="sm" variant="ghost" colorScheme="red" onClick={() => handleDelete(m._id)} isLoading={deleting} />
-                        </HStack>
-                      </Flex>
-                    ))}
-                  </VStack>
-                </Box>
-              ) : null}
-
-              <Tabs variant="soft-rounded" colorScheme="green">
-                <TabList flexWrap="wrap" gap={2} borderBottomWidth="1px" borderColor="gray.200" pb={4} mb={4}>
-                  <Tab fontWeight="600" _selected={{ color: "white", bg: primaryColor }}>
-                    <HStack><Icon as={FaMobileAlt} /><Text>Mobile Money</Text></HStack>
-                  </Tab>
-                  <Tab fontWeight="600" _selected={{ color: "white", bg: primaryColor }}>
-                    <HStack><Icon as={FaCreditCard} /><Text>Card (last 4)</Text></HStack>
-                  </Tab>
-                </TabList>
-                <TabPanels>
-                  <TabPanel px={0}>
-                    <VStack align="stretch" spacing={4} maxW="400px">
-                      <FormControl isInvalid={!!mmError}>
-                        <FormLabel fontWeight="600">Provider</FormLabel>
-                        <Select
-                          placeholder="Select provider"
-                          value={mmProvider}
-                          onChange={(e) => { setMmProvider(e.target.value); setMmError(""); }}
-                          borderColor="gray.300"
-                          _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
-                        >
-                          <option value="MTN">MTN Mobile Money</option>
-                          <option value="AIRTEL">Airtel Money</option>
-                        </Select>
-                        {mmProvider && (
-                          <HStack mt={2} spacing={2} p={2} bg="gray.50" borderRadius="md">
-                            {["MTN", "AIRTEL"].includes(mmProvider) ? (
-                              <PaymentProviderLogo provider={mmProvider} size={28} />
-                            ) : (
-                              <Icon as={FaMobileAlt} boxSize={6} color={primaryColor} />
-                            )}
-                            <Text fontSize="sm" fontWeight="500" color="gray.700">{mmProvider === "MTN" ? "MTN Mobile Money" : "Airtel Money"} selected</Text>
-                          </HStack>
-                        )}
-                        <FormHelperText>Uganda: MTN (076,077,078,031,039) or Airtel (070,075,074,020)</FormHelperText>
-                        <FormErrorMessage>{mmError}</FormErrorMessage>
-                      </FormControl>
-                      <FormControl isInvalid={!!mmError}>
-                        <FormLabel fontWeight="600">Phone</FormLabel>
-                        <InputGroup>
-                          <InputLeftElement pointerEvents="none" color="gray.400">+256</InputLeftElement>
-                          <Input
-                            pl="3.5rem"
-                            placeholder="712345678 or 0712345678"
-                            value={mmPhone}
-                            onChange={(e) => { setMmPhone(e.target.value); setMmError(""); }}
-                            borderColor="gray.300"
-                            _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
-                          />
-                        </InputGroup>
-                        <FormErrorMessage>{mmError}</FormErrorMessage>
-                      </FormControl>
-                      <Button
-                        leftIcon={<FaMobileAlt />}
-                        colorScheme="green"
-                        bg={primaryColor}
-                        _hover={{ bg: secondaryColor }}
-                        onClick={handleSaveMobileMoney}
-                        isLoading={adding}
-                      >
-                        Save Mobile Money
-                      </Button>
-                    </VStack>
-                  </TabPanel>
-                  <TabPanel px={0}>
-                    <VStack align="stretch" spacing={4} maxW="400px">
-                      <FormControl isInvalid={!!cardError}>
-                        <FormLabel fontWeight="600">Last 4 digits</FormLabel>
-                        <Input
-                          placeholder="1234"
-                          maxLength={4}
-                          value={cardLast4}
-                          onChange={(e) => { setCardLast4(e.target.value.replace(/\D/g, "").slice(0, 4)); setCardError(""); }}
-                          borderColor="gray.300"
-                          _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
-                        />
-                        <FormHelperText>For display and admin payouts. Full card is never stored.</FormHelperText>
-                        <FormErrorMessage>{cardError}</FormErrorMessage>
-                      </FormControl>
-                      <FormControl>
-                        <FormLabel fontWeight="600">Brand</FormLabel>
-                        <Select
-                          placeholder="Select card brand"
-                          value={cardBrand}
-                          onChange={(e) => setCardBrand(e.target.value)}
-                          borderColor="gray.300"
-                          _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
-                        >
-                          <option value="Visa">Visa</option>
-                          <option value="Mastercard">Mastercard</option>
-                        </Select>
-                      </FormControl>
-                      <FormControl>
-                        <FormLabel fontWeight="600">Name on card</FormLabel>
-                        <Input
-                          placeholder="John Doe"
-                          value={cardName}
-                          onChange={(e) => setCardName(e.target.value)}
-                          borderColor="gray.300"
-                          _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
-                        />
-                      </FormControl>
-                      <FormControl>
-                        <FormLabel fontWeight="600">Expiry (MM/YY)</FormLabel>
-                        <Input
-                          placeholder="12/28"
-                          value={cardExpiry}
-                          onChange={(e) => setCardExpiry(e.target.value)}
-                          borderColor="gray.300"
-                          _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
-                        />
-                      </FormControl>
-                      <Button
-                        leftIcon={<FaCreditCard />}
-                        colorScheme="green"
-                        bg={primaryColor}
-                        _hover={{ bg: secondaryColor }}
-                        onClick={handleSaveCard}
-                        isLoading={adding}
-                      >
-                        Save card (last 4)
-                      </Button>
-                    </VStack>
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            </CardBody>
-          </Card>
-
-          {/* Withdrawal History */}
-          <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden" mt={6}>
-            <CardBody>
-              <HStack mb={4} justify="space-between">
-                <HStack>
-                  <Box p={2} bg={themeBg} borderRadius="lg">
-                    <Icon as={FaArrowDown} color={primaryColor} boxSize={5} />
-                  </Box>
-                  <Heading size="md" color="gray.800">Withdrawal History</Heading>
-                </HStack>
-                <Button size="sm" variant="ghost" onClick={() => { loadWithdrawals(); openHistory(); }}>
-                  View All
-                </Button>
-              </HStack>
-              {loadingWithdrawals ? (
-                <Skeleton h="60px" borderRadius="md" />
-              ) : withdrawals.length > 0 ? (
-                <VStack align="stretch" spacing={2}>
-                  {withdrawals.slice(0, 3).map((w) => (
-                    <Flex key={w._id} p={3} borderRadius="md" bg="gray.50" justify="space-between" align="center">
-                      <VStack align="start" spacing={0}>
-                        <Text fontWeight="600" fontSize="sm">UGX {w.amount.toLocaleString()}</Text>
-                        <Text fontSize="xs" color="gray.500">{new Date(w.createdAt).toLocaleDateString()}</Text>
-                      </VStack>
-                      <Badge
-                        colorScheme={
-                          w.status === "completed" ? "green" : w.status === "failed" ? "red" : w.status === "processing" ? "blue" : "gray"
-                        }
-                      >
-                        {w.status}
-                      </Badge>
-                    </Flex>
-                  ))}
-                </VStack>
-              ) : (
-                <Text fontSize="sm" color="gray.500" textAlign="center" py={4}>No withdrawals yet</Text>
-              )}
-            </CardBody>
-          </Card>
-        </Box>
-      </Container>
-
-      {/* Withdrawal Modal */}
-      <Modal isOpen={isWithdrawOpen} onClose={closeWithdraw} size="md">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Withdraw Funds</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <VStack spacing={4}>
-              <Box w="full">
-                <Text fontSize="sm" color="gray.600" mb={2}>Available Balance</Text>
-                <Heading size="lg" color={primaryColor}>UGX {(stats.cash || 0).toLocaleString()}</Heading>
-              </Box>
-              {selectedPayoutMethod && (
-                <Box w="full" p={3} bg="gray.50" borderRadius="md">
-                  <Text fontSize="xs" color="gray.600" mb={1}>Withdrawing to:</Text>
-                  <HStack>
-                    {selectedPayoutMethod.type === "mobile_money" && selectedPayoutMethod.provider && ["MTN", "AIRTEL"].includes(selectedPayoutMethod.provider) ? (
-                      <PaymentProviderLogo provider={selectedPayoutMethod.provider} size={22} />
-                    ) : selectedPayoutMethod.type === "mobile_money" ? (
-                      <Icon as={FaMobileAlt} boxSize={5} color={primaryColor} />
-                    ) : selectedPayoutMethod.type === "card" ? (
-                      <Icon as={getPaymentIcon(selectedPayoutMethod)} boxSize={5} color={primaryColor} />
-                    ) : (
-                      <Icon as={FaMobileAlt} boxSize={5} color={primaryColor} />
-                    )}
-                    <Text fontWeight="600">
-                      {selectedPayoutMethod.type === "mobile_money" 
-                        ? `${selectedPayoutMethod.provider} • ***${String(selectedPayoutMethod.phone || "").slice(-4)}`
-                        : `•••• ${selectedPayoutMethod.last4} ${selectedPayoutMethod.brand || ""}`}
-                    </Text>
-                  </HStack>
-                </Box>
-              )}
-              <FormControl>
-                <FormLabel fontWeight="600">Amount (UGX)</FormLabel>
-                <Input
-                  type="number"
-                  min={1000}
-                  placeholder="Minimum: 1,000"
-                  value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(e.target.value)}
-                />
-                <FormHelperText>Minimum withdrawal: UGX 1,000</FormHelperText>
-              </FormControl>
-              {!selectedPayoutMethod && (
-                <Text fontSize="sm" color="red.500">Please add a mobile money payout method first.</Text>
-              )}
-            </VStack>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="ghost" onClick={closeWithdraw}>Cancel</Button>
-            <Button
-              colorScheme="green"
-              bg={primaryColor}
-              _hover={{ bg: secondaryColor }}
-              onClick={confirmWithdraw}
-              isLoading={withdrawing}
-              isDisabled={!selectedPayoutMethod || !withdrawAmount || Number(withdrawAmount) < 1000}
-              leftIcon={<FaArrowDown />}
-            >
-              Withdraw
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      {/* Withdrawal History Modal */}
-      <Modal isOpen={isHistoryOpen} onClose={closeHistory} size="lg">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Withdrawal History</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {loadingWithdrawals ? (
-              <Skeleton h="200px" />
-            ) : withdrawals.length > 0 ? (
-              <VStack align="stretch" spacing={3}>
-                {withdrawals.map((w) => (
-                  <Flex
-                    key={w._id}
-                    p={4}
-                    borderRadius="lg"
-                    borderWidth="1px"
-                    borderColor="gray.200"
-                    justify="space-between"
-                    align="center"
-                  >
-                    <VStack align="start" spacing={1}>
-                      <HStack>
-                        <Text fontWeight="700" fontSize="lg">UGX {w.amount.toLocaleString()}</Text>
-                        <Badge
-                          colorScheme={
-                            w.status === "completed" ? "green" : w.status === "failed" ? "red" : w.status === "processing" ? "blue" : "gray"
-                          }
-                        >
-                          {w.status}
-                        </Badge>
-                      </HStack>
-                      <Text fontSize="xs" color="gray.500">
-                        {w.payoutMethod?.type === "mobile_money" 
-                          ? `${w.payoutMethod?.provider} • ***${String(w.payoutMethod?.phone || "").slice(-4)}`
-                          : `Card • •••• ${w.payoutMethod?.last4}`}
-                      </Text>
-                      <Text fontSize="xs" color="gray.400">{new Date(w.createdAt).toLocaleString()}</Text>
-                      {w.failureReason && (
-                        <Text fontSize="xs" color="red.500">Error: {w.failureReason}</Text>
-                      )}
-                    </VStack>
-                  </Flex>
+        {/* Payout methods */}
+        <SCard delay={460} style={{ marginBottom: 14 }}>
+          <SHead Icon={Landmark} title="Where to receive payouts" />
+          <div style={{ padding: "18px 22px 24px", display: "flex", flexDirection: "column", gap: 18 }}>
+            <div style={{ background: "#f0f7f0", borderRadius: 12, padding: "11px 14px", display: "flex", alignItems: "center", gap: 9, border: "1px solid #c6e4c6" }}>
+              <Shield size={15} strokeWidth={2} color="#1a5c1a" style={{ flexShrink: 0 }} />
+              <p style={{ fontSize: 12, color: "#2d6a2d", fontWeight: 700 }}>MTN &amp; Airtel supported • Card accepted for records</p>
+            </div>
+            {loadingMethods ? <div style={{ height: 80, background: "#f0f5f0", borderRadius: 12 }} /> : payoutMethods.length > 0 && (
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 900, color: "#94a394", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Saved payout methods</p>
+                {payoutMethods.map((m) => (
+                  <div key={m._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderRadius: 15, border: "1.5px solid #1a5c1a", background: "#f8fcf8", marginBottom: 10 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{ width: 42, height: 42, borderRadius: 11, background: "#ffcc00", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#1a1a1a", flexShrink: 0 }}>
+                        {m.type === "mobile_money" && ["MTN", "AIRTEL"].includes(m.provider) ? <PaymentProviderLogo provider={m.provider} size={28} /> : "MTN"}
+                      </div>
+                      <div>
+                        <p style={{ fontSize: 14, fontWeight: 800, color: "#0e1e0e" }}>{m.type === "mobile_money" ? `${m.provider}  •••${String(m.phone || "").slice(-4)}` : `•••• ${m.last4}`}</p>
+                        {m.isDefault && <span style={{ background: "#dcfce7", color: "#16a34a", fontSize: 9, fontWeight: 900, padding: "2px 8px", borderRadius: 100, letterSpacing: 0.8, textTransform: "uppercase", display: "inline-flex", alignItems: "center", gap: 4, marginTop: 3 }}><CheckCircle2 size={9} strokeWidth={2.5} /> Default</span>}
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      {!m.isDefault && <button type="button" onClick={() => handleSetDefault(m._id)} disabled={settingDefault} style={{ padding: "6px 10px", fontSize: 11, fontWeight: 700, color: "#1a5c1a", background: "#fff", border: "1.5px solid #1a5c1a", borderRadius: 8, cursor: "pointer" }}>Set default</button>}
+                      <button type="button" onClick={() => handleDelete(m._id)} disabled={deleting} style={{ background: "#fef2f2", border: "none", borderRadius: 10, padding: "9px", cursor: "pointer", color: "#dc2626" }}><Trash2 size={16} strokeWidth={2} /></button>
+                    </div>
+                  </div>
                 ))}
-              </VStack>
-            ) : (
-              <Text textAlign="center" color="gray.500" py={8}>No withdrawal history</Text>
+              </div>
             )}
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={closeHistory}>Close</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      </Box>
-    );
+            <div style={{ display: "flex", gap: 6, padding: "5px", background: "#f0f5f0", borderRadius: 15 }}>
+              {[{ id: "momo", Icon: Smartphone, label: "Mobile Money" }, { id: "card", Icon: CreditCard, label: "Card (last 4)" }].map((t) => (
+                <button key={t.id} type="button" onClick={() => setPayTab(t.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "11px", borderRadius: 11, border: "none", background: payTab === t.id ? "#fff" : "transparent", color: payTab === t.id ? "#1a5c1a" : "#5a7a5a", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", boxShadow: payTab === t.id ? "0 2px 10px rgba(0,0,0,.08)" : "none" }}>
+                  <t.Icon size={15} strokeWidth={2} />{t.label}
+                </button>
+              ))}
+            </div>
+            {payTab === "momo" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, animation: "fadeUp .28s ease" }}>
+                <FSelect label="Select provider" value={provider} onChange={(e) => setProvider(e.target.value)} opts={[{ v: "MTN", l: "MTN Mobile Money" }, { v: "AIRTEL", l: "Airtel Money" }]} />
+                <div style={{ background: "#fffbeb", borderRadius: 11, padding: "10px 13px", display: "flex", alignItems: "flex-start", gap: 8, border: "1px solid #fde68a" }}>
+                  <Info size={14} strokeWidth={2} color="#d97706" style={{ flexShrink: 0, marginTop: 1 }} />
+                  <p style={{ fontSize: 11, color: "#92400e", fontWeight: 700, lineHeight: 1.5 }}>Uganda: MTN (076,077,078,031,039) or Airtel (070,075,074,020)</p>
+                </div>
+                <FInput label="Phone number" value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" LeftIcon={Smartphone} prefix="+256" />
+                <PBtn Icon={CheckCircle2} full onClick={handleSaveMobileMoney} loading={adding}>Save Mobile Money</PBtn>
+              </div>
+            )}
+            {payTab === "card" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 14, animation: "fadeUp .28s ease" }}>
+                <div style={{ background: "#f0f7f0", borderRadius: 12, padding: "11px 14px", display: "flex", alignItems: "flex-start", gap: 9, border: "1px solid #c6e4c6" }}>
+                  <Lock size={14} strokeWidth={2} color="#1a5c1a" style={{ flexShrink: 0, marginTop: 1 }} />
+                  <div>
+                    <p style={{ fontSize: 12, color: "#1a5c1a", fontWeight: 800, marginBottom: 2 }}>Last 4 digits only</p>
+                    <p style={{ fontSize: 11, color: "#2d6a2d", fontWeight: 600, lineHeight: 1.5 }}>For display and admin payouts. Full card is never stored.</p>
+                  </div>
+                </div>
+                <FInput label="Last 4 digits" value={cardLast4} onChange={(e) => setCardLast4(e.target.value.replace(/\D/g, "").slice(0, 4))} type="tel" LeftIcon={CreditCard} />
+                <div>
+                  <p style={{ fontSize: 10, fontWeight: 800, color: "#94a394", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Brand</p>
+                  <div style={{ display: "flex", gap: 10 }}>
+                    {[{ id: "Visa", label: "Visa" }, { id: "Mastercard", label: "Mastercard" }].map((b) => (
+                      <button key={b.id} type="button" onClick={() => setCardBrand(b.id)} style={{ flex: 1, padding: "14px", borderRadius: 14, border: `2px solid ${cardBrand === b.id ? "#1a5c1a" : "#dde8dd"}`, background: cardBrand === b.id ? "#f0f7f0" : "#fafcfa", cursor: "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: 800, color: cardBrand === b.id ? "#1a5c1a" : "#4a6a4a", boxShadow: cardBrand === b.id ? "0 0 0 3px rgba(26,92,26,.12)" : "none" }}>{b.label}</button>
+                    ))}
+                  </div>
+                </div>
+                <FInput label="Name on card" value={cardName} onChange={(e) => setCardName(e.target.value)} LeftIcon={CreditCard} />
+                <FInput label="Expiry (MM/YY)" value={cardExpiry} onChange={(e) => { let v = e.target.value.replace(/\D/g, "").slice(0, 4); if (v.length >= 3) v = v.slice(0, 2) + "/" + v.slice(2); setCardExpiry(v); }} type="tel" LeftIcon={CalendarClock} />
+                <PBtn Icon={Plus} full gradient="linear-gradient(135deg,#075985,#0284c7)" accent="#0284c7" onClick={handleSaveCard} loading={adding}>Save Card</PBtn>
+              </div>
+            )}
+          </div>
+        </SCard>
+
+        {/* Withdrawal history */}
+        <SCard delay={540}>
+          <SHead Icon={CalendarClock} title="Withdrawal History" action={<button type="button" style={{ background: "none", border: "none", fontSize: 13, fontWeight: 800, color: "#1a5c1a", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }} onClick={() => loadWithdrawals()}>View All <ArrowRight size={13} strokeWidth={2.5} /></button>} />
+          <div style={{ padding: "6px 0 10px" }}>
+            {loadingWithdrawals ? <div style={{ height: 120, background: "#f0f5f0", borderRadius: 12, margin: "0 22px" }} /> : withdrawals.length > 0 ? withdrawals.slice(0, 5).map((t, i) => (
+              <div key={t._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "15px 22px", borderBottom: i < Math.min(5, withdrawals.length) - 1 ? "1px solid #f0f5f0" : "none", animation: `fadeUp .4s ${i * 60}ms ease both` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 13, background: "#fef2f2", display: "flex", alignItems: "center", justifyContent: "center", color: "#dc2626", flexShrink: 0 }}><ArrowDownToLine size={18} strokeWidth={1.9} /></div>
+                  <div>
+                    <p style={{ fontSize: 15, fontWeight: 900, color: "#0e1e0e" }}>{fmt(t.amount)}</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 3 }}><CalendarClock size={11} strokeWidth={2} color="#94a394" /><span style={{ fontSize: 11, color: "#94a394", fontWeight: 600 }}>{new Date(t.createdAt).toLocaleDateString()}</span></div>
+                  </div>
+                </div>
+                <TxBadge status={t.status} />
+              </div>
+            )) : <p style={{ padding: "20px 22px", fontSize: 13, color: "#94a394", textAlign: "center" }}>No withdrawals yet</p>}
+          </div>
+        </SCard>
+      </div>
+    </>
+  );
 }
