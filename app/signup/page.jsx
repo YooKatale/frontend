@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { useAuth } from "@slices/authSlice";
@@ -17,55 +17,54 @@ button,input,select{font-family:'Nunito',sans-serif}
 .wrap-auth{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 16px;position:relative;z-index:1;overflow-x:hidden;width:100%}
 `;
 
+function getTokenAndUserFromUrl() {
+  if (typeof window === "undefined") return { token: null, userParam: null };
+  const search = window.location.search || "";
+  const hash = window.location.hash || "";
+  const combined = search + (hash ? (hash.startsWith("#") ? "&" + hash.slice(1) : hash) : "");
+  const params = new URLSearchParams(combined);
+  const token = params.get("token") ?? params.get("access_token") ?? params.get("accessToken") ?? (hash.match(/[#&]access_token=([^&]+)/) || [])[1];
+  const userParam = params.get("user");
+  return { token, userParam };
+}
+
 export default function SignUpPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
   const { userInfo } = useAuth();
+  const callbackHandled = useRef(false);
 
   useEffect(() => {
     const q = searchParams;
-    const tokenFromQuery = q?.get("token") ?? q?.get("access_token") ?? q?.get("accessToken");
-    const userParam = q?.get("user");
-    const hash = typeof window !== "undefined" ? window.location.hash : "";
-    const tokenFromHash = hash ? (hash.match(/[#&]access_token=([^&]+)/) || [])[1] : null;
-    const token = tokenFromQuery || tokenFromHash;
+    const { token: tokenFromUrl, userParam: userFromUrl } = getTokenAndUserFromUrl();
+    const token = tokenFromUrl ?? q?.get("token") ?? q?.get("access_token") ?? q?.get("accessToken");
+    const userParam = userFromUrl ?? q?.get("user");
     const googleCallback = q?.get("google_callback") === "1" || q?.get("google_callback") === "true";
 
-    if (googleCallback && !token && !userParam) {
-      (async () => {
-        try {
-          const base = DB_URL.replace(/\/api\/?$/, "");
-          const res = await fetch(`${base}/api/auth/me`, { credentials: "include" });
-          const json = await res.json().catch(() => ({}));
-          const user = json?.data ?? json?.user ?? json;
-          const tokenFromMe = json?.token ?? json?.data?.token ?? user?.token;
-          if ((user && (user._id || user.id)) || tokenFromMe) {
-            dispatch(setCredentials({ ...user, token: tokenFromMe ?? user?.token }));
-            let returnUrl = q?.get("redirect") || q?.get("returnUrl") || "/";
-            try { returnUrl = decodeURIComponent(returnUrl); } catch (_) {}
-            if (!returnUrl.startsWith("/")) returnUrl = "/";
-            window.history.replaceState({}, "", window.location.pathname);
-            router.replace(returnUrl);
-          }
-        } catch (_) {}
-      })();
-      return;
-    }
+    const applyUserAndRedirect = (data, returnUrlFallback) => {
+      if (!data || (!data.token && !data.accessToken && !data._id && !data.id)) return false;
+      dispatch(setCredentials(data));
+      let returnUrl = q?.get("returnUrl") || q?.get("redirect") || returnUrlFallback || "/";
+      try { returnUrl = decodeURIComponent(returnUrl); } catch (_) {}
+      if (!returnUrl.startsWith("/")) returnUrl = "/";
+      window.history.replaceState({}, "", window.location.pathname);
+      router.replace(returnUrl);
+      return true;
+    };
 
     if (token || userParam) {
+      if (callbackHandled.current) return;
+      callbackHandled.current = true;
       (async () => {
         try {
           let data = {};
           if (userParam) {
-            try {
-              data = JSON.parse(decodeURIComponent(userParam));
-            } catch (_) {}
+            try { data = JSON.parse(decodeURIComponent(userParam)); } catch (_) {}
           }
           if (token) data = { ...data, token };
           if (!data?.token && !data?.accessToken) data.token = token;
           if (data?.token != null || data?._id != null || data?.id != null) {
-            dispatch(setCredentials(data));
             const t = data?.token ?? data?.accessToken;
             if (t) {
               try {
@@ -73,16 +72,37 @@ export default function SignUpPage() {
                 const res = await fetch(`${base}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` }, credentials: "include" });
                 const json = await res.json().catch(() => ({}));
                 const fullUser = json?.data ?? json?.user ?? json;
-                if (fullUser && (fullUser._id || fullUser.id)) dispatch(setCredentials({ ...data, ...fullUser }));
+                if (fullUser && (fullUser._id || fullUser.id)) data = { ...data, ...fullUser };
               } catch (_) {}
             }
-            let returnUrl = q?.get("returnUrl") || q?.get("redirect") || "/";
-            try { returnUrl = decodeURIComponent(returnUrl); } catch (_) {}
-            if (!returnUrl.startsWith("/")) returnUrl = "/";
-            window.history.replaceState({}, "", window.location.pathname);
-            router.replace(returnUrl);
+            applyUserAndRedirect(data);
           }
         } catch (_) {}
+      })();
+      return;
+    }
+
+    if (googleCallback) {
+      (async () => {
+        const base = DB_URL.replace(/\/api\/?$/, "");
+        const tryAuthMe = async () => {
+          const res = await fetch(`${base}/api/auth/me`, { credentials: "include" });
+          const json = await res.json().catch(() => ({}));
+          const user = json?.data ?? json?.user ?? json;
+          const tokenFromMe = json?.token ?? json?.data?.token ?? user?.token;
+          return (user && (user._id || user.id)) || tokenFromMe
+            ? { ...user, token: tokenFromMe ?? user?.token }
+            : null;
+        };
+        let data = await tryAuthMe();
+        if (!data) {
+          await new Promise((r) => setTimeout(r, 800));
+          data = await tryAuthMe();
+        }
+        if (data && !callbackHandled.current) {
+          callbackHandled.current = true;
+          applyUserAndRedirect(data);
+        }
       })();
     }
   }, [searchParams, dispatch, router]);
