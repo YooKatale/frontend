@@ -30,6 +30,29 @@ export default function SignUpPage() {
     const hash = typeof window !== "undefined" ? window.location.hash : "";
     const tokenFromHash = hash ? (hash.match(/[#&]access_token=([^&]+)/) || [])[1] : null;
     const token = tokenFromQuery || tokenFromHash;
+    const googleCallback = q?.get("google_callback") === "1" || q?.get("google_callback") === "true";
+
+    if (googleCallback && !token && !userParam) {
+      (async () => {
+        try {
+          const base = DB_URL.replace(/\/api\/?$/, "");
+          const res = await fetch(`${base}/api/auth/me`, { credentials: "include" });
+          const json = await res.json().catch(() => ({}));
+          const user = json?.data ?? json?.user ?? json;
+          const tokenFromMe = json?.token ?? json?.data?.token ?? user?.token;
+          if ((user && (user._id || user.id)) || tokenFromMe) {
+            dispatch(setCredentials({ ...user, token: tokenFromMe ?? user?.token }));
+            let returnUrl = q?.get("redirect") || q?.get("returnUrl") || "/";
+            try { returnUrl = decodeURIComponent(returnUrl); } catch (_) {}
+            if (!returnUrl.startsWith("/")) returnUrl = "/";
+            window.history.replaceState({}, "", window.location.pathname);
+            router.replace(returnUrl);
+          }
+        } catch (_) {}
+      })();
+      return;
+    }
+
     if (token || userParam) {
       (async () => {
         try {

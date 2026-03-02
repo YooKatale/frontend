@@ -351,7 +351,11 @@ export default function AccountPage() {
     }
   };
 
-  const displayName = `${userInfo?.firstname || ""} ${userInfo?.lastname || ""}`.trim() || userInfo?.email || "Account";
+  const displayName =
+    `${userInfo?.firstname ?? userInfo?.firstName ?? userInfo?.given_name ?? ""} ${userInfo?.lastname ?? userInfo?.lastName ?? userInfo?.family_name ?? ""}`.trim() ||
+    userInfo?.name ||
+    userInfo?.email ||
+    "Account";
   const tier = (userInfo?.subscription || userInfo?.plan || stats.subscription || "Free") + " MEMBER";
   const loyaltyPts = userInfo?.loyaltyPts ?? 0;
 

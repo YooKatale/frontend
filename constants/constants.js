@@ -29,10 +29,10 @@ export function getAvatarUrl(avatar) {
   return origin.replace(/\/$/, "") + (s.startsWith("/") ? s : "/" + s);
 }
 
-/** Get user avatar URL from user object (handles avatar, profilePic, profile_pic). */
+/** Get user avatar URL from user object (handles avatar, profilePic, profile_pic, picture for Google). */
 export function getUserAvatarUrl(user) {
   if (!user || typeof user !== "object") return undefined;
-  const url = user.avatar || user.profilePic || user.profile_pic || user.profileImage;
+  const url = user.avatar || user.profilePic || user.profile_pic || user.profileImage || user.picture || user.photoURL;
   return getAvatarUrl(url);
 }
 

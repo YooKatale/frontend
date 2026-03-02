@@ -362,12 +362,10 @@ export function SignInForm({ onSuccess, onSwitch, compact, inModal, returnUrl })
 
   const handleContinueWithGoogle = () => {
     if (typeof window === "undefined") return;
-    const returnPath = window.location.pathname + window.location.search;
-    const signinPath = "/signin" + (returnPath && returnPath !== "/" && returnPath !== "/signin" ? "?returnUrl=" + encodeURIComponent(returnPath) : "");
-    const redirectUrl = window.location.origin + signinPath;
+    const dest = (returnUrl && returnUrl !== "/" && returnUrl !== "/signin") ? returnUrl : (window.location.pathname !== "/signin" ? window.location.pathname + window.location.search : "/");
     const base = API_ORIGIN || DB_URL.replace(/\/api\/?$/, "");
-    const url = `${base}/api/auth/google?redirect=${encodeURIComponent(redirectUrl)}`;
-    window.location.href = url;
+    const params = new URLSearchParams({ redirect: dest, mode: "signin" });
+    window.location.href = `${base}/api/auth/google?${params.toString()}`;
   };
 
   const handleSubmit = async () => {
@@ -468,12 +466,10 @@ export function SignUpForm({ onSuccess, onSwitch, inModal, stable = false, retur
 
   const handleContinueWithGoogle = () => {
     if (typeof window === "undefined") return;
-    const returnPath = window.location.pathname + window.location.search;
-    const signupPath = "/signup" + (returnPath && returnPath !== "/" && returnPath !== "/signup" ? "?returnUrl=" + encodeURIComponent(returnPath) : "");
-    const redirectUrl = window.location.origin + signupPath;
+    const dest = (returnUrl && returnUrl !== "/" && returnUrl !== "/signup") ? returnUrl : (window.location.pathname !== "/signup" ? window.location.pathname + window.location.search : "/");
     const base = API_ORIGIN || DB_URL.replace(/\/api\/?$/, "");
-    const url = `${base}/api/auth/google?redirect=${encodeURIComponent(redirectUrl)}`;
-    window.location.href = url;
+    const params = new URLSearchParams({ redirect: dest, mode: "signup" });
+    window.location.href = `${base}/api/auth/google?${params.toString()}`;
   };
 
   const validateStep1 = () => {
