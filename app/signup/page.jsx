@@ -31,14 +31,25 @@ import Link from "next/link";
 import { useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useRegisterMutation } from "@slices/usersApiSlice";
+import { useRegisterMutation, useLazyAuthMeQuery } from "@slices/usersApiSlice";
 import { setCredentials, useAuth } from "@slices/authSlice";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { FaPhoneAlt, FaWhatsapp, FaEnvelope } from "react-icons/fa";
-import { API_ORIGIN } from "@config/config";
+import { API_ORIGIN, DB_URL } from "@config/config";
 import Image from "next/image";
+
+function getTokenAndUserFromUrl() {
+  if (typeof window === "undefined") return { token: null, userParam: null };
+  const search = window.location.search || "";
+  const hash = window.location.hash || "";
+  const combined = search + (hash ? (hash.startsWith("#") ? "&" + hash.slice(1) : hash) : "");
+  const params = new URLSearchParams(combined);
+  const token = params.get("token") ?? params.get("access_token") ?? params.get("accessToken") ?? (hash.match(/[#&]access_token=([^&]+)/) || [])[1];
+  const userParam = params.get("user");
+  return { token, userParam };
+}
 
 const MotionBox = motion(Box);
 const MotionButton = motion(Button);
@@ -64,9 +75,12 @@ const SignUp = () => {
   const chakraToast = useToast();
   const dispatch = useDispatch();
   const [register] = useRegisterMutation();
+  const [fetchAuthMe] = useLazyAuthMeQuery();
   const [isGoogleLoading, setGoogleLoading] = useState(false);
   const { userInfo } = useAuth();
   const redirectSell = searchParams.get("redirect") === "sell";
+  const redirectTo = searchParams.get("returnUrl") || searchParams.get("redirect") || "/";
+  const googleCallback = searchParams.get("google_callback");
 
   useEffect(() => {
     if (userInfo) return push("/");
@@ -76,6 +90,43 @@ const SignUp = () => {
       if (refCode != null) setReferralCode(refCode);
     }
   }, [userInfo, push]);
+
+  useEffect(() => {
+    if (!googleCallback) return;
+    (async () => {
+      const { token: tokenFromUrl, userParam } = getTokenAndUserFromUrl();
+      if (tokenFromUrl || userParam) {
+        try {
+          let data = {};
+          if (userParam) {
+            try { data = JSON.parse(decodeURIComponent(userParam)); } catch (_) {}
+          }
+          if (tokenFromUrl) data = { ...data, token: tokenFromUrl };
+          if (!data?.token && !data?.accessToken) data.token = tokenFromUrl;
+          dispatch(setCredentials(data));
+          const t = data?.token ?? data?.accessToken;
+          if (t) {
+            try {
+              const base = (DB_URL || "").replace(/\/api\/?$/, "");
+              const res = await fetch(`${base}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` }, credentials: "include" });
+              const json = await res.json().catch(() => ({}));
+              const fullUser = json?.data ?? json?.user ?? json;
+              if (fullUser && (fullUser._id || fullUser.id)) dispatch(setCredentials({ ...data, ...fullUser, token: t }));
+            } catch (_) {}
+          }
+          push(redirectTo || "/");
+          return;
+        } catch (_) {}
+      }
+      try {
+        const res = await fetchAuthMe().unwrap();
+        dispatch(setCredentials({ ...res }));
+        push(redirectTo || "/");
+      } catch (_) {
+        push("/signup");
+      }
+    })();
+  }, [googleCallback]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e) => {
     e.preventDefault();

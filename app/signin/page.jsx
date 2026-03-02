@@ -32,8 +32,19 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Lock, Mail, ArrowRight } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import { API_ORIGIN } from "@config/config";
+import { API_ORIGIN, DB_URL } from "@config/config";
 import Image from "next/image";
+
+function getTokenAndUserFromUrl() {
+  if (typeof window === "undefined") return { token: null, userParam: null };
+  const search = window.location.search || "";
+  const hash = window.location.hash || "";
+  const combined = search + (hash ? (hash.startsWith("#") ? "&" + hash.slice(1) : hash) : "");
+  const params = new URLSearchParams(combined);
+  const token = params.get("token") ?? params.get("access_token") ?? params.get("accessToken") ?? (hash.match(/[#&]access_token=([^&]+)/) || [])[1];
+  const userParam = params.get("user");
+  return { token, userParam };
+}
 
 const MotionBox = motion(Box);
 const MotionButton = motion(Button);
@@ -61,6 +72,39 @@ const SignIn = ({ redirect, callback, ismodal }) => {
   useEffect(() => {
     if (!googleCallback) return;
     (async () => {
+      const { token: tokenFromUrl, userParam } = getTokenAndUserFromUrl();
+      if (tokenFromUrl || userParam) {
+        try {
+          let data = {};
+          if (userParam) {
+            try { data = JSON.parse(decodeURIComponent(userParam)); } catch (_) {}
+          }
+          if (tokenFromUrl) data = { ...data, token: tokenFromUrl };
+          if (!data?.token && !data?.accessToken) data.token = tokenFromUrl;
+          dispatch(setCredentials(data));
+          const t = data?.token ?? data?.accessToken;
+          if (t) {
+            try {
+              const base = (DB_URL || "").replace(/\/api\/?$/, "");
+              const res = await fetch(`${base}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` }, credentials: "include" });
+              const json = await res.json().catch(() => ({}));
+              const fullUser = json?.data ?? json?.user ?? json;
+              if (fullUser && (fullUser._id || fullUser.id)) dispatch(setCredentials({ ...data, ...fullUser, token: t }));
+            } catch (_) {}
+          }
+          chakraToast({
+            title: "Welcome back!",
+            description: `Signed in successfully`,
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+            position: "top-right",
+          });
+          if (callback) callback({ loggedIn: true, user: data?._id });
+          else push(redirectTo || redirect || "/");
+          return;
+        } catch (_) {}
+      }
       try {
         const res = await fetchAuthMe().unwrap();
         dispatch(setCredentials({ ...res }));
@@ -77,7 +121,7 @@ const SignIn = ({ redirect, callback, ismodal }) => {
       } catch (e) {
         chakraToast({
           title: "Session sync failed",
-          description: e?.data?.message || "Please sign in again.",
+          description: e?.data?.message || "Not authorised – no token found. Try signing in again.",
           status: "error",
           duration: 5000,
           isClosable: true,
