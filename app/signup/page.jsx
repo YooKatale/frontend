@@ -1,134 +1,660 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Box,
+  Flex,
+  FormControl,
+  Heading,
+  Text,
+  FormLabel,
+  Input,
+  Button,
+  Grid,
+  Select,
+  Checkbox,
+  Stack,
+  Icon,
+  Container,
+  Divider,
+  VStack,
+  Badge,
+  Card,
+  CardBody,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  Link as ChakraLink,
+} from "@chakra-ui/react";
+import { ThemeColors } from "@constants/constants";
+import Link from "next/link";
+import { useToast } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useAuth } from "@slices/authSlice";
-import { setCredentials } from "@slices/authSlice";
-import { SignUpForm, Bg } from "@components/AuthUI";
-import { DB_URL } from "@config/config";
+import { useRegisterMutation } from "@slices/usersApiSlice";
+import { setCredentials, useAuth } from "@slices/authSlice";
+import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
+import { FcGoogle } from "react-icons/fc";
+import { FaPhoneAlt, FaWhatsapp, FaEnvelope } from "react-icons/fa";
+import { API_ORIGIN } from "@config/config";
+import Image from "next/image";
 
-const AUTH_PAGE_CSS = `
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800;900&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{min-height:100dvh;overflow-x:hidden}
-body{font-family:'Nunito',sans-serif;-webkit-font-smoothing:antialiased;background:#edf5ed}
-button,input,select{font-family:'Nunito',sans-serif}
-.wrap-auth{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 16px;position:relative;z-index:1;overflow-x:hidden;width:100%}
-`;
+const MotionBox = motion(Box);
+const MotionButton = motion(Button);
 
-function getTokenAndUserFromUrl() {
-  if (typeof window === "undefined") return { token: null, userParam: null };
-  const search = window.location.search || "";
-  const hash = window.location.hash || "";
-  const combined = search + (hash ? (hash.startsWith("#") ? "&" + hash.slice(1) : hash) : "");
-  const params = new URLSearchParams(combined);
-  const token = params.get("token") ?? params.get("access_token") ?? params.get("accessToken") ?? (hash.match(/[#&]access_token=([^&]+)/) || [])[1];
-  const userParam = params.get("user");
-  return { token, userParam };
-}
+const SignUp = () => {
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [email, setEmail] = useState("");
+  const [dob, setDob] = useState("");
+  const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState("");
+  const [password, setPassword] = useState("");
+  const [vegan, setVegan] = useState(false);
+  const [address, setAddress] = useState("");
+  const [isLoading, setLoading] = useState(false);
+  const [referralCode, setReferralCode] = useState(null);
+  const [notifyViaCall, setNotifyViaCall] = useState(false);
+  const [notifyViaWhatsApp, setNotifyViaWhatsApp] = useState(false);
+  const [notifyViaEmail, setNotifyViaEmail] = useState(true);
 
-export default function SignUpPage() {
-  const router = useRouter();
+  const { push } = useRouter();
   const searchParams = useSearchParams();
+  const chakraToast = useToast();
   const dispatch = useDispatch();
+  const [register] = useRegisterMutation();
+  const [isGoogleLoading, setGoogleLoading] = useState(false);
   const { userInfo } = useAuth();
-  const callbackHandled = useRef(false);
+  const redirectSell = searchParams.get("redirect") === "sell";
 
   useEffect(() => {
-    const q = searchParams;
-    const { token: tokenFromUrl, userParam: userFromUrl } = getTokenAndUserFromUrl();
-    const token = tokenFromUrl ?? q?.get("token") ?? q?.get("access_token") ?? q?.get("accessToken");
-    const userParam = userFromUrl ?? q?.get("user");
-    const googleCallback = q?.get("google_callback") === "1" || q?.get("google_callback") === "true";
-
-    const applyUserAndRedirect = (data, returnUrlFallback) => {
-      if (!data || (!data.token && !data.accessToken && !data._id && !data.id)) return false;
-      dispatch(setCredentials(data));
-      let returnUrl = q?.get("returnUrl") || q?.get("redirect") || returnUrlFallback || "/";
-      try { returnUrl = decodeURIComponent(returnUrl); } catch (_) {}
-      if (!returnUrl.startsWith("/")) returnUrl = "/";
-      window.history.replaceState({}, "", window.location.pathname);
-      router.replace(returnUrl);
-      return true;
-    };
-
-    if (token || userParam) {
-      if (callbackHandled.current) return;
-      callbackHandled.current = true;
-      (async () => {
-        try {
-          let data = {};
-          if (userParam) {
-            try { data = JSON.parse(decodeURIComponent(userParam)); } catch (_) {}
-          }
-          if (token) data = { ...data, token };
-          if (!data?.token && !data?.accessToken) data.token = token;
-          if (data?.token != null || data?._id != null || data?.id != null) {
-            const t = data?.token ?? data?.accessToken;
-            if (t) {
-              try {
-                const base = DB_URL.replace(/\/api\/?$/, "");
-                const res = await fetch(`${base}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` }, credentials: "include" });
-                const json = await res.json().catch(() => ({}));
-                const fullUser = json?.data ?? json?.user ?? json;
-                if (fullUser && (fullUser._id || fullUser.id)) data = { ...data, ...fullUser };
-              } catch (_) {}
-            }
-            applyUserAndRedirect(data);
-          }
-        } catch (_) {}
-      })();
-      return;
+    if (userInfo) return push("/");
+    if (typeof window !== "undefined") {
+      const urlpath = new URLSearchParams(window.location.search);
+      const refCode = urlpath.get("ref");
+      if (refCode != null) setReferralCode(refCode);
     }
+  }, [userInfo, push]);
 
-    if (googleCallback) {
-      (async () => {
-        const base = DB_URL.replace(/\/api\/?$/, "");
-        const tryAuthMe = async () => {
-          const res = await fetch(`${base}/api/auth/me`, { credentials: "include" });
-          const json = await res.json().catch(() => ({}));
-          const user = json?.data ?? json?.user ?? json;
-          const tokenFromMe = json?.token ?? json?.data?.token ?? user?.token;
-          return (user && (user._id || user.id)) || tokenFromMe
-            ? { ...user, token: tokenFromMe ?? user?.token }
-            : null;
-        };
-        let data = await tryAuthMe();
-        if (!data) {
-          await new Promise((r) => setTimeout(r, 800));
-          data = await tryAuthMe();
-        }
-        if (data && !callbackHandled.current) {
-          callbackHandled.current = true;
-          applyUserAndRedirect(data);
-        }
-      })();
-    }
-  }, [searchParams, dispatch, router]);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      if (!e.target.terms.checked) {
+        chakraToast({
+          title: "Agreement Required",
+          description: "Please agree to the terms and conditions.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
+        });
+        setLoading(false);
+        return;
+      }
+      const referenceCode =
+        referralCode != null && referralCode.toString().trim() !== ""
+          ? referralCode
+          : undefined;
 
-  useEffect(() => {
-    if (searchParams?.get("token") || searchParams?.get("user") || searchParams?.get("access_token") || searchParams?.get("accessToken")) return;
-    if (userInfo && typeof userInfo === "object" && Object.keys(userInfo).length > 0) {
-      router.replace(searchParams?.get("returnUrl") || "/");
+      const res = await register({
+        firstname,
+        lastname,
+        email,
+        phone,
+        gender,
+        vegan,
+        dob,
+        address,
+        password,
+        referenceCode,
+        notificationPreferences: {
+          calls: notifyViaCall,
+          whatsapp: notifyViaWhatsApp,
+          email: notifyViaEmail,
+        },
+      }).unwrap();
+
+      dispatch(setCredentials({ ...res }));
+
+      try {
+        await fetch("/api/mail", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, type: "welcome" }),
+        });
+      } catch (emailError) {
+        console.error("Welcome email error:", emailError);
+      }
+
+      chakraToast({
+        title: "Welcome to YooKatale!",
+        description: redirectSell ? "Account created. Taking you to seller dashboard…" : "Account created. Redirecting to sign in…",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
+      });
+
+      if (redirectSell) {
+        setTimeout(() => push("/sell"), 500);
+      } else {
+        setTimeout(() => push("/signin"), 1500);
+      }
+    } catch (err) {
+      setLoading(false);
+      chakraToast({
+        title: "Registration Failed",
+        description:
+          err.data?.message || err.data || err.error || "Check your details and try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
     }
-  }, [userInfo, router, searchParams]);
+  };
+
+  const handleGoogleSignup = () => {
+    setGoogleLoading(true);
+    const redirectDest = searchParams.get("returnUrl") || searchParams.get("redirect") || "/";
+    const params = new URLSearchParams({ redirect: redirectDest, mode: "signup" });
+    window.location.href = `${API_ORIGIN}/api/auth/google?${params.toString()}`;
+  };
 
   return (
-    <>
-      <style>{AUTH_PAGE_CSS}</style>
-      <Bg stable />
-      <div className="wrap-auth">
-        <SignUpForm
-          stable
-          returnUrl={searchParams?.get("returnUrl") || searchParams?.get("redirect") || undefined}
-          onSuccess={(returnUrl) => router.replace(returnUrl || "/")}
-          onSwitch={() => {
-            const ret = searchParams?.get("returnUrl") || searchParams?.get("redirect") || "/";
-            router.push("/signin?returnUrl=" + encodeURIComponent(ret));
-          }}
-        />
-      </div>
-    </>
+    <Container maxW="container.xl" p={0}>
+      <Flex minH="100vh" bg="gray.50" alignItems="center" justifyContent="center" p={{ base: 6, lg: 12 }}>
+        <Box
+          w="full"
+          maxW="xl"
+        >
+          <MotionBox
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Card
+              borderRadius="2xl"
+              boxShadow="0 10px 40px rgba(0,0,0,0.08)"
+              border="1px solid"
+              borderColor="gray.100"
+              overflow="hidden"
+            >
+              <CardBody p={{ base: 6, md: 8 }}>
+                <Flex justify="center" mb={8}>
+                  <Link href="/">
+                    <Box
+                      as="img"
+                      src="/assets/icons/logo2.png"
+                      alt="YooKatale Logo"
+                      w="140px"
+                      h="70px"
+                      objectFit="contain"
+                      cursor="pointer"
+                      _hover={{ opacity: 0.9 }}
+                      transition="opacity 0.2s"
+                    />
+                  </Link>
+                </Flex>
+
+                <Box mb={6}>
+                  <Heading size="lg" color="gray.800" mb={1}>
+                    Create account
+                  </Heading>
+                  <Text color="gray.600" fontSize="sm">
+                    Google or email
+                  </Text>
+                </Box>
+
+                <MotionButton
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  size="lg"
+                  variant="outline"
+                  onClick={handleGoogleSignup}
+                  isLoading={isGoogleLoading}
+                  loadingText="Connecting..."
+                  leftIcon={<Icon as={FcGoogle} boxSize={5} />}
+                  w="full"
+                  h="52px"
+                  borderRadius="xl"
+                  borderColor="gray.200"
+                  bg="white"
+                  _hover={{
+                    bg: "gray.50",
+                    borderColor: ThemeColors.primaryColor,
+                    boxShadow: `0 4px 12px ${ThemeColors.primaryColor}26`,
+                  }}
+                  fontWeight="semibold"
+                  mb={6}
+                >
+                  Continue with Google
+                </MotionButton>
+
+                <Flex align="center" my={6}>
+                  <Divider flex="1" />
+                  <Text px={4} color="gray.400" fontSize="sm" fontWeight="semibold">
+                    OR SIGN UP WITH EMAIL
+                  </Text>
+                  <Divider flex="1" />
+                </Flex>
+
+                <form onSubmit={handleSubmit}>
+                  <VStack spacing={5}>
+                    <Grid
+                      templateColumns={{ base: "1fr", md: "1fr 1fr" }}
+                      gap={4}
+                      w="full"
+                    >
+                      <FormControl isRequired>
+                        <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                          First name
+                        </FormLabel>
+                        <Input
+                          size="lg"
+                          borderRadius="lg"
+                          value={firstname}
+                          onChange={(e) => setFirstname(e.target.value)}
+                          placeholder="First name"
+                          borderColor="gray.300"
+                          _hover={{ borderColor: ThemeColors.primaryColor }}
+                          _focus={{
+                            borderColor: ThemeColors.primaryColor,
+                            boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                          }}
+                        />
+                      </FormControl>
+                      <FormControl isRequired>
+                        <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                          Last name
+                        </FormLabel>
+                        <Input
+                          size="lg"
+                          borderRadius="lg"
+                          value={lastname}
+                          onChange={(e) => setLastname(e.target.value)}
+                          placeholder="Last name"
+                          borderColor="gray.300"
+                          _hover={{ borderColor: ThemeColors.primaryColor }}
+                          _focus={{
+                            borderColor: ThemeColors.primaryColor,
+                            boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+
+                    <Grid
+                      templateColumns={{ base: "1fr", md: "1fr 1fr" }}
+                      gap={4}
+                      w="full"
+                    >
+                      <FormControl isRequired>
+                        <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                          Email
+                        </FormLabel>
+                        <Input
+                          size="lg"
+                          borderRadius="lg"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="you@example.com"
+                          borderColor="gray.300"
+                          _hover={{ borderColor: ThemeColors.primaryColor }}
+                          _focus={{
+                            borderColor: ThemeColors.primaryColor,
+                            boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                          }}
+                        />
+                      </FormControl>
+                      <FormControl>
+                        <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                          Phone
+                        </FormLabel>
+                        <Input
+                          size="lg"
+                          borderRadius="lg"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="+256 XXX XXX XXX"
+                          borderColor="gray.300"
+                          _hover={{ borderColor: ThemeColors.primaryColor }}
+                          _focus={{
+                            borderColor: ThemeColors.primaryColor,
+                            boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+
+                    <Grid
+                      templateColumns={{ base: "1fr", md: "1fr 1fr" }}
+                      gap={4}
+                      w="full"
+                    >
+                      <FormControl>
+                        <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                          Gender
+                        </FormLabel>
+                        <Select
+                          size="lg"
+                          borderRadius="lg"
+                          value={gender}
+                          onChange={(e) => setGender(e.target.value)}
+                          placeholder="Select"
+                          borderColor="gray.300"
+                          _hover={{ borderColor: ThemeColors.primaryColor }}
+                          _focus={{
+                            borderColor: ThemeColors.primaryColor,
+                            boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                          }}
+                        >
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                        </Select>
+                      </FormControl>
+                      <FormControl>
+                        <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                          Date of birth
+                        </FormLabel>
+                        <Input
+                          size="lg"
+                          borderRadius="lg"
+                          type="date"
+                          value={dob}
+                          onChange={(e) => setDob(e.target.value)}
+                          borderColor="gray.300"
+                          _hover={{ borderColor: ThemeColors.primaryColor }}
+                          _focus={{
+                            borderColor: ThemeColors.primaryColor,
+                            boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+
+                    <FormControl>
+                      <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                        Delivery address
+                      </FormLabel>
+                      <Input
+                        size="lg"
+                        borderRadius="lg"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Address"
+                        borderColor="gray.300"
+                        _hover={{ borderColor: ThemeColors.primaryColor }}
+                        _focus={{
+                          borderColor: ThemeColors.primaryColor,
+                          boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                        }}
+                      />
+                    </FormControl>
+
+                    <FormControl isRequired>
+                      <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                        Password
+                      </FormLabel>
+                      <Input
+                        size="lg"
+                        borderRadius="lg"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Strong password"
+                        borderColor="gray.300"
+                        _hover={{ borderColor: ThemeColors.primaryColor }}
+                        _focus={{
+                          borderColor: ThemeColors.primaryColor,
+                          boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}`,
+                        }}
+                      />
+                    </FormControl>
+
+                    {referralCode && (
+                      <FormControl w="full">
+                        <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                          Referral code
+                          <Badge ml={2} colorScheme="green">
+                            Applied
+                          </Badge>
+                        </FormLabel>
+                        <Input
+                          size="lg"
+                          borderRadius="lg"
+                          value={referralCode}
+                          isReadOnly
+                          bg="green.50"
+                          borderColor="green.200"
+                          color="green.700"
+                        />
+                      </FormControl>
+                    )}
+
+                    <Box w="full" pt={4} borderTop="1px solid" borderColor="gray.200">
+                      <Text fontSize="md" fontWeight="semibold" color="gray.800" mb={4}>
+                        Preferences
+                      </Text>
+                      <Stack spacing={4}>
+                        <Checkbox
+                          size="lg"
+                          isChecked={vegan}
+                          onChange={(e) => setVegan(e.target.checked)}
+                          colorScheme="green"
+                          spacing={3}
+                        >
+                          <Box>
+                            <Text fontWeight="medium">Vegetarian / Vegan</Text>
+                            <Text fontSize="sm" color="gray.600">
+                              Customized meal recommendations
+                            </Text>
+                          </Box>
+                        </Checkbox>
+                        <Box>
+                          <Text fontSize="sm" fontWeight="medium" color="gray.700" mb={3}>
+                            Notifications
+                          </Text>
+                          <Stack spacing={3} pl={1}>
+                            <Checkbox
+                              isChecked={notifyViaEmail}
+                              onChange={(e) => setNotifyViaEmail(e.target.checked)}
+                              colorScheme="blue"
+                            >
+                              <Flex align="center" gap={2}>
+                                <Icon as={FaEnvelope} color="blue.500" />
+                                <Text>Email</Text>
+                              </Flex>
+                            </Checkbox>
+                            <Checkbox
+                              isChecked={notifyViaCall}
+                              onChange={(e) => setNotifyViaCall(e.target.checked)}
+                              colorScheme="green"
+                            >
+                              <Flex align="center" gap={2}>
+                                <Icon as={FaPhoneAlt} color="green.500" />
+                                <Text>Phone</Text>
+                              </Flex>
+                            </Checkbox>
+                            <Checkbox
+                              isChecked={notifyViaWhatsApp}
+                              onChange={(e) => setNotifyViaWhatsApp(e.target.checked)}
+                              colorScheme="whatsapp"
+                            >
+                              <Flex align="center" gap={2}>
+                                <Icon as={FaWhatsapp} color="whatsapp.600" />
+                                <Text>WhatsApp</Text>
+                              </Flex>
+                            </Checkbox>
+                          </Stack>
+                        </Box>
+                      </Stack>
+                    </Box>
+
+                    <Box w="full">
+                      <Checkbox
+                        size="lg"
+                        name="terms"
+                        colorScheme="green"
+                        isRequired
+                        spacing={3}
+                      >
+                        <Box>
+                          <Text fontWeight="medium">
+                            I agree to the{" "}
+                            <ChakraLink
+                              as={Link}
+                              href="/terms"
+                              color={ThemeColors.primaryColor}
+                              fontWeight="semibold"
+                              _hover={{ textDecoration: "underline" }}
+                            >
+                              Terms
+                            </ChakraLink>{" "}
+                            and{" "}
+                            <ChakraLink
+                              as={Link}
+                              href="/privacy"
+                              color={ThemeColors.primaryColor}
+                              fontWeight="semibold"
+                              _hover={{ textDecoration: "underline" }}
+                            >
+                              Privacy Policy
+                            </ChakraLink>
+                          </Text>
+                        </Box>
+                      </Checkbox>
+                    </Box>
+
+                    <MotionButton
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      size="lg"
+                      w="full"
+                      h="56px"
+                      bg={ThemeColors.primaryColor}
+                      color="white"
+                      borderRadius="xl"
+                      isLoading={isLoading}
+                      loadingText="Creating…"
+                      _hover={{
+                        bg: ThemeColors.darkColor,
+                        transform: "translateY(-2px)",
+                        boxShadow: `0 10px 25px ${ThemeColors.primaryColor}4D`,
+                      }}
+                      _active={{ transform: "translateY(0)" }}
+                      fontWeight="semibold"
+                      fontSize="md"
+                    >
+                      Create account
+                    </MotionButton>
+                  </VStack>
+                </form>
+
+                <Alert status="info" borderRadius="lg" mt={6} variant="subtle" size="sm">
+                  <AlertIcon />
+                  <Box>
+                    <AlertTitle fontSize="sm">Secure</AlertTitle>
+                    <AlertDescription fontSize="xs">
+                      Encrypted registration
+                    </AlertDescription>
+                  </Box>
+                </Alert>
+
+                <Box textAlign="center" mt={4}>
+                  <Text fontSize="sm" color="gray.600">
+                    Already have an account?{" "}
+                    <ChakraLink
+                      as={Link}
+                      href="/signin"
+                      color={ThemeColors.primaryColor}
+                      fontWeight="semibold"
+                      _hover={{ textDecoration: "underline" }}
+                    >
+                      Sign In
+                    </ChakraLink>
+                  </Text>
+                </Box>
+              </CardBody>
+            </Card>
+
+            <Flex
+              direction={{ base: "column", sm: "row" }}
+              align="center"
+              justify="center"
+              gap={{ base: 3, sm: 4 }}
+              mt={8}
+              flexWrap="wrap"
+            >
+              <Button
+                as="a"
+                href="https://play.google.com/store/apps/details?id=com.yookataleapp.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                size="lg"
+                px={{ base: 4, sm: 5 }}
+                py={2}
+                h="auto"
+                minH={{ base: "44px", sm: "48px" }}
+                borderRadius="xl"
+                bg="gray.800"
+                color="white"
+                border="1px solid"
+                borderColor="gray.600"
+                _hover={{ bg: "gray.700", transform: "translateY(-2px)", boxShadow: "lg", borderColor: "gray.500" }}
+                transition="all 0.3s"
+                gap={2}
+                w={{ base: "full", sm: "auto" }}
+                maxW={{ base: "280px", sm: "none" }}
+              >
+                <Box position="relative" w={{ base: "24px", sm: "28px" }} h={{ base: "24px", sm: "28px" }} flexShrink={0}>
+                  <Image src="/assets/images/google.svg" alt="" width={28} height={28} style={{ objectFit: "contain" }} />
+                </Box>
+                <VStack align="start" spacing={0}>
+                  <Text fontSize={{ base: "9px", sm: "10px" }} color="white" opacity={0.9}>Get it on</Text>
+                  <Text fontSize={{ base: "xs", sm: "sm" }} fontWeight="700" color="white">Google Play</Text>
+                </VStack>
+              </Button>
+              <Button
+                as="a"
+                href="https://apps.apple.com/app/yookatale"
+                target="_blank"
+                rel="noopener noreferrer"
+                size="lg"
+                px={{ base: 4, sm: 5 }}
+                py={2}
+                h="auto"
+                minH={{ base: "44px", sm: "48px" }}
+                borderRadius="xl"
+                bg="gray.800"
+                color="white"
+                border="1px solid"
+                borderColor="gray.600"
+                _hover={{ bg: "gray.700", transform: "translateY(-2px)", boxShadow: "lg", borderColor: "gray.500" }}
+                transition="all 0.3s"
+                gap={2}
+                w={{ base: "full", sm: "auto" }}
+                maxW={{ base: "280px", sm: "none" }}
+              >
+                <Box position="relative" w={{ base: "22px", sm: "24px" }} h={{ base: "22px", sm: "24px" }} flexShrink={0}>
+                  <Image src="/assets/images/apple.svg" alt="" width={24} height={24} style={{ objectFit: "contain" }} />
+                </Box>
+                <VStack align="start" spacing={0}>
+                  <Text fontSize={{ base: "9px", sm: "10px" }} color="white" opacity={0.9}>Download on the</Text>
+                  <Text fontSize={{ base: "xs", sm: "sm" }} fontWeight="700" color="white">App Store</Text>
+                </VStack>
+              </Button>
+            </Flex>
+          </MotionBox>
+        </Box>
+      </Flex>
+    </Container>
   );
-}
+};
+
+export default SignUp;
