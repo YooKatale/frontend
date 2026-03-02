@@ -41,9 +41,32 @@ function getTokenAndUserFromUrl() {
   const hash = window.location.hash || "";
   const combined = search + (hash ? (hash.startsWith("#") ? "&" + hash.slice(1) : hash) : "");
   const params = new URLSearchParams(combined);
-  const token = params.get("token") ?? params.get("access_token") ?? params.get("accessToken") ?? (hash.match(/[#&]access_token=([^&]+)/) || [])[1];
+  const token = params.get("token") ?? params.get("access_token") ?? params.get("accessToken") ?? params.get("jwt") ?? (hash.match(/[#&]access_token=([^&]+)/) || [])[1];
   const userParam = params.get("user");
   return { token, userParam };
+}
+
+async function fetchAuthMeWithCookieRetries(baseUrl, retries = 3, delays = [0, 700, 1500]) {
+  const url = baseUrl ? `${baseUrl}/api/auth/me` : "";
+  if (!url) return null;
+  for (let i = 0; i < retries; i++) {
+    if (delays[i] > 0) await new Promise((r) => setTimeout(r, delays[i]));
+    try {
+      const res = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+        mode: "cors",
+        headers: { Accept: "application/json" },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        const user = data?.data ?? data?.user ?? data;
+        const token = data?.token ?? data?.data?.token ?? user?.token;
+        return user && (user._id || user.id) ? { ...user, token: token ?? user?.token } : null;
+      }
+    } catch (_) {}
+  }
+  return null;
 }
 
 const MotionBox = motion(Box);
@@ -105,9 +128,14 @@ const SignIn = ({ redirect, callback, ismodal }) => {
           return;
         } catch (_) {}
       }
-      try {
-        const res = await fetchAuthMe().unwrap();
-        dispatch(setCredentials({ ...res }));
+      const base = (DB_URL || "").replace(/\/api\/?$/, "");
+      let res = await fetchAuthMeWithCookieRetries(base);
+      if (!res) {
+        try { res = await fetchAuthMe().unwrap(); } catch (_) {}
+      }
+      if (res) {
+        const token = res?.token ?? res?.accessToken;
+        dispatch(setCredentials({ ...res, token }));
         chakraToast({
           title: "Welcome back!",
           description: `Signed in as ${res?.lastname || res?.firstname || res?.email || "User"}`,
@@ -118,16 +146,15 @@ const SignIn = ({ redirect, callback, ismodal }) => {
         });
         if (callback) callback({ loggedIn: true, user: res?._id });
         else push(redirectTo || redirect || "/");
-      } catch (e) {
+      } else {
         chakraToast({
           title: "Session sync failed",
-          description: e?.data?.message || "Not authorised – no token found. Try signing in again.",
-          status: "error",
-          duration: 5000,
+          description: "Cookies may not be available on this device. Sign in with email and password below, or ask your admin to have the backend send the token in the URL after Google sign-in.",
+          status: "warning",
+          duration: 8000,
           isClosable: true,
           position: "top-right",
         });
-        push("/signin");
       }
     })();
   }, [googleCallback]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -177,7 +204,7 @@ const SignIn = ({ redirect, callback, ismodal }) => {
   const handleGoogleLogin = () => {
     setGoogleLoading(true);
     const dest = redirectTo || redirect || "/";
-    const params = new URLSearchParams({ redirect: dest, mode: "signin" });
+    const params = new URLSearchParams({ redirect: dest, mode: "signin", return_token: "1" });
     window.location.href = `${API_ORIGIN}/api/auth/google?${params.toString()}`;
   };
 
