@@ -89,11 +89,13 @@ const SignIn = ({ redirect, callback, ismodal }) => {
   const { userInfo } = useAuth();
 
   const googleCallback = searchParams.get("google_callback");
+  const tokenFromQuery = getTokenAndUserFromUrl().token;
   const redirectTo = searchParams.get("redirect") || searchParams.get("returnUrl") || "/";
   const redirectSell = searchParams.get("redirect") === "sell";
 
+  // Run when: (1) google_callback=1 (cookie flow), or (2) token in URL (backend token-in-URL redirect)
   useEffect(() => {
-    if (!googleCallback) return;
+    if (!googleCallback && !tokenFromQuery) return;
     (async () => {
       const { token: tokenFromUrl, userParam } = getTokenAndUserFromUrl();
       if (tokenFromUrl || userParam) {
@@ -157,7 +159,7 @@ const SignIn = ({ redirect, callback, ismodal }) => {
         });
       }
     })();
-  }, [googleCallback]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [googleCallback, tokenFromQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -208,7 +210,7 @@ const SignIn = ({ redirect, callback, ismodal }) => {
     window.location.href = `${API_ORIGIN}/api/auth/google?${params.toString()}`;
   };
 
-  if (googleCallback) {
+  if (googleCallback || tokenFromQuery) {
     return (
       <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="gray.50">
         <Flex direction="column" align="center" gap={4}>
