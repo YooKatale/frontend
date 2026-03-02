@@ -149,7 +149,7 @@ const SignIn = ({ redirect, callback, ismodal }) => {
       } else {
         chakraToast({
           title: "Session sync failed",
-          description: "Cookies may not be available on this device. Sign in with email and password below, or ask your admin to have the backend send the token in the URL after Google sign-in.",
+          description: "Frontend and backend are on different domains (Vercel vs Render), so session cookies can't be shared. Sign in with email below, or configure the backend to redirect with the token in the URL (see BACKEND_GOOGLE_TOKEN_REDIRECT.md).",
           status: "warning",
           duration: 8000,
           isClosable: true,
