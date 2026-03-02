@@ -287,8 +287,8 @@ export default function Home() {
   const [fetchCategories] = useProductsCategoriesGetMutation();
   const [fetchSlots] = useMealSlotsPublicGetMutation();
   const [fetchOverrides] = useMealCalendarOverridesGetMutation();
-  const { data: countryCuisinesData } = useGetCountryCuisinesQuery(undefined, { skip: false });
-  const { data: homepageConfigData } = useGetHomepageConfigQuery(undefined, { skip: false });
+  const { data: countryCuisinesData } = useGetCountryCuisinesQuery(undefined, { skip: false, refetchOnFocus: true, refetchOnMountOrArgChange: 300 });
+  const { data: homepageConfigData } = useGetHomepageConfigQuery(undefined, { skip: false, refetchOnFocus: true, refetchOnMountOrArgChange: 300 });
 
   const countries = useMemo(() => {
     const fromApi = countryCuisinesData?.data;

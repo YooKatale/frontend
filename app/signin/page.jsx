@@ -111,14 +111,20 @@ export default function SignInPage() {
             <SignInForm
               returnUrl={searchParams?.get("returnUrl") || searchParams?.get("redirect") || undefined}
               onSuccess={(returnUrl) => router.replace(returnUrl || "/")}
-              onSwitch={() => router.push("/signup")}
+              onSwitch={() => {
+                const ret = searchParams?.get("returnUrl") || searchParams?.get("redirect") || "/";
+                router.push("/signup?returnUrl=" + encodeURIComponent(ret));
+              }}
             />
           </div>
         ) : (
         <SignInForm
-          returnUrl={searchParams?.get("returnUrl") || undefined}
+          returnUrl={searchParams?.get("returnUrl") || searchParams?.get("redirect") || undefined}
           onSuccess={(returnUrl) => router.replace(returnUrl || "/")}
-          onSwitch={() => router.push("/signup")}
+          onSwitch={() => {
+            const ret = searchParams?.get("returnUrl") || searchParams?.get("redirect") || "/";
+            router.push("/signup?returnUrl=" + encodeURIComponent(ret));
+          }}
         />
         )}
       </div>

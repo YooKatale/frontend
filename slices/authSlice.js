@@ -17,10 +17,16 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setCredentials: (state, action) => {
-      state.userInfo = action.payload;
-      typeof window !== "undefined"
-        ? localStorage?.setItem("yookatale-app", JSON.stringify(action.payload))
-        : (localStorage = null);
+      const payload = action.payload;
+      const next =
+        payload && typeof payload === "object"
+          ? { ...(state.userInfo && typeof state.userInfo === "object" ? state.userInfo : {}), ...payload }
+          : payload;
+      state.userInfo = next;
+      if (typeof window !== "undefined") {
+        if (next == null) localStorage?.removeItem("yookatale-app");
+        else localStorage?.setItem("yookatale-app", JSON.stringify(next));
+      }
     },
     logout: (state, action) => {
       state.userInfo = null;

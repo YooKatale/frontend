@@ -53,9 +53,11 @@ export default function SignUpPage() {
                 if (fullUser && (fullUser._id || fullUser.id)) dispatch(setCredentials({ ...data, ...fullUser }));
               } catch (_) {}
             }
-            const returnUrl = q?.get("returnUrl") || "/";
+            let returnUrl = q?.get("returnUrl") || q?.get("redirect") || "/";
+            try { returnUrl = decodeURIComponent(returnUrl); } catch (_) {}
+            if (!returnUrl.startsWith("/")) returnUrl = "/";
             window.history.replaceState({}, "", window.location.pathname);
-            router.replace(returnUrl.startsWith("/") ? returnUrl : "/");
+            router.replace(returnUrl);
           }
         } catch (_) {}
       })();
@@ -76,9 +78,12 @@ export default function SignUpPage() {
       <div className="wrap-auth">
         <SignUpForm
           stable
-          returnUrl={searchParams?.get("returnUrl") || undefined}
+          returnUrl={searchParams?.get("returnUrl") || searchParams?.get("redirect") || undefined}
           onSuccess={(returnUrl) => router.replace(returnUrl || "/")}
-          onSwitch={() => router.push("/signin")}
+          onSwitch={() => {
+            const ret = searchParams?.get("returnUrl") || searchParams?.get("redirect") || "/";
+            router.push("/signin?returnUrl=" + encodeURIComponent(ret));
+          }}
         />
       </div>
     </>
