@@ -580,7 +580,7 @@ export default function MealPlanCalendarNew({ planType = "premium", subscription
               <div className="ctrl-group">
                 <div className="ctrl-label">Income level</div>
                 <div className="ctrl-btns">
-                  {[["low", "Low income"], ["middle", "Middle income"]].map(([v, l]) => (
+                  {[["low", "Low income"], ["middle", "Middle income"], ["high", "High budget"]].map(([v, l]) => (
                     <button
                       key={v}
                       type="button"
