@@ -156,6 +156,7 @@ const Partner = () => {
     setVendorFormData({ ...vendorFormData, [name]: newValue });
   };
 
+  // Delivery Form Handlers — Drivers: only name, email, phone, terms required. Business fields & location are optional.
   const validateDeliveryForm = () => {
     const newErrors = {};
     if (!deliveryFormData.fullname.trim()) newErrors.fullname = 'Full name is required';
@@ -169,12 +170,8 @@ const Partner = () => {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(deliveryFormData.email)) {
       newErrors.email = 'Enter a valid email address';
     }
-    if (!deliveryFormData.location.trim()) newErrors.location = 'Location is required';
-    if (!deliveryFormData.businessName.trim()) newErrors.businessName = 'Business name is required';
-    if (!deliveryFormData.businessAddress.trim()) newErrors.businessAddress = 'Business address is required';
-    if (!deliveryFormData.businessHours.trim()) newErrors.businessHours = 'Business hours are required';
     if (deliveryFormData.transport !== 'bike' && !deliveryFormData.numberPlate.trim()) {
-      newErrors.numberPlate = 'Number plate is required';
+      newErrors.numberPlate = 'Number plate is required for vehicle/motorcycle';
     }
     setDeliveryErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -209,15 +206,16 @@ const Partner = () => {
         fullname: deliveryFormData.fullname,
         phone: deliveryFormData.phone,
         email: deliveryFormData.email,
-        location: deliveryFormData.location,
-        businessName: deliveryFormData.businessName,
-        businessAddress: deliveryFormData.businessAddress,
-        businessHours: deliveryFormData.businessHours,
+        location: deliveryFormData.location || '',
+        businessName: deliveryFormData.businessName || '',
+        businessAddress: deliveryFormData.businessAddress || '',
+        businessHours: deliveryFormData.businessHours || '',
         transport: deliveryFormData.transport,
         vegan: deliveryFormData.vegan,
+        terms: deliveryFormData.terms,
       };
       if (deliveryFormData.transport !== 'bike') {
-        payload.numberPlate = deliveryFormData.numberPlate;
+        payload.numberPlate = deliveryFormData.numberPlate || '';
       }
       await submitDeliveryForm(payload).unwrap();
       setDeliverySubmitted(true);
@@ -247,11 +245,15 @@ const Partner = () => {
       }, 1500);
     } catch (error) {
       setIsDeliveryLoading(false);
+      const msg = error?.data?.message || error?.error || 'An unexpected error occurred';
+      const isBusinessNameError = /business\s*name|businessName/i.test(String(msg));
       chakraToast({
         title: 'Error',
-        description: error.data?.message || error.error || 'An unexpected error occurred',
+        description: isBusinessNameError
+          ? "Driver registration only requires Full name, Email, Phone, and Terms. Leave business fields blank and try again."
+          : msg,
         status: 'error',
-        duration: 5000,
+        duration: 6000,
         isClosable: true,
         position: 'top-right',
       });
@@ -815,7 +817,7 @@ const Partner = () => {
 
                   <div className={styles.fieldRow}>
                     <div className={styles.fieldGroup}>
-                      <label className={styles.label}>Location / Area *</label>
+                      <label className={styles.label}>Location / Area (optional)</label>
                       <input
                         type="text"
                         name="location"
