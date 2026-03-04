@@ -388,13 +388,14 @@ export default function Home() {
   ];
 
   const [currentDay, setCurrentDay] = useState("monday");
+  const [mealIncomeLevel, setMealIncomeLevel] = useState("middle");
   useEffect(() => {
     const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
     setCurrentDay(dayNames[new Date().getDay()]);
   }, []);
 
   const MEAL_SECTIONS = useMemo(() => {
-    const incomeLevel = "middle";
+    const incomeLevel = mealIncomeLevel || "middle";
     const getSlot = (day, mealTypeId, prepTypeId) =>
       mealSlots.find(
         (s) => s.incomeLevel === incomeLevel && s.prepType === prepTypeId && s.day === day && s.mealType === mealTypeId
@@ -437,7 +438,7 @@ export default function Home() {
       });
       return { key: mealType, label, color, icon, items };
     });
-  }, [currentDay, mealSlots, mealOverrides]);
+  }, [currentDay, mealSlots, mealOverrides, mealIncomeLevel]);
 
   const CATEGORY_PRIORITY = ["popular", "discover", "promotional", "recommended", "topdeals"];
   const SECTION_COLORS = ["#e07820", "#1a5c1a", "#8a1a5c", "#1a5c1a", "#e07820"];
@@ -656,6 +657,39 @@ export default function Home() {
           </div>
         );
       })}
+      {/* Meal sections with budget filter (middle / low / high) */}
+      <div className="sec-wrap">
+        <div className="sec-head" style={{ justifyContent: "flex-end", paddingBottom: 4 }}>
+          <div style={{ display: "flex", gap: 6, alignItems: "center", fontSize: 11 }}>
+            <span style={{ color: "#666" }}>Budget level:</span>
+            {[
+              { value: "low", label: "Low" },
+              { value: "middle", label: "Middle" },
+              { value: "high", label: "High" },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setMealIncomeLevel(opt.value)}
+                style={{
+                  borderRadius: 999,
+                  border: "1px solid",
+                  padding: "2px 10px",
+                  fontSize: 11,
+                  background: mealIncomeLevel === opt.value ? "#1a5c1a" : "transparent",
+                  color: mealIncomeLevel === opt.value ? "#fff" : "#1a5c1a",
+                  borderColor: "#1a5c1a",
+                  cursor: "pointer",
+                  transition: "background 0.15s ease, color 0.15s ease",
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {MEAL_SECTIONS.map((sec, idx) => {
         const i = SECTIONS.length + idx;
         if (!sec.items?.length) return null;
