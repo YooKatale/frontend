@@ -141,14 +141,10 @@ export const TestBlog = `
 `;
 
 import { getEmailLayout } from "./emailLayout";
+import { welcomeEmailTemplate } from "./welcomeEmailTemplate";
 
-// Welcome email template for new signups (new dark UI)
-const welcomeBody = `
-  <p class="intro">Switch to a new shopping style this new year. Forget about cooking or going to the market — subscribe for our <strong>Freemium</strong>, <strong>Premium</strong>, <strong>Family</strong> or <strong>Business</strong> Plan monthly or annually. Get everything delivered at your doorstep.</p>
-  <p class="intro">Discover and customize your meals, set when and where to eat with friends, family and loved ones. Earn loyalty points, credit points, gifts and discounts.</p>
-  <p style="text-align:center;margin-top:24px;"><a href="https://www.yookatale.app/signup" class="body-btn">Sign up</a> <a href="https://www.yookatale.app/subscription" class="body-btn" style="background:#f59e0b;color:#1c0f00;margin-left:8px;">Subscribe</a></p>
-`;
-export const emailTemplate = getEmailLayout({ pageTitle: "Welcome to Yookatale", headerTitle: "Welcome to Yookatale", headerSub: "Yoo mobile food market", bodyHtml: welcomeBody });
+// Welcome email: full HTML design (feature pills, CTA cards, mock screens, app download, footer)
+export const emailTemplate = welcomeEmailTemplate;
 
 // Newsletter email template (new dark UI)
 const newsletterBody = `
