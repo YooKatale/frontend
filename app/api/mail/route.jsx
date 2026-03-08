@@ -42,6 +42,7 @@ import { inviteFriendsEmailTemplate } from "@constants/inviteFriendsEmailTemplat
 import { downloadAppEmailTemplate } from "@constants/downloadAppEmailTemplate";
 import { howToSubscribeEmailTemplate } from "@constants/howToSubscribeEmailTemplate";
 import { subscriptionConfirmationEmailTemplate } from "@constants/subscriptionConfirmationEmailTemplate";
+import { partnerEmailTemplate } from "@constants/partnerEmailTemplate";
 import { NextResponse } from "next/server";
 import transporter, { defaultSender } from "@lib/emailConfig";
 
@@ -150,7 +151,7 @@ export const POST = async (req, res) => {
     const sanitizedGreeting = sanitizeInput(greeting);
     
     // Security: Validate email type to prevent template injection
-    const validTypes = ['welcome', 'newsletter', 'meal_notification', 'invitation', 'subscription', 'app_download', 'get_started', 'invite_friends', 'download_app', 'how_to_subscribe', 'subscription_confirmation'];
+    const validTypes = ['welcome', 'newsletter', 'meal_notification', 'invitation', 'subscription', 'app_download', 'get_started', 'invite_friends', 'download_app', 'how_to_subscribe', 'subscription_confirmation', 'partner'];
     const emailType = validTypes.includes(type) ? type : 'welcome';
     
     // Check if email transporter is configured
@@ -231,6 +232,10 @@ export const POST = async (req, res) => {
       emailHtml = invitationEmailTemplate;
       subject = "Invitation To YooKatale";
       emailTypeLabel = "invitation";
+    } else if (emailType === 'partner') {
+      emailHtml = partnerEmailTemplate;
+      subject = "Partner with Yookatale - Vendors & Drivers";
+      emailTypeLabel = "partner";
     } else {
       // Default to welcome email for signups
       emailHtml = emailTemplate;

@@ -99,16 +99,16 @@ export const inviteFriendsEmailTemplate = `
                     <td width="50%" style="padding: 0 4px 0 0; vertical-align: top;">
                       <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
                         <a href="https://www.yookatale.app/#refer" style="text-decoration: none; color: inherit; display: block;">
-                          <img src="https://www.yookatale.app/assets/images/app-cashout-rewards.png" alt="Invite page - Cashout & Rewards" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
-                          <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">1. Invite page — Cashout & Rewards</p></div>
+                          <img src="https://www.yookatale.app/assets/images/app-invite-sidebar.png" alt="Click to Invite - Open menu" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
+                          <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">1. Click to Invite — Open menu</p></div>
                         </a>
                       </div>
                     </td>
                     <td width="50%" style="padding: 0 0 0 4px; vertical-align: top;">
                       <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
                         <a href="https://www.yookatale.app/#refer" style="text-decoration: none; color: inherit; display: block;">
-                          <img src="https://www.yookatale.app/assets/images/app-invite-sidebar.png" alt="Click to Invite - Open menu" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
-                          <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">2. Click to Invite — Open menu</p></div>
+                          <img src="https://www.yookatale.app/assets/images/app-invite-referral-modal.png" alt="Share your referral links" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
+                          <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">2. Share referral links — Copy & share</p></div>
                         </a>
                       </div>
                     </td>
@@ -117,8 +117,8 @@ export const inviteFriendsEmailTemplate = `
                     <td colspan="2" style="padding: 8px 0 0 0;">
                       <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
                         <a href="https://www.yookatale.app/#refer" style="text-decoration: none; color: inherit; display: block;">
-                          <img src="https://www.yookatale.app/assets/images/app-invite-referral-modal.png" alt="Share your referral links" style="display: block; width: 100%; height: auto; border: 0; max-height: 400px; object-fit: contain;" />
-                          <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">3. Share referral links — Copy & share</p></div>
+                          <img src="https://www.yookatale.app/assets/images/app-cashout-rewards.png" alt="Cashout & Rewards" style="display: block; width: 100%; height: auto; border: 0; max-height: 400px; object-fit: contain;" />
+                          <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">3. Cashout & Rewards — Invite page</p></div>
                         </a>
                       </div>
                     </td>
