@@ -133,41 +133,8 @@ export const howToSubscribeEmailTemplate = `
                     <td width="50%" style="padding: 0 0 0 4px; vertical-align: top;">
                       <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
                         <a href="https://www.yookatale.app/#refer" style="text-decoration: none; color: inherit; display: block;">
-                        <img src="https://www.yookatale.app/assets/images/app-cashout-rewards.png" alt="Cashout & Rewards - Earn after inviting" style="display: block; width: 100%; height: auto; border: 0; max-height: 300px; object-fit: contain;" />
+                        <img src="https://www.yookatale.app/assets/images/app-cashout-rewards-portrait.png" alt="Cashout & Rewards - Earn after inviting" style="display: block; width: 100%; height: auto; border: 0; max-height: 360px; object-fit: contain;" />
                           <div style="padding: 8px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 11px;">Earn after inviting — Cashout & Rewards</p></div>
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-
-              <div style="background-color: #f0fdf4; border-radius: 12px; padding: 12px; margin: 16px 0; border: 1px solid #86efac;">
-                <h3 style="color: #166534; font-size: 14px; font-weight: 700; margin: 0 0 8px; text-align: center;">Invite Friends & Earn — Cashout, Click to Invite, Share Referral Links</h3>
-                <p style="color: #4b5563; font-size: 11px; line-height: 1.5; margin: 0 0 12px; text-align: center;">Go to Cashout, tap Invite a Friend, then share your referral link</p>
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                  <tr>
-                    <td width="33%" style="padding: 0 2px 0 0; vertical-align: top;">
-                      <div style="border: 1px solid #86efac; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
-                        <a href="https://www.yookatale.app/#refer" style="text-decoration: none; color: inherit; display: block;">
-                          <img src="https://www.yookatale.app/assets/images/app-cashout-rewards.png" alt="Invite page - Cashout & Rewards" style="display: block; width: 100%; height: auto; border: 0; max-height: 220px; object-fit: contain;" />
-                          <div style="padding: 6px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 10px;">1. Invite page — Cashout & Rewards</p></div>
-                        </a>
-                      </div>
-                    </td>
-                    <td width="33%" style="padding: 0 2px; vertical-align: top;">
-                      <div style="border: 1px solid #86efac; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
-                        <a href="https://www.yookatale.app/#refer" style="text-decoration: none; color: inherit; display: block;">
-                          <img src="https://www.yookatale.app/assets/images/app-invite-sidebar.png" alt="Click to Invite - Menu" style="display: block; width: 100%; height: auto; border: 0; max-height: 220px; object-fit: contain;" />
-                          <div style="padding: 6px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 10px;">2. Click to Invite — Open menu</p></div>
-                        </a>
-                      </div>
-                    </td>
-                    <td width="33%" style="padding: 0 0 0 2px; vertical-align: top;">
-                      <div style="border: 1px solid #86efac; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
-                        <a href="https://www.yookatale.app/#refer" style="text-decoration: none; color: inherit; display: block;">
-                          <img src="https://www.yookatale.app/assets/images/app-invite-referral-modal.png" alt="Share your referral links" style="display: block; width: 100%; height: auto; border: 0; max-height: 220px; object-fit: contain;" />
-                          <div style="padding: 6px;"><p style="margin: 0; font-weight: 600; color: #111827; font-size: 10px;">3. Share referral links — Copy & share</p></div>
                         </a>
                       </div>
                     </td>
