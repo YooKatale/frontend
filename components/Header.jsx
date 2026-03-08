@@ -72,6 +72,7 @@ import { useLogoutMutation } from "@slices/usersApiSlice";
 import { useCartMutation } from "@slices/productsApiSlice";
 import { logout, useAuth } from "@slices/authSlice";
 import { ThemeColors, CLIENT_DASHBOARD_URL, CategoriesJson, getUserAvatarUrl } from "@constants/constants";
+import { CART_UPDATED_EVENT } from "@lib/cartEvents";
 import ReferralModal from "@components/ReferralModal";
 import PreNavbar from "@components/PreNavbar";
 import { useAuthModal } from "@components/AuthModalContext";
@@ -128,9 +129,14 @@ const Header = () => {
 
   useEffect(() => {
     const onFocus = () => loadCartCount();
+    const onCartUpdated = () => loadCartCount();
     if (typeof window !== "undefined") {
       window.addEventListener("focus", onFocus);
-      return () => window.removeEventListener("focus", onFocus);
+      window.addEventListener(CART_UPDATED_EVENT, onCartUpdated);
+      return () => {
+        window.removeEventListener("focus", onFocus);
+        window.removeEventListener(CART_UPDATED_EVENT, onCartUpdated);
+      };
     }
   }, [loadCartCount]);
 

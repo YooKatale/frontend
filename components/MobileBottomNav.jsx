@@ -10,6 +10,7 @@ import { useState, useEffect, useCallback } from "react";
 import { AiOutlineHome, AiOutlineShoppingCart, AiOutlineUser, AiOutlineBarChart } from "react-icons/ai";
 import { FaHeart } from "react-icons/fa";
 import { getUserAvatarUrl } from "@constants/constants";
+import { CART_UPDATED_EVENT } from "@lib/cartEvents";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home", icon: AiOutlineHome },
@@ -51,8 +52,13 @@ export default function MobileBottomNav() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const onCartUpdated = () => loadCartCount();
     window.addEventListener("focus", loadCartCount);
-    return () => window.removeEventListener("focus", loadCartCount);
+    window.addEventListener(CART_UPDATED_EVENT, onCartUpdated);
+    return () => {
+      window.removeEventListener("focus", loadCartCount);
+      window.removeEventListener(CART_UPDATED_EVENT, onCartUpdated);
+    };
   }, [loadCartCount]);
 
   return (

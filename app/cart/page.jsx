@@ -28,6 +28,7 @@ import {
   useCartMutation,
   useCartUpdateMutation,
 } from "@slices/productsApiSlice";
+import { dispatchCartUpdated } from "@lib/cartEvents";
 import CartCard from "@components/CartCard";
 import { FormatCurr } from "@utils/utils";
 import Link from "next/link";
@@ -131,6 +132,7 @@ const Cart = () => {
       const res = await deleteCartItem(id).unwrap();
 
       if (res?.status && res?.status === "Success") {
+        dispatchCartUpdated();
         chakraToast({
           title: "Removed",
           description: "Item removed from cart",
@@ -185,6 +187,7 @@ const Cart = () => {
         quantity: newQuantity,
         userId: userInfo?._id,
       }).unwrap();
+      dispatchCartUpdated();
     } catch (err) {
       const revertedCart = [...cart];
       setCart(revertedCart);
@@ -257,6 +260,7 @@ const Cart = () => {
       setCart([]);
       setCartTotal(0);
       setDiscountAmount(0);
+      dispatchCartUpdated();
 
       chakraToast({
         title: "Cart Cleared",

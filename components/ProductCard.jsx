@@ -4,6 +4,7 @@ import { useToast, Box, Text, useDisclosure } from "@chakra-ui/react";
 import React, { useState } from "react";
 import Link from "next/link";
 import { useCartCreateMutation } from "@slices/productsApiSlice";
+import { dispatchCartUpdated } from "@lib/cartEvents";
 import { useWishlist } from "@slices/wishlistSlice";
 import { FormatCurr } from "@utils/utils";
 import { getImageUrl } from "@constants/constants";
@@ -54,6 +55,7 @@ const ProductCard = ({ product, userInfo, variant }) => {
       }).unwrap();
 
       if (res?.message) {
+        dispatchCartUpdated();
         chakraToast({
           title: "Success",
           description: res.message,

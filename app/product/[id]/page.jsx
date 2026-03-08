@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useToast } from "@chakra-ui/react";
 import { useAuth } from "@slices/authSlice";
 import { useProductGetMutation, useProductsGetMutation, useCartCreateMutation } from "@slices/productsApiSlice";
+import { dispatchCartUpdated } from "@lib/cartEvents";
 import { useWishlist } from "@slices/wishlistSlice";
 import { FormatCurr } from "@utils/utils";
 import SignIn from "@app/signin/page";
@@ -101,6 +102,7 @@ function ProductDetailPage() {
         userId: userInfo._id,
         discountedPrice: displayPrice,
       }).unwrap();
+      dispatchCartUpdated();
       showToast("Added to cart!");
     } catch (err) {
       const msg = err?.data?.message || err?.message || "Could not add to cart";
