@@ -35,12 +35,14 @@ import {
   useGetMyRewardsMutation,
   useRedeemRewardMutation,
   useGetCashoutStatsMutation,
+  useGetReferralsMutation,
+  useGetReferralRewardsMutation,
 } from "@slices/usersApiSlice";
 import { useAuth } from "@slices/authSlice";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FaGift, FaStar } from "react-icons/fa";
+import { FaGift, FaStar, FaUsers, FaMoneyBillWave } from "react-icons/fa";
 
 const MotionCard = motion(Card);
 
@@ -56,29 +58,38 @@ export default function RewardsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedReward, setSelectedReward] = useState(null);
 
+  const [referralData, setReferralData] = useState(null);
+  const [referralRewards, setReferralRewards] = useState(null);
+
   const [getRewards] = useGetRewardsMutation();
   const [getMyRewards] = useGetMyRewardsMutation();
   const [redeemReward, { isLoading: redeeming }] = useRedeemRewardMutation();
   const [getCashoutStats] = useGetCashoutStatsMutation();
+  const [getReferrals] = useGetReferralsMutation();
+  const [getReferralRewards] = useGetReferralRewardsMutation();
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      const [rewardsRes, myRewardsRes, statsRes] = await Promise.all([
+      const [rewardsRes, myRewardsRes, statsRes, referralsRes, referralRewardsRes] = await Promise.all([
         getRewards().unwrap().catch(() => ({ status: "Success", data: [] })),
         getMyRewards().unwrap().catch(() => ({ status: "Success", data: [] })),
         getCashoutStats().unwrap().catch(() => ({ status: "Success", data: { loyalty: 0 } })),
+        getReferrals().unwrap().catch(() => ({ status: "Success", data: null })),
+        getReferralRewards().unwrap().catch(() => ({ status: "Success", data: null })),
       ]);
       setRewards(Array.isArray(rewardsRes?.data) ? rewardsRes.data : []);
       setMyRewards(Array.isArray(myRewardsRes?.data) ? myRewardsRes.data : []);
       setLoyaltyPoints(Number(statsRes?.data?.loyalty || 0));
+      if (referralsRes?.data) setReferralData(referralsRes.data);
+      if (referralRewardsRes?.data) setReferralRewards(referralRewardsRes.data);
     } catch (e) {
       setRewards([]);
       setMyRewards([]);
     } finally {
       setLoading(false);
     }
-  }, [getRewards, getMyRewards, getCashoutStats]);
+  }, [getRewards, getMyRewards, getCashoutStats, getReferrals, getReferralRewards]);
 
   useEffect(() => {
     if (!userInfo || typeof userInfo !== "object" || Object.keys(userInfo).length === 0) {
@@ -86,7 +97,7 @@ export default function RewardsPage() {
       return;
     }
     loadData();
-  }, [userInfo, router, loadData]);
+  }, [userInfo, router, loadData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleRedeem = (reward) => {
     setSelectedReward(reward);
@@ -159,6 +170,164 @@ export default function RewardsPage() {
       </Box>
 
       <Container maxW="container.xl" px={{ base: 4, md: 6 }} py={8}>
+        {/* Referral Earnings Summary */}
+        {referralData && (
+          <Box mb={10}>
+            <Heading size="md" mb={4} color="gray.800">Referral Earnings</Heading>
+            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4} mb={4}>
+              <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="green.100" overflow="hidden">
+                <CardBody>
+                  <HStack spacing={3}>
+                    <Flex w={10} h={10} borderRadius="lg" bg="green.50" align="center" justify="center">
+                      <Icon as={FaMoneyBillWave} color="green.500" boxSize={5} />
+                    </Flex>
+                    <Box>
+                      <Text fontSize="xs" color="gray.500" fontWeight="600">Total Earned</Text>
+                      <Text fontSize="xl" fontWeight="800" color="green.600">UGX {Number(referralData.totalEarnings || 0).toLocaleString()}</Text>
+                    </Box>
+                  </HStack>
+                </CardBody>
+              </Card>
+              <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="blue.100" overflow="hidden">
+                <CardBody>
+                  <HStack spacing={3}>
+                    <Flex w={10} h={10} borderRadius="lg" bg="blue.50" align="center" justify="center">
+                      <Icon as={FaUsers} color="blue.500" boxSize={5} />
+                    </Flex>
+                    <Box>
+                      <Text fontSize="xs" color="gray.500" fontWeight="600">People Referred</Text>
+                      <Text fontSize="xl" fontWeight="800" color="blue.600">{referralData.totalReferred || 0}</Text>
+                    </Box>
+                  </HStack>
+                </CardBody>
+              </Card>
+              <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="purple.100" overflow="hidden">
+                <CardBody>
+                  <HStack spacing={3}>
+                    <Flex w={10} h={10} borderRadius="lg" bg="purple.50" align="center" justify="center">
+                      <Icon as={FaStar} color="purple.500" boxSize={5} />
+                    </Flex>
+                    <Box>
+                      <Text fontSize="xs" color="gray.500" fontWeight="600">Per Referral</Text>
+                      <Text fontSize="xl" fontWeight="800" color="purple.600">UGX {Number(referralData.rewardPerReferral || 50000).toLocaleString()}</Text>
+                    </Box>
+                  </HStack>
+                </CardBody>
+              </Card>
+            </SimpleGrid>
+
+            {referralData.referredUsers?.length > 0 && (
+              <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
+                <CardBody>
+                  <Text fontWeight="700" fontSize="sm" color="gray.700" mb={3}>People you referred</Text>
+                  <VStack spacing={3} align="stretch">
+                    {referralData.referredUsers.map((person, i) => {
+                      const name = [person.firstname, person.lastname].filter(Boolean).join(" ") || "YooKatale User";
+                      const joinDate = person.joinedAt ? new Date(person.joinedAt).toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric" }) : "";
+                      return (
+                        <Flex key={person._id || i} align="center" justify="space-between" p={3} borderRadius="lg" bg="gray.50" _hover={{ bg: "green.50" }} transition="all 0.2s">
+                          <HStack spacing={3}>
+                            <Flex w={10} h={10} borderRadius="lg" bg="green.500" align="center" justify="center">
+                              <Text color="white" fontWeight="800" fontSize="sm">
+                                {(person.firstname?.[0] || "Y").toUpperCase()}{(person.lastname?.[0] || "U").toUpperCase()}
+                              </Text>
+                            </Flex>
+                            <Box>
+                              <Text fontWeight="700" fontSize="sm" color="gray.800">{name}</Text>
+                              {person.email && <Text fontSize="xs" color="gray.500">{person.email}</Text>}
+                            </Box>
+                          </HStack>
+                          <VStack spacing={0} align="end">
+                            <Badge colorScheme="green" fontSize="xs">Joined</Badge>
+                            {joinDate && <Text fontSize="xs" color="gray.400" mt={1}>{joinDate}</Text>}
+                          </VStack>
+                        </Flex>
+                      );
+                    })}
+                  </VStack>
+                </CardBody>
+              </Card>
+            )}
+          </Box>
+        )}
+
+        {/* First-Purchase Referral Rewards */}
+        {referralRewards?.rewards?.length > 0 && (
+          <Box mb={10}>
+            <Heading size="md" mb={4} color="gray.800">First-Purchase Bonuses</Heading>
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} mb={4}>
+              <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="green.100" overflow="hidden">
+                <CardBody>
+                  <HStack spacing={3}>
+                    <Flex w={10} h={10} borderRadius="lg" bg="green.50" align="center" justify="center">
+                      <Icon as={FaMoneyBillWave} color="green.500" boxSize={5} />
+                    </Flex>
+                    <Box>
+                      <Text fontSize="xs" color="gray.500" fontWeight="600">Cash Bonuses</Text>
+                      <Text fontSize="xl" fontWeight="800" color="green.600">UGX {Number(referralRewards.totalCash || 0).toLocaleString()}</Text>
+                    </Box>
+                  </HStack>
+                </CardBody>
+              </Card>
+              <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="yellow.100" overflow="hidden">
+                <CardBody>
+                  <HStack spacing={3}>
+                    <Flex w={10} h={10} borderRadius="lg" bg="yellow.50" align="center" justify="center">
+                      <Icon as={FaGift} color="yellow.600" boxSize={5} />
+                    </Flex>
+                    <Box>
+                      <Text fontSize="xs" color="gray.500" fontWeight="600">Gift Cards Earned</Text>
+                      <Text fontSize="xl" fontWeight="800" color="yellow.600">UGX {Number(referralRewards.totalGiftCards || 0).toLocaleString()}</Text>
+                    </Box>
+                  </HStack>
+                </CardBody>
+              </Card>
+            </SimpleGrid>
+
+            <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">
+              <CardBody>
+                <Text fontWeight="700" fontSize="sm" color="gray.700" mb={3}>Rewards from friends' first purchases</Text>
+                <VStack spacing={3} align="stretch">
+                  {referralRewards.rewards.map((reward, i) => {
+                    const person = reward.referredUser || {};
+                    const name = [person.firstname, person.lastname].filter(Boolean).join(" ") || "YooKatale User";
+                    const date = reward.createdAt ? new Date(reward.createdAt).toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric" }) : "";
+                    return (
+                      <Flex key={reward._id || i} direction="column" p={3} borderRadius="lg" bg="gray.50" _hover={{ bg: "yellow.50" }} transition="all 0.2s" gap={2}>
+                        <Flex align="center" justify="space-between">
+                          <HStack spacing={3}>
+                            <Flex w={10} h={10} borderRadius="lg" bg="orange.400" align="center" justify="center">
+                              <Text color="white" fontWeight="800" fontSize="sm">
+                                {(person.firstname?.[0] || "Y").toUpperCase()}{(person.lastname?.[0] || "U").toUpperCase()}
+                              </Text>
+                            </Flex>
+                            <Box>
+                              <Text fontWeight="700" fontSize="sm" color="gray.800">{name} made a purchase!</Text>
+                              {date && <Text fontSize="xs" color="gray.400">{date}</Text>}
+                            </Box>
+                          </HStack>
+                        </Flex>
+                        <Flex gap={2} flexWrap="wrap" ml={13}>
+                          {reward.cashAmount > 0 && (
+                            <Badge colorScheme="green" fontSize="xs" px={2} py={1} borderRadius="md">
+                              +UGX {Number(reward.cashAmount).toLocaleString()} cash
+                            </Badge>
+                          )}
+                          {reward.giftCard && (
+                            <Badge colorScheme="yellow" fontSize="xs" px={2} py={1} borderRadius="md">
+                              Gift Card: {reward.giftCard.code} (UGX {Number(reward.giftCard.amount).toLocaleString()})
+                            </Badge>
+                          )}
+                        </Flex>
+                      </Flex>
+                    );
+                  })}
+                </VStack>
+              </CardBody>
+            </Card>
+          </Box>
+        )}
+
         {/* My Redeemed Rewards */}
         {myRewards.length > 0 && (
           <Box mb={10}>

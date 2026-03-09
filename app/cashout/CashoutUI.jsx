@@ -226,4 +226,4 @@ export const CashoutGlobalStyles = () => (
   `}</style>
 );
 
-export { Wallet, ArrowDownToLine, Users, Star, Gift, CreditCard, Share2, Gamepad2, Smartphone, Trash2, ArrowRight, CheckCircle2, Copy, Check, Plus, Lock, Eye, EyeOff, TrendingUp, Sparkles, Zap, Shield, Info, CircleDollarSign, BadgePercent, Landmark, CalendarClock };
+export { Wallet, ArrowDownToLine, Users, Star, Gift, CreditCard, Share2, Gamepad2, Smartphone, Trash2, ArrowRight, CheckCircle2, Copy, Check, Plus, Lock, Eye, EyeOff, TrendingUp, Sparkles, Zap, Shield, Info, CircleDollarSign, BadgePercent, Landmark, CalendarClock, UserCheck, UserPlus, Mail, Phone };

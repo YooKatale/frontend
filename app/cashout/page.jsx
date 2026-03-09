@@ -20,6 +20,8 @@ import {
   useSetDefaultPayoutMethodMutation,
   useWithdrawFundsMutation,
   useGetWithdrawalsMutation,
+  useGetReferralsMutation,
+  useGetReferralRewardsMutation,
 } from "@slices/usersApiSlice";
 import {
   StatCard,
@@ -58,6 +60,10 @@ import {
   Copy,
   Check,
   CircleDollarSign,
+  UserCheck,
+  UserPlus,
+  Mail,
+  Phone,
 } from "./CashoutUI";
 
 async function generateReferralCode(userId) {
@@ -99,6 +105,10 @@ export default function CashoutPage() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [loadingMethods, setLoadingMethods] = useState(true);
   const [loadingWithdrawals, setLoadingWithdrawals] = useState(false);
+  const [referralData, setReferralData] = useState(null);
+  const [loadingReferrals, setLoadingReferrals] = useState(false);
+  const [referralRewards, setReferralRewards] = useState(null);
+  const [loadingReferralRewards, setLoadingReferralRewards] = useState(false);
 
   const [getCashoutStats] = useGetCashoutStatsMutation();
   const [getPayoutMethods] = useGetPayoutMethodsMutation();
@@ -107,11 +117,15 @@ export default function CashoutPage() {
   const [setDefaultPayoutMethod, { isLoading: settingDefault }] = useSetDefaultPayoutMethodMutation();
   const [withdrawFunds, { isLoading: withdrawing }] = useWithdrawFundsMutation();
   const [getWithdrawals] = useGetWithdrawalsMutation();
+  const [getReferrals] = useGetReferralsMutation();
+  const [getReferralRewards] = useGetReferralRewardsMutation();
 
   useEffect(() => {
     if (!userInfo?._id) return;
-    generateReferralCode(userInfo._id).then((code) => setReferralUrl(`https://yookatale.app/signup?ref=${code}`));
-  }, [userInfo?._id]);
+    if (!referralData?.referralLink) {
+      generateReferralCode(userInfo._id).then((code) => setReferralUrl(`https://yookatale.app/signup?ref=${code}`));
+    }
+  }, [userInfo?._id, referralData?.referralLink]);
 
   const loadStats = useCallback(async () => {
     try {
@@ -149,6 +163,35 @@ export default function CashoutPage() {
     }
   }, [getWithdrawals]);
 
+  const loadReferrals = useCallback(async () => {
+    try {
+      setLoadingReferrals(true);
+      const res = await getReferrals().unwrap();
+      if (res?.status === "Success" && res?.data) {
+        setReferralData(res.data);
+        if (res.data.referralLink) setReferralUrl(res.data.referralLink);
+      }
+    } catch {
+      setReferralData(null);
+    } finally {
+      setLoadingReferrals(false);
+    }
+  }, [getReferrals]);
+
+  const loadReferralRewards = useCallback(async () => {
+    try {
+      setLoadingReferralRewards(true);
+      const res = await getReferralRewards().unwrap();
+      if (res?.status === "Success" && res?.data) {
+        setReferralRewards(res.data);
+      }
+    } catch {
+      setReferralRewards(null);
+    } finally {
+      setLoadingReferralRewards(false);
+    }
+  }, [getReferralRewards]);
+
   useEffect(() => {
     setIsCheckingAuth(true);
     // Check if userInfo is available
@@ -162,7 +205,9 @@ export default function CashoutPage() {
     loadStats().catch(console.error);
     loadMethods().catch(console.error);
     loadWithdrawals().catch(console.error);
-  }, [userInfo, router, loadStats, loadMethods, loadWithdrawals]);
+    loadReferrals().catch(console.error);
+    loadReferralRewards().catch(console.error);
+  }, [userInfo, router, loadStats, loadMethods, loadWithdrawals, loadReferrals, loadReferralRewards]);
 
   const handleSaveMobileMoney = async () => {
     const prov = (provider || "").toUpperCase();
@@ -365,7 +410,7 @@ export default function CashoutPage() {
             gradient="linear-gradient(135deg,#1a5c1a,#2d8c2d)"
             cta={<PBtn Icon={ArrowDownToLine} small onClick={handleWithdraw}>Withdraw</PBtn>}
           />
-          <StatCard label="Total Invites" delay={80} Icon={Users} value={loadingStats ? "—" : String(stats.invites || 0)} sub="Friends referred" accent="#0284c7" gradient="linear-gradient(135deg,#075985,#0284c7)" />
+          <StatCard label="Total Invites" delay={80} Icon={Users} value={loadingStats && loadingReferrals ? "—" : String(referralData?.totalReferred ?? stats.invites ?? 0)} sub="Friends referred" accent="#0284c7" gradient="linear-gradient(135deg,#075985,#0284c7)" />
           <StatCard label="Loyalty Points" delay={160} Icon={BadgePercent} value={loadingStats ? "—" : String(stats.loyalty || 0)} sub="Points to redeem" accent="#c2620a" gradient="linear-gradient(135deg,#9a3412,#ea580c)" />
         </div>
 
@@ -414,6 +459,156 @@ export default function CashoutPage() {
             </div>
           </SCard>
         </div>
+
+        {/* People You Referred */}
+        <SCard delay={440} style={{ marginBottom: 14 }}>
+          <SHead Icon={UserCheck} title="People You Referred" action={
+            referralData?.totalReferred > 0 ? (
+              <span style={{ background: "#dcfce7", color: "#16a34a", fontSize: 10, fontWeight: 900, padding: "4px 10px", borderRadius: 100, letterSpacing: 0.6 }}>
+                {referralData.totalReferred} {referralData.totalReferred === 1 ? "person" : "people"}
+              </span>
+            ) : null
+          } />
+          <div style={{ padding: "6px 0 10px" }}>
+            {loadingReferrals ? (
+              <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 12 }}>
+                {[1, 2, 3].map((i) => (
+                  <div key={i} style={{ height: 64, background: "#f0f5f0", borderRadius: 14, animation: "shimmer 1.5s infinite", backgroundImage: "linear-gradient(90deg, #f0f5f0 25%, #e8f0e8 50%, #f0f5f0 75%)", backgroundSize: "200% 100%" }} />
+                ))}
+              </div>
+            ) : referralData?.referredUsers?.length > 0 ? (
+              <>
+                <div style={{ padding: "12px 22px 8px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <div style={{ background: "#f0fdf4", borderRadius: 10, padding: "8px 12px", display: "flex", alignItems: "center", gap: 6, border: "1px solid #bbf7d0" }}>
+                    <CircleDollarSign size={13} strokeWidth={2} color="#16a34a" />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#16a34a" }}>Total Earned: UGX {Number(referralData.totalEarnings || 0).toLocaleString()}</span>
+                  </div>
+                  <div style={{ background: "#eff6ff", borderRadius: 10, padding: "8px 12px", display: "flex", alignItems: "center", gap: 6, border: "1px solid #bfdbfe" }}>
+                    <UserPlus size={13} strokeWidth={2} color="#2563eb" />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#2563eb" }}>UGX {Number(referralData.rewardPerReferral || 50000).toLocaleString()} per referral</span>
+                  </div>
+                </div>
+                {referralData.referredUsers.map((person, i) => {
+                  const name = [person.firstname, person.lastname].filter(Boolean).join(" ") || "YooKatale User";
+                  const initials = (person.firstname?.[0] || "Y").toUpperCase() + (person.lastname?.[0] || "U").toUpperCase();
+                  const joinDate = person.joinedAt ? new Date(person.joinedAt).toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric" }) : "";
+                  return (
+                    <div key={person._id || i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 22px", borderBottom: i < referralData.referredUsers.length - 1 ? "1px solid #f0f5f0" : "none", animation: `fadeUp .4s ${i * 60}ms ease both` }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
+                        {person.avatar ? (
+                          <img src={person.avatar} alt={name} style={{ width: 44, height: 44, borderRadius: 13, objectFit: "cover", border: "2px solid #dcfce7", flexShrink: 0 }} />
+                        ) : (
+                          <div style={{ width: 44, height: 44, borderRadius: 13, background: "linear-gradient(135deg,#1a5c1a,#2d8c2d)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#fff", flexShrink: 0 }}>
+                            {initials}
+                          </div>
+                        )}
+                        <div>
+                          <p style={{ fontSize: 14, fontWeight: 800, color: "#0e1e0e", marginBottom: 2 }}>{name}</p>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                            {person.email && (
+                              <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: "#7a9a7a", fontWeight: 600 }}>
+                                <Mail size={10} strokeWidth={2} />{person.email}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "right", flexShrink: 0 }}>
+                        <span style={{ background: "#dcfce7", color: "#16a34a", fontSize: 10, fontWeight: 900, padding: "3px 8px", borderRadius: 100, display: "inline-flex", alignItems: "center", gap: 3, letterSpacing: 0.5 }}>
+                          <CheckCircle2 size={9} strokeWidth={2.5} />Joined
+                        </span>
+                        {joinDate && <p style={{ fontSize: 10, color: "#94a394", fontWeight: 600, marginTop: 4 }}>{joinDate}</p>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </>
+            ) : (
+              <div style={{ padding: "30px 22px", textAlign: "center" }}>
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg,#e0f2fe,#f0fdf4)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+                  <UserPlus size={26} strokeWidth={1.8} color="#0284c7" />
+                </div>
+                <p style={{ fontSize: 14, fontWeight: 800, color: "#0e1e0e", marginBottom: 4 }}>No referrals yet</p>
+                <p style={{ fontSize: 12, color: "#7a9a7a", fontWeight: 600, maxWidth: 280, margin: "0 auto 16px" }}>Share your referral link with friends. When they sign up, they appear here and you earn UGX 50,000!</p>
+                <PBtn Icon={Share2} onClick={openReferral}>Invite Friends Now</PBtn>
+              </div>
+            )}
+          </div>
+        </SCard>
+
+        {/* First-Purchase Referral Rewards */}
+        {(loadingReferralRewards || referralRewards?.rewards?.length > 0) && (
+          <SCard delay={450} style={{ marginBottom: 14 }}>
+            <SHead Icon={Gift} title="First-Purchase Rewards" action={
+              referralRewards?.totalRewards > 0 ? (
+                <span style={{ background: "#fef3c7", color: "#d97706", fontSize: 10, fontWeight: 900, padding: "4px 10px", borderRadius: 100, letterSpacing: 0.6 }}>
+                  {referralRewards.totalRewards} {referralRewards.totalRewards === 1 ? "reward" : "rewards"}
+                </span>
+              ) : null
+            } />
+            <div style={{ padding: "6px 0 10px" }}>
+              {loadingReferralRewards ? (
+                <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 12 }}>
+                  {[1, 2].map((i) => (
+                    <div key={i} style={{ height: 80, background: "#f0f5f0", borderRadius: 14, animation: "shimmer 1.5s infinite", backgroundImage: "linear-gradient(90deg, #f0f5f0 25%, #e8f0e8 50%, #f0f5f0 75%)", backgroundSize: "200% 100%" }} />
+                  ))}
+                </div>
+              ) : referralRewards?.rewards?.length > 0 ? (
+                <>
+                  <div style={{ padding: "12px 22px 8px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <div style={{ background: "#f0fdf4", borderRadius: 10, padding: "8px 12px", display: "flex", alignItems: "center", gap: 6, border: "1px solid #bbf7d0" }}>
+                      <CircleDollarSign size={13} strokeWidth={2} color="#16a34a" />
+                      <span style={{ fontSize: 11, fontWeight: 800, color: "#16a34a" }}>Cash Earned: UGX {Number(referralRewards.totalCash || 0).toLocaleString()}</span>
+                    </div>
+                    <div style={{ background: "#fef3c7", borderRadius: 10, padding: "8px 12px", display: "flex", alignItems: "center", gap: 6, border: "1px solid #fde68a" }}>
+                      <Gift size={13} strokeWidth={2} color="#d97706" />
+                      <span style={{ fontSize: 11, fontWeight: 800, color: "#d97706" }}>Gift Cards: UGX {Number(referralRewards.totalGiftCards || 0).toLocaleString()}</span>
+                    </div>
+                  </div>
+                  {referralRewards.rewards.map((reward, i) => {
+                    const person = reward.referredUser || {};
+                    const name = [person.firstname, person.lastname].filter(Boolean).join(" ") || "YooKatale User";
+                    const initials = (person.firstname?.[0] || "Y").toUpperCase() + (person.lastname?.[0] || "U").toUpperCase();
+                    const date = reward.createdAt ? new Date(reward.createdAt).toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric" }) : "";
+                    return (
+                      <div key={reward._id || i} style={{ padding: "14px 22px", borderBottom: i < referralRewards.rewards.length - 1 ? "1px solid #f0f5f0" : "none", animation: `fadeUp .4s ${i * 60}ms ease both` }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
+                            {person.avatar ? (
+                              <img src={person.avatar} alt={name} style={{ width: 44, height: 44, borderRadius: 13, objectFit: "cover", border: "2px solid #fef3c7", flexShrink: 0 }} />
+                            ) : (
+                              <div style={{ width: 44, height: 44, borderRadius: 13, background: "linear-gradient(135deg,#d97706,#f59e0b)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#fff", flexShrink: 0 }}>
+                                {initials}
+                              </div>
+                            )}
+                            <div>
+                              <p style={{ fontSize: 14, fontWeight: 800, color: "#0e1e0e", marginBottom: 2 }}>{name} made a purchase!</p>
+                              {date && <p style={{ fontSize: 11, color: "#94a394", fontWeight: 600 }}>{date}</p>}
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          {reward.cashAmount > 0 && (
+                            <div style={{ background: "#f0fdf4", borderRadius: 10, padding: "8px 12px", display: "flex", alignItems: "center", gap: 6, border: "1px solid #bbf7d0" }}>
+                              <CircleDollarSign size={12} strokeWidth={2} color="#16a34a" />
+                              <span style={{ fontSize: 12, fontWeight: 800, color: "#16a34a" }}>+UGX {Number(reward.cashAmount).toLocaleString()} cash</span>
+                            </div>
+                          )}
+                          {reward.giftCard && (
+                            <div style={{ background: "#fef3c7", borderRadius: 10, padding: "8px 12px", display: "flex", alignItems: "center", gap: 6, border: "1px solid #fde68a" }}>
+                              <Gift size={12} strokeWidth={2} color="#d97706" />
+                              <span style={{ fontSize: 12, fontWeight: 800, color: "#d97706" }}>Gift Card: {reward.giftCard.code} (UGX {Number(reward.giftCard.amount).toLocaleString()})</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </>
+              ) : null}
+            </div>
+          </SCard>
+        )}
 
         {/* Payout methods */}
         <SCard delay={460} style={{ marginBottom: 14 }}>
