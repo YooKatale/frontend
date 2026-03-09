@@ -283,6 +283,12 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     redeemGiftCardCode: builder.mutation({
       query: (body) => ({ url: `${DB_URL}/gift-cards/redeem`, method: "POST", body }),
     }),
+    initiateGiftCardPayment: builder.mutation({
+      query: (body) => ({ url: `${DB_URL}/gift-cards/pay`, method: "POST", body }),
+    }),
+    verifyGiftCardPayment: builder.mutation({
+      query: (body) => ({ url: `${DB_URL}/gift-cards/pay/verify`, method: "POST", body }),
+    }),
     // Referrals
     getReferrals: builder.mutation({
       query: () => ({ url: `${DB_URL}/cashout/referrals`, method: "GET" }),
@@ -365,6 +371,8 @@ export const {
   useValidateGiftCardMutation,
   useGetGiftCardOccasionsMutation,
   useRedeemGiftCardCodeMutation,
+  useInitiateGiftCardPaymentMutation,
+  useVerifyGiftCardPaymentMutation,
   useGetReferralsMutation,
   useGetReferralRewardsMutation,
   useWithdrawFundsMutation,

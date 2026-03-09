@@ -17,15 +17,17 @@ import { ThemeColors } from "@constants/constants";
 import {
   useGetGiftCardsMutation, usePurchaseGiftCardMutation,
   useUseGiftCardMutation, useValidateGiftCardMutation,
-  useRedeemGiftCardCodeMutation,
+  useRedeemGiftCardCodeMutation, useInitiateGiftCardPaymentMutation,
+  useVerifyGiftCardPaymentMutation, useInitiateGiftCardPaymentMutation,
+  useVerifyGiftCardPaymentMutation,
 } from "@slices/usersApiSlice";
 import { useAuth } from "@slices/authSlice";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaGift, FaCopy, FaTicketAlt, FaPaperPlane, FaWallet,
-  FaEnvelope, FaUser, FaPhone, FaLock,
+  FaEnvelope, FaUser, FaPhone, FaLock, FaCreditCard, FaMobileAlt,
 } from "react-icons/fa";
 
 const MotionCard = motion(Card);
@@ -47,6 +49,14 @@ const OCCASIONS = [
   { key: "anniversary", emoji: "\uD83D\uDC8D", label: "Anniversary", tagline: "Years of love" },
   { key: "baby_shower", emoji: "\uD83D\uDC76", label: "Baby Shower", tagline: "Welcome the little one" },
   { key: "housewarming", emoji: "\uD83C\uDFE0", label: "Housewarming", tagline: "New home, new start" },
+  { key: "women_day", emoji: "\uD83D\uDC69", label: "Women\u2019s Day", tagline: "Celebrate her strength" },
+  { key: "independence_day", emoji: "\uD83C\uDDFA\uD83C\uDDEC", label: "Independence Day", tagline: "Celebrate the nation" },
+  { key: "eid", emoji: "\uD83C\uDF19", label: "Eid Mubarak", tagline: "Blessed celebrations" },
+  { key: "teachers_day", emoji: "\uD83D\uDCDA", label: "Teacher\u2019s Day", tagline: "Honor great teachers" },
+  { key: "friendship_day", emoji: "\uD83E\uDD1D", label: "Friendship Day", tagline: "Cherish your friends" },
+  { key: "get_well", emoji: "\uD83D\uDC8A", label: "Get Well Soon", tagline: "Wishing speedy recovery" },
+  { key: "congratulations", emoji: "\uD83C\uDFC6", label: "Congratulations", tagline: "You deserve it" },
+  { key: "just_because", emoji: "\uD83D\uDC9D", label: "Just Because", tagline: "No reason needed" },
 ];
 
 const PRESET_AMOUNTS = [10000, 20000, 50000, 100000, 200000, 500000];
@@ -243,6 +253,7 @@ export default function GiftCardsPage() {
   const [recipientEmail, setRecipientEmail] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
   const [personalMessage, setPersonalMessage] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("mobile_money");
 
   /* --- Redeem form --- */
   const [redeemCode, setRedeemCode] = useState("");
@@ -251,6 +262,8 @@ export default function GiftCardsPage() {
   const [getGiftCards] = useGetGiftCardsMutation();
   const [purchaseGiftCard, { isLoading: purchasing }] = usePurchaseGiftCardMutation();
   const [redeemGiftCardCode, { isLoading: redeeming }] = useRedeemGiftCardCodeMutation();
+  const [initiateGiftCardPayment] = useInitiateGiftCardPaymentMutation();
+  const [verifyGiftCardPayment] = useVerifyGiftCardPaymentMutation();
 
   /* --- Refs for scrolling --- */
   const occasionsRef = useRef(null);
@@ -279,6 +292,8 @@ export default function GiftCardsPage() {
     }
   }, [getGiftCards]);
 
+  const searchParams = useSearchParams();
+
   useEffect(() => {
     if (!userInfo || typeof userInfo !== "object" || Object.keys(userInfo).length === 0) {
       router.push("/signin");
@@ -286,6 +301,24 @@ export default function GiftCardsPage() {
     }
     loadGiftCards();
   }, [userInfo, router, loadGiftCards]);
+
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    const txRef = searchParams.get("tx_ref");
+    const transactionId = searchParams.get("transaction_id");
+    if (payment === "verify" && txRef) {
+      (async () => {
+        try {
+          const vRes = await verifyGiftCardPayment({ tx_ref: txRef, transaction_id: transactionId }).unwrap();
+          toast({ title: "Payment Verified!", description: vRes?.message || "Your voucher is now active.", status: "success", duration: 5000, isClosable: true });
+          loadGiftCards();
+        } catch (ve) {
+          toast({ title: "Verification Issue", description: ve?.data?.message || "Could not verify payment. Contact support if you were charged.", status: "warning", duration: 6000, isClosable: true });
+        }
+        router.replace("/gift-cards", { scroll: false });
+      })();
+    }
+  }, [searchParams]);
 
   /* ---- Reset purchase form ---- */
   const resetPurchaseForm = () => {
@@ -296,6 +329,7 @@ export default function GiftCardsPage() {
     setRecipientEmail("");
     setRecipientPhone("");
     setPersonalMessage("");
+    setPaymentMethod("mobile_money");
   };
 
   const closePurchase = () => {
@@ -324,18 +358,53 @@ export default function GiftCardsPage() {
       const body = {
         amount: finalAmount,
         occasion: selectedOccasion,
+        paymentMethod,
         personalMessage: personalMessage.trim() || undefined,
-        notes: personalMessage.trim() || undefined,
       };
       if (forSomeoneElse) {
         body.recipientName = recipientName.trim() || undefined;
         body.recipientEmail = recipientEmail.trim();
         body.recipientPhone = recipientPhone.trim() || undefined;
       }
-      const res = await purchaseGiftCard(body).unwrap();
-      toast({ title: "Voucher Purchased!", description: res?.message || "Your shopping voucher is ready.", status: "success", duration: 5000, isClosable: true });
-      closePurchase();
-      loadGiftCards();
+      const res = await initiateGiftCardPayment(body).unwrap();
+      const payload = res?.data?.flutterwavePayload;
+      if (payload) {
+        if (typeof window !== "undefined" && window.FlutterwaveCheckout) {
+          window.FlutterwaveCheckout({
+            ...payload,
+            public_key: payload.public_key || process.env.NEXT_PUBLIC_FLW_PUBLIC_KEY,
+            callback: async (response) => {
+              try {
+                const vRes = await verifyGiftCardPayment({ tx_ref: payload.tx_ref, transaction_id: response.transaction_id }).unwrap();
+                toast({ title: "Payment Successful!", description: vRes?.message || "Your voucher is now active.", status: "success", duration: 5000, isClosable: true });
+                closePurchase();
+                loadGiftCards();
+              } catch (ve) {
+                toast({ title: "Verification Issue", description: ve?.data?.message || "Payment received but verification pending. Check My Vouchers.", status: "warning", duration: 6000, isClosable: true });
+                closePurchase();
+                loadGiftCards();
+              }
+            },
+            onclose: () => {
+              toast({ title: "Payment Cancelled", description: "You can retry the purchase anytime.", status: "info", duration: 3000, isClosable: true });
+            },
+          });
+        } else {
+          const redirectUrl = payload.redirect_url || res?.data?.paymentLink;
+          if (redirectUrl) {
+            window.location.href = `https://checkout.flutterwave.com/v3/hosted/pay?tx_ref=${payload.tx_ref}&amount=${payload.amount}&currency=${payload.currency}&redirect_url=${encodeURIComponent(redirectUrl)}&customer[email]=${encodeURIComponent(payload.customer?.email || "")}&customizations[title]=${encodeURIComponent(payload.customizations?.title || "Yookatale")}`;
+          } else {
+            const fallbackRes = await purchaseGiftCard({ ...body, notes: personalMessage.trim() || undefined }).unwrap();
+            toast({ title: "Voucher Purchased!", description: fallbackRes?.message || "Your shopping voucher is ready.", status: "success", duration: 5000, isClosable: true });
+            closePurchase();
+            loadGiftCards();
+          }
+        }
+      } else {
+        toast({ title: "Voucher Purchased!", description: res?.message || "Your shopping voucher is ready.", status: "success", duration: 5000, isClosable: true });
+        closePurchase();
+        loadGiftCards();
+      }
     } catch (e) {
       toast({ title: "Purchase Failed", description: e?.data?.message || e?.message || "Something went wrong.", status: "error", duration: 5000, isClosable: true });
     }
@@ -718,6 +787,43 @@ export default function GiftCardsPage() {
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              {/* Payment Method */}
+              <FormControl>
+                <FormLabel fontSize="sm" fontWeight="600" color="gray.600">Payment Method</FormLabel>
+                <HStack spacing={3}>
+                  <Button
+                    flex={1}
+                    variant={paymentMethod === "mobile_money" ? "solid" : "outline"}
+                    bg={paymentMethod === "mobile_money" ? ThemeColors.primaryColor : "transparent"}
+                    color={paymentMethod === "mobile_money" ? "white" : "gray.700"}
+                    borderColor={paymentMethod === "mobile_money" ? ThemeColors.primaryColor : "gray.200"}
+                    _hover={{ bg: paymentMethod === "mobile_money" ? "#2e7d32" : "gray.50" }}
+                    borderRadius="lg"
+                    leftIcon={<Icon as={FaMobileAlt} />}
+                    onClick={() => setPaymentMethod("mobile_money")}
+                    fontWeight="600"
+                    fontSize="sm"
+                  >
+                    Mobile Money
+                  </Button>
+                  <Button
+                    flex={1}
+                    variant={paymentMethod === "card" ? "solid" : "outline"}
+                    bg={paymentMethod === "card" ? ThemeColors.primaryColor : "transparent"}
+                    color={paymentMethod === "card" ? "white" : "gray.700"}
+                    borderColor={paymentMethod === "card" ? ThemeColors.primaryColor : "gray.200"}
+                    _hover={{ bg: paymentMethod === "card" ? "#2e7d32" : "gray.50" }}
+                    borderRadius="lg"
+                    leftIcon={<Icon as={FaCreditCard} />}
+                    onClick={() => setPaymentMethod("card")}
+                    fontWeight="600"
+                    fontSize="sm"
+                  >
+                    Card
+                  </Button>
+                </HStack>
+              </FormControl>
 
               {/* Personal Message */}
               <FormControl>
