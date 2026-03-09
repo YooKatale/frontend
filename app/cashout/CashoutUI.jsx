@@ -32,6 +32,10 @@ import {
   Timer,
   CalendarClock,
   AlertCircle,
+  UserCheck,
+  UserPlus,
+  Mail,
+  Phone,
 } from "lucide-react";
 
 const fmt = (n) => "UGX " + Number(n).toLocaleString();
