@@ -15,10 +15,12 @@ import {
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import {
-  useGetGiftCardsMutation, usePurchaseGiftCardMutation,
-  useUseGiftCardMutation, useValidateGiftCardMutation,
-  useRedeemGiftCardCodeMutation, useInitiateGiftCardPaymentMutation,
-  useVerifyGiftCardPaymentMutation, useInitiateGiftCardPaymentMutation,
+  useGetGiftCardsMutation,
+  usePurchaseGiftCardMutation,
+  useUseGiftCardMutation,
+  useValidateGiftCardMutation,
+  useRedeemGiftCardCodeMutation,
+  useInitiateGiftCardPaymentMutation,
   useVerifyGiftCardPaymentMutation,
 } from "@slices/usersApiSlice";
 import { useAuth } from "@slices/authSlice";
