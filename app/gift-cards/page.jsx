@@ -392,14 +392,17 @@ export default function GiftCardsPage() {
             },
           });
         } else {
-          const redirectUrl = payload.redirect_url || res?.data?.paymentLink;
-          if (redirectUrl) {
-            window.location.href = `https://checkout.flutterwave.com/v3/hosted/pay?tx_ref=${payload.tx_ref}&amount=${payload.amount}&currency=${payload.currency}&redirect_url=${encodeURIComponent(redirectUrl)}&customer[email]=${encodeURIComponent(payload.customer?.email || "")}&customizations[title]=${encodeURIComponent(payload.customizations?.title || "Yookatale")}`;
+          const paymentLink = res?.data?.paymentLink;
+          if (paymentLink) {
+            window.location.href = paymentLink;
           } else {
-            const fallbackRes = await purchaseGiftCard({ ...body, notes: personalMessage.trim() || undefined }).unwrap();
-            toast({ title: "Voucher Purchased!", description: fallbackRes?.message || "Your shopping voucher is ready.", status: "success", duration: 5000, isClosable: true });
-            closePurchase();
-            loadGiftCards();
+            toast({
+              title: "Checkout Unavailable",
+              description: "Could not open Flutterwave checkout. Please try again.",
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            });
           }
         }
       } else {

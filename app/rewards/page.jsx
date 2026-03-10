@@ -28,6 +28,7 @@ import {
   useToast,
   VStack,
   Badge,
+  Progress,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import {
@@ -60,6 +61,13 @@ export default function RewardsPage() {
 
   const [referralData, setReferralData] = useState(null);
   const [referralRewards, setReferralRewards] = useState(null);
+  const referralTargetCash = 50000;
+  const rewardPerReferral = Number(referralData?.rewardPerReferral || 2000);
+  const referralsNeededForTarget = rewardPerReferral > 0 ? Math.ceil(referralTargetCash / rewardPerReferral) : 25;
+  const referralsProgressPercent = Math.min(
+    100,
+    Math.round(((Number(referralData?.totalReferred || 0) / referralsNeededForTarget) * 100) || 0)
+  );
 
   const [getRewards] = useGetRewardsMutation();
   const [getMyRewards] = useGetMyRewardsMutation();
@@ -209,12 +217,27 @@ export default function RewardsPage() {
                     </Flex>
                     <Box>
                       <Text fontSize="xs" color="gray.500" fontWeight="600">Per Referral</Text>
-                      <Text fontSize="xl" fontWeight="800" color="purple.600">UGX {Number(referralData.rewardPerReferral || 50000).toLocaleString()}</Text>
+                      <Text fontSize="xl" fontWeight="800" color="purple.600">UGX {Number(referralData.rewardPerReferral || 2000).toLocaleString()}</Text>
                     </Box>
                   </HStack>
                 </CardBody>
               </Card>
             </SimpleGrid>
+
+            <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="teal.100" overflow="hidden" mb={4}>
+              <CardBody>
+                <HStack justify="space-between" mb={2}>
+                  <Text fontSize="sm" fontWeight="700" color="gray.700">Target Progress</Text>
+                  <Badge colorScheme="teal" fontSize="xs">
+                    {Math.min(Number(referralData?.totalReferred || 0), referralsNeededForTarget)}/{referralsNeededForTarget} referrals
+                  </Badge>
+                </HStack>
+                <Text fontSize="xs" color="gray.500" mb={2}>
+                  Invite {referralsNeededForTarget}+ people to reach UGX {referralTargetCash.toLocaleString()}.
+                </Text>
+                <Progress value={referralsProgressPercent} colorScheme="teal" borderRadius="full" h="8px" />
+              </CardBody>
+            </Card>
 
             {referralData.referredUsers?.length > 0 && (
               <Card bg="white" borderRadius="xl" boxShadow="md" borderWidth="1px" borderColor="gray.100" overflow="hidden">

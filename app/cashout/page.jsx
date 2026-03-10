@@ -314,8 +314,8 @@ export default function CashoutPage() {
       toast({ title: "Error", description: "Select a payout method.", status: "error", duration: 4000, isClosable: true });
       return;
     }
-    if (!Number.isFinite(amt) || amt < 1000) {
-      toast({ title: "Invalid Amount", description: "Minimum withdrawal is UGX 1,000.", status: "error", duration: 4000, isClosable: true });
+    if (!Number.isFinite(amt) || amt < 5000) {
+      toast({ title: "Invalid Amount", description: "Minimum withdrawal is UGX 5,000.", status: "error", duration: 4000, isClosable: true });
       return;
     }
     if (amt > (stats.cash || 0)) {
@@ -485,7 +485,7 @@ export default function CashoutPage() {
                   </div>
                   <div style={{ background: "#eff6ff", borderRadius: 10, padding: "8px 12px", display: "flex", alignItems: "center", gap: 6, border: "1px solid #bfdbfe" }}>
                     <UserPlus size={13} strokeWidth={2} color="#2563eb" />
-                    <span style={{ fontSize: 11, fontWeight: 800, color: "#2563eb" }}>UGX {Number(referralData.rewardPerReferral || 50000).toLocaleString()} per referral</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#2563eb" }}>UGX {Number(referralData.rewardPerReferral || 2000).toLocaleString()} per referral</span>
                   </div>
                 </div>
                 {referralData.referredUsers.map((person, i) => {
@@ -529,7 +529,7 @@ export default function CashoutPage() {
                   <UserPlus size={26} strokeWidth={1.8} color="#0284c7" />
                 </div>
                 <p style={{ fontSize: 14, fontWeight: 800, color: "#0e1e0e", marginBottom: 4 }}>No referrals yet</p>
-                <p style={{ fontSize: 12, color: "#7a9a7a", fontWeight: 600, maxWidth: 280, margin: "0 auto 16px" }}>Share your referral link with friends. When they sign up, they appear here and you earn UGX 50,000!</p>
+                <p style={{ fontSize: 12, color: "#7a9a7a", fontWeight: 600, maxWidth: 280, margin: "0 auto 16px" }}>Share your referral link with friends. When they sign up, they appear here and you earn UGX 2,000!</p>
                 <PBtn Icon={Share2} onClick={openReferral}>Invite Friends Now</PBtn>
               </div>
             )}
