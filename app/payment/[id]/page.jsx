@@ -10,8 +10,9 @@ import {
   useOrderUpdateMutation,
   useValidateCouponMutation,
 } from "@slices/productsApiSlice";
+import { useValidateGiftCardMutation } from "@slices/usersApiSlice";
 import { FormatCurr } from "@utils/utils";
-import { Loader2, Check, Shield, CreditCard, Truck, Smartphone, Zap } from "lucide-react";
+import { Loader2, Check, Shield, CreditCard, Truck, Smartphone, Zap, Gift } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@slices/authSlice";
@@ -40,12 +41,16 @@ const Payment = ({ params }) => {
   const [orderError, setOrderError] = useState(null);
   const [CouponFormIsLoading, setCouponFormIsLoading] = useState(false);
   const [CouponCode, setCouponCode] = useState("");
+  const [giftCardCode, setGiftCardCode] = useState("");
+  const [giftCardPreview, setGiftCardPreview] = useState(null);
+  const [isCheckingGiftCard, setIsCheckingGiftCard] = useState(false);
   const [couponApplied, setCouponApplied] = useState(false);
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
 
   const [fetchOrder] = useOrderMutation();
   const [updateOrder] = useOrderUpdateMutation();
   const [validateCoupon] = useValidateCouponMutation();
+  const [validateGiftCard] = useValidateGiftCardMutation();
 
   const chakraToast = useToast();
   const { userInfo } = useAuth();
@@ -143,10 +148,117 @@ const Payment = ({ params }) => {
     }
   }, [params?.id, handleDataFetch, fetchSubscriptionStatus, userInfo?.token]);
 
+  const handleValidateGiftCard = async () => {
+    const code = giftCardCode.trim().toUpperCase();
+    if (!code) {
+      chakraToast({
+        title: "Gift Card Required",
+        description: "Please enter your gift card code.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+
+    try {
+      setIsCheckingGiftCard(true);
+      const res = await validateGiftCard(code).unwrap();
+
+      if (res?.valid) {
+        setGiftCardPreview(res?.data || null);
+        chakraToast({
+          title: "Gift Card Valid",
+          description: `Available balance: UGX ${FormatCurr(res?.data?.balance || 0)}`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+          position: "top",
+        });
+      } else {
+        setGiftCardPreview(null);
+        chakraToast({
+          title: "Invalid Gift Card",
+          description: res?.message || "Gift card could not be validated.",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+          position: "top",
+        });
+      }
+    } catch (err) {
+      setGiftCardPreview(null);
+      chakraToast({
+        title: "Gift Card Error",
+        description:
+          err?.data?.message || err?.message || "Could not validate this gift card.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+        position: "top",
+      });
+    } finally {
+      setIsCheckingGiftCard(false);
+    }
+  };
+
   const handlePayment = async () => {
     if (!paymentMethod || isLoading) return;
+
+    if (paymentMethod === "gift_card" && !giftCardCode.trim()) {
+      chakraToast({
+        title: "Gift Card Required",
+        description: "Please enter your gift card code before payment.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
     
     setIsLoading(true);
+
+    if (paymentMethod === "gift_card") {
+      try {
+        const res = await updateOrder({
+          data: {
+            payment: {
+              paymentMethod: "gift_card",
+              giftCardCode: giftCardCode.trim().toUpperCase(),
+            },
+            order: params.id,
+            schema: "schedule",
+            user: userInfo || {},
+          },
+        }).unwrap();
+
+        if (res?.status === "Success" || res?.status === "success") {
+          chakraToast({
+            description: "Gift card applied successfully. Order confirmed!",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            position: "top",
+          });
+          setTimeout(() => router.push("/"), 1500);
+        }
+      } catch (err) {
+        chakraToast({
+          title: "Gift Card Payment Failed",
+          description:
+            err?.data?.message || err?.message || "Could not pay with this gift card.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "top",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
   
     if (paymentMethod === "cash_on_delivery") {
       try {
@@ -332,6 +444,14 @@ const Payment = ({ params }) => {
       icon: <CreditCard className="w-6 h-6" />,
       logos: null,
       colorScheme: "blue",
+    },
+    {
+      value: "gift_card",
+      label: "Gift Card",
+      description: "Use your Yookatale gift card balance",
+      icon: <Gift className="w-6 h-6" />,
+      logos: null,
+      colorScheme: "pink",
     },
     {
       value: "cash_on_delivery",
@@ -550,6 +670,43 @@ const Payment = ({ params }) => {
                   </AnimatePresence>
                 </Box>
 
+                {paymentMethod === "gift_card" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ marginBottom: "1rem" }}
+                  >
+                    <Box p={4} border="1px solid" borderColor="gray.200" borderRadius="xl" bg="gray.50">
+                      <Text fontSize="sm" fontWeight="600" color="gray.700" mb={2}>
+                        Enter Gift Card Code
+                      </Text>
+                      <Flex gap={2}>
+                        <Input
+                          type="text"
+                          placeholder="e.g. YOOABCDEFG12"
+                          value={giftCardCode}
+                          onChange={(e) => {
+                            setGiftCardCode(e.target.value.toUpperCase());
+                            setGiftCardPreview(null);
+                          }}
+                        />
+                        <ButtonComponent
+                          text={isCheckingGiftCard ? "" : "Check"}
+                          size="md"
+                          onClick={handleValidateGiftCard}
+                          icon={isCheckingGiftCard ? <Loader2 className="w-4 h-4 animate-spin" /> : undefined}
+                          disabled={isCheckingGiftCard || !giftCardCode.trim()}
+                        />
+                      </Flex>
+                      {giftCardPreview && (
+                        <Text mt={2} fontSize="sm" color="green.600">
+                          Valid card. Balance: UGX {FormatCurr(giftCardPreview?.balance || 0)}
+                        </Text>
+                      )}
+                    </Box>
+                  </motion.div>
+                )}
+
                 {/* Payment Button */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -594,9 +751,11 @@ const Payment = ({ params }) => {
                     ) : (
                       <>
                         {paymentMethod === "cash_on_delivery" && <Truck className="w-5 h-5" />}
+                        {paymentMethod === "gift_card" && <Gift className="w-5 h-5" />}
                         {paymentMethod === "payLater" && <Zap className="w-5 h-5" />}
-                        {!["cash_on_delivery", "payLater"].includes(paymentMethod) && <CreditCard className="w-5 h-5" />}
+                        {!["cash_on_delivery", "gift_card", "payLater"].includes(paymentMethod) && <CreditCard className="w-5 h-5" />}
                         {paymentMethod === "cash_on_delivery" ? "Place Order" : 
+                         paymentMethod === "gift_card" ? "Pay with Gift Card" :
                          paymentMethod === "payLater" ? "Confirm Pay Later" : 
                          `Pay UGX ${FormatCurr(Order?.total)}`}
                       </>
@@ -607,6 +766,8 @@ const Payment = ({ params }) => {
                     <Text fontSize="sm" color="gray.500" textAlign="center" mt={3}>
                       {paymentMethod === "cash_on_delivery" 
                         ? "You'll pay when your order arrives"
+                        : paymentMethod === "gift_card"
+                        ? "Your gift card balance will be used for this order"
                         : paymentMethod === "payLater"
                         ? "Payment will be charged to your subscription"
                         : "You'll be redirected to a secure payment page"}
