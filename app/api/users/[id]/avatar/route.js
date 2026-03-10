@@ -18,6 +18,7 @@ export async function PUT(request, { params }) {
       body: formData,
       headers: {
         Cookie: request.headers.get("cookie") || "",
+        Authorization: request.headers.get("authorization") || "",
       },
       credentials: "include",
     });

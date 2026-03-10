@@ -320,7 +320,8 @@ export default function AccountPage() {
     if (!file.type.startsWith("image/")) return;
     setAvatarLoading(true);
     try {
-      const res = await updateUserAvatar({ userId: userInfo._id, file }).unwrap();
+      const authToken = userInfo?.token || userInfo?.accessToken;
+      const res = await updateUserAvatar({ userId: userInfo._id, file, token: authToken }).unwrap();
       if (res?.data) {
         const updated = { ...userInfo, avatar: res.data.avatar ?? userInfo.avatar, ...res.data };
         dispatch(setCredentials(updated));
@@ -337,7 +338,8 @@ export default function AccountPage() {
     if (!confirm("Are you sure you want to delete your account? This cannot be undone.")) return;
     setIsDeleting(true);
     try {
-      const res = await fetch(`${DB_URL}/users/${userInfo?._id}`, { method: "DELETE", credentials: "include" });
+      const authToken = userInfo?.token || userInfo?.accessToken;
+      const res = await fetch(`${DB_URL}/users/${userInfo?._id}`, { method: "DELETE", credentials: "include", headers: authToken ? { Authorization: `Bearer ${authToken}` } : {} });
       const data = await res.json().catch(() => ({}));
       if (res.ok || data?.status === "Success") {
         if (typeof window !== "undefined") {
@@ -357,7 +359,7 @@ export default function AccountPage() {
     userInfo?.email ||
     "Account";
   const tier = (userInfo?.subscription || userInfo?.plan || stats.subscription || "Free") + " MEMBER";
-  const loyaltyPts = userInfo?.loyaltyPts ?? 0;
+  const loyaltyPts = userInfo?.loyaltyPoints ?? userInfo?.loyaltyPts ?? 0;
 
   if (userInfo === undefined) return null;
   if (!userInfo) return null;

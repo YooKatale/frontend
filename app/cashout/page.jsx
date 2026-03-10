@@ -99,7 +99,7 @@ export default function CashoutPage() {
   const [cardExpiry, setCardExpiry] = useState("");
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  const [stats, setStats] = useState({ cash: 0, invites: 0, loyalty: 0 });
+  const [stats, setStats] = useState({ cash: 0, invites: 0, loyalty: 0, points: 0, redeemablePoints: 0, eligibleToRedeemPoints: false, minSignupsForCashout: 25, rewardPerReferralCashEquivalent: 2000 });
   const [payoutMethods, setPayoutMethods] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
   const [loadingStats, setLoadingStats] = useState(true);
@@ -133,7 +133,7 @@ export default function CashoutPage() {
       const res = await getCashoutStats().unwrap();
       if (res?.status === "Success" && res?.data) setStats(res.data);
     } catch (e) {
-      setStats({ cash: 0, invites: 0, loyalty: 0 });
+      setStats({ cash: 0, invites: 0, loyalty: 0, points: 0, redeemablePoints: 0, eligibleToRedeemPoints: false, minSignupsForCashout: 25, rewardPerReferralCashEquivalent: 2000 });
     } finally {
       setLoadingStats(false);
     }
@@ -411,7 +411,7 @@ export default function CashoutPage() {
             cta={<PBtn Icon={ArrowDownToLine} small onClick={handleWithdraw}>Withdraw</PBtn>}
           />
           <StatCard label="Total Invites" delay={80} Icon={Users} value={loadingStats && loadingReferrals ? "—" : String(referralData?.totalReferred ?? stats.invites ?? 0)} sub="Friends referred" accent="#0284c7" gradient="linear-gradient(135deg,#075985,#0284c7)" />
-          <StatCard label="Loyalty Points" delay={160} Icon={BadgePercent} value={loadingStats ? "—" : String(stats.loyalty || 0)} sub="Points to redeem" accent="#c2620a" gradient="linear-gradient(135deg,#9a3412,#ea580c)" />
+          <StatCard label="Referral Points" delay={160} Icon={BadgePercent} value={loadingStats ? "—" : String(stats.loyalty || 0)} sub="Signup referral points" accent="#c2620a" gradient="linear-gradient(135deg,#9a3412,#ea580c)" />
         </div>
 
         {/* Rewards + Gift cards */}
@@ -437,12 +437,17 @@ export default function CashoutPage() {
           <SCard delay={340}>
             <SHead Icon={Share2} title="Invite a Friend" />
             <div style={{ padding: "18px 22px 22px", display: "flex", flexDirection: "column", gap: 16 }}>
-              <p style={{ fontSize: 13, color: "#5a7a5a", fontWeight: 600, lineHeight: 1.7 }}>Earn up to <strong style={{ color: "#1a5c1a" }}>UGX 50,000</strong> for every friend who signs up with your link.</p>
+              <p style={{ fontSize: 13, color: "#5a7a5a", fontWeight: 600, lineHeight: 1.7 }}>Earn <strong style={{ color: "#1a5c1a" }}>1 point</strong> for every friend who signs up. Redeem cash after 25+ successful referrals.</p>
               <div style={{ background: "#f0f7f0", borderRadius: 13, padding: "11px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, border: "1.5px solid #c6e4c6" }}>
                 <span style={{ fontSize: 12, fontWeight: 700, color: "#2d6a2d", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{referralUrl || "Get your link below"}</span>
                 <button type="button" onClick={handleCopy} style={{ display: "flex", alignItems: "center", gap: 5, flexShrink: 0, background: copied ? "#1a5c1a" : "#fff", color: copied ? "#fff" : "#1a5c1a", border: "1.5px solid #1a5c1a", borderRadius: 8, padding: "5px 11px", fontSize: 11, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>
                   {copied ? <><Check size={11} strokeWidth={2.5} />Copied!</> : <><Copy size={11} strokeWidth={2.2} />Copy</>}
                 </button>
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: stats.eligibleToRedeemPoints ? "#166534" : "#92400e" }}>
+                {stats.eligibleToRedeemPoints
+                  ? `Ready for cashout: ${Number(stats.redeemablePoints || 0).toLocaleString()} pts (~UGX ${Number(stats.pointsCashEquivalent || 0).toLocaleString()})`
+                  : `Need ${Math.max(0, Number(stats.minSignupsForCashout || 25) - Number(stats.invites || 0))} more signup referrals to unlock point-to-cash redemption.`}
               </div>
               <PBtn Icon={Share2} full onClick={openReferral}>Get Referral Link</PBtn>
             </div>
@@ -481,11 +486,11 @@ export default function CashoutPage() {
                 <div style={{ padding: "12px 22px 8px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   <div style={{ background: "#f0fdf4", borderRadius: 10, padding: "8px 12px", display: "flex", alignItems: "center", gap: 6, border: "1px solid #bbf7d0" }}>
                     <CircleDollarSign size={13} strokeWidth={2} color="#16a34a" />
-                    <span style={{ fontSize: 11, fontWeight: 800, color: "#16a34a" }}>Total Earned: UGX {Number(referralData.totalEarnings || 0).toLocaleString()}</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#16a34a" }}>Cash Wallet: UGX {Number(stats.cash || 0).toLocaleString()}</span>
                   </div>
                   <div style={{ background: "#eff6ff", borderRadius: 10, padding: "8px 12px", display: "flex", alignItems: "center", gap: 6, border: "1px solid #bfdbfe" }}>
                     <UserPlus size={13} strokeWidth={2} color="#2563eb" />
-                    <span style={{ fontSize: 11, fontWeight: 800, color: "#2563eb" }}>UGX {Number(referralData.rewardPerReferral || 2000).toLocaleString()} per referral</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#2563eb" }}>{Number(referralData.rewardPerReferral || 1).toLocaleString()} point per referral</span>
                   </div>
                 </div>
                 {referralData.referredUsers.map((person, i) => {
@@ -529,7 +534,7 @@ export default function CashoutPage() {
                   <UserPlus size={26} strokeWidth={1.8} color="#0284c7" />
                 </div>
                 <p style={{ fontSize: 14, fontWeight: 800, color: "#0e1e0e", marginBottom: 4 }}>No referrals yet</p>
-                <p style={{ fontSize: 12, color: "#7a9a7a", fontWeight: 600, maxWidth: 280, margin: "0 auto 16px" }}>Share your referral link with friends. When they sign up, they appear here and you earn UGX 2,000!</p>
+                <p style={{ fontSize: 12, color: "#7a9a7a", fontWeight: 600, maxWidth: 280, margin: "0 auto 16px" }}>Share your referral link with friends. When they sign up, they appear here and you earn 1 referral point.</p>
                 <PBtn Icon={Share2} onClick={openReferral}>Invite Friends Now</PBtn>
               </div>
             )}

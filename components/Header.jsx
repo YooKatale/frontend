@@ -68,8 +68,8 @@ import {
   FaBolt,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { useLogoutMutation } from "@slices/usersApiSlice";
-import { useCartMutation } from "@slices/productsApiSlice";
+import { useGetCashoutStatsMutation, useLogoutMutation } from "@slices/usersApiSlice";
+import { useCartMutation, useOrdersMutation } from "@slices/productsApiSlice";
 import { logout, useAuth } from "@slices/authSlice";
 import { ThemeColors, CLIENT_DASHBOARD_URL, CategoriesJson, getUserAvatarUrl } from "@constants/constants";
 import { CART_UPDATED_EVENT } from "@lib/cartEvents";
@@ -94,6 +94,8 @@ const Header = () => {
   const [searchParam, setSearchParam] = useState("");
   const [searchCategory, setSearchCategory] = useState("All");
   const [cartItemsCount, setCartItemsCount] = useState(0);
+  const [ordersCount, setOrdersCount] = useState(0);
+  const [walletBalance, setWalletBalance] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const mobileSearchRef = useRef(null);
   const { push } = useRouter();
@@ -103,6 +105,8 @@ const Header = () => {
   const dispatch = useDispatch();
   const [logoutUser] = useLogoutMutation();
   const [fetchCart] = useCartMutation();
+  const [fetchOrders] = useOrdersMutation();
+  const [fetchCashoutStats] = useGetCashoutStatsMutation();
   const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = useDisclosure();
 
   const userDisplayName = userInfo?.name || userInfo?.firstname || userInfo?.email || "Account";
@@ -123,13 +127,41 @@ const Header = () => {
     }
   }, [userInfo?._id, fetchCart]);
 
-  useEffect(() => {
-    loadCartCount();
-  }, [loadCartCount]);
+
+  const loadQuickStats = useCallback(async () => {
+    if (!userInfo?._id) {
+      setOrdersCount(0);
+      setWalletBalance(0);
+      return;
+    }
+    try {
+      const [ordersRes, cashRes] = await Promise.all([
+        fetchOrders(userInfo._id).unwrap().catch(() => null),
+        fetchCashoutStats().unwrap().catch(() => null),
+      ]);
+      const allOrders = ordersRes?.data?.AllOrders ?? [];
+      setOrdersCount(Array.isArray(allOrders) ? allOrders.length : 0);
+      setWalletBalance(Number(cashRes?.data?.cash || 0));
+    } catch {
+      setOrdersCount(0);
+      setWalletBalance(0);
+    }
+  }, [userInfo?._id, fetchOrders, fetchCashoutStats]);
 
   useEffect(() => {
-    const onFocus = () => loadCartCount();
-    const onCartUpdated = () => loadCartCount();
+    loadCartCount();
+    loadQuickStats();
+  }, [loadCartCount, loadQuickStats]);
+
+  useEffect(() => {
+    const onFocus = () => {
+      loadCartCount();
+      loadQuickStats();
+    };
+    const onCartUpdated = () => {
+      loadCartCount();
+      loadQuickStats();
+    };
     if (typeof window !== "undefined") {
       window.addEventListener("focus", onFocus);
       window.addEventListener(CART_UPDATED_EVENT, onCartUpdated);
@@ -138,7 +170,7 @@ const Header = () => {
         window.removeEventListener(CART_UPDATED_EVENT, onCartUpdated);
       };
     }
-  }, [loadCartCount]);
+  }, [loadCartCount, loadQuickStats]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -832,7 +864,7 @@ const Header = () => {
               {userInfo && (
                 <Flex gridTemplateColumns="repeat(3,1fr)" gap={0} bg="rgba(255,255,255,0.06)" borderRadius="12px" overflow="hidden" as="div" display="grid">
                   <Box py="9px" textAlign="center" borderRight="1px solid rgba(255,255,255,0.08)">
-                    <Text fontFamily="Syne, sans-serif" fontSize="14px" fontWeight="800" color="white">0</Text>
+                    <Text fontFamily="Syne, sans-serif" fontSize="14px" fontWeight="800" color="white">{ordersCount}</Text>
                     <Text fontSize="9px" color="rgba(255,255,255,0.55)" textTransform="uppercase" letterSpacing="0.05em" mt="1px">Orders</Text>
                   </Box>
                   <Box py="9px" textAlign="center" borderRight="1px solid rgba(255,255,255,0.08)">
@@ -840,7 +872,7 @@ const Header = () => {
                     <Text fontSize="9px" color="rgba(255,255,255,0.55)" textTransform="uppercase" letterSpacing="0.05em" mt="1px">Wishlist</Text>
                   </Box>
                   <Box py="9px" textAlign="center">
-                    <Text fontFamily="Syne, sans-serif" fontSize="14px" fontWeight="800" color="white">UGX 0</Text>
+                    <Text fontFamily="Syne, sans-serif" fontSize="14px" fontWeight="800" color="white">UGX {walletBalance.toLocaleString()}</Text>
                     <Text fontSize="9px" color="rgba(255,255,255,0.55)" textTransform="uppercase" letterSpacing="0.05em" mt="1px">Wallet</Text>
                   </Box>
                 </Flex>
@@ -928,7 +960,7 @@ const Header = () => {
                       {pathname === "/invoices" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
                       <Flex w="34px" h="34px" borderRadius="10px" bg={pathname === "/invoices" ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}><FaShoppingBag size={17} color={pathname === "/invoices" ? "#1a6b3a" : "#637568"} /></Flex>
                       <Text fontSize="13px" fontWeight={pathname === "/invoices" ? 700 : 500} color={pathname === "/invoices" ? "#1a6b3a" : "#1e2d22"} flex={1}>My Orders</Text>
-                      <Badge fontSize="9px" fontWeight="800" px="7px" py="2px" borderRadius="full" bg="#1a6b3a" color="white">0</Badge>
+                      <Badge fontSize="9px" fontWeight="800" px="7px" py="2px" borderRadius="full" bg="#1a6b3a" color="white">{ordersCount}</Badge>
                       <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
                       </Flex>
                     </Link>

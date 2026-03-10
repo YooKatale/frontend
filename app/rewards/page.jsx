@@ -62,8 +62,9 @@ export default function RewardsPage() {
   const [referralData, setReferralData] = useState(null);
   const [referralRewards, setReferralRewards] = useState(null);
   const referralTargetCash = 50000;
-  const rewardPerReferral = Number(referralData?.rewardPerReferral || 2000);
-  const referralsNeededForTarget = rewardPerReferral > 0 ? Math.ceil(referralTargetCash / rewardPerReferral) : 25;
+  const rewardPerReferral = Number(referralData?.rewardPerReferral || 1);
+  const rewardPerReferralCashEquivalent = Number(referralData?.rewardPerReferralCashEquivalent || 2000);
+  const referralsNeededForTarget = rewardPerReferralCashEquivalent > 0 ? Math.ceil(referralTargetCash / rewardPerReferralCashEquivalent) : 25;
   const referralsProgressPercent = Math.min(
     100,
     Math.round(((Number(referralData?.totalReferred || 0) / referralsNeededForTarget) * 100) || 0)
@@ -216,8 +217,8 @@ export default function RewardsPage() {
                       <Icon as={FaStar} color="purple.500" boxSize={5} />
                     </Flex>
                     <Box>
-                      <Text fontSize="xs" color="gray.500" fontWeight="600">Per Referral</Text>
-                      <Text fontSize="xl" fontWeight="800" color="purple.600">UGX {Number(referralData.rewardPerReferral || 2000).toLocaleString()}</Text>
+                      <Text fontSize="xs" color="gray.500" fontWeight="600">Per Referral Signup</Text>
+                      <Text fontSize="xl" fontWeight="800" color="purple.600">{Number(referralData.rewardPerReferral || 1).toLocaleString()} point</Text>
                     </Box>
                   </HStack>
                 </CardBody>
@@ -233,7 +234,7 @@ export default function RewardsPage() {
                   </Badge>
                 </HStack>
                 <Text fontSize="xs" color="gray.500" mb={2}>
-                  Invite {referralsNeededForTarget}+ people to reach UGX {referralTargetCash.toLocaleString()}.
+                  Invite {referralsNeededForTarget}+ people to reach UGX {referralTargetCash.toLocaleString()} at UGX {rewardPerReferralCashEquivalent.toLocaleString()} per point (cashout unlock at 25 signups).
                 </Text>
                 <Progress value={referralsProgressPercent} colorScheme="teal" borderRadius="full" h="8px" />
               </CardBody>

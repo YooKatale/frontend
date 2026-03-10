@@ -57,9 +57,10 @@ const UpdateAccount = ({ isOpen, onClose }) => {
     setLoading(true);
 
     try {
+      const authToken = userInfo?.token || userInfo?.accessToken;
       const res = await fetch(`${DB_URL}/users/${userInfo?._id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}) },
         credentials: "include",
         body: JSON.stringify({
           firstname: userData.firstname.trim(),
