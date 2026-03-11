@@ -600,6 +600,24 @@ const Partner = () => {
                     />
                   </button>
 
+                  <div className={styles.termsRow}>
+                    <label className={styles.termsLabel}>
+                      <input
+                        type="checkbox"
+                        name="terms"
+                        checked={vendorFormData.terms}
+                        onChange={handleVendorChange}
+                      />
+                      <span>
+                        I agree to the{" "}
+                        <a href="/vendor-terms" target="_blank" rel="noopener noreferrer">
+                          Vendor Terms &amp; Conditions
+                        </a>
+                        .
+                      </span>
+                    </label>
+                  </div>
+
                   <button type="submit" className={styles.submitBtn} disabled={isVendorLoading}>
                     <svg
                       fill="none"
@@ -888,6 +906,24 @@ const Partner = () => {
                       }`}
                     />
                   </button>
+
+                  <div className={styles.termsRow}>
+                    <label className={styles.termsLabel}>
+                      <input
+                        type="checkbox"
+                        name="terms"
+                        checked={deliveryFormData.terms}
+                        onChange={handleDeliveryChange}
+                      />
+                      <span>
+                        I agree to the{' '}
+                        <a href="/usage" target="_blank" rel="noopener noreferrer">
+                          Delivery Partner Terms &amp; Conditions
+                        </a>
+                        .
+                      </span>
+                    </label>
+                  </div>
 
                   <button
                           type="submit"
