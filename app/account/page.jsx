@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@slices/authSlice";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "@slices/authSlice";
 import { useOrdersMutation } from "@slices/productsApiSlice";
@@ -221,7 +221,10 @@ export default function AccountPage() {
   const { userInfo } = useAuth();
   const router = useRouter();
   const dispatch = useDispatch();
-  const [active, setActive] = useState("profile");
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams?.get("tab") || "profile").toLowerCase();
+  const allowedTabs = new Set(["profile", "orders", "subscriptions", "settings"]);
+  const [active, setActive] = useState(allowedTabs.has(initialTab) ? initialTab : "profile");
   const [saved, setSaved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({ orders: 0, spent: 0, subscription: "Free" });

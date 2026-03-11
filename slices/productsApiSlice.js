@@ -102,6 +102,33 @@ export const productsApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    ordersMe: builder.query({
+      query: () => ({
+        url: `${DB_URL}/orders/me`,
+        method: "GET",
+      }),
+      transformResponse: (res) => (res?.status === "Success" ? res.data : []),
+    }),
+    cancelOrder: builder.mutation({
+      query: ({ orderId, reason }) => ({
+        url: `${DB_URL}/orders/${orderId}/cancel`,
+        method: "PATCH",
+        body: { reason },
+      }),
+    }),
+    deleteOrderFromHistory: builder.mutation({
+      query: ({ orderId }) => ({
+        url: `${DB_URL}/orders/${orderId}/me-delete`,
+        method: "DELETE",
+      }),
+    }),
+    orderTracking: builder.query({
+      query: ({ orderId }) => ({
+        url: `${DB_URL}/delivery/order/${orderId}`,
+        method: "GET",
+      }),
+      transformResponse: (res) => (res?.status === "Success" ? res.data : {}),
+    }),
     orderUpdate: builder.mutation({
       query: (data) => ({
         url: `${DB_URL}/products/order`,
@@ -141,9 +168,13 @@ export const {
   useSearchMutation,
   useNewScheduleMutation,
   useOrdersMutation,
+  useOrdersMeQuery,
   useProductsCategoriesGetMutation,
   useOrderMutation,
   useOrderUpdateMutation,
+  useCancelOrderMutation,
+  useDeleteOrderFromHistoryMutation,
+  useOrderTrackingQuery,
   useCartCheckoutMutation,
   useValidateCouponMutation,
   useGetCountryCuisinesQuery,

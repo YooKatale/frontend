@@ -1,264 +1,106 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Box, Flex, Text, Heading, Badge, Progress, VStack, HStack, Icon } from "@chakra-ui/react";
-import { 
-  ShoppingCart, 
-  CheckCircle, 
-  Restaurant, 
-  LocalShipping, 
-  DeliveryDining, 
-  DoneAll 
-} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Box, Text, Heading, Badge, Progress, VStack, HStack, Link } from "@chakra-ui/react";
+import { ShoppingCart, CheckCircle, ChefHat, Truck, Navigation, PackageCheck } from "lucide-react";
 import { ref, onValue, off } from "firebase/database";
 import { db } from "@lib/firebase";
+import { DB_URL } from "@config/config";
 
-/**
- * Real-time Order Tracking Component (like Jumia Foods/Glovo)
- * Shows live order status updates and delivery progress
- */
 export default function OrderTracking({ orderId, initialOrder }) {
   const [order, setOrder] = useState(initialOrder || null);
-  const [deliveryLocation, setDeliveryLocation] = useState(null);
+  const [backendTracking, setBackendTracking] = useState(null);
   const [loading, setLoading] = useState(!initialOrder);
 
   useEffect(() => {
     if (!orderId || !db) return;
-
-    // Listen to order updates in real-time
     const orderRef = ref(db, `orders/${orderId}`);
-    const unsubscribeOrder = onValue(orderRef, (snapshot) => {
-      const data = snapshot.val();
+    const unsub = onValue(orderRef, (snap) => {
+      const data = snap.val();
       if (data) {
-        setOrder(data);
+        setOrder((prev) => ({ ...prev, ...data }));
         setLoading(false);
       }
     });
+    return () => off(orderRef);
+  }, [orderId]);
 
-    // Listen to delivery location updates
-    const deliveryRef = ref(db, `orders/${orderId}/delivery`);
-    const unsubscribeDelivery = onValue(deliveryRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        setDeliveryLocation(data);
-      }
-    });
+  useEffect(() => {
+    if (!orderId) return;
+    let alive = true;
+    const fetchTracking = async () => {
+      try {
+        const res = await fetch(`${DB_URL}/delivery/order/${orderId}`, { credentials: "include" });
+        const json = await res.json();
+        if (alive && json?.status === "Success") {
+          setBackendTracking(json.data);
+          setOrder((prev) => ({ ...prev, status: json.data?.orderStatus || prev?.status }));
+          setLoading(false);
+        }
+      } catch {}
+    };
 
+    fetchTracking();
+    const t = setInterval(fetchTracking, 15000);
     return () => {
-      off(orderRef);
-      off(deliveryRef);
+      alive = false;
+      clearInterval(t);
     };
   }, [orderId]);
 
-  const getStatusInfo = (status) => {
-    const statusLower = status?.toLowerCase() || "pending";
-    
-    const statusMap = {
-      pending: {
-        text: "Order Placed",
-        icon: ShoppingCart,
-        color: "orange",
-        progress: 16,
-      },
-      confirmed: {
-        text: "Order Confirmed",
-        icon: CheckCircle,
-        color: "blue",
-        progress: 33,
-      },
-      preparing: {
-        text: "Preparing Your Order",
-        icon: Restaurant,
-        color: "purple",
-        progress: 50,
-      },
-      awaiting_delivery: {
-        text: "Awaiting Delivery",
-        icon: LocalShipping,
-        color: "yellow",
-        progress: 66,
-      },
-      out_for_delivery: {
-        text: "Out for Delivery",
-        icon: DeliveryDining,
-        color: "green",
-        progress: 83,
-      },
-      delivered: {
-        text: "Delivered",
-        icon: DoneAll,
-        color: "green",
-        progress: 100,
-      },
-      completed: {
-        text: "Completed",
-        icon: DoneAll,
-        color: "green",
-        progress: 100,
-      },
+  const statusInfo = useMemo(() => {
+    const key = String(order?.status || "pending").toLowerCase();
+    const map = {
+      pending: { label: "Order Placed", progress: 12, color: "orange", icon: ShoppingCart },
+      confirmed: { label: "Confirmed", progress: 24, color: "blue", icon: CheckCircle },
+      preparing: { label: "Preparing", progress: 42, color: "purple", icon: ChefHat },
+      ready: { label: "Ready for Pickup", progress: 58, color: "cyan", icon: PackageCheck },
+      assigned: { label: "Driver Assigned", progress: 70, color: "teal", icon: Truck },
+      picked_up: { label: "Picked Up", progress: 82, color: "teal", icon: Truck },
+      in_transit: { label: "On the Way", progress: 92, color: "green", icon: Navigation },
+      delivered: { label: "Delivered", progress: 100, color: "green", icon: CheckCircle },
+      cancelled: { label: "Cancelled", progress: 100, color: "red", icon: CheckCircle },
     };
-
-    return statusMap[statusLower] || statusMap.pending;
-  };
+    return map[key] || map.pending;
+  }, [order?.status]);
 
   if (loading) {
-    return (
-      <Box p={8} textAlign="center">
-        <Text>Loading order details...</Text>
-      </Box>
-    );
+    return <Box p={6}><Text fontSize="sm" color="gray.500">Loading tracking...</Text></Box>;
   }
 
-  if (!order) {
-    return (
-      <Box p={8} textAlign="center">
-        <Text>Order not found</Text>
-      </Box>
-    );
-  }
-
-  const statusInfo = getStatusInfo(order.status);
-  const StatusIcon = statusInfo.icon;
-
-  const steps = [
-    { label: "Order Placed", completed: true },
-    { label: "Order Confirmed", completed: order.status !== "pending" },
-    { label: "Preparing", completed: ["preparing", "awaiting_delivery", "out_for_delivery", "delivered", "completed"].includes(order.status?.toLowerCase()) },
-    { label: "Awaiting Delivery", completed: ["awaiting_delivery", "out_for_delivery", "delivered", "completed"].includes(order.status?.toLowerCase()) },
-    { label: "Out for Delivery", completed: ["out_for_delivery", "delivered", "completed"].includes(order.status?.toLowerCase()) },
-    { label: "Delivered", completed: ["delivered", "completed"].includes(order.status?.toLowerCase()) },
-  ];
+  const IconComp = statusInfo.icon;
+  const location = backendTracking?.deliveryLocation?.location;
+  const hasCoords = location?.lat != null && location?.lng != null;
 
   return (
-    <Box w="100%" maxW="800px" mx="auto" p={6}>
-      {/* Status Header */}
-      <Box
-        bg={`${statusInfo.color}.500`}
-        color="white"
-        p={8}
-        borderRadius="lg"
-        mb={6}
-        textAlign="center"
-      >
-        <Box display="flex" justifyContent="center" mb={4}>
-          <StatusIcon size={64} />
-        </Box>
-        <Heading size="lg" mb={2}>
-          {statusInfo.text}
-        </Heading>
-        <Text fontSize="sm" opacity={0.9}>
-          Order #{orderId?.substring(0, 8) || "N/A"}
-        </Text>
-      </Box>
+    <Box borderWidth="1px" borderColor="gray.200" borderRadius="lg" p={4}>
+      <HStack justify="space-between" mb={3}>
+        <HStack><IconComp size={18} /><Heading size="sm">{statusInfo.label}</Heading></HStack>
+        <Badge colorScheme={statusInfo.color}>{String(order?.status || "pending").replace("_", " ")}</Badge>
+      </HStack>
 
-      {/* Progress Bar */}
-      <Box mb={8}>
-        <HStack justify="space-between" mb={2}>
-          <Text fontWeight="bold">Order Progress</Text>
-          <Text fontSize="sm" color="gray.600">
-            {statusInfo.progress}%
-          </Text>
-        </HStack>
-        <Progress
-          value={statusInfo.progress}
-          colorScheme={statusInfo.color}
-          size="lg"
-          borderRadius="full"
-        />
-      </Box>
+      <Progress value={statusInfo.progress} colorScheme={statusInfo.color} borderRadius="full" mb={4} />
 
-      {/* Progress Steps */}
-      <VStack spacing={4} align="stretch" mb={8}>
-        {steps.map((step, index) => (
-          <HStack key={index} spacing={4}>
-            <Box
-              w={10}
-              h={10}
-              borderRadius="full"
-              bg={step.completed ? `${statusInfo.color}.500` : "gray.200"}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              color={step.completed ? "white" : "gray.500"}
-              fontWeight="bold"
-            >
-              {index + 1}
-            </Box>
-            <Text
-              flex={1}
-              fontWeight={step.completed ? "bold" : "normal"}
-              color={step.completed ? "black" : "gray.500"}
-            >
-              {step.label}
-            </Text>
-            {step.completed && (
-              <CheckCircle size={20} color="green" />
-            )}
+      {hasCoords ? (
+        <VStack align="stretch" spacing={2}>
+          <Text fontSize="xs" color="gray.500">Driver location updated{location?.updatedAt ? `: ${new Date(location.updatedAt).toLocaleTimeString()}` : ""}</Text>
+          <Box borderWidth="1px" borderColor="gray.200" borderRadius="md" overflow="hidden">
+            <iframe
+              title={`tracking-${orderId}`}
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=${location.lng - 0.02}%2C${location.lat - 0.02}%2C${location.lng + 0.02}%2C${location.lat + 0.02}&layer=mapnik&marker=${location.lat}%2C${location.lng}`}
+              width="100%"
+              height="220"
+              style={{ border: 0 }}
+              loading="lazy"
+            />
+          </Box>
+          <HStack spacing={4}>
+            <Link href={backendTracking?.navigation?.googleMaps || `https://www.google.com/maps?q=${location.lat},${location.lng}`} isExternal color="blue.600" fontSize="xs">Open Google Maps</Link>
+            <Link href={backendTracking?.navigation?.openStreetMap || `https://www.openstreetmap.org/?mlat=${location.lat}&mlon=${location.lng}#map=16/${location.lat}/${location.lng}`} isExternal color="blue.600" fontSize="xs">OpenStreetMap</Link>
           </HStack>
-        ))}
-      </VStack>
-
-      {/* Order Details */}
-      <Box
-        borderWidth={1}
-        borderColor="gray.200"
-        borderRadius="lg"
-        p={6}
-        mb={6}
-      >
-        <Heading size="md" mb={4}>
-          Order Details
-        </Heading>
-        <VStack spacing={3} align="stretch">
-          <HStack justify="space-between">
-            <Text color="gray.600">Order ID</Text>
-            <Text fontWeight="bold">{orderId?.substring(0, 8) || "N/A"}</Text>
-          </HStack>
-          {order.createdAt && (
-            <HStack justify="space-between">
-              <Text color="gray.600">Order Date</Text>
-              <Text fontWeight="bold">
-                {new Date(order.createdAt).toLocaleString()}
-              </Text>
-            </HStack>
-          )}
-          {order.deliveryAddress && (
-            <HStack justify="space-between">
-              <Text color="gray.600">Delivery Address</Text>
-              <Text fontWeight="bold" textAlign="right" maxW="60%">
-                {order.deliveryAddress.address1 || "N/A"}
-              </Text>
-            </HStack>
-          )}
-          {order.total && (
-            <HStack justify="space-between">
-              <Text color="gray.600">Total Amount</Text>
-              <Text fontWeight="bold" color="green.600">
-                UGX {order.total.toLocaleString()}
-              </Text>
-            </HStack>
-          )}
         </VStack>
-      </Box>
-
-      {/* Delivery Location (if available) */}
-      {deliveryLocation && deliveryLocation.location && (
-        <Box
-          borderWidth={1}
-          borderColor="gray.200"
-          borderRadius="lg"
-          p={6}
-        >
-          <Heading size="md" mb={4}>
-            Delivery Location
-          </Heading>
-          <Text color="gray.600" mb={2}>
-            {deliveryLocation.location.address || "Location updated"}
-          </Text>
-          <Badge colorScheme="green">
-            Live Tracking Active
-          </Badge>
-        </Box>
+      ) : (
+        <Text fontSize="xs" color="gray.500">Live location will appear once the driver starts delivery updates.</Text>
       )}
     </Box>
   );

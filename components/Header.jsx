@@ -248,6 +248,8 @@ const Header = () => {
     { label: "Partner", href: "/partner", icon: FaHandshake },
     { label: "Subscribe", href: "/subscription", icon: AiOutlineBarChart },
     { label: "Cashout", href: "/cashout", icon: FaWallet },
+    { label: "Rewards", href: "/rewards", icon: FaStar },
+    { label: "Gift Cards", href: "/gift-cards", icon: FaGift },
     { label: "Invite a friend", href: "/#refer", icon: FaGift, isInvite: true },
     { label: "Sign Up", href: "/signup", icon: AiOutlineLogin, hideWhenLoggedIn: true },
   ];
@@ -549,6 +551,38 @@ const Header = () => {
                     </MenuItem>
                     <MenuItem
                       as={Link}
+                      href="/rewards"
+                      py={3}
+                      px={4}
+                      fontSize="0.9375rem"
+                      fontWeight="500"
+                      icon={<FaStar size={16} />}
+                      transition="all 0.2s"
+                      _hover={{
+                    bg: "#e6f0e6",
+                    color: "#1a5c1a",
+                      }}
+                    >
+                      Rewards
+                    </MenuItem>
+                    <MenuItem
+                      as={Link}
+                      href="/gift-cards"
+                      py={3}
+                      px={4}
+                      fontSize="0.9375rem"
+                      fontWeight="500"
+                      icon={<FaGift size={16} />}
+                      transition="all 0.2s"
+                      _hover={{
+                    bg: "#e6f0e6",
+                    color: "#1a5c1a",
+                      }}
+                    >
+                      Gift Cards
+                    </MenuItem>
+                    <MenuItem
+                      as={Link}
                       href="/cashout"
                       py={3}
                       px={4}
@@ -640,7 +674,7 @@ const Header = () => {
               <MenuList minW="200px" py={1}>
                 <MenuItem as={Link} href="/faqs" py={2.5}>FAQs</MenuItem>
                 <MenuItem as={Link} href="/contact" py={2.5}>Contact Us</MenuItem>
-                <MenuItem as={Link} href="/account" py={2.5}>Track Order</MenuItem>
+                <MenuItem as={Link} href="/account?tab=orders" py={2.5}>Track Order</MenuItem>
               </MenuList>
             </Menu>
 
