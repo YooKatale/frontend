@@ -158,7 +158,7 @@ export const downloadAppEmailTemplate = `
               </div>
               <div style="text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 10px;">
                 <p style="color: rgba(255, 255, 255, 0.7); font-size: 10px; margin: 0 0 4px;">Copyright © ${new Date().getFullYear()} Yookatale. All rights reserved.</p>
-                <p style="color: rgba(255, 255, 255, 0.6); font-size: 9px; margin: 0;">You're receiving this because you signed up to Yookatale. <a href="https://www.yookatale.app" style="color: rgba(255, 255, 255, 0.85); text-decoration: underline;">Unsubscribe</a></p>
+                <p style="color: rgba(255, 255, 255, 0.6); font-size: 9px; margin: 0;">You're receiving this because you signed up to Yookatale. <a href="https://www.yookatale.app/unsubscribe" style="color: rgba(255, 255, 255, 0.85); text-decoration: underline;">Unsubscribe</a></p>
               </div>
             </td>
           </tr>
