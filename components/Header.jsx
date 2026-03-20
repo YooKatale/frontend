@@ -247,6 +247,7 @@ const Header = () => {
     { label: "Contact", href: "/contact", icon: AiOutlineContacts },
     { label: "Partner", href: "/partner", icon: FaHandshake },
     { label: "Subscribe", href: "/subscription", icon: AiOutlineBarChart },
+    { label: "Advertise", href: "/advertising", icon: AiOutlineBarChart },
     { label: "Cashout", href: "/cashout", icon: FaWallet },
     { label: "Rewards", href: "/rewards", icon: FaStar },
     { label: "Gift Cards", href: "/gift-cards", icon: FaGift },
@@ -956,7 +957,7 @@ const Header = () => {
               {/* Company */}
               <Divider my="6px" mx="14px" borderColor="#e8f0eb" />
               <Text fontSize="9.5px" fontWeight="700" textTransform="uppercase" letterSpacing="0.12em" color="#637568" px="18px" pt="14px" pb="6px">Company</Text>
-              {visibleNavLinks.filter((l) => ["/about", "/news", "/careers", "/contact", "/partner", "/subscription"].includes(l.href)).map((link) => {
+              {visibleNavLinks.filter((l) => ["/about", "/news", "/careers", "/contact", "/partner", "/subscription", "/advertising"].includes(l.href)).map((link) => {
                 const Icon = link.icon;
                 const isActive = pathname === (link.href ?? "");
                 const badge = link.badge;
@@ -1007,16 +1008,32 @@ const Header = () => {
                       <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
                       </Flex>
                     </Link>
+                  <Link href="/cashout" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
+                    <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/cashout" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
+                      {pathname === "/cashout" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
+                      <Flex w="34px" h="34px" borderRadius="10px" bg={pathname === "/cashout" ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}><FaWallet size={17} color={pathname === "/cashout" ? "#1a6b3a" : "#637568"} /></Flex>
+                      <Text fontSize="13px" fontWeight={pathname === "/cashout" ? 700 : 500} color={pathname === "/cashout" ? "#1a6b3a" : "#1e2d22"} flex={1}>Cashout</Text>
+                      <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
+                    </Flex>
+                  </Link>
+                  <Link href="/rewards" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
+                    <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/rewards" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
+                      {pathname === "/rewards" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
+                      <Flex w="34px" h="34px" borderRadius="10px" bg={pathname === "/rewards" ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}><FaStar size={17} color={pathname === "/rewards" ? "#1a6b3a" : "#637568"} /></Flex>
+                      <Text fontSize="13px" fontWeight={pathname === "/rewards" ? 700 : 500} color={pathname === "/rewards" ? "#1a6b3a" : "#1e2d22"} flex={1}>Rewards</Text>
+                      <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
+                    </Flex>
+                  </Link>
+                  <Link href="/gift-cards" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
+                    <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/gift-cards" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
+                      {pathname === "/gift-cards" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
+                      <Flex w="34px" h="34px" borderRadius="10px" bg={pathname === "/gift-cards" ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}><FaGift size={17} color={pathname === "/gift-cards" ? "#1a6b3a" : "#637568"} /></Flex>
+                      <Text fontSize="13px" fontWeight={pathname === "/gift-cards" ? 700 : 500} color={pathname === "/gift-cards" ? "#1a6b3a" : "#1e2d22"} flex={1}>Gift Cards</Text>
+                      <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
+                    </Flex>
+                  </Link>
                   </>
-                )}
-              <Link href="/cashout" onClick={closeMobileNav} _hover={{ textDecoration: "none" }}>
-                <Flex align="center" gap="12px" py="11px" px="18px" position="relative" bg={pathname === "/cashout" ? "#e8f5ee" : "transparent"} _hover={{ bg: "#e8f5ee" }} transition="background 0.12s">
-                  {pathname === "/cashout" && <Box position="absolute" left={0} top="50%" transform="translateY(-50%)" w="3px" h="22px" borderRadius="0 3px 3px 0" bg="#1a6b3a" />}
-                  <Flex w="34px" h="34px" borderRadius="10px" bg={pathname === "/cashout" ? "#e8f5ee" : "#f4f8f5"} align="center" justify="center" flexShrink={0}><FaWallet size={17} color={pathname === "/cashout" ? "#1a6b3a" : "#637568"} /></Flex>
-                  <Text fontSize="13px" fontWeight={pathname === "/cashout" ? 700 : 500} color={pathname === "/cashout" ? "#1a6b3a" : "#1e2d22"} flex={1}>Cashout</Text>
-                  <Box flexShrink={0} color="#c0cfc4"><FaChevronDown size={14} style={{ transform: "rotate(-90deg)" }} /></Box>
-                </Flex>
-              </Link>
+                }}
               <Flex as="button" type="button" align="center" gap="12px" py="11px" px="18px" w="100%" textAlign="left" bg="transparent" _hover={{ bg: "#e8f5ee" }} _active={{ bg: "#e8f5ee" }} onClick={openInviteModal} transition="background 0.12s">
                 <Flex w="34px" h="34px" borderRadius="10px" bg="#f4f8f5" align="center" justify="center" flexShrink={0}><FaGift size={17} color="#637568" /></Flex>
                 <Text fontSize="13px" fontWeight="500" color="#1e2d22" flex={1}>Invite a Friend</Text>

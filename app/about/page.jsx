@@ -90,7 +90,7 @@ const About = () => {
   const stats = [
     { label: "Food Categories", value: "50+" },
     { label: "Communities Served", value: "100+" },
-    { label: "Countries", value: "3+" },
+    { label: "Cities in Uganda", value: "5+" },
     { label: "Happy Customers", value: "10K+" },
   ];
 
@@ -178,7 +178,7 @@ const About = () => {
                 bgGradient={`linear(to-r, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`}
                 bgClip="text"
               >
-                Transforming Food Access Across Africa
+                Transforming Food Access in Uganda
               </Heading>
             </MotionBox>
 
@@ -229,7 +229,7 @@ const About = () => {
                     YooKatale
                   </Text>{" "}
                   is a revolutionary mobile food marketplace connecting farmers, vendors, and consumers across
-                  Uganda and beyond. We're building Africa's largest digital food network that promotes diverse
+                  Uganda. We're building the country's leading digital food marketplace that promotes diverse
                   food products while maintaining affordability and exceptional quality.
                 </Text>
               </VStack>
@@ -327,7 +327,7 @@ const About = () => {
                       fontWeight="medium"
                       lineHeight="tall"
                     >
-                      To build the most connected food ecosystem in Africa.
+                      To build the most connected food ecosystem in Uganda.
                     </Text>
                   </VStack>
                 </MotionBox>
@@ -538,7 +538,7 @@ const About = () => {
                 <Text fontSize="lg" color="gray.600" lineHeight="tall">
                   We're pioneers in hybrid technology solutions. By blending physical infrastructure with
                   cutting-edge digital platforms, we're solving real-world food accessibility problems while
-                  building a sustainable future for African agriculture.
+                  building a sustainable future for Ugandan agriculture.
                 </Text>
               </VStack>
             </MotionBox>
@@ -603,7 +603,7 @@ const About = () => {
               maxW="600px"
               mx="auto"
             >
-              Join us in revolutionizing how Africa eats, grows, and shares food.
+              Join us in revolutionizing how Uganda eats, grows, and shares food.
             </Text>
           </MotionBox>
         </VStack>

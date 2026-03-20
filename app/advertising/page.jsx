@@ -1,564 +1,319 @@
 "use client";
 
 import {
-  Box,
-  Grid,
-  Text,
-  GridItem,
-  Card,
-  CardHeader,
-  useToast,
+  Box, Container, Flex, Text, Heading, Button, HStack, VStack,
+  Badge, SimpleGrid, Spinner, Center, Icon, Tabs, TabList, Tab,
+  TabPanels, TabPanel, useToast,
 } from "@chakra-ui/react";
-import { SmallCloseIcon, CheckIcon } from "@chakra-ui/icons";
+import { Check, X, Zap, Star, BarChart2, Mail, Users, CreditCard } from "lucide-react";
 import { useAuth } from "@slices/authSlice";
 import React, { useEffect, useState } from "react";
-import MobileView from "@components/advertising/mobile-view";
 import {
   useAdvertisementPackageGetMutation,
   useAdvertisementPostMutation,
 } from "@slices/usersApiSlice";
 import { useRouter } from "next/navigation";
 
+const PRIMARY = "#185f2d";
+const SECONDARY = "#1f793a";
+
+const BASIC_HIGHLIGHTS = [
+  { icon: Zap, label: "Banner ad placement in the app" },
+  { icon: BarChart2, label: "Basic performance report" },
+  { icon: Users, label: "Reach local buyers in your area" },
+];
+
+const VIP_HIGHLIGHTS = [
+  { icon: Zap, label: "Premium banner + featured listing" },
+  { icon: BarChart2, label: "Full analytics & sales insights" },
+  { icon: Mail, label: "Email & social media promotion" },
+  { icon: Users, label: "Dedicated account manager" },
+  { icon: Star, label: "Priority placement in search results" },
+];
+
+function PeriodCard({ pack, isSelected, onClick }) {
+  return (
+    <Box
+      as="button"
+      onClick={onClick}
+      w="100%"
+      textAlign="left"
+      p={4}
+      borderRadius="xl"
+      border="2px solid"
+      borderColor={isSelected ? PRIMARY : "gray.200"}
+      bg={isSelected ? `${PRIMARY}08` : "white"}
+      transition="all 0.15s"
+      _hover={{ borderColor: PRIMARY, bg: `${PRIMARY}05` }}
+      cursor="pointer"
+    >
+      <Flex justify="space-between" align="center">
+        <Box>
+          <Text fontSize="sm" fontWeight="700" color="gray.700" textTransform="capitalize">{pack.period}</Text>
+          <Text fontSize="xs" color="gray.400" mt={0.5}>per period</Text>
+        </Box>
+        <Box textAlign="right">
+          <Text fontSize="lg" fontWeight="800" color={isSelected ? PRIMARY : "gray.800"}>
+            UGX {Number(pack.price).toLocaleString()}
+          </Text>
+          {isSelected && (
+            <Badge bg={PRIMARY} color="white" borderRadius="full" fontSize="9px" px={2}>Selected</Badge>
+          )}
+        </Box>
+      </Flex>
+    </Box>
+  );
+}
+
+function FeatureItem({ icon: IconComp, label }) {
+  return (
+    <HStack spacing={3} align="center">
+      <Flex w="32px" h="32px" borderRadius="lg" bg={`${PRIMARY}12`} align="center" justify="center" flexShrink={0}>
+        <IconComp size={15} color={PRIMARY} />
+      </Flex>
+      <Text fontSize="sm" color="gray.600">{label}</Text>
+    </HStack>
+  );
+}
+
 const Advertising = () => {
   const chakraToast = useToast();
   const router = useRouter();
   const [advertisementPackages, setAdvertisementPackages] = useState([]);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [activeCard, setActiveCard] = useState("basic");
-  const [activeButton, setActiveButton] = useState("weekly");
-  const [payment, setPayment] = useState(0);
+  const [selectedPack, setSelectedPack] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [fetchingPackages, setFetchingPackages] = useState(true);
   const [fetchPackages] = useAdvertisementPackageGetMutation();
   const [createAdvertisement] = useAdvertisementPostMutation();
-  const [isLoading, setIsLoading] = useState(false);
-  const [advertId, setAdvertId] = useState(null);
   const { userInfo } = useAuth();
 
-  // check if user logged in
-  if (!userInfo || userInfo == {} || userInfo == "") {
+  if (!userInfo || userInfo === {} || userInfo === "") {
     router.push("/signin");
   }
 
-  const handleCardClick = (cardId) => {
-    setActiveCard(cardId);
-  };
-
-  const fetchAdvertisementPackages = async (req, res) => {
+  const fetchAdvertisementPackages = async () => {
+    setFetchingPackages(true);
     try {
       const res = await fetchPackages().unwrap();
-      if (res?.success === true) {
-        setAdvertisementPackages(res?.packages);
-      }
-    } catch (error) {}
+      if (res?.success === true) setAdvertisementPackages(res?.packages || []);
+    } catch {}
+    setFetchingPackages(false);
   };
 
   useEffect(() => {
     fetchAdvertisementPackages();
   }, []);
 
-  const handleButtonClick = (buttonId) => {
-    setActiveButton(buttonId);
+  const handleTabChange = (index) => {
+    setActiveTabIndex(index);
+    setActiveCard(index === 0 ? "basic" : "vip");
+    setSelectedPack(null);
   };
 
   const handlePayment = async () => {
-    setIsLoading((prev) => (prev ? false : true));
+    if (!selectedPack) return;
+    setIsLoading(true);
     try {
-      if (advertId !== null) {
-        const res = await createAdvertisement({
-          user: userInfo._id,
-          packageId: advertId,
-        }).unwrap();
-
-        setIsLoading((prev) => (prev ? false : true));
-        console.log("res", res);
-        if (res.status == "Sucess") router.push(`/payment/${res.data.Order}`);
-      }
-      return;
+      const res = await createAdvertisement({
+        user: userInfo._id,
+        packageId: selectedPack._id,
+      }).unwrap();
+      if (res.status === "Sucess") router.push(`/payment/${res.data.Order}`);
     } catch (err) {
       chakraToast({
-        title: "Error",
-        description: err.data?.message
-          ? err.data?.message
-          : err.data || err.error,
+        title: "Payment Error",
+        description: err.data?.message || err.error || "Something went wrong",
         status: "error",
         duration: 5000,
-        isClosable: false,
+        isClosable: true,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const filteredPackages = advertisementPackages.filter(
+    (p) => p.type?.toLowerCase() === (activeCard === "basic" ? "basic" : "vip")
+  );
+
+  const highlights = activeCard === "basic" ? BASIC_HIGHLIGHTS : VIP_HIGHLIGHTS;
+
   return (
-    <>
-      <MobileView
-        handlePayment={handlePayment}
-        advertisementPackages={advertisementPackages}
-        userInfo={userInfo}
-        setAdvertId={setAdvertId}
-        payment={payment}
-        setPayment={setPayment}
-      />
-      <Box className="hidden md:block">
-        <h1 className="ml-10 mt-10">Choose the plan that works for you</h1>
-        <Box
-          padding={{ base: "3rem 2rem", md: "3rem", xl: "3rem" }}
-          className="flex md:items-center md:justify-center sm:overflow-x md:overflow-x-hidden"
-        >
-          <Grid className="flex  md:grid-cols-3" gap={4}>
-            <GridItem rowSpan={2} colSpan={1} className="mt-[68px]">
-              <div className="w-full text-sm font-medium text-gray-900  rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                <Text
-                  aria-current="true"
-                  className="block w-full py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
-                >
-                  <h1 className="font-bold">Weekly</h1>
-                  <div className="">
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      Adverts
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      access to pro sales
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      yookatale insights
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      emails & social media link
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      personal manager
-                    </Text>
-                  </div>
-                </Text>
-                <Text className="block w-full py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                  <h1 className="font-bold">Monthly</h1>
-                  <div className="">
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      Adverts
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      access to pro sales
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      yookatale insights
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      emails & social media link
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      personal manager
-                    </Text>
-                  </div>
-                </Text>
+    <Box bg="gray.50" minH="100vh" py={{ base: 8, md: 12 }}>
+      <Container maxW="860px">
+        {/* Hero */}
+        <VStack spacing={3} textAlign="center" mb={10}>
+          <Badge bg={PRIMARY} color="white" px={3} py={1} borderRadius="full" fontSize="xs" fontWeight="700" letterSpacing="wider">
+            ADVERTISE
+          </Badge>
+          <Heading
+            size={{ base: "lg", md: "xl" }}
+            fontWeight="800"
+            color="gray.800"
+            lineHeight="shorter"
+          >
+            Reach more customers on YooKatale
+          </Heading>
+          <Text color="gray.500" maxW="480px" fontSize="sm" lineHeight="tall">
+            Put your products in front of thousands of active shoppers in Uganda. Pick a plan that fits your budget.
+          </Text>
+        </VStack>
 
-                <Text className="block w-full py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                  <h1 className="font-bold">3 Monthly</h1>
-                  <div className="">
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      Adverts
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      access to pro sales
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      yookatale insights
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      emails & social media link
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      personal manager
-                    </Text>
-                  </div>
-                </Text>
-                <Text className="block w-full py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                  <h1 className="font-bold">6 Months</h1>
-                  <div className="">
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      Adverts
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      access to pro sales
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      yookatale insights
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      emails & social media link
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      personal manager
-                    </Text>
-                  </div>
-                </Text>
-                <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                  <h1 className="font-bold">1 year</h1>
-                  <div className="">
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      Adverts
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      access to pro sales
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      yookatale insights
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      emails & social media link
-                    </Text>
-                    <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                      personal manager
-                    </Text>
-                  </div>
-                </Text>
-              </div>
-            </GridItem>
-            <GridItem
-              rowSpan={2}
-              colSpan={1}
-              className="cursor-pointer hidden md:block"
-              onClick={() => handleCardClick("basic")}
+        {/* Plan tabs */}
+        <Tabs index={activeTabIndex} onChange={handleTabChange}>
+          <TabList
+            justifyContent="center"
+            border="none"
+            mb={8}
+            bg="white"
+            borderRadius="xl"
+            p={1}
+            maxW="300px"
+            mx="auto"
+            boxShadow="0 2px 8px rgba(0,0,0,0.06)"
+          >
+            <Tab
+              flex={1}
+              borderRadius="lg"
+              fontSize="sm"
+              fontWeight="700"
+              _selected={{ bg: PRIMARY, color: "white" }}
+              _hover={{ color: PRIMARY }}
+              color="gray.500"
+              py={2.5}
             >
-              <Card
-                className={`${
-                  activeCard === "basic" ? "border-2 border-[#ffd900]" : ""
-                }`}
-              >
-                <CardHeader className="bg-light">Basic</CardHeader>
-                <div className="w-full text-sm font-medium text-gray-900  rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                  <Text
-                    aria-current="true"
-                    className="block w-full px-4 py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
-                  >
-                    32,000 ugx
-                    <div className="">
-                      <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        1 Advert
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                    </div>
-                  </Text>
-
-                  <Text
-                    aria-current="true"
-                    className="block w-full px-4 py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
-                  >
-                    92,000 ugx
-                    <div className="">
-                      <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        2 Adverts
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                    </div>
-                  </Text>
-                  <Text
-                    aria-current="true"
-                    className="block w-full px-4 py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
-                  >
-                    300,000 ugx
-                    <div className="">
-                      <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        3 Adverts
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                    </div>
-                  </Text>
-
-                  <Text
-                    aria-current="true"
-                    className="block w-full px-4 py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
-                  >
-                    530,000 ugx
-                    <div className="">
-                      <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        6 Adverts
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                    </div>
-                  </Text>
-                  <Text
-                    aria-current="true"
-                    className="block w-full px-4 py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
-                  >
-                    <div className="flex justify-between">1,600,000 ugx</div>
-                    <div className="">
-                      <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        9 Adverts
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                    </div>
-                  </Text>
-                </div>
-              </Card>
-            </GridItem>
-            <GridItem
-              rowSpan={2}
-              colSpan={1}
-              className="cursor-pointer hidden md:block"
-              onClick={() => handleCardClick("vip")}
+              Basic
+            </Tab>
+            <Tab
+              flex={1}
+              borderRadius="lg"
+              fontSize="sm"
+              fontWeight="700"
+              _selected={{ bg: PRIMARY, color: "white" }}
+              _hover={{ color: PRIMARY }}
+              color="gray.500"
+              py={2.5}
             >
-              <Card
-                className={`${
-                  activeCard === "vip" ? "border-2 border-[#ffd900]" : ""
-                }`}
-              >
-                <CardHeader className="bg-secondary">VIP</CardHeader>
-                <div className="w-full text-sm font-medium text-gray-900  rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                  <Text
-                    aria-current="true"
-                    className="block w-full px-4 py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
-                  >
-                    0 ugx
-                    <div className="">
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                    </div>
-                  </Text>
+              VIP
+            </Tab>
+          </TabList>
 
-                  <Text
-                    aria-current="true"
-                    className="block w-full px-4 py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
+          <TabPanels>
+            {[0, 1].map((tabIdx) => (
+              <TabPanel key={tabIdx} p={0}>
+                <Flex gap={6} direction={{ base: "column", md: "row" }} align="flex-start">
+                  {/* Left: Features */}
+                  <Box
+                    flex="1"
+                    bg="white"
+                    borderRadius="2xl"
+                    p={6}
+                    border="1px solid"
+                    borderColor="gray.100"
+                    boxShadow="0 2px 8px rgba(0,0,0,0.05)"
                   >
-                    600,000 ugx
-                    <div className="">
-                      <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        2 Adverts
-                      </Text>
-                      <Text className="block w-full ml-10 py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                    </div>
-                  </Text>
-                  <Text
-                    aria-current="true"
-                    className="block w-full px-4 py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
-                  >
-                    1,600,000 ugx
-                    <div className="">
-                      <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        3 Adverts
-                      </Text>
-                      <Text className="block w-full ml-10 py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                      <Text className="block w-full ml-10 py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                      <Text className="block w-full ml-10 py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                    </div>
-                  </Text>
+                    <Flex align="center" gap={3} mb={5}>
+                      <Box p={2.5} borderRadius="lg" bg={`${PRIMARY}12`}>
+                        {tabIdx === 0 ? <Zap size={18} color={PRIMARY} /> : <Star size={18} color={PRIMARY} />}
+                      </Box>
+                      <Box>
+                        <Text fontSize="md" fontWeight="800" color="gray.800">{tabIdx === 0 ? "Basic Plan" : "VIP Plan"}</Text>
+                        <Text fontSize="xs" color="gray.400">{tabIdx === 0 ? "Great for getting started" : "Maximum visibility & support"}</Text>
+                      </Box>
+                    </Flex>
+                    <VStack spacing={3} align="stretch">
+                      {highlights.map((h, i) => (
+                        <FeatureItem key={i} icon={h.icon} label={h.label} />
+                      ))}
+                    </VStack>
+                  </Box>
 
-                  <Text
-                    aria-current="true"
-                    className="block w-full px-4 py-3 bg-blue-700 border-b border-dashed border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
+                  {/* Right: Period selector + pay */}
+                  <Box
+                    flex="1.2"
+                    bg="white"
+                    borderRadius="2xl"
+                    p={6}
+                    border="1px solid"
+                    borderColor="gray.100"
+                    boxShadow="0 2px 8px rgba(0,0,0,0.05)"
                   >
-                    3,200,000 ugx
-                    <div className="">
-                      <Text className="block w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        6 Adverts
-                      </Text>
-                      <Text className="block w-full ml-10 py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                      <Text className="block w-full ml-10 py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                      <Text className="block w-full ml-10 py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                      <Text className="block w-full ml-10 py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <CheckIcon />
-                      </Text>
-                    </div>
-                  </Text>
-                  <Text
-                    aria-current="true"
-                    className="block w-full px-4 py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600"
-                  >
-                    0 ugx
-                    <div className="">
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                      <Text className="block ml-10 w-full py-3 bg-blue-700 border-gray-200 rounded-t-lg  dark:bg-gray-800 dark:border-gray-600">
-                        <SmallCloseIcon />
-                      </Text>
-                    </div>
-                  </Text>
-                </div>
-              </Card>
-            </GridItem>
-          </Grid>
-        </Box>
-        {activeCard === "basic" ? (
-          <>
-            <Box className="w-full sticky flex h-60 backdrop-blur-md bg-light rounded-md">
-              {advertisementPackages
-                .filter((pack) => pack.type === "Basic")
-                .map((pack) => (
-                  <div
-                    className="flex items-center justify-center ml-10"
-                    key={pack._id}
-                  >
-                    <button
-                      onClick={() => {
-                        handleButtonClick(pack.period);
-                        setPayment(pack.price);
-                        setAdvertId(pack._id);
-                      }}
-                      className={`py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 ${
-                        activeButton === pack.period ? "border-[#ffd900]" : ""
-                      }`}
-                    >
-                      {pack.period}
-                    </button>
-                  </div>
-                ))}
-              {advertisementPackages.filter((pack) => pack.type === "Basic")
-                .length > 0 && (
-                <div className="flex items-center ml-[600px] justify-center">
-                  {payment !== null && (
-                    <button
+                    <Text fontSize="xs" fontWeight="700" textTransform="uppercase" letterSpacing="wider" color="gray.400" mb={3}>
+                      Choose a period
+                    </Text>
+
+                    {fetchingPackages ? (
+                      <Center py={8}><Spinner color={PRIMARY} /></Center>
+                    ) : filteredPackages.length === 0 ? (
+                      <Center py={8}>
+                        <Text color="gray.400" fontSize="sm">No packages available</Text>
+                      </Center>
+                    ) : (
+                      <VStack spacing={2} align="stretch" mb={5}>
+                        {filteredPackages.map((pack) => (
+                          <PeriodCard
+                            key={pack._id}
+                            pack={pack}
+                            isSelected={selectedPack?._id === pack._id}
+                            onClick={() => setSelectedPack(pack)}
+                          />
+                        ))}
+                      </VStack>
+                    )}
+
+                    {selectedPack && (
+                      <Box
+                        p={4}
+                        borderRadius="xl"
+                        bg="gray.50"
+                        border="1px solid"
+                        borderColor="gray.100"
+                        mb={4}
+                      >
+                        <Flex justify="space-between" align="center">
+                          <Text fontSize="sm" color="gray.500">Total due</Text>
+                          <Text fontSize="xl" fontWeight="800" color={PRIMARY}>
+                            UGX {Number(selectedPack.price).toLocaleString()}
+                          </Text>
+                        </Flex>
+                        <Text fontSize="xs" color="gray.400" mt={1}>
+                          {selectedPack.period} · {tabIdx === 0 ? "Basic" : "VIP"} plan
+                        </Text>
+                      </Box>
+                    )}
+
+                    <Button
+                      w="100%"
+                      h="50px"
+                      bg={selectedPack ? PRIMARY : "gray.200"}
+                      color={selectedPack ? "white" : "gray.400"}
+                      fontWeight="700"
+                      fontSize="sm"
+                      borderRadius="xl"
+                      leftIcon={<CreditCard size={16} />}
                       onClick={handlePayment}
-                      className="py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-green border border-gray-200 dark:border-gray-600"
+                      isLoading={isLoading}
+                      isDisabled={!selectedPack}
+                      _hover={{ bg: selectedPack ? SECONDARY : "gray.200" }}
+                      cursor={selectedPack ? "pointer" : "not-allowed"}
                     >
-                      {payment} ugx
-                    </button>
-                  )}
-                </div>
-              )}
-            </Box>
-          </>
-        ) : (
-          <>
-            <Box className="w-full sticky flex h-60 backdrop-blur-md bg-light rounded-md">
-              {advertisementPackages
-                .filter((pack) => pack.type === "Vip")
-                .map((pack) => (
-                  <div
-                    className="flex items-center justify-center ml-10"
-                    key={pack._id}
-                  >
-                    <button
-                      onClick={() => {
-                        handleButtonClick(pack.period);
-                        setPayment(pack.price);
-                        setAdvertId(pack._id);
-                      }}
-                      className={`py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 ${
-                        activeButton === pack.period ? "border-[#ffd900]" : ""
-                      }`}
-                    >
-                      {pack.period}
-                    </button>
-                  </div>
-                ))}
-              {advertisementPackages.filter((pack) => pack.type === "Vip")
-                .length > 0 && (
-                <div className="flex items-center ml-[600px] justify-center">
-                  {payment !== null && (
-                    <button
-                      onClick={handlePayment}
-                      className="py-2.5 px-10 font-bold me-2 mb-2 text-xl text-gray-900 focus:outline-none bg-green border border-gray-200 dark:border-gray-600"
-                    >
-                      {payment} ugx
-                    </button>
-                  )}
-                </div>
-              )}
-            </Box>
-          </>
-        )}
-      </Box>
-    </>
+                      {selectedPack ? `Pay UGX ${Number(selectedPack.price).toLocaleString()}` : "Select a period to continue"}
+                    </Button>
+                  </Box>
+                </Flex>
+              </TabPanel>
+            ))}
+          </TabPanels>
+        </Tabs>
+
+        {/* Footer note */}
+        <Text textAlign="center" fontSize="xs" color="gray.400" mt={8}>
+          Payments are processed securely. Contact us at <Text as="span" color={PRIMARY} fontWeight="600">support@yookatale.app</Text> for any questions.
+        </Text>
+      </Container>
+    </Box>
   );
 };
 
