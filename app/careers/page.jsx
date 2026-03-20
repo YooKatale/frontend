@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import {
   Box,
   Container,
@@ -117,31 +118,47 @@ function Careers() {
             variants={containerVariants}
             initial="hidden"
             animate={isVisible ? "visible" : "hidden"}
-            textAlign="center"
           >
-            <MotionBox variants={itemVariants}>
+            {/* Banner image */}
+            <MotionBox variants={itemVariants} mb={{ base: 8, md: 10 }}>
+              <Box
+                borderRadius="2xl"
+                overflow="hidden"
+                boxShadow="0 8px 40px rgba(24,95,45,0.18)"
+                position="relative"
+                w="full"
+                maxW="780px"
+                mx="auto"
+              >
+                <Image
+                  src="/assets/images/careers-banner.jpeg"
+                  alt="YooKatale — We Are Hiring"
+                  width={780}
+                  height={780}
+                  style={{ width: "100%", height: "auto", display: "block" }}
+                  priority
+                />
+              </Box>
+            </MotionBox>
+
+            {/* Heading block */}
+            <MotionBox variants={itemVariants} textAlign="center">
               <Text
                 fontSize="sm" fontWeight="semibold"
                 color={ThemeColors.primaryColor}
                 letterSpacing="wider" textTransform="uppercase" mb="3"
               >
-                We are hiring
+                Open Positions
               </Text>
-            </MotionBox>
-
-            <MotionBox variants={itemVariants}>
               <Heading
                 as="h1"
-                fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}
+                fontSize={{ base: "2xl", md: "4xl", lg: "5xl" }}
                 fontWeight="bold" lineHeight="shorter" mb="4"
                 bgGradient={`linear(to-r, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`}
                 bgClip="text"
               >
                 Join Our Team
               </Heading>
-            </MotionBox>
-
-            <MotionBox variants={itemVariants}>
               <Box
                 height="4px" width="80px" margin="0 auto 1.25rem"
                 background={`linear-gradient(to right, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`}
