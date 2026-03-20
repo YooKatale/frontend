@@ -3,8 +3,6 @@
 import {
   Box,
   Button,
-  Flex,
-  Heading,
   Text,
   Modal,
   ModalOverlay,
@@ -17,14 +15,15 @@ import {
   Icon,
   Textarea,
   FormControl,
-  FormLabel,
   Select,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@slices/authSlice";
-import { Star, X, Send } from "lucide-react";
+import { Star, Send } from "lucide-react";
 import { usePlatformFeedbackCreateMutation } from "@slices/usersApiSlice";
+
+const RATING_LABELS = ["", "Poor", "Fair", "Good", "Great", "Excellent"];
 
 const PlatformFeedbackModal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,77 +43,43 @@ const PlatformFeedbackModal = () => {
       const ua = navigator.userAgent || navigator.vendor || window.opera;
       setUserAgent(ua);
 
-      // Check if user has already submitted feedback recently
       const lastFeedback = localStorage.getItem("platformFeedbackLastSubmitted");
       const feedbackCount = parseInt(localStorage.getItem("platformFeedbackCount") || "0");
 
-      // Show prompt after user has been active
       const shouldShow = () => {
-        if (feedbackCount >= 2) return false; // Don't show more than 2 times
-        if (!lastFeedback) return true; // First time
-
-        const daysSinceLastFeedback = (Date.now() - parseInt(lastFeedback)) / (1000 * 60 * 60 * 24);
-        return daysSinceLastFeedback >= 14; // Show again after 14 days
+        if (feedbackCount >= 2) return false;
+        if (!lastFeedback) return true;
+        const days = (Date.now() - parseInt(lastFeedback)) / (1000 * 60 * 60 * 24);
+        return days >= 14;
       };
 
-      // Show after user has been on the platform for a while
-      // Require more activity: at least 5 page views and 5 minutes of activity
       const pageViews = parseInt(sessionStorage.getItem("pageViews") || "0");
       sessionStorage.setItem("pageViews", (pageViews + 1).toString());
 
-      // Track session start time
       const sessionStart = sessionStorage.getItem("sessionStartTime");
-      if (!sessionStart) {
-        sessionStorage.setItem("sessionStartTime", Date.now().toString());
-      }
+      if (!sessionStart) sessionStorage.setItem("sessionStartTime", Date.now().toString());
 
-      // Calculate time spent in session (in minutes)
-      const timeSpent = sessionStart 
-        ? (Date.now() - parseInt(sessionStart)) / (1000 * 60)
-        : 0;
+      const timeSpent = sessionStart ? (Date.now() - parseInt(sessionStart)) / (1000 * 60) : 0;
 
-      // Only show if user has viewed at least 5 pages AND spent at least 5 minutes
       if (shouldShow() && pageViews >= 5 && timeSpent >= 5) {
-        // Random delay between 2-5 minutes after meeting criteria
-        // This ensures it doesn't interrupt the user immediately
-        const delay = 120000 + Math.random() * 180000; // 2-5 minutes
+        const delay = 120000 + Math.random() * 180000;
         const timer = setTimeout(() => {
-          // Double check user is still active (hasn't left the page)
-          const currentPageViews = parseInt(sessionStorage.getItem("pageViews") || "0");
-          const currentTimeSpent = sessionStart 
-            ? (Date.now() - parseInt(sessionStart)) / (1000 * 60)
-            : 0;
-          
-          // Only show if still meets criteria
-          if (currentPageViews >= 5 && currentTimeSpent >= 5) {
-            setIsOpen(true);
-          }
+          const curViews = parseInt(sessionStorage.getItem("pageViews") || "0");
+          const curTime = sessionStart ? (Date.now() - parseInt(sessionStart)) / (1000 * 60) : 0;
+          if (curViews >= 5 && curTime >= 5) setIsOpen(true);
         }, delay);
-
         return () => clearTimeout(timer);
       }
     }
   }, []);
 
-  const handleRatingClick = (value) => {
-    setRating(value);
-    setHoveredRating(0);
-  };
-
   const handleSubmit = async () => {
     if (rating === 0) {
-      chakraToast({
-        title: "Rating Required",
-        description: "Please select a rating before submitting.",
-        status: "warning",
-        duration: 3000,
-        isClosable: true,
-      });
+      chakraToast({ title: "Please select a rating", status: "warning", duration: 2500, isClosable: true });
       return;
     }
-
     try {
-      const feedbackData = {
+      await createPlatformFeedback({
         userId: userInfo?._id || null,
         rating,
         feedback: feedback.trim() || null,
@@ -122,244 +87,170 @@ const PlatformFeedbackModal = () => {
         platform: /iPad|iPhone|iPod/.test(userAgent) ? "ios" : /android/i.test(userAgent) ? "android" : "web",
         userEmail: userInfo?.email || null,
         userName: userInfo?.firstname || userInfo?.email?.split("@")[0] || "Anonymous",
-      };
-
-      await createPlatformFeedback(feedbackData).unwrap();
+      }).unwrap();
 
       setHasSubmitted(true);
       localStorage.setItem("platformFeedbackLastSubmitted", Date.now().toString());
       localStorage.setItem("platformFeedbackCount", (parseInt(localStorage.getItem("platformFeedbackCount") || "0") + 1).toString());
 
-      chakraToast({
-        title: "Thank You!",
-        description: "Your feedback helps us improve YooKatale.",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
+      chakraToast({ title: "Feedback received", description: "Thank you for helping us improve.", status: "success", duration: 3000, isClosable: true });
 
-      // Close modal after 2 seconds
       setTimeout(() => {
         setIsOpen(false);
         setHasSubmitted(false);
         setRating(0);
         setFeedback("");
         setCategory("general");
-      }, 2000);
-    } catch (error) {
-      console.error("Error submitting feedback:", error);
-      chakraToast({
-        title: "Error",
-        description: "Failed to submit feedback. Please try again.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      }, 1800);
+    } catch {
+      chakraToast({ title: "Could not submit feedback", status: "error", duration: 3000, isClosable: true });
     }
   };
 
-  const handleClose = () => {
-    setIsOpen(false);
-    sessionStorage.setItem("platformFeedbackDismissed", "true");
-  };
-
-  const renderStars = () => {
-    return (
-      <HStack spacing={2} justifyContent="center">
-        {[1, 2, 3, 4, 5].map((star) => {
-          const filled = star <= (hoveredRating || rating);
-          return (
-            <Box
-              key={star}
-              as="button"
-              cursor="pointer"
-              onClick={() => handleRatingClick(star)}
-              onMouseEnter={() => setHoveredRating(star)}
-              onMouseLeave={() => setHoveredRating(0)}
-              transition="all 0.2s"
-              transform={filled ? "scale(1.1)" : "scale(1)"}
-            >
-              <Icon
-                as={Star}
-                w={{ base: 8, md: 10 }}
-                h={{ base: 8, md: 10 }}
-                color={filled ? "#FFD700" : "#E2E8F0"}
-                fill={filled ? "#FFD700" : "none"}
-                stroke={filled ? "#FFD700" : "#E2E8F0"}
-              />
-            </Box>
-          );
-        })}
-      </HStack>
-    );
-  };
+  const handleClose = () => { setIsOpen(false); sessionStorage.setItem("platformFeedbackDismissed", "true"); };
 
   if (!isOpen) return null;
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      isCentered
-      size={{ base: "sm", md: "md" }}
-      closeOnOverlayClick={false}
-    >
-      <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
+    <Modal isOpen={isOpen} onClose={handleClose} isCentered size="xs" closeOnOverlayClick={false}>
+      <ModalOverlay bg="blackAlpha.500" backdropFilter="blur(6px)" />
       <ModalContent
-        borderRadius="xl"
-        mx={{ base: 4, md: 0 }}
-        maxW={{ base: "90vw", md: "500px" }}
+        borderRadius="2xl"
+        mx={4}
+        maxW="380px"
+        boxShadow="0 20px 60px rgba(0,0,0,0.15)"
+        overflow="hidden"
       >
         <ModalCloseButton
-          onClick={handleClose}
-          size="lg"
-          color="gray.500"
-          _hover={{ color: "gray.700" }}
+          size="sm" top={3} right={3}
+          color="gray.400"
+          _hover={{ color: "gray.700", bg: "gray.100" }}
+          borderRadius="full"
+          zIndex={10}
         />
-        <ModalBody p={{ base: 6, md: 8 }}>
-          {!hasSubmitted ? (
-            <VStack spacing={6} textAlign="center">
-              <Box>
-                <Heading
-                  as="h2"
-                  size={{ base: "lg", md: "xl" }}
-                  color={ThemeColors.darkColor}
-                  mb={2}
+
+        {!hasSubmitted ? (
+          <ModalBody p={6} pt={7}>
+            <VStack spacing={5} align="stretch">
+              {/* Header */}
+              <VStack spacing={1} textAlign="center">
+                <Box
+                  w={11} h={11} borderRadius="xl" mx="auto" mb={1}
+                  bg={`${ThemeColors.primaryColor}12`}
+                  display="flex" alignItems="center" justifyContent="center"
                 >
-                  How's Your Experience?
-                </Heading>
-                <Text fontSize={{ base: "sm", md: "md" }} color="gray.600">
-                  We'd love to hear about your experience with YooKatale. Your feedback helps us serve you better!
-                </Text>
+                  <Star size={20} color={ThemeColors.primaryColor} fill={ThemeColors.primaryColor} />
+                </Box>
+                <Text fontSize="md" fontWeight="700" color="gray.800">How was your experience?</Text>
+                <Text fontSize="xs" color="gray.500">Your feedback helps us serve you better</Text>
+              </VStack>
+
+              {/* Stars */}
+              <Box textAlign="center">
+                <HStack spacing={2} justifyContent="center" mb={1.5}>
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const filled = star <= (hoveredRating || rating);
+                    return (
+                      <Box
+                        key={star}
+                        as="button"
+                        cursor="pointer"
+                        onClick={() => { setRating(star); setHoveredRating(0); }}
+                        onMouseEnter={() => setHoveredRating(star)}
+                        onMouseLeave={() => setHoveredRating(0)}
+                        transition="transform 0.15s"
+                        transform={filled ? "scale(1.15)" : "scale(1)"}
+                        p={1}
+                      >
+                        <Icon
+                          as={Star}
+                          w={7} h={7}
+                          color={filled ? "#F6A623" : "#E2E8F0"}
+                          fill={filled ? "#F6A623" : "none"}
+                          stroke={filled ? "#F6A623" : "#CBD5E0"}
+                        />
+                      </Box>
+                    );
+                  })}
+                </HStack>
+                {rating > 0 && (
+                  <Text fontSize="xs" color="gray.400" fontWeight="600" textTransform="uppercase" letterSpacing="0.06em">
+                    {RATING_LABELS[rating]}
+                  </Text>
+                )}
               </Box>
 
-              <Box w="100%" py={4}>
-                <FormControl isRequired>
-                  <FormLabel fontSize={{ base: "sm", md: "md" }} mb={3}>
-                    Rate Your Experience
-                  </FormLabel>
-                  {renderStars()}
-                  {rating > 0 && (
-                    <Text
-                      fontSize="sm"
-                      color="gray.500"
-                      mt={3}
-                      fontWeight="medium"
-                    >
-                      {rating === 5
-                        ? "Excellent! ⭐"
-                        : rating === 4
-                        ? "Great! 👍"
-                        : rating === 3
-                        ? "Good! 😊"
-                        : rating === 2
-                        ? "Fair"
-                        : "Poor"}
-                    </Text>
-                  )}
-                </FormControl>
-              </Box>
+              {/* Category */}
+              <Select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                size="sm"
+                borderRadius="lg"
+                borderColor="gray.200"
+                bg="gray.50"
+                fontSize="sm"
+                _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: "none" }}
+              >
+                <option value="general">General experience</option>
+                <option value="service">Service</option>
+                <option value="delivery">Delivery</option>
+                <option value="product">Products</option>
+                <option value="app">App</option>
+                <option value="other">Other</option>
+              </Select>
 
-              <Box w="100%">
-                <FormControl>
-                  <FormLabel fontSize={{ base: "sm", md: "md" }} mb={2}>
-                    Category (optional)
-                  </FormLabel>
-                  <Select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    size="md"
-                    borderRadius="lg"
-                    borderColor="gray.300"
-                    _focus={{ borderColor: ThemeColors.darkColor, boxShadow: `0 0 0 1px ${ThemeColors.darkColor}` }}
-                    mb={4}
-                  >
-                    <option value="general">General experience</option>
-                    <option value="service">Service</option>
-                    <option value="delivery">Delivery</option>
-                    <option value="product">Products</option>
-                    <option value="app">App</option>
-                    <option value="other">Other</option>
-                  </Select>
-                </FormControl>
-                <FormControl>
-                  <FormLabel fontSize={{ base: "sm", md: "md" }} mb={2}>
-                    Tell Us More (Optional)
-                  </FormLabel>
-                  <Textarea
-                    value={feedback}
-                    onChange={(e) => setFeedback(e.target.value)}
-                    placeholder="Share your thoughts, suggestions, or any issues you've encountered..."
-                    rows={4}
-                    resize="vertical"
-                    fontSize={{ base: "sm", md: "md" }}
-                    borderRadius="lg"
-                    borderColor="gray.300"
-                    _focus={{
-                      borderColor: ThemeColors.darkColor,
-                      boxShadow: `0 0 0 1px ${ThemeColors.darkColor}`,
-                    }}
-                  />
-                </FormControl>
-              </Box>
+              {/* Comment */}
+              <Textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="Share your thoughts or suggestions (optional)..."
+                rows={3}
+                resize="none"
+                fontSize="sm"
+                borderRadius="lg"
+                borderColor="gray.200"
+                bg="gray.50"
+                _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: "none" }}
+              />
 
-              <VStack spacing={3} w="100%">
+              {/* Actions */}
+              <VStack spacing={2}>
                 <Button
-                  w="100%"
-                  bg={ThemeColors.darkColor}
-                  color="white"
-                  size="lg"
-                  fontSize={{ base: "sm", md: "md" }}
-                  fontWeight="semibold"
-                  borderRadius="lg"
-                  leftIcon={<Send size={18} />}
+                  w="100%" size="md"
+                  bg={ThemeColors.primaryColor} color="white"
+                  fontWeight="700" borderRadius="xl"
+                  leftIcon={<Send size={14} />}
                   onClick={handleSubmit}
                   isDisabled={rating === 0}
-                  _hover={{
-                    bg: ThemeColors.primaryColor,
-                    transform: "translateY(-2px)",
-                    boxShadow: "lg",
-                  }}
-                  _disabled={{
-                    bg: "gray.300",
-                    cursor: "not-allowed",
-                  }}
-                  transition="all 0.3s"
+                  _hover={{ bg: ThemeColors.secondaryColor }}
+                  _disabled={{ bg: "gray.200", cursor: "not-allowed" }}
                 >
                   Submit Feedback
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClose}
-                  color="gray.600"
-                >
-                  Maybe Later
+                <Button variant="ghost" size="sm" onClick={handleClose} color="gray.400" fontWeight="500" fontSize="xs">
+                  Maybe later
                 </Button>
               </VStack>
             </VStack>
-          ) : (
-            <VStack spacing={6} textAlign="center">
-              <Box>
-                <Heading
-                  as="h2"
-                  size={{ base: "lg", md: "xl" }}
-                  color={ThemeColors.darkColor}
-                  mb={2}
-                >
-                  Thank You! 🙏
-                </Heading>
-                <Text fontSize={{ base: "sm", md: "md" }} color="gray.600">
-                  We truly appreciate your feedback. It helps us make YooKatale even better for you!
-                </Text>
+          </ModalBody>
+        ) : (
+          <ModalBody p={6} py={10}>
+            <VStack spacing={3} textAlign="center">
+              <Box
+                w={12} h={12} borderRadius="xl" mx="auto"
+                bg={`${ThemeColors.primaryColor}12`}
+                display="flex" alignItems="center" justifyContent="center"
+              >
+                <Star size={22} color={ThemeColors.primaryColor} fill={ThemeColors.primaryColor} />
               </Box>
+              <Text fontSize="lg" fontWeight="700" color="gray.800">Thank You</Text>
+              <Text fontSize="sm" color="gray.500">We appreciate your feedback and will use it to improve.</Text>
             </VStack>
-          )}
-        </ModalBody>
+          </ModalBody>
+        )}
       </ModalContent>
     </Modal>
   );
 };
 
 export default PlatformFeedbackModal;
-

@@ -3,8 +3,6 @@
 import {
   Box,
   Button,
-  Flex,
-  Heading,
   Text,
   Modal,
   ModalOverlay,
@@ -19,8 +17,10 @@ import {
 import { ThemeColors } from "@constants/constants";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@slices/authSlice";
-import { Star, X, ExternalLink } from "lucide-react";
+import { Star, ExternalLink } from "lucide-react";
 import { useAppRatingCreateMutation } from "@slices/usersApiSlice";
+
+const RATING_LABELS = ["", "Poor", "Fair", "Good", "Great", "Excellent"];
 
 const AppStoreRatingPrompt = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,387 +36,247 @@ const AppStoreRatingPrompt = () => {
   const [createAppRating] = useAppRatingCreateMutation();
 
   useEffect(() => {
-    // Detect user agent
     if (typeof window !== "undefined") {
       const ua = navigator.userAgent || navigator.vendor || window.opera;
       setUserAgent(ua);
-      
-      // Check if user has already rated
-      const rated = localStorage.getItem("appStoreRated");
-      if (rated === "true") {
-        setHasRated(true);
-        return;
-      }
 
-      // Check if user has seen the prompt before
+      const rated = localStorage.getItem("appStoreRated");
+      if (rated === "true") { setHasRated(true); return; }
+
       const lastPrompt = localStorage.getItem("appRatingLastPrompt");
       const promptCount = parseInt(localStorage.getItem("appRatingPromptCount") || "0");
 
-      // Show prompt after user has been active for a while
-      // Show after 3rd visit or after 7 days since last prompt
       const shouldShow = () => {
-        if (promptCount >= 3) return false; // Don't show more than 3 times
-        if (!lastPrompt) return true; // First time
-        
-        const daysSinceLastPrompt = (Date.now() - parseInt(lastPrompt)) / (1000 * 60 * 60 * 24);
-        return daysSinceLastPrompt >= 7; // Show again after 7 days
+        if (promptCount >= 3) return false;
+        if (!lastPrompt) return true;
+        const days = (Date.now() - parseInt(lastPrompt)) / (1000 * 60 * 60 * 24);
+        return days >= 7;
       };
 
-      // Track session activity
       const pageViews = parseInt(sessionStorage.getItem("appRatingPageViews") || "0");
       sessionStorage.setItem("appRatingPageViews", (pageViews + 1).toString());
 
-      // Track session start time
       const sessionStart = sessionStorage.getItem("appRatingSessionStart");
-      if (!sessionStart) {
-        sessionStorage.setItem("appRatingSessionStart", Date.now().toString());
-      }
+      if (!sessionStart) sessionStorage.setItem("appRatingSessionStart", Date.now().toString());
 
-      // Calculate time spent in session (in minutes)
-      const timeSpent = sessionStart 
-        ? (Date.now() - parseInt(sessionStart)) / (1000 * 60)
-        : 0;
+      const timeSpent = sessionStart ? (Date.now() - parseInt(sessionStart)) / (1000 * 60) : 0;
 
       if (shouldShow() && pageViews >= 5 && timeSpent >= 5) {
-        // Delay showing the prompt by 3-5 minutes after meeting criteria
-        // This ensures it doesn't interrupt the user immediately
-        const delay = 180000 + Math.random() * 120000; // 3-5 minutes
+        const delay = 180000 + Math.random() * 120000;
         const timer = setTimeout(() => {
-          // Double check user is still active
-          const currentPageViews = parseInt(sessionStorage.getItem("appRatingPageViews") || "0");
-          const currentTimeSpent = sessionStart 
-            ? (Date.now() - parseInt(sessionStart)) / (1000 * 60)
-            : 0;
-          
-          // Only show if still meets criteria
-          if (currentPageViews >= 5 && currentTimeSpent >= 5) {
+          const curViews = parseInt(sessionStorage.getItem("appRatingPageViews") || "0");
+          const curTime = sessionStart ? (Date.now() - parseInt(sessionStart)) / (1000 * 60) : 0;
+          if (curViews >= 5 && curTime >= 5) {
             setIsOpen(true);
             localStorage.setItem("appRatingLastPrompt", Date.now().toString());
             localStorage.setItem("appRatingPromptCount", (promptCount + 1).toString());
           }
         }, delay);
-
         return () => clearTimeout(timer);
       }
     }
   }, []);
 
-  const isIOS = () => {
-    return /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-  };
-
-  const isAndroid = () => {
-    return /android/i.test(userAgent);
-  };
+  const isIOS = () => /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+  const isAndroid = () => /android/i.test(userAgent);
 
   const getStoreUrl = () => {
-    if (isIOS()) {
-      // App Store URL - Update this with your actual App Store link once published
-      // Format: https://apps.apple.com/app/yookatale/id[YOUR_APP_ID]
-      return process.env.NEXT_PUBLIC_APP_STORE_URL || "https://apps.apple.com/app/yookatale/id1234567890";
-    } else if (isAndroid()) {
-      // Play Store URL - Update this with your actual Play Store link once published
-      // Format: https://play.google.com/store/apps/details?id=[YOUR_PACKAGE_NAME]
-      return process.env.NEXT_PUBLIC_PLAY_STORE_URL || "https://play.google.com/store/apps/details?id=com.yookataleapp.app";
-    }
+    if (isIOS()) return process.env.NEXT_PUBLIC_APP_STORE_URL || "https://apps.apple.com/app/yookatale/id1234567890";
+    if (isAndroid()) return process.env.NEXT_PUBLIC_PLAY_STORE_URL || "https://play.google.com/store/apps/details?id=com.yookataleapp.app";
     return null;
   };
 
   const handleRatingClick = (value) => {
     setRating(value);
     setHoveredRating(0);
-    
-    // If rating is 4 or 5 stars, show store redirect
-    if (value >= 4) {
-      setShowStoreRedirect(true);
-    } else {
-      // For lower ratings, ask for feedback
-      handleLowRating();
-    }
+    if (value >= 4) setShowStoreRedirect(true);
+    else handleLowRating(value);
   };
 
-  const handleLowRating = async () => {
+  const handleLowRating = async (val) => {
     try {
       if (userInfo?._id) {
-        await createAppRating({
-          userId: userInfo._id,
-          rating: rating,
-          platform: isIOS() ? "ios" : isAndroid() ? "android" : "web",
-          redirectedToStore: false,
-        }).unwrap();
+        await createAppRating({ userId: userInfo._id, rating: val ?? rating, platform: isIOS() ? "ios" : isAndroid() ? "android" : "web", redirectedToStore: false }).unwrap();
       }
-      
-      chakraToast({
-        title: "Thank you for your feedback!",
-        description: "We appreciate your input and will work to improve.",
-        status: "info",
-        duration: 3000,
-        isClosable: true,
-      });
-      
+      chakraToast({ title: "Thank you for your feedback", status: "info", duration: 3000, isClosable: true });
       setIsOpen(false);
-    } catch (error) {
-      console.error("Error saving rating:", error);
-    }
+    } catch {}
   };
 
   const handleStoreRedirect = async () => {
     try {
       if (userInfo?._id) {
-        await createAppRating({
-          userId: userInfo._id,
-          rating: rating,
-          platform: isIOS() ? "ios" : isAndroid() ? "android" : "web",
-          redirectedToStore: true,
-        }).unwrap();
+        await createAppRating({ userId: userInfo._id, rating, platform: isIOS() ? "ios" : isAndroid() ? "android" : "web", redirectedToStore: true }).unwrap();
       }
-
-      // Mark as rated
       localStorage.setItem("appStoreRated", "true");
       setHasRated(true);
-      
       const storeUrl = getStoreUrl();
-      if (storeUrl) {
-        window.open(storeUrl, "_blank");
-      }
-      
+      if (storeUrl) window.open(storeUrl, "_blank");
       setIsOpen(false);
-      
-      chakraToast({
-        title: "Thank you!",
-        description: "Your support means the world to us!",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-    } catch (error) {
-      console.error("Error saving rating:", error);
-    }
+      chakraToast({ title: "Thank you for the support!", status: "success", duration: 3000, isClosable: true });
+    } catch {}
   };
 
-  const handleClose = () => {
-    setIsOpen(false);
-    // Don't show again for this session
-    sessionStorage.setItem("appRatingDismissed", "true");
-  };
-
-  const handleMaybeLater = () => {
-    setIsOpen(false);
-    // Reset prompt count to show again later
-    localStorage.setItem("appRatingPromptCount", "0");
-  };
-
-  const renderStars = () => {
-    return (
-      <HStack spacing={2} justifyContent="center">
-        {[1, 2, 3, 4, 5].map((star) => {
-          const filled = star <= (hoveredRating || rating);
-          return (
-            <Box
-              key={star}
-              as="button"
-              cursor="pointer"
-              onClick={() => handleRatingClick(star)}
-              onMouseEnter={() => setHoveredRating(star)}
-              onMouseLeave={() => setHoveredRating(0)}
-              transition="all 0.2s"
-              transform={filled ? "scale(1.1)" : "scale(1)"}
-            >
-              <Icon
-                as={Star}
-                w={{ base: 8, md: 10 }}
-                h={{ base: 8, md: 10 }}
-                color={filled ? "#FFD700" : "#E2E8F0"}
-                fill={filled ? "#FFD700" : "none"}
-                stroke={filled ? "#FFD700" : "#E2E8F0"}
-              />
-            </Box>
-          );
-        })}
-      </HStack>
-    );
-  };
+  const handleClose = () => { setIsOpen(false); sessionStorage.setItem("appRatingDismissed", "true"); };
+  const handleMaybeLater = () => { setIsOpen(false); localStorage.setItem("appRatingPromptCount", "0"); };
 
   if (hasRated || !isOpen) return null;
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      isCentered
-      size={{ base: "sm", md: "md" }}
-      closeOnOverlayClick={false}
-    >
-      <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
+    <Modal isOpen={isOpen} onClose={handleClose} isCentered size="xs" closeOnOverlayClick={false}>
+      <ModalOverlay bg="blackAlpha.500" backdropFilter="blur(6px)" />
       <ModalContent
-        borderRadius="xl"
-        mx={{ base: 4, md: 0 }}
-        maxW={{ base: "90vw", md: "500px" }}
+        borderRadius="2xl"
+        mx={4}
+        maxW="360px"
+        boxShadow="0 20px 60px rgba(0,0,0,0.15)"
+        overflow="hidden"
       >
         <ModalCloseButton
-          onClick={handleClose}
-          size="lg"
-          color="gray.500"
-          _hover={{ color: "gray.700" }}
+          size="sm"
+          top={3}
+          right={3}
+          color="gray.400"
+          _hover={{ color: "gray.700", bg: "gray.100" }}
+          borderRadius="full"
+          zIndex={10}
         />
-        <ModalBody p={{ base: 6, md: 8 }}>
-          {!showStoreRedirect ? (
-            <VStack spacing={6} textAlign="center">
-              <Box>
-                <Heading
-                  as="h2"
-                  size={{ base: "lg", md: "xl" }}
-                  color={ThemeColors.darkColor}
-                  mb={2}
-                >
-                  Enjoying YooKatale?
-                </Heading>
-                <Text fontSize={{ base: "sm", md: "md" }} color="gray.600">
-                  Your feedback helps us improve! Would you mind rating us on the{" "}
-                  {isIOS() ? "App Store" : isAndroid() ? "Play Store" : "store"}?
-                </Text>
+
+        {!showStoreRedirect ? (
+          <ModalBody p={6} pt={8}>
+            <VStack spacing={5} textAlign="center">
+              {/* Icon */}
+              <Box
+                w={12} h={12}
+                borderRadius="xl"
+                bg={`${ThemeColors.primaryColor}12`}
+                display="flex" alignItems="center" justifyContent="center"
+              >
+                <Star size={22} color={ThemeColors.primaryColor} fill={ThemeColors.primaryColor} />
               </Box>
 
-              <Box w="100%" py={4}>
-                {renderStars()}
+              {/* Title */}
+              <VStack spacing={1}>
+                <Text fontSize="lg" fontWeight="700" color="gray.800" lineHeight="1.3">
+                  Enjoying YooKatale?
+                </Text>
+                <Text fontSize="sm" color="gray.500" lineHeight="1.5">
+                  A quick rating helps us reach more people
+                </Text>
+              </VStack>
+
+              {/* Stars */}
+              <Box w="100%">
+                <HStack spacing={2} justifyContent="center" mb={2}>
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const filled = star <= (hoveredRating || rating);
+                    return (
+                      <Box
+                        key={star}
+                        as="button"
+                        cursor="pointer"
+                        onClick={() => handleRatingClick(star)}
+                        onMouseEnter={() => setHoveredRating(star)}
+                        onMouseLeave={() => setHoveredRating(0)}
+                        transition="transform 0.15s"
+                        transform={filled ? "scale(1.15)" : "scale(1)"}
+                        p={1}
+                      >
+                        <Icon
+                          as={Star}
+                          w={7} h={7}
+                          color={filled ? "#F6A623" : "#E2E8F0"}
+                          fill={filled ? "#F6A623" : "none"}
+                          stroke={filled ? "#F6A623" : "#CBD5E0"}
+                        />
+                      </Box>
+                    );
+                  })}
+                </HStack>
                 {rating > 0 && (
-                  <Text
-                    fontSize="sm"
-                    color="gray.500"
-                    mt={3}
-                    fontWeight="medium"
-                  >
-                    {rating === 5
-                      ? "Excellent! ⭐"
-                      : rating === 4
-                      ? "Great! 👍"
-                      : rating === 3
-                      ? "Good! 😊"
-                      : rating === 2
-                      ? "Fair"
-                      : "Poor"}
+                  <Text fontSize="xs" color="gray.500" fontWeight="600" textTransform="uppercase" letterSpacing="0.05em">
+                    {RATING_LABELS[rating]}
                   </Text>
                 )}
               </Box>
 
+              {/* CTAs */}
               {rating >= 4 && (
-                <VStack spacing={3} w="100%">
+                <VStack spacing={2} w="100%">
                   <Button
-                    w="100%"
-                    bg={ThemeColors.darkColor}
-                    color="white"
-                    size="lg"
-                    fontSize={{ base: "sm", md: "md" }}
-                    fontWeight="semibold"
-                    borderRadius="lg"
-                    rightIcon={<ExternalLink size={18} />}
+                    w="100%" size="md"
+                    bg={ThemeColors.primaryColor} color="white"
+                    fontWeight="700" borderRadius="xl"
+                    rightIcon={<ExternalLink size={15} />}
                     onClick={handleStoreRedirect}
-                    _hover={{
-                      bg: ThemeColors.primaryColor,
-                      transform: "translateY(-2px)",
-                      boxShadow: "lg",
-                    }}
-                    transition="all 0.3s"
+                    _hover={{ bg: ThemeColors.secondaryColor }}
                   >
-                    Rate on {isIOS() ? "App Store" : isAndroid() ? "Play Store" : "Store"}
+                    Rate on {isIOS() ? "App Store" : "Play Store"}
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleMaybeLater}
-                    color="gray.600"
-                  >
-                    Maybe Later
+                  <Button variant="ghost" size="sm" onClick={handleMaybeLater} color="gray.400" fontWeight="500" fontSize="xs">
+                    Maybe later
                   </Button>
                 </VStack>
               )}
-
               {rating > 0 && rating < 4 && (
-                <VStack spacing={3} w="100%">
+                <VStack spacing={2} w="100%">
                   <Button
-                    w="100%"
-                    bg={ThemeColors.darkColor}
-                    color="white"
-                    size="lg"
-                    onClick={handleLowRating}
-                    _hover={{ bg: ThemeColors.primaryColor }}
+                    w="100%" size="md"
+                    bg="gray.800" color="white"
+                    fontWeight="700" borderRadius="xl"
+                    onClick={() => handleLowRating(rating)}
+                    _hover={{ bg: "gray.700" }}
                   >
                     Submit Feedback
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleClose}
-                    color="gray.600"
-                  >
-                    Close
+                  <Button variant="ghost" size="sm" onClick={handleClose} color="gray.400" fontWeight="500" fontSize="xs">
+                    Dismiss
                   </Button>
                 </VStack>
               )}
-
               {rating === 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleMaybeLater}
-                  color="gray.600"
-                >
-                  Maybe Later
+                <Button variant="ghost" size="sm" onClick={handleMaybeLater} color="gray.400" fontWeight="500" fontSize="xs">
+                  Maybe later
                 </Button>
               )}
             </VStack>
-          ) : (
-            <VStack spacing={6} textAlign="center">
-              <Box>
-                <Heading
-                  as="h2"
-                  size={{ base: "lg", md: "xl" }}
-                  color={ThemeColors.darkColor}
-                  mb={2}
-                >
-                  Thank You! 🙏
-                </Heading>
-                <Text fontSize={{ base: "sm", md: "md" }} color="gray.600">
-                  We're thrilled you love YooKatale! Your rating helps others discover us.
-                </Text>
+          </ModalBody>
+        ) : (
+          <ModalBody p={6} pt={8}>
+            <VStack spacing={5} textAlign="center">
+              <Box
+                w={12} h={12}
+                borderRadius="xl"
+                bg={`${ThemeColors.primaryColor}12`}
+                display="flex" alignItems="center" justifyContent="center"
+              >
+                <Star size={22} color={ThemeColors.primaryColor} fill={ThemeColors.primaryColor} />
               </Box>
-
-              <VStack spacing={3} w="100%">
+              <VStack spacing={1}>
+                <Text fontSize="lg" fontWeight="700" color="gray.800">Thank You</Text>
+                <Text fontSize="sm" color="gray.500">Your support means a lot to us.</Text>
+              </VStack>
+              <VStack spacing={2} w="100%">
                 <Button
-                  w="100%"
-                  bg={ThemeColors.darkColor}
-                  color="white"
-                  size="lg"
-                  fontSize={{ base: "sm", md: "md" }}
-                  fontWeight="semibold"
-                  borderRadius="lg"
-                  rightIcon={<ExternalLink size={18} />}
+                  w="100%" size="md"
+                  bg={ThemeColors.primaryColor} color="white"
+                  fontWeight="700" borderRadius="xl"
+                  rightIcon={<ExternalLink size={15} />}
                   onClick={handleStoreRedirect}
-                  _hover={{
-                    bg: ThemeColors.primaryColor,
-                    transform: "translateY(-2px)",
-                    boxShadow: "lg",
-                  }}
-                  transition="all 0.3s"
+                  _hover={{ bg: ThemeColors.secondaryColor }}
                 >
-                  Rate on {isIOS() ? "App Store" : isAndroid() ? "Play Store" : "Store"}
+                  Rate on {isIOS() ? "App Store" : "Play Store"}
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClose}
-                  color="gray.600"
-                >
-                  Maybe Later
+                <Button variant="ghost" size="sm" onClick={handleClose} color="gray.400" fontWeight="500" fontSize="xs">
+                  Maybe later
                 </Button>
               </VStack>
             </VStack>
-          )}
-        </ModalBody>
+          </ModalBody>
+        )}
       </ModalContent>
     </Modal>
   );
 };
 
 export default AppStoreRatingPrompt;
-
