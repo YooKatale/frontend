@@ -45,9 +45,7 @@ import {
 import { ThemeColors } from "@constants/constants";
 import { useGetCareersMutation } from "@slices/careersListSlice";
 import { useJobApplicationMutation } from "@slices/applicationSlice";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { storage } from "@lib/firebase";
-import { v4 } from "uuid";
+import { DB_URL } from "@config/config";
 
 const MotionBox = motion(Box);
 
@@ -647,20 +645,28 @@ const ApplyForm = ({ jobTitle }) => {
     if (!file) return;
     setLoading(true);
     try {
-      const imageRef = ref(storage, `/Applications/${file.name + v4()}`);
-      const uploadFile = await uploadBytes(imageRef, file);
-      if (uploadFile) {
-        const downloadURL = await getDownloadURL(imageRef);
-        const response = await submitApplication({ ...formData, resume: downloadURL });
-        if (response.data.status === "Success") {
-          setSubmitted(true);
-          setFormData({ name: "", email: "", phone: "", coverLetter: "" });
-          setFile(null);
-        }
+      // Upload CV to backend (uses Firebase Admin SDK server-side)
+      const cvForm = new FormData();
+      cvForm.append("cv", file);
+      const uploadRes = await fetch(`${DB_URL}/careers/upload-cv`, {
+        method: "POST",
+        body: cvForm,
+      });
+      const uploadJson = await uploadRes.json();
+      if (uploadJson.status !== "Success") throw new Error(uploadJson.message || "CV upload failed");
+
+      // Submit application with the CV URL
+      const response = await submitApplication({ ...formData, resume: uploadJson.url });
+      if (response?.data?.status === "Success") {
+        setSubmitted(true);
+        setFormData({ name: "", email: "", phone: "", coverLetter: "" });
+        setFile(null);
+      } else {
+        throw new Error(response?.error?.data?.message || "Submission failed");
       }
     } catch (error) {
       console.error("Error submitting application:", error);
-      alert("Error submitting application. Please try again later.");
+      alert(`Error: ${error.message || "Please try again later."}`);
     }
     setLoading(false);
   };
