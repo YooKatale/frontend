@@ -1033,7 +1033,7 @@ const Header = () => {
                     </Flex>
                   </Link>
                   </>
-                }}
+                )}
               <Flex as="button" type="button" align="center" gap="12px" py="11px" px="18px" w="100%" textAlign="left" bg="transparent" _hover={{ bg: "#e8f5ee" }} _active={{ bg: "#e8f5ee" }} onClick={openInviteModal} transition="background 0.12s">
                 <Flex w="34px" h="34px" borderRadius="10px" bg="#f4f8f5" align="center" justify="center" flexShrink={0}><FaGift size={17} color="#637568" /></Flex>
                 <Text fontSize="13px" fontWeight="500" color="#1e2d22" flex={1}>Invite a Friend</Text>
