@@ -86,6 +86,18 @@ export default function ClientLayoutWrapper({ children }) {
     dispatch(hydrateWishlist());
   }, [dispatch]);
 
+  // Fire-and-forget page visit tracking
+  useEffect(() => {
+    try {
+      fetch(`${DB_URL}/track`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page: pathname }),
+        keepalive: true,
+      }).catch(() => {});
+    } catch {}
+  }, [pathname]);
+
   return (
     <>
       <AuthSync />
