@@ -38,6 +38,9 @@ import {
   FiUsers,
   FiTrendingUp,
   FiHeart,
+  FiShare2,
+  FiCopy,
+  FiCheck,
 } from "react-icons/fi";
 import { ThemeColors } from "@constants/constants";
 import { useGetCareersMutation } from "@slices/careersListSlice";
@@ -47,6 +50,8 @@ import { storage } from "@lib/firebase";
 import { v4 } from "uuid";
 
 const MotionBox = motion(Box);
+
+const SITE_URL = "https://www.yookatale.app";
 
 const perks = [
   { icon: FiUsers, label: "Collaborative Team" },
@@ -59,6 +64,7 @@ function Careers() {
   const [fetchCareers] = useGetCareersMutation();
   const sectionRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [highlightedJobId, setHighlightedJobId] = useState(null);
 
   const getCareers = async () => {
     try {
@@ -73,6 +79,10 @@ function Careers() {
 
   useEffect(() => {
     getCareers();
+    // Read ?job=<id> from URL to auto-open a specific job when shared
+    const params = new URLSearchParams(window.location.search);
+    const jobId = params.get("job");
+    if (jobId) setHighlightedJobId(jobId);
   }, []);
 
   useEffect(() => {
@@ -168,8 +178,7 @@ function Careers() {
                 fontSize={{ base: "md", md: "lg" }} color="gray.600"
                 maxW="560px" mx="auto" lineHeight="tall"
               >
-                Help us build Africa&apos;s largest digital food network. We&apos;re looking for passionate
-                people who want to make a real impact.
+                We&apos;re looking for passionate people to help grow Uganda&apos;s leading food marketplace.
               </Text>
             </MotionBox>
 
@@ -201,38 +210,13 @@ function Careers() {
               <VStack spacing="6" align="stretch">
                 {careers.map((job, i) => (
                   <MotionBox key={job._id} variants={itemVariants} custom={i}>
-                    <JobCard job={job} />
+                    <JobCard job={job} autoOpen={highlightedJobId === job._id} />
                   </MotionBox>
                 ))}
               </VStack>
             ) : (
               <EmptyState />
             )}
-          </MotionBox>
-
-          {/* CTA footer */}
-          <MotionBox
-            initial={{ opacity: 0, y: 16 }}
-            animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            textAlign="center"
-            py="8"
-            px={{ base: 6, md: 10 }}
-            bg="green.50"
-            borderRadius="2xl"
-            border="1px solid"
-            borderColor="green.100"
-          >
-            <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="semibold" color="gray.800" mb="2">
-              Don&apos;t see a role that fits?
-            </Text>
-            <Text fontSize="md" color="gray.600">
-              Send your CV directly to{" "}
-              <Text as="span" color={ThemeColors.primaryColor} fontWeight="semibold">
-                info@yookatale.com
-              </Text>{" "}
-              — we&apos;re always open to great talent.
-            </Text>
           </MotionBox>
 
         </VStack>
@@ -242,9 +226,37 @@ function Careers() {
 }
 
 /* ─── Job Card ─── */
-const JobCard = ({ job }) => {
+const JobCard = ({ job, autoOpen }) => {
   const [openDetails, setOpenDetails] = useState(false);
   const [showApplyForm, setShowApplyForm] = useState(false);
+  const [showSharePanel, setShowSharePanel] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const cardRef = useRef(null);
+  const sharePanelRef = useRef(null);
+
+  const shareUrl = `${SITE_URL}/careers?job=${job?._id}`;
+  const shareText = `${job?.title} at YooKatale | ${job?.location} | Salary: ${job?.salary} | Apply: ${shareUrl}`;
+
+  // Auto-open details when job ID matches shared link
+  useEffect(() => {
+    if (autoOpen && job?._id) {
+      setOpenDetails(true);
+      setTimeout(() => {
+        cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 300);
+    }
+  }, [autoOpen, job?._id]);
+
+  // Close share panel on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (sharePanelRef.current && !sharePanelRef.current.contains(e.target)) {
+        setShowSharePanel(false);
+      }
+    };
+    if (showSharePanel) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showSharePanel]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -261,11 +273,82 @@ const JobCard = ({ job }) => {
     setShowApplyForm((prev) => !prev);
   };
 
+  const handleShare = async () => {
+    // Use native Web Share API on mobile if available
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${job?.title} — YooKatale`,
+          text: shareText,
+          url: shareUrl,
+        });
+        return;
+      } catch (_) {
+        // User cancelled or API unavailable — fall through to panel
+      }
+    }
+    setShowSharePanel((prev) => !prev);
+  };
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const socialLinks = [
+    {
+      label: "WhatsApp",
+      color: "#25D366",
+      bg: "#e8fdf2",
+      href: `https://wa.me/?text=${encodeURIComponent(shareText)}`,
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+      ),
+    },
+    {
+      label: "X / Twitter",
+      color: "#000000",
+      bg: "#f0f0f0",
+      href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${job?.title} at YooKatale | ${job?.location}`)}&url=${encodeURIComponent(shareUrl)}`,
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#000">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+      ),
+    },
+    {
+      label: "Facebook",
+      color: "#1877F2",
+      bg: "#e8f0fe",
+      href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>
+      ),
+    },
+    {
+      label: "LinkedIn",
+      color: "#0A66C2",
+      bg: "#e8f2fc",
+      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#0A66C2">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </svg>
+      ),
+    },
+  ];
+
   return (
     <Box
+      ref={cardRef}
       bg="white" borderRadius="2xl"
-      border="1px solid" borderColor="gray.100"
-      boxShadow="0 4px 20px rgba(0,0,0,0.07)"
+      border="1px solid" borderColor={autoOpen ? "green.200" : "gray.100"}
+      boxShadow={autoOpen ? "0 8px 32px rgba(24,95,45,0.15)" : "0 4px 20px rgba(0,0,0,0.07)"}
       overflow="hidden"
       transition="box-shadow 0.2s, border-color 0.2s"
       _hover={{ boxShadow: "0 8px 32px rgba(24,95,45,0.12)", borderColor: "green.100" }}
@@ -303,7 +386,7 @@ const JobCard = ({ job }) => {
       <Divider borderColor="gray.100" />
 
       {/* Actions */}
-      <Flex px={{ base: 5, md: 8 }} py="4" gap="3" wrap="wrap">
+      <Flex px={{ base: 5, md: 8 }} py="4" gap="3" wrap="wrap" align="center">
         <Button
           onClick={toggleDetails}
           size="sm"
@@ -329,6 +412,88 @@ const JobCard = ({ job }) => {
         >
           Apply Now
         </Button>
+
+        {/* Share button + panel */}
+        <Box position="relative" ref={sharePanelRef}>
+          <Button
+            onClick={handleShare}
+            size="sm"
+            variant="ghost"
+            borderRadius="lg"
+            fontWeight="semibold"
+            leftIcon={<FiShare2 />}
+            color="gray.600"
+            _hover={{ bg: "gray.100", color: "gray.800" }}
+          >
+            Share
+          </Button>
+
+          <AnimatePresence>
+            {showSharePanel && (
+              <motion.div
+                initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                transition={{ duration: 0.18 }}
+                style={{
+                  position: "absolute",
+                  bottom: "calc(100% + 8px)",
+                  left: 0,
+                  zIndex: 50,
+                  minWidth: "220px",
+                }}
+              >
+                <Box
+                  bg="white" borderRadius="xl"
+                  border="1px solid" borderColor="gray.100"
+                  boxShadow="0 8px 32px rgba(0,0,0,0.14)"
+                  p="3"
+                >
+                  <Text fontSize="xs" fontWeight="semibold" color="gray.400" mb="2" px="1" textTransform="uppercase" letterSpacing="wide">
+                    Share this job
+                  </Text>
+                  <VStack spacing="1" align="stretch">
+                    {socialLinks.map((s) => (
+                      <Box
+                        key={s.label}
+                        as="a"
+                        href={s.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        display="flex"
+                        alignItems="center"
+                        gap="2"
+                        px="3" py="2"
+                        borderRadius="lg"
+                        bg={s.bg}
+                        _hover={{ opacity: 0.85 }}
+                        cursor="pointer"
+                        textDecoration="none"
+                      >
+                        {s.icon}
+                        <Text fontSize="sm" fontWeight="medium" color="gray.700">{s.label}</Text>
+                      </Box>
+                    ))}
+                    {/* Copy link */}
+                    <Box
+                      display="flex" alignItems="center" gap="2"
+                      px="3" py="2" borderRadius="lg"
+                      bg={copied ? "green.50" : "gray.50"}
+                      cursor="pointer"
+                      onClick={handleCopy}
+                      _hover={{ opacity: 0.85 }}
+                    >
+                      <Icon as={copied ? FiCheck : FiCopy} color={copied ? ThemeColors.primaryColor : "gray.500"} />
+                      <Text fontSize="sm" fontWeight="medium" color={copied ? ThemeColors.primaryColor : "gray.700"}>
+                        {copied ? "Link copied!" : "Copy link"}
+                      </Text>
+                    </Box>
+                  </VStack>
+                </Box>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Box>
       </Flex>
 
       {/* Expandable details */}
@@ -378,6 +543,20 @@ const JobCard = ({ job }) => {
                   </VStack>
                 </Box>
               </Grid>
+
+              {/* Apply note */}
+              <Box
+                mt="6" p="4" bg="green.50" borderRadius="xl"
+                border="1px solid" borderColor="green.100"
+              >
+                <Text fontSize="sm" color="gray.700">
+                  <Text as="span" fontWeight="semibold">To Apply:</Text> Send your resume to{" "}
+                  <Text as="a" href="mailto:info@yookatale.app" color={ThemeColors.primaryColor} fontWeight="semibold">
+                    info@yookatale.app
+                  </Text>{" "}
+                  or use the Apply Now button above. Specify the vacancy and location you wish to apply for.
+                </Text>
+              </Box>
             </Box>
           </motion.div>
         )}
@@ -445,7 +624,9 @@ const EmptyState = () => (
     </Heading>
     <Text color="gray.500" fontSize="md" maxW="400px" mx="auto">
       We&apos;re not actively hiring at the moment, but check back soon or send your CV to{" "}
-      <Text as="span" color={ThemeColors.primaryColor} fontWeight="semibold">info@yookatale.com</Text>.
+      <Text as="a" href="mailto:info@yookatale.app" color={ThemeColors.primaryColor} fontWeight="semibold">
+        info@yookatale.app
+      </Text>.
     </Text>
   </Box>
 );
