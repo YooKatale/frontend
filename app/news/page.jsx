@@ -11,7 +11,7 @@ import {
 import { FiSearch, FiClock, FiArrowRight, FiUser } from "react-icons/fi";
 import { ThemeColors } from "@constants/constants";
 
-const CATEGORIES = ["All", "Company", "Promotions", "Food & Recipes", "Agriculture", "Technology", "General"];
+const DEFAULT_CATEGORIES = ["Company", "Promotions", "Food & Recipes", "Agriculture", "Technology", "General"];
 
 const CATEGORY_COLORS = {
   Company: "green",
@@ -148,6 +148,10 @@ export default function NewsPage() {
     load();
   }, []);
 
+  // Build category list dynamically from fetched articles
+  const articleCategories = [...new Set(articles.map((a) => a.category).filter(Boolean))];
+  const allCategoryOptions = ["All", ...new Set([...DEFAULT_CATEGORIES, ...articleCategories])];
+
   const filtered = articles.filter((a) => {
     const matchCat = category === "All" || a.category === category;
     const q = search.toLowerCase();
@@ -197,7 +201,7 @@ export default function NewsPage() {
         {/* Category filters */}
         <Box mb={8} overflowX="auto" pb={2}>
           <HStack spacing={2} minW="max-content">
-            {CATEGORIES.map((cat) => (
+            {allCategoryOptions.map((cat) => (
               <Button
                 key={cat}
                 size="sm"
