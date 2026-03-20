@@ -21,11 +21,63 @@ const syne = Syne({ subsets: ["latin"], variable: "--font-syne", display: "swap"
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans", display: "swap" });
 
 export const metadata = {
-  title: "Yookatale — Shop Fresh, Live Better",
+  metadataBase: new URL("https://yookatale.com"),
+  title: {
+    default: "Yookatale — Fresh Groceries & Food Delivery in Kampala, Uganda",
+    template: "%s | Yookatale",
+  },
   description:
-    "YooKatale Uganda | Online Food shopping, Organic and Fresh Foods Mobile Market, Affordable, Reliable & Convenient",
+    "Yookatale is Uganda's leading online grocery and fresh food delivery platform. Shop organic produce, meals, beverages, and household essentials — delivered fast in Kampala.",
+  keywords: [
+    "online groceries Uganda",
+    "food delivery Kampala",
+    "fresh produce Uganda",
+    "organic food Uganda",
+    "Yookatale",
+    "buy food online Uganda",
+    "grocery delivery Kampala",
+    "fresh vegetables Uganda",
+    "meal delivery Uganda",
+    "online supermarket Uganda",
+  ],
+  authors: [{ name: "Yookatale", url: "https://yookatale.com" }],
+  creator: "Yookatale",
+  publisher: "Yookatale",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_UG",
+    url: "https://yookatale.com",
+    siteName: "Yookatale",
+    title: "Yookatale — Fresh Groceries & Food Delivery in Kampala, Uganda",
+    description:
+      "Shop fresh produce, organic food, and everyday essentials online. Fast delivery across Kampala. Uganda's favourite grocery app.",
+    images: [
+      {
+        url: "/assets/icons/logo2.png",
+        width: 1200,
+        height: 630,
+        alt: "Yookatale — Fresh Groceries Uganda",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Yookatale — Fresh Groceries & Food Delivery in Kampala",
+    description:
+      "Uganda's online grocery marketplace. Fresh produce, meals & essentials delivered to your door in Kampala.",
+    images: ["/assets/icons/logo2.png"],
+    creator: "@yookatale",
+  },
+  alternates: {
+    canonical: "https://yookatale.com",
+  },
   manifest: "/manifest.json",
-  themeColor: "#0D0D0D",
+  themeColor: "#185f2d",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

@@ -1,19 +1,27 @@
 export const metadata = {
-  title: "Careers | YooKatale",
+  title: "Careers — Join the Yookatale Team",
   description:
-    "YooKatale, a mobile food market for selling, buying and advertising food products and services in Uganda. View open positions and apply today.",
+    "We're hiring! Join Yookatale — Uganda's leading fresh food delivery platform. View open positions in tech, operations, delivery, and marketing and apply today.",
+  keywords: [
+    "jobs in Uganda",
+    "Yookatale careers",
+    "tech jobs Kampala",
+    "food delivery jobs Uganda",
+    "startup jobs Uganda",
+    "hiring Kampala",
+  ],
   openGraph: {
-    title: "We Are Hiring | YooKatale",
+    title: "We're Hiring | Join Yookatale Uganda",
     description:
-      "YooKatale invites qualified applicants to fill vacant posts. View open positions and apply at www.yookatale.app.",
-    url: "https://www.yookatale.app/careers",
-    siteName: "YooKatale",
+      "Yookatale is growing and we want you on our team. Browse open roles and apply to work at Uganda's favourite grocery delivery platform.",
+    url: "https://yookatale.com/careers",
+    siteName: "Yookatale",
     images: [
       {
-        url: "https://www.yookatale.app/assets/images/careers-banner.jpeg",
-        width: 780,
-        height: 780,
-        alt: "YooKatale — We Are Hiring",
+        url: "/assets/icons/logo2.png",
+        width: 1200,
+        height: 630,
+        alt: "Yookatale — We Are Hiring",
       },
     ],
     locale: "en_UG",
@@ -21,11 +29,12 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "We Are Hiring | YooKatale",
-    description:
-      "YooKatale invites qualified applicants to fill vacant posts. View open positions and apply at www.yookatale.app.",
-    images: ["https://www.yookatale.app/assets/images/careers-banner.jpeg"],
+    title: "We're Hiring at Yookatale",
+    description: "Join Uganda's fastest-growing food delivery platform. View open positions and apply today.",
+    images: ["/assets/icons/logo2.png"],
+    creator: "@yookatale",
   },
+  alternates: { canonical: "https://yookatale.com/careers" },
 };
 
 export default function CareersLayout({ children }) {
