@@ -706,7 +706,7 @@ const ApplyForm = ({ jobTitle }) => {
           </FormLabel>
           <Input
             name="name" value={formData.name} onChange={handleChange}
-            placeholder="Jane Doe"
+            placeholder="e.g. Nakato Amina"
             bg="white" borderRadius="lg" borderColor="gray.200"
             _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}` }}
             fontSize="sm"
@@ -719,7 +719,7 @@ const ApplyForm = ({ jobTitle }) => {
           </FormLabel>
           <Input
             type="email" name="email" value={formData.email} onChange={handleChange}
-            placeholder="jane@example.com"
+            placeholder="e.g. amina@gmail.com"
             bg="white" borderRadius="lg" borderColor="gray.200"
             _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}` }}
             fontSize="sm"
@@ -741,14 +741,16 @@ const ApplyForm = ({ jobTitle }) => {
 
         <FormControl isRequired>
           <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700" mb="1">
-            <HStack spacing="1"><Icon as={FiUpload} /><Text>Attach CV (Resume)</Text></HStack>
+            <HStack spacing="1"><Icon as={FiUpload} /><Text>Attach CV / Resume</Text></HStack>
           </FormLabel>
           <Input
-            type="file" id="cv" onChange={(e) => handleUpload(e.target.files)}
+            type="file" id="cv" accept="application/pdf,.pdf"
+            onChange={(e) => handleUpload(e.target.files)}
             bg="white" borderRadius="lg" borderColor="gray.200"
             fontSize="sm" pt="1.5"
             _focus={{ borderColor: ThemeColors.primaryColor, boxShadow: `0 0 0 1px ${ThemeColors.primaryColor}` }}
           />
+          <Text fontSize="xs" color="gray.400" mt="1">PDF format only · Max 5MB</Text>
         </FormControl>
       </Grid>
 
