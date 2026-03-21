@@ -27,6 +27,7 @@ import {
   useCartDeleteMutation,
   useCartMutation,
   useCartUpdateMutation,
+  useValidateCouponMutation,
 } from "@slices/productsApiSlice";
 import { dispatchCartUpdated } from "@lib/cartEvents";
 import CartCard from "@components/CartCard";
@@ -40,8 +41,15 @@ import {
   FiShoppingCart,
   FiRefreshCw,
   FiChevronRight,
+  FiShield,
+  FiTruck,
+  FiClock,
+  FiCheck,
 } from "react-icons/fi";
 import { TbShoppingCartOff } from "react-icons/tb";
+
+const DELIVERY_FEE = 3500;
+const FREE_DELIVERY_THRESHOLD = 50000;
 
 const MotionBox = motion(Box);
 
@@ -68,6 +76,7 @@ const Cart = () => {
   const [fetchCart] = useCartMutation();
   const [deleteCartItem] = useCartDeleteMutation();
   const [updateCartItem] = useCartUpdateMutation();
+  const [validateCoupon] = useValidateCouponMutation();
 
   const chakraToast = useToast();
 
@@ -202,41 +211,29 @@ const Cart = () => {
     }
   };
 
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     if (!couponCode.trim()) {
-      chakraToast({
-        title: "Invalid Code",
-        description: "Please enter a coupon code",
-        status: "warning",
-        duration: 3000,
-        isClosable: true,
-      });
+      chakraToast({ title: "Enter a coupon code", status: "warning", duration: 2500, isClosable: true });
       return;
     }
-
     setIsApplyingCoupon(true);
-    setTimeout(() => {
+    try {
+      const res = await validateCoupon({ code: couponCode.trim().toUpperCase(), cartTotal }).unwrap();
+      const discountVal = res?.data?.discountAmount || res?.data?.discount || (cartTotal * (res?.data?.discountPercent || 10) / 100);
+      setDiscountAmount(Math.round(discountVal));
+      chakraToast({ title: "Coupon applied!", description: res?.data?.message || `Discount of UGX ${FormatCurr(discountVal)} applied`, status: "success", duration: 3000, isClosable: true });
+    } catch (err) {
+      // Fallback: support built-in YOO10 code offline
       if (couponCode.toUpperCase() === "YOO10") {
-        const discount = cartTotal * 0.1;
+        const discount = Math.round(cartTotal * 0.1);
         setDiscountAmount(discount);
-        chakraToast({
-          title: "Coupon Applied!",
-          description: "10% discount has been applied",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
+        chakraToast({ title: "Coupon applied!", description: "10% discount applied", status: "success", duration: 3000, isClosable: true });
       } else {
-        chakraToast({
-          title: "Invalid Coupon",
-          description: "The coupon code is not valid",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+        chakraToast({ title: "Invalid coupon", description: err?.data?.message || "This code is not valid or has expired", status: "error", duration: 3500, isClosable: true });
       }
+    } finally {
       setIsApplyingCoupon(false);
-    }, 1500);
+    }
   };
 
   /** Opens checkout modal. Called by “Proceed to Checkout” button. */
@@ -287,7 +284,10 @@ const Cart = () => {
     handleDataFetch();
   }, []);
 
-  const finalTotal = cartTotal - discountAmount;
+  const deliveryFee = cartTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
+  const toFreeDelivery = Math.max(0, FREE_DELIVERY_THRESHOLD - cartTotal);
+  const freeDeliveryProgress = Math.min(100, (cartTotal / FREE_DELIVERY_THRESHOLD) * 100);
+  const finalTotal = cartTotal - discountAmount + deliveryFee;
 
   return (
     <MotionBox
@@ -523,53 +523,74 @@ const Cart = () => {
                     </Flex>
                   </Box>
 
+                  {/* Free delivery progress */}
+                  {toFreeDelivery > 0 ? (
+                    <Box mb={5} p={3} bg="orange.50" borderRadius="lg" border="1px solid" borderColor="orange.200">
+                      <Flex align="center" gap={2} mb={2}>
+                        <FiTruck color="#dd6b20" size={14} />
+                        <Text fontSize="xs" color="orange.700" fontWeight="600">
+                          Add UGX {FormatCurr(toFreeDelivery)} more for FREE delivery
+                        </Text>
+                      </Flex>
+                      <Box bg="orange.100" borderRadius="full" h="6px" overflow="hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${freeDeliveryProgress}%` }}
+                          transition={{ duration: 0.8 }}
+                          style={{ height: "100%", background: "#dd6b20", borderRadius: "9999px" }}
+                        />
+                      </Box>
+                    </Box>
+                  ) : (
+                    <Box mb={5} p={3} bg="green.50" borderRadius="lg" border="1px solid" borderColor="green.200">
+                      <Flex align="center" gap={2}>
+                        <FiCheck color="#276749" size={14} />
+                        <Text fontSize="xs" color="green.700" fontWeight="600">You qualify for FREE delivery!</Text>
+                      </Flex>
+                    </Box>
+                  )}
+
                   <Box mb={6}>
                     <Flex justify="space-between" mb={2}>
-                      <Text color="gray.600">Subtotal</Text>
-                      <Text fontWeight="semibold">UGX {FormatCurr(cartTotal)}</Text>
+                      <Text color="gray.600" fontSize="sm">Subtotal ({cart.length} item{cart.length !== 1 ? "s" : ""})</Text>
+                      <Text fontWeight="semibold" fontSize="sm">UGX {FormatCurr(cartTotal)}</Text>
                     </Flex>
 
                     <Flex justify="space-between" mb={2}>
                       <Flex align="center" gap={1}>
-                        <Text color="gray.600">Shipping</Text>
-                        <Badge
-                          bg={ThemeColors.primaryColor}
-                          color="white"
-                          size="sm"
-                        >
-                          FREE
-                        </Badge>
+                        <Text color="gray.600" fontSize="sm">Delivery</Text>
                       </Flex>
-                      <Text fontWeight="semibold">UGX 0</Text>
+                      {deliveryFee === 0 ? (
+                        <Flex align="center" gap={1}>
+                          <Badge bg={ThemeColors.primaryColor} color="white" fontSize="xs">FREE</Badge>
+                        </Flex>
+                      ) : (
+                        <Text fontWeight="semibold" fontSize="sm">UGX {FormatCurr(deliveryFee)}</Text>
+                      )}
                     </Flex>
 
                     {discountAmount > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                      >
+                      <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                         <Flex justify="space-between" mb={2}>
-                          <Text color={ThemeColors.primaryColor}>Discount</Text>
-                          <Text fontWeight="semibold" color={ThemeColors.primaryColor}>
-                            -UGX {FormatCurr(discountAmount)}
-                          </Text>
+                          <Text color="green.600" fontSize="sm">Coupon discount</Text>
+                          <Text fontWeight="semibold" color="green.600" fontSize="sm">-UGX {FormatCurr(discountAmount)}</Text>
                         </Flex>
                       </motion.div>
                     )}
 
                     <Divider my={3} />
 
-                    <Flex justify="space-between" mb={4}>
-                      <Text fontSize="lg" fontWeight="bold">
-                        Total
-                      </Text>
+                    <Flex justify="space-between" mb={1}>
+                      <Text fontSize="lg" fontWeight="bold">Total</Text>
                       <Box textAlign="right">
                         <Text fontSize="xl" fontWeight="bold" color={ThemeColors.primaryColor}>
                           UGX {FormatCurr(finalTotal)}
                         </Text>
-                        <Text fontSize="sm" color="gray.500">
-                          Including VAT
-                        </Text>
+                        {discountAmount > 0 && (
+                          <Text fontSize="xs" color="green.500" fontWeight="600">
+                            You save UGX {FormatCurr(discountAmount + (DELIVERY_FEE - deliveryFee))}
+                          </Text>
+                        )}
                       </Box>
                     </Flex>
                   </Box>
@@ -601,7 +622,7 @@ const Cart = () => {
                     </Button>
                   </MotionBox>
 
-                  <Box mt={4} textAlign="center">
+                  <Box mt={3} textAlign="center">
                     <Link href="/">
                       <Text
                         color={ThemeColors.primaryColor}
@@ -610,11 +631,28 @@ const Cart = () => {
                         display="inline-flex"
                         alignItems="center"
                         gap={1}
+                        fontSize="sm"
                       >
                         Continue Shopping
                         <FiChevronRight />
                       </Text>
                     </Link>
+                  </Box>
+
+                  {/* Trust badges */}
+                  <Box mt={5} pt={4} borderTop="1px solid" borderColor="gray.100">
+                    <Flex justify="center" gap={4} flexWrap="wrap">
+                      {[
+                        { icon: FiShield, label: "Secure Checkout" },
+                        { icon: FiTruck, label: "Fast Delivery" },
+                        { icon: FiClock, label: "24/7 Support" },
+                      ].map(({ icon: Icon, label }) => (
+                        <Flex key={label} direction="column" align="center" gap={1}>
+                          <Icon size={16} color={ThemeColors.primaryColor} />
+                          <Text fontSize="10px" color="gray.500" fontWeight="500">{label}</Text>
+                        </Flex>
+                      ))}
+                    </Flex>
                   </Box>
                 </Box>
               </MotionBox>

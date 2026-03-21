@@ -112,18 +112,22 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
   }, []);
 
   const handleSubmit = async () => {
+    if (!userInfo?._id) {
+      chakraToast({ title: "Please sign in to checkout", status: "warning", duration: 3000, position: "top-right" });
+      return;
+    }
     setIsLoading(true);
     setIsProcessing(true);
     let processTimer;
 
     try {
       processTimer = setInterval(() => {
-        setProgress((old) => (old >= 100 ? 100 : Math.min(old + 20, 100)));
-      }, 200);
+        setProgress((old) => (old >= 90 ? 90 : Math.min(old + 15, 90)));
+      }, 300);
 
       const res = await createCartCheckout({
         user: userInfo,
-        customerName: `${userInfo.firstname} ${userInfo.lastname}`,
+        customerName: `${userInfo?.firstname || ""} ${userInfo?.lastname || ""}`.trim() || userInfo?.email,
         Carts: Cart,
         order: {
           orderTotal: cartTotal + DELIVERY_COST,
@@ -134,24 +138,34 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
           receiptId,
           orderId,
         },
-      });
+      }).unwrap();
 
       if (processTimer) clearInterval(processTimer);
       setProgress(100);
 
+      // Server returns: { status: "Success", data: { Order: orderId } }
+      const createdOrderId = res?.data?.Order;
+      if (!createdOrderId) throw new Error("Order was created but no ID was returned. Please check your orders.");
+
       setTimeout(() => {
-        router.push(`/payment/${res.data.data.Order}`);
+        router.push(`/payment/${createdOrderId}`);
         setIsProcessing(false);
-      }, 1500);
+      }, 800);
     } catch (err) {
       if (processTimer) clearInterval(processTimer);
       setIsProcessing(false);
       setIsLoading(false);
+      const msg =
+        err?.data?.message ||
+        err?.message ||
+        err?.error ||
+        "Something went wrong. Please check your connection and try again.";
       chakraToast({
-        title: "Error",
-        description: err.data?.message ?? err.data ?? err.error,
+        title: "Checkout failed",
+        description: msg,
         status: "error",
-        duration: 5000,
+        duration: 6000,
+        isClosable: true,
         position: "top-right",
       });
     }
