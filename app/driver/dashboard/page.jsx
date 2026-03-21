@@ -1,11 +1,21 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { DB_URL } from "@config/config";
 import { useDriverSocket } from "@hooks/useDriverSocket";
 import { useDriverFCM } from "@hooks/useDriverFCM";
+
+const ActiveDeliveryMap = dynamic(
+  () => import("@components/driver/ActiveDeliveryMap"),
+  { ssr: false, loading: () => <div style={{ width: "100%", height: "100%", background: "#0D0D0D", borderRadius: 18 }} /> }
+);
+const DriverOrderCard = dynamic(
+  () => import("@components/driver/OrderCard"),
+  { ssr: false }
+);
 
 const DRIVER_KEY = "yookatale-driver";
 // Location updates now go through Socket.IO (useDriverSocket hook)
@@ -193,6 +203,7 @@ export default function DriverDashboardPage() {
       fetchDashboard();
       fetchAvailableOrders();
     },
+    onLocationUpdate: (loc) => setMyLocation(loc),
   });
 
   // FCM hook: requests notification permission, saves token to backend, handles foreground messages
@@ -426,114 +437,14 @@ export default function DriverDashboardPage() {
                   overflow: "hidden",
                   boxShadow: `0 0 40px ${activeStatusConfig?.color || C.gold}10`,
                 }}>
-                  {/* Card header */}
-                  <div style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: activeStatusConfig?.color || C.gold, boxShadow: `0 0 8px ${activeStatusConfig?.color}`, animation: "pulse 2s ease-in-out infinite" }} />
-                      <span style={{ fontWeight: 700, fontSize: 14, color: C.text1 }}>Active Delivery</span>
-                    </div>
-                    <Badge label={activeStatusConfig?.label || activeDeliveryStatus} color={activeStatusConfig?.color || C.gold} />
-                  </div>
-
-                  <div style={{ padding: "18px", display: "flex", flexDirection: "column", gap: 14 }}>
-                    {/* Order info */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {deliveryOrder?.customerName && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <div style={{ width: 32, height: 32, borderRadius: 10, background: `${C.gold}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <IcoUser a={{ ...ico(14), color: C.gold }} />
-                          </div>
-                          <span style={{ fontSize: 14, fontWeight: 600, color: C.text1 }}>{deliveryOrder.customerName}</span>
-                        </div>
-                      )}
-                      {deliveryOrder?.customerPhone && (
-                        <a href={`tel:${deliveryOrder.customerPhone}`} style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-                          <div style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(59,130,246,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <IcoPhone a={{ ...ico(14), color: C.blue }} />
-                          </div>
-                          <span style={{ fontSize: 14, color: C.blue, fontWeight: 500 }}>{deliveryOrder.customerPhone}</span>
-                        </a>
-                      )}
-                      {deliveryOrder?.deliveryAddress && (
-                        <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                          <div style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(139,92,246,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
-                            <IcoPin a={{ ...ico(14), color: C.purple }} />
-                          </div>
-                          <span style={{ fontSize: 13, color: C.text2, lineHeight: 1.5 }}>
-                            {typeof deliveryOrder.deliveryAddress === "object"
-                              ? deliveryOrder.deliveryAddress.address || JSON.stringify(deliveryOrder.deliveryAddress)
-                              : deliveryOrder.deliveryAddress}
-                          </span>
-                        </div>
-                      )}
-                      {deliveryOrder?.total && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <div style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(16,185,129,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <IcoCoin a={{ ...ico(14), color: "#10b981" }} />
-                          </div>
-                          <span style={{ fontSize: 15, fontWeight: 700, color: C.gold }}>UGX {Number(deliveryOrder.total).toLocaleString()}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Navigate button */}
-                    {(() => {
-                      const addr = deliveryOrder?.deliveryAddress;
-                      const destLat = addr?.lat || addr?.latitude;
-                      const destLng = addr?.lng || addr?.longitude;
-                      const navUrl = mapsUrl(destLat, destLng);
-                      return navUrl ? (
-                        <a
-                          href={navUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                            width: "100%", background: "linear-gradient(135deg, #1d4ed8, #1e40af)",
-                            border: "none", borderRadius: 12, padding: "12px 0",
-                            color: C.white, fontSize: 14, fontWeight: 600, textDecoration: "none",
-                            boxShadow: "0 4px 20px rgba(29,78,216,0.3)", transition: "all 0.2s",
-                          }}
-                        >
-                          <IcoMap a={ico(16)} />
-                          Navigate with Google Maps
-                        </a>
-                      ) : (
-                        <div style={{ textAlign: "center", fontSize: 12, color: C.text3, padding: "8px 0" }}>
-                          No GPS coordinates — ask customer for location
-                        </div>
-                      );
-                    })()}
-
-                    {/* Status update button */}
-                    {activeStatusConfig?.next && (
-                      <button
-                        onClick={() => updateDeliveryStatus(activeDelivery._id, activeStatusConfig.next)}
-                        disabled={isUpdatingStatus}
-                        style={{
-                          width: "100%", background: `linear-gradient(135deg, ${activeStatusConfig.color}, ${activeStatusConfig.color}cc)`,
-                          border: "none", borderRadius: 12, padding: "13px 0",
-                          color: C.white, fontWeight: 700, fontSize: 14, cursor: isUpdatingStatus ? "not-allowed" : "pointer",
-                          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                          opacity: isUpdatingStatus ? 0.6 : 1, transition: "all 0.2s",
-                          boxShadow: `0 4px 20px ${activeStatusConfig.color}30`,
-                          fontFamily: "inherit",
-                        }}
-                      >
-                        {isUpdatingStatus ? (
-                          <><IcoSpinner a={ico(16)} /> Updating...</>
-                        ) : (
-                          <><IcoCheck a={ico(16)} /> {activeStatusConfig.nextLabel}</>
-                        )}
-                      </button>
-                    )}
-
-                    {activeDeliveryStatus === "delivered" && (
-                      <div style={{ textAlign: "center", padding: "10px 0", color: "#10b981", fontWeight: 700, fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                        <IcoCheck a={ico(16)} />
-                        Delivery Complete! Looking for new orders...
-                      </div>
-                    )}
+                  {/* Map navigation view */}
+                  <div style={{ height: 480, position: "relative" }}>
+                    <ActiveDeliveryMap
+                      activeDelivery={activeDelivery}
+                      driverLocation={myLocation ? { lat: myLocation.lat, lng: myLocation.lng, heading: myLocation.heading ?? 0 } : null}
+                      onUpdateStatus={updateDeliveryStatus}
+                      isUpdating={isUpdatingStatus}
+                    />
                   </div>
                 </div>
               ) : (
@@ -635,88 +546,15 @@ export default function DriverDashboardPage() {
                   <p style={{ color: C.text3, fontSize: 12 }}>Orders refresh every 12 seconds automatically</p>
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {availableOrders.map((order) => {
-                    const addr = order.deliveryAddress;
-                    const destLat = addr?.lat || addr?.latitude;
-                    const destLng = addr?.lng || addr?.longitude;
-                    const navUrl = mapsUrl(destLat, destLng);
-                    return (
-                      <Card key={order._id} style={{ overflow: "hidden" }} className="order-card">
-                        {/* Order header */}
-                        <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontSize: 11, fontFamily: "monospace", color: C.text3 }}>#{String(order._id).slice(-6).toUpperCase()}</span>
-                            {order.distanceKm != null && (
-                              <span style={{ fontSize: 11, background: "rgba(59,130,246,0.12)", color: C.blue, padding: "2px 8px", borderRadius: 999, fontWeight: 600 }}>
-                                {order.distanceKm} km away
-                              </span>
-                            )}
-                          </div>
-                          <Badge label={order.status} color={order.status === "ready" ? "#10b981" : order.status === "confirmed" ? C.blue : C.text3} />
-                        </div>
-
-                        <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
-                          {order.customerName && (
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                              <IcoUser a={{ ...ico(13), color: C.text3 }} />
-                              <span style={{ fontSize: 13, color: C.text2 }}>{order.customerName}</span>
-                            </div>
-                          )}
-                          {addr && (
-                            <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                              <IcoPin a={{ ...ico(13), color: C.text3, marginTop: 1 }} />
-                              <span style={{ fontSize: 12, color: C.text3, lineHeight: 1.5 }}>
-                                {typeof addr === "object" ? addr.address || addr.address1 || "Address on map" : addr}
-                              </span>
-                            </div>
-                          )}
-                          {order.total && (
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                              <span style={{ fontSize: 15, fontWeight: 800, color: C.gold }}>UGX {Number(order.total).toLocaleString()}</span>
-                              <span style={{ fontSize: 11, color: C.text3 }}>· ~UGX {Math.round(Number(order.total) * 0.05).toLocaleString()} commission</span>
-                            </div>
-                          )}
-
-                          {/* Action buttons */}
-                          <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-                            <button
-                              onClick={() => acceptOrder(order._id)}
-                              disabled={!!isAccepting || !isAvailable}
-                              style={{
-                                flex: 1, background: `linear-gradient(135deg, ${C.green}, ${C.greenLt})`,
-                                border: "none", borderRadius: 10, padding: "11px 0",
-                                color: C.white, fontSize: 13, fontWeight: 700, cursor: (!!isAccepting || !isAvailable) ? "not-allowed" : "pointer",
-                                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-                                opacity: (!!isAccepting || !isAvailable) ? 0.5 : 1,
-                                boxShadow: "0 4px 16px rgba(24,95,45,0.3)",
-                                fontFamily: "inherit",
-                              }}
-                            >
-                              {isAccepting === order._id ? (
-                                <><IcoSpinner a={ico(14)} /> Accepting...</>
-                              ) : (
-                                <><IcoCheck a={ico(14)} /> Accept Order</>
-                              )}
-                            </button>
-                            {navUrl && (
-                              <a
-                                href={navUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                  padding: "11px 14px", background: "rgba(29,78,216,0.15)", border: `1px solid rgba(29,78,216,0.3)`,
-                                  borderRadius: 10, color: C.blue, display: "flex", alignItems: "center", textDecoration: "none",
-                                }}
-                              >
-                                <IcoMap a={ico(16)} />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </Card>
-                    );
-                  })}
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  {availableOrders.map((order) => (
+                    <DriverOrderCard
+                      key={order._id}
+                      order={order}
+                      onAccept={acceptOrder}
+                      isAccepting={isAccepting === order._id}
+                    />
+                  ))}
                 </div>
               )}
             </div>

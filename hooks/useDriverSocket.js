@@ -19,7 +19,7 @@ import { connectSocket } from "@lib/socket";
  * The PATCH /api/driver/:id/location endpoint is no longer called from the
  * browser — the socket handler on the server writes to MongoDB (debounced).
  */
-export function useDriverSocket({ partnerId, driverToken, onNewOrder } = {}) {
+export function useDriverSocket({ partnerId, driverToken, onNewOrder, onLocationUpdate } = {}) {
   useEffect(() => {
     if (!partnerId) return;
 
@@ -42,12 +42,13 @@ export function useDriverSocket({ partnerId, driverToken, onNewOrder } = {}) {
       locationInterval = setInterval(() => {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
-            socket.emit("driver:location", {
+            const loc = {
               lat: pos.coords.latitude,
               lng: pos.coords.longitude,
               heading: pos.coords.heading || 0,
-              partnerId,
-            });
+            };
+            socket.emit("driver:location", { ...loc, partnerId });
+            if (typeof onLocationUpdate === "function") onLocationUpdate(loc);
           },
           () => {}
         );
