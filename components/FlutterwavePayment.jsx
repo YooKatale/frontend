@@ -11,8 +11,9 @@ const FlutterwavePayment = ({ data, callback, closeComponent }) => {
   const launched = useRef(false);
 
   const flwConfig = {
-    public_key: "FLWPUBK-90aa8f20e8f80d3418dc9af31c93c3e9-X",
-    tx_ref: Date.now(),
+    public_key: process.env.NEXT_PUBLIC_FLW_PUBLIC_KEY || "FLWPUBK-90aa8f20e8f80d3418dc9af31c93c3e9-X",
+    // tx_ref encodes orderId so the Flutterwave webhook can find the order
+    tx_ref: data?.orderId ? `YKT-ORDER-${data.orderId}-${Date.now()}` : `YKT-${Date.now()}`,
     amount: data?.total,
     currency: "UGX",
     payment_options: data?.paymentMethod === "card" ? "card" : "mobilemoneyuganda",
