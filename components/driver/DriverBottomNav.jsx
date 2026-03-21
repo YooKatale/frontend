@@ -12,7 +12,7 @@ const C = {
 
 const TABS = [
   { key: "home",     label: "Home",     Icon: FaHome,           path: "/driver/dashboard" },
-  { key: "delivery", label: "Delivery", Icon: FaMotorcycle,     path: "/driver/dashboard" },
+  { key: "delivery", label: "Delivery", Icon: FaMotorcycle,     path: "/driver/delivery"  },
   { key: "earnings", label: "Earnings", Icon: FaMoneyBillWave,  path: "/driver/earnings"  },
   { key: "profile",  label: "Profile",  Icon: FaUser,           path: "/driver/profile"   },
 ];
@@ -22,8 +22,6 @@ export default function DriverBottomNav({ hasActiveDelivery = false }) {
   const router    = useRouter();
 
   const isActive = (tab) => {
-    if (tab.key === "home")     return pathname === "/driver/dashboard" && !hasActiveDelivery;
-    if (tab.key === "delivery") return pathname === "/driver/dashboard" && hasActiveDelivery;
     return pathname === tab.path;
   };
 
