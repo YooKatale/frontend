@@ -4,9 +4,11 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { DB_URL } from "@config/config";
+import { useDriverSocket } from "@hooks/useDriverSocket";
 
 const DRIVER_KEY = "yookatale-driver";
-const LOCATION_INTERVAL = 10000;
+// Location updates now go through Socket.IO (useDriverSocket hook)
+// LOCATION_INTERVAL removed — socket handler debounces DB writes server-side
 const POLL_INTERVAL = 12000;
 
 /* ── Brand tokens ──────────────────────────────────────── */
@@ -180,33 +182,17 @@ export default function DriverDashboardPage() {
     return () => clearInterval(pollIntervalRef.current);
   }, [session, fetchDashboard, fetchAvailableOrders]);
 
-  useEffect(() => {
-    if (!session?.driver?._id) return;
-    const sendLocation = (lat, lng) => {
-      fetch(`${DB_URL}/driver/${session.driver._id}/location`, {
-        method: "PATCH",
-        headers: authHeaders(),
-        body: JSON.stringify({ lat, lng }),
-      }).catch(() => {});
-    };
-    const startTracking = () => {
-      if (!navigator.geolocation) return;
-      navigator.geolocation.getCurrentPosition((pos) => {
-        const { latitude: lat, longitude: lng } = pos.coords;
-        setMyLocation({ lat, lng });
-        sendLocation(lat, lng);
-      }, () => {});
-      locationIntervalRef.current = setInterval(() => {
-        navigator.geolocation.getCurrentPosition((pos) => {
-          const { latitude: lat, longitude: lng } = pos.coords;
-          setMyLocation({ lat, lng });
-          sendLocation(lat, lng);
-        }, () => {});
-      }, LOCATION_INTERVAL);
-    };
-    startTracking();
-    return () => clearInterval(locationIntervalRef.current);
-  }, [session, authHeaders]);
+  // Socket hook: emits GPS every 4s via WebSocket and listens for new order assignments
+  // The server handler broadcasts to the order room immediately and debounces DB writes
+  useDriverSocket({
+    partnerId: session?.driver?._id,
+    driverToken: session?.token,
+    onNewOrder: (data) => {
+      showToast(`New order assigned! #${data?.shortId || ""}`, "success");
+      fetchDashboard();
+      fetchAvailableOrders();
+    },
+  });
 
   const toggleAvailability = async () => {
     if (!session?.driver?._id || isTogglingAvail) return;

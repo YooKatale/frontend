@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { DB_URL } from "@config/config";
+import { useOrderTracking } from "@hooks/useOrderTracking";
 
 /* ── Brand tokens ─────────────────────────────────────────── */
 const C = {
@@ -25,7 +26,8 @@ const C = {
   red:     "#ef4444",
 };
 
-const POLL_MS = 5000;
+// Polling replaced by Socket.IO — kept only as a fallback constant (unused)
+// const POLL_MS = 5000;
 
 const STATUS_FLOW = [
   { key: "pending",    label: "Order Placed",    desc: "Your order has been received" },
@@ -93,8 +95,10 @@ export default function OrderTrackingPage() {
   const [ratingComment, setRatingComment] = useState("");
   const [isSubmittingRating, setIsSubmittingRating] = useState(false);
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
-  const pollRef = useRef(null);
   const justRated = useRef(false);
+
+  // Real-time socket hook — overlay status + driver location on top of initial fetch
+  const { socketStatus, driverLocation } = useOrderTracking(orderId);
 
   const fetchLive = useCallback(async () => {
     try {
@@ -110,11 +114,32 @@ export default function OrderTrackingPage() {
     }
   }, [orderId]);
 
+  // One initial fetch only — sockets handle all subsequent updates
   useEffect(() => {
     fetchLive();
-    pollRef.current = setInterval(fetchLive, POLL_MS);
-    return () => clearInterval(pollRef.current);
   }, [fetchLive]);
+
+  // Apply real-time status updates from socket
+  useEffect(() => {
+    if (!socketStatus?.status) return;
+    setLiveData((prev) =>
+      prev ? { ...prev, orderStatus: socketStatus.status } : prev
+    );
+  }, [socketStatus]);
+
+  // Apply real-time driver location from socket
+  useEffect(() => {
+    if (!driverLocation) return;
+    setLiveData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        driver: prev.driver
+          ? { ...prev.driver, location: { lat: driverLocation.lat, lng: driverLocation.lng, updatedAt: new Date().toISOString() } }
+          : prev.driver,
+      };
+    });
+  }, [driverLocation]);
 
   const submitRating = async () => {
     if (!rating || !liveData?.driver?._id) return;
