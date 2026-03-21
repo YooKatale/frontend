@@ -1,5 +1,3 @@
-"use client";
-
 import { createSlice, createSelector } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
 
@@ -28,11 +26,11 @@ const authSlice = createSlice({
         else localStorage?.setItem("yookatale-app", JSON.stringify(next));
       }
     },
-    logout: (state, action) => {
+    logout: (state) => {
       state.userInfo = null;
-      typeof window !== "undefined"
-        ? localStorage?.removeItem("yookatale-app")
-        : (localStorage = null);
+      if (typeof window !== "undefined") {
+        localStorage?.removeItem("yookatale-app");
+      }
     },
   },
 });

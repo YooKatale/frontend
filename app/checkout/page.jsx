@@ -1,9 +1,16 @@
 "use client";
 
-// import React from 'react'
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const Checkout = () => {
-  return <div>Checkout</div>;
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/cart");
+  }, [router]);
+
+  return null;
 };
 
 export default Checkout;
