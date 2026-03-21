@@ -3,18 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { DB_URL } from "@config/config";
 
 const DRIVER_STORAGE_KEY = "yookatale-driver";
 
-/* ── inline SVG icons (no extra deps) ─────────────────────────────────── */
-const IconMoto = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7 text-white">
-    <circle cx="5.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/>
-    <path d="M8 17.5h7M15 17.5V9l-3-5h-2L8 9h4l2 3"/>
-    <path d="M19 9h-4M5.5 15l1.5-6h2"/>
-  </svg>
-);
 const IconMail = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
     <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
@@ -36,7 +29,7 @@ const IconEyeOff = () => (
   </svg>
 );
 const IconAlert = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 flex-shrink-0 text-red-400">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 flex-shrink-0">
     <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
   </svg>
 );
@@ -54,6 +47,11 @@ const IconSpinner = () => (
 const IconBack = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
     <path d="M19 12H5M12 19l-7-7 7-7"/>
+  </svg>
+);
+const IconShield = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
   </svg>
 );
 
@@ -108,237 +106,261 @@ export default function DriverLoginPage() {
 
   if (!mounted) return null;
 
-  return (
-    <div className="min-h-screen flex" style={{ background: "linear-gradient(135deg, #0a0f0a 0%, #0d1a10 50%, #0f2014 100%)" }}>
+  /* ── shared input style ────────────────────────────────── */
+  const inputStyle = {
+    width: "100%",
+    background: "rgba(255,255,255,0.05)",
+    border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: 12,
+    color: "#ffffff",
+    fontSize: 14,
+    outline: "none",
+    fontFamily: "inherit",
+    transition: "border-color 0.2s, box-shadow 0.2s",
+  };
+  const onFocusGold = (e) => {
+    e.target.style.borderColor = "rgba(245,166,35,0.7)";
+    e.target.style.boxShadow = "0 0 0 3px rgba(245,166,35,0.12)";
+  };
+  const onBlurGold = (e) => {
+    e.target.style.borderColor = "rgba(255,255,255,0.12)";
+    e.target.style.boxShadow = "none";
+  };
 
-      {/* Left panel — branding (hidden on mobile) */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden">
-        {/* Background texture */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div style={{ position: "absolute", top: "-20%", left: "-10%", width: "60%", height: "60%", background: "radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%)" }} />
-          <div style={{ position: "absolute", bottom: "-10%", right: "-10%", width: "50%", height: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 70%)" }} />
-          {/* Grid lines */}
-          <svg className="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#22c55e" strokeWidth="0.5"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)"/>
-          </svg>
-        </div>
+  return (
+    <div
+      className="min-h-screen flex"
+      style={{
+        background: "#0D0D0D",
+        fontFamily: "'Sora', 'DM Sans', system-ui, sans-serif",
+      }}
+    >
+      {/* ── diagonal background lines ── */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
+        <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.035 }}>
+          <defs>
+            <pattern id="diag" width="60" height="60" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="60" stroke="#F5A623" strokeWidth="0.8"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#diag)"/>
+        </svg>
+        {/* gold glow top-left */}
+        <div style={{ position:"absolute", top:"-15%", left:"-10%", width:"50%", height:"50%", background:"radial-gradient(circle, rgba(245,166,35,0.06) 0%, transparent 70%)" }} />
+        {/* green glow bottom-right */}
+        <div style={{ position:"absolute", bottom:"-15%", right:"-10%", width:"45%", height:"45%", background:"radial-gradient(circle, rgba(24,95,45,0.10) 0%, transparent 70%)" }} />
+      </div>
+
+      {/* ════════════ LEFT PANEL — branding ════════════ */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-14 relative overflow-hidden" style={{ zIndex: 1, borderRight: "1px solid rgba(255,255,255,0.06)" }}>
 
         {/* Logo */}
-        <div className="relative z-10">
-          <div className="flex items-center gap-3">
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: "linear-gradient(135deg, #16a34a, #15803d)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 20px rgba(34,197,94,0.3)" }}>
-              <IconMoto />
-            </div>
-            <div>
-              <p className="text-white font-bold text-lg tracking-tight">Yookatale</p>
-              <p className="text-green-400 text-xs font-medium tracking-widest uppercase">Driver Portal</p>
-            </div>
+        <div className="flex items-center gap-3">
+          <div style={{ width: 48, height: 48, borderRadius: 14, overflow: "hidden", border: "2px solid rgba(245,166,35,0.35)", boxShadow: "0 0 24px rgba(245,166,35,0.18)" }}>
+            <Image src="/assets/icons/logo2.png" alt="Yookatale" width={48} height={48} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
+          </div>
+          <div>
+            <p style={{ color: "#ffffff", fontWeight: 700, fontSize: 18, letterSpacing: "-0.3px", lineHeight: 1 }}>Yookatale</p>
+            <p style={{ color: "#F5A623", fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", marginTop: 3 }}>Driver Portal</p>
           </div>
         </div>
 
         {/* Centre copy */}
-        <div className="relative z-10">
-          <h2 className="text-4xl font-bold text-white leading-tight mb-4">
-            Deliver. Earn.<br />
-            <span style={{ background: "linear-gradient(90deg, #22c55e, #4ade80)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+        <div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,166,35,0.1)", border: "1px solid rgba(245,166,35,0.25)", borderRadius: 999, padding: "4px 12px", marginBottom: 20 }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#F5A623", boxShadow: "0 0 6px #F5A623" }} className="animate-pulse" />
+            <span style={{ color: "#F5A623", fontSize: 11, fontWeight: 600, letterSpacing: "0.08em" }}>Uganda's #1 Delivery Network</span>
+          </div>
+
+          <h2 style={{ color: "#ffffff", fontSize: 42, fontWeight: 800, lineHeight: 1.15, marginBottom: 16, letterSpacing: "-0.5px" }}>
+            Deliver.<br />Earn.<br />
+            <span style={{ background: "linear-gradient(90deg, #F5A623, #f7c05a)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               Grow.
             </span>
           </h2>
-          <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
-            Uganda's most trusted delivery network. Accept orders, navigate live, and get paid weekly — all from one dashboard.
+          <p style={{ color: "#c9cdd4", fontSize: 14, lineHeight: 1.7, maxWidth: 300 }}>
+            Accept orders, navigate live across Kampala, and get paid weekly — all from one powerful dashboard.
           </p>
 
-          {/* Stats row */}
-          <div className="flex gap-6 mt-8">
+          {/* Stats */}
+          <div style={{ display: "flex", gap: 32, marginTop: 36 }}>
             {[
               { value: "500+", label: "Active Riders" },
-              { value: "5min", label: "Avg Response" },
+              { value: "5 min", label: "Avg Response" },
               { value: "98%", label: "On-Time Rate" },
             ].map((s) => (
               <div key={s.label}>
-                <p className="text-green-400 text-xl font-bold">{s.value}</p>
-                <p className="text-gray-500 text-xs mt-0.5">{s.label}</p>
+                <p style={{ color: "#F5A623", fontSize: 22, fontWeight: 800, lineHeight: 1 }}>{s.value}</p>
+                <p style={{ color: "#7c8190", fontSize: 11, marginTop: 4, fontWeight: 500 }}>{s.label}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Bottom note */}
-        <div className="relative z-10">
-          <p className="text-gray-600 text-xs">
+        {/* Bottom */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <IconShield />
+          <p style={{ color: "#6b7280", fontSize: 12 }}>
             Not a driver yet?{" "}
-            <Link href="/partner" className="text-green-400 hover:text-green-300 transition-colors font-medium">
+            <Link href="/partner" style={{ color: "#F5A623", fontWeight: 600, textDecoration: "none" }}>
               Apply to join the fleet
             </Link>
           </p>
         </div>
       </div>
 
-      {/* Right panel — form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12">
-        <div className="w-full max-w-sm">
+      {/* ════════════ RIGHT PANEL — form ════════════ */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 relative" style={{ zIndex: 1 }}>
+        <div style={{ width: "100%", maxWidth: 400 }}>
 
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-3 mb-10">
-            <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #16a34a, #15803d)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <IconMoto />
+            <div style={{ width: 42, height: 42, borderRadius: 12, overflow: "hidden", border: "2px solid rgba(245,166,35,0.35)" }}>
+              <Image src="/assets/icons/logo2.png" alt="Yookatale" width={42} height={42} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
             </div>
             <div>
-              <p className="text-white font-bold">Yookatale</p>
-              <p className="text-green-400 text-xs tracking-widest uppercase">Driver Portal</p>
+              <p style={{ color: "#ffffff", fontWeight: 700, fontSize: 16 }}>Yookatale</p>
+              <p style={{ color: "#F5A623", fontSize: 10, fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase" }}>Driver Portal</p>
             </div>
           </div>
 
-          {/* Heading */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-white mb-1">Welcome back</h1>
-            <p className="text-gray-500 text-sm">Sign in to access your delivery dashboard</p>
-          </div>
+          {/* Card */}
+          <div style={{ background: "#111111", borderRadius: 20, border: "1px solid rgba(255,255,255,0.08)", padding: "36px 32px", boxShadow: "0 24px 80px rgba(0,0,0,0.5)" }}>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-
-            {/* Email */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-400 mb-1.5 tracking-wide uppercase">
-                Email
-              </label>
-              <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500">
-                  <IconMail />
-                </span>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  required
-                  style={{
-                    width: "100%",
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 12,
-                    padding: "12px 16px 12px 42px",
-                    color: "#fff",
-                    fontSize: 14,
-                    outline: "none",
-                    transition: "border-color 0.2s, box-shadow 0.2s",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "rgba(34,197,94,0.6)";
-                    e.target.style.boxShadow = "0 0 0 3px rgba(34,197,94,0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "rgba(255,255,255,0.1)";
-                    e.target.style.boxShadow = "none";
-                  }}
-                />
-              </div>
+            {/* Heading */}
+            <div style={{ marginBottom: 28 }}>
+              <h1 style={{ color: "#ffffff", fontSize: 24, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 6 }}>
+                Welcome back
+              </h1>
+              <p style={{ color: "#9ca3af", fontSize: 14 }}>
+                Sign in to access your delivery dashboard
+              </p>
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-400 mb-1.5 tracking-wide uppercase">
-                Password
-              </label>
-              <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500">
-                  <IconLock />
-                </span>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Your password"
-                  autoComplete="current-password"
-                  required
-                  style={{
-                    width: "100%",
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 12,
-                    padding: "12px 44px 12px 42px",
-                    color: "#fff",
-                    fontSize: 14,
-                    outline: "none",
-                    transition: "border-color 0.2s, box-shadow 0.2s",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "rgba(34,197,94,0.6)";
-                    e.target.style.boxShadow = "0 0 0 3px rgba(34,197,94,0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "rgba(255,255,255,0.1)";
-                    e.target.style.boxShadow = "none";
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
-                  tabIndex={-1}
-                >
-                  {showPassword ? <IconEyeOff /> : <IconEye />}
-                </button>
-              </div>
-            </div>
+            {/* Form */}
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
 
-            {/* Error */}
-            {error && (
-              <div className="flex items-start gap-2.5 p-3.5 rounded-xl" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)" }}>
-                <IconAlert />
-                <p className="text-red-400 text-sm leading-snug">{error}</p>
+              {/* Email */}
+              <div>
+                <label style={{ display: "block", color: "#d1d5db", fontSize: 12, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>
+                  Email Address
+                </label>
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#6b7280", pointerEvents: "none" }}>
+                    <IconMail />
+                  </span>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    autoComplete="email"
+                    required
+                    style={{ ...inputStyle, padding: "12px 16px 12px 42px" }}
+                    onFocus={onFocusGold}
+                    onBlur={onBlurGold}
+                  />
+                </div>
               </div>
-            )}
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              style={{
-                width: "100%",
-                background: isLoading ? "rgba(22,163,74,0.5)" : "linear-gradient(135deg, #16a34a, #15803d)",
-                border: "none",
-                borderRadius: 12,
-                padding: "13px 0",
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: 15,
-                cursor: isLoading ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                transition: "all 0.2s",
-                boxShadow: isLoading ? "none" : "0 4px 24px rgba(22,163,74,0.35)",
-                marginTop: 8,
-              }}
-              onMouseEnter={(e) => { if (!isLoading) e.currentTarget.style.transform = "translateY(-1px)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
-            >
-              {isLoading ? (
-                <><IconSpinner /> Signing in...</>
-              ) : (
-                <>Sign In <IconArrow /></>
+              {/* Password */}
+              <div>
+                <label style={{ display: "block", color: "#d1d5db", fontSize: 12, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>
+                  Password
+                </label>
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#6b7280", pointerEvents: "none" }}>
+                    <IconLock />
+                  </span>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Your password"
+                    autoComplete="current-password"
+                    required
+                    style={{ ...inputStyle, padding: "12px 44px 12px 42px" }}
+                    onFocus={onFocusGold}
+                    onBlur={onBlurGold}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#6b7280", padding: 0, display: "flex", alignItems: "center" }}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <IconEyeOff /> : <IconEye />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Error */}
+              {error && (
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 14px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", color: "#f87171" }}>
+                  <IconAlert />
+                  <p style={{ fontSize: 13, lineHeight: 1.5 }}>{error}</p>
+                </div>
               )}
-            </button>
-          </form>
 
-          {/* Footer links */}
-          <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between">
-            <Link href="/partner" className="text-xs text-gray-500 hover:text-green-400 transition-colors">
-              Apply as rider
-            </Link>
-            <Link href="/" className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-gray-400 transition-colors">
-              <IconBack />
-              Back to Yookatale
-            </Link>
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                style={{
+                  width: "100%",
+                  background: isLoading
+                    ? "rgba(24,95,45,0.5)"
+                    : "linear-gradient(135deg, #185f2d, #1a7a36)",
+                  border: "none",
+                  borderRadius: 12,
+                  padding: "13px 0",
+                  color: "#fff",
+                  fontWeight: 700,
+                  fontSize: 15,
+                  cursor: isLoading ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  transition: "all 0.2s",
+                  boxShadow: isLoading ? "none" : "0 4px 24px rgba(24,95,45,0.4)",
+                  marginTop: 4,
+                  fontFamily: "inherit",
+                  letterSpacing: "0.01em",
+                }}
+                onMouseEnter={(e) => { if (!isLoading) { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(24,95,45,0.5)"; } }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = isLoading ? "none" : "0 4px 24px rgba(24,95,45,0.4)"; }}
+              >
+                {isLoading ? (
+                  <><IconSpinner /> Signing in...</>
+                ) : (
+                  <>Sign In <IconArrow /></>
+                )}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", marginTop: 24, paddingTop: 20, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <Link href="/partner" style={{ color: "#9ca3af", fontSize: 13, textDecoration: "none", fontWeight: 500, transition: "color 0.2s" }}
+                onMouseEnter={(e) => e.currentTarget.style.color = "#F5A623"}
+                onMouseLeave={(e) => e.currentTarget.style.color = "#9ca3af"}
+              >
+                Apply as rider
+              </Link>
+              <Link href="/" style={{ display: "flex", alignItems: "center", gap: 5, color: "#6b7280", fontSize: 13, textDecoration: "none", fontWeight: 500, transition: "color 0.2s" }}
+                onMouseEnter={(e) => e.currentTarget.style.color = "#d1d5db"}
+                onMouseLeave={(e) => e.currentTarget.style.color = "#6b7280"}
+              >
+                <IconBack />
+                Back to Yookatale
+              </Link>
+            </div>
+          </div>
+
+          {/* Secure badge */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 20, color: "#4b5563" }}>
+            <IconShield />
+            <span style={{ fontSize: 12 }}>Secured with 256-bit encryption</span>
           </div>
         </div>
       </div>
