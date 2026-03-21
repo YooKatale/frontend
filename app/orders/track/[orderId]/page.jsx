@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -98,9 +98,12 @@ export default function OrderTrackingPage() {
   const justRated = useRef(false);
   const [toast, setToast] = useState(null);
   const toastTimer = useRef(null);
+  const [eta, setEta] = useState(null);         // { durationSeconds, durationText, distanceText }
+  const [countdown, setCountdown] = useState(null); // remaining seconds (ticks locally)
+  const countdownTimer = useRef(null);
 
-  // Real-time socket hook — overlay status + driver location on top of initial fetch
-  const { socketStatus, driverLocation } = useOrderTracking(orderId);
+  // Real-time socket hook — overlay status + driver location + ETA updates
+  const { socketStatus, driverLocation, socketEta } = useOrderTracking(orderId);
 
   const fetchLive = useCallback(async () => {
     try {
@@ -108,6 +111,7 @@ export default function OrderTrackingPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.message || "Order not found");
       setLiveData(data.data);
+      if (data.data?.eta) setEta(data.data.eta);
       setError("");
     } catch (e) {
       setError(e.message || "Failed to load order");
@@ -160,6 +164,23 @@ export default function OrderTrackingPage() {
     });
   }, [driverLocation]);
 
+  // Update ETA from socket (every ~30s from server)
+  useEffect(() => {
+    if (!socketEta) return;
+    setEta(socketEta);
+  }, [socketEta]);
+
+  // Countdown tick — resets when eta.durationSeconds changes, ticks down every second
+  useEffect(() => {
+    if (!eta?.durationSeconds) return;
+    setCountdown(eta.durationSeconds);
+    if (countdownTimer.current) clearInterval(countdownTimer.current);
+    countdownTimer.current = setInterval(() => {
+      setCountdown((s) => (s != null && s > 0 ? s - 1 : 0));
+    }, 1000);
+    return () => clearInterval(countdownTimer.current);
+  }, [eta?.durationSeconds]);
+
   const submitRating = async () => {
     if (!rating || !liveData?.driver?._id) return;
     setIsSubmittingRating(true);
@@ -205,13 +226,26 @@ export default function OrderTrackingPage() {
   const hasDriver = !!driver;
   const canRate = isDelivered && hasDriver && !delivery?.rated && !ratingSubmitted && !justRated.current;
 
-  /* ETA calculation */
-  let etaText = null;
-  if (driver?.location?.lat && driver?.location?.lng && deliveryAddress?.lat && deliveryAddress?.lng) {
-    const km = haversineKm(driver.location.lat, driver.location.lng, deliveryAddress.lat, deliveryAddress.lng);
-    const mins = Math.max(1, Math.round(km / 0.4));
-    etaText = km < 0.2 ? "Almost there!" : `~${mins} min away`;
-  }
+  /* ETA display — server ETA preferred; haversine client fallback */
+  const etaDisplay = useMemo(() => {
+    if (eta?.durationText) {
+      const secs = countdown != null ? countdown : eta.durationSeconds;
+      const mins = Math.floor(secs / 60);
+      const sec  = secs % 60;
+      const countdownStr = secs <= 0 ? "Arriving now" : mins > 0 ? `${mins}m ${sec}s` : `${sec}s`;
+      return { text: countdownStr, dist: eta.distanceText, fromServer: true };
+    }
+    if (driver?.location?.lat && driver?.location?.lng && deliveryAddress?.lat && deliveryAddress?.lng) {
+      const km = haversineKm(driver.location.lat, driver.location.lng, deliveryAddress.lat, deliveryAddress.lng);
+      const mins = Math.max(1, Math.round(km / 0.4));
+      return {
+        text: km < 0.2 ? "Almost there!" : `~${mins} min`,
+        dist: `${km.toFixed(1)} km`,
+        fromServer: false,
+      };
+    }
+    return null;
+  }, [eta, countdown, driver, deliveryAddress]);
 
   /* Google Maps embed */
   let mapSrc = null;
@@ -364,16 +398,24 @@ export default function OrderTrackingPage() {
           </div>
 
           {/* ETA */}
-          {etaText && !isDelivered && !isCancelled && (
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 999, padding: "5px 14px", marginTop: 14 }}>
-              <IcoClock />
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#10b981" }}>{etaText}</span>
+          {etaDisplay && !isDelivered && !isCancelled && (
+            <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 8 }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 999, padding: "5px 14px" }}>
+                <IcoClock />
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#10b981" }}>{etaDisplay.text}</span>
+              </div>
+              {etaDisplay.dist && (
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", border: `1px solid ${C.border}`, borderRadius: 999, padding: "5px 12px" }}>
+                  <IcoPin />
+                  <span style={{ fontSize: 12, color: C.text2 }}>{etaDisplay.dist} away</span>
+                </div>
+              )}
             </div>
           )}
 
           {/* Order total */}
           {total && (
-            <div style={{ marginTop: etaText ? 10 : 14, display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ marginTop: etaDisplay ? 10 : 14, display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: C.text3, fontSize: 12 }}>Order total:</span>
               <span style={{ color: C.gold, fontWeight: 700, fontSize: 14 }}>UGX {Number(total).toLocaleString()}</span>
             </div>

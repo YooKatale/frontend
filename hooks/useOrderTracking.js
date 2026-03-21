@@ -18,6 +18,7 @@ import { connectSocket } from "@lib/socket";
 export function useOrderTracking(orderId) {
   const [socketStatus, setSocketStatus] = useState(null);
   const [driverLocation, setDriverLocation] = useState(null);
+  const [socketEta, setSocketEta] = useState(null);
 
   useEffect(() => {
     if (!orderId) return;
@@ -30,15 +31,18 @@ export function useOrderTracking(orderId) {
     const onStatus = (data) => setSocketStatus(data);
     const onLocation = (data) =>
       setDriverLocation({ lat: data.lat, lng: data.lng, heading: data.heading || 0 });
+    const onEta = (data) => setSocketEta(data.eta || null);
 
     socket.on("order:status_changed", onStatus);
     socket.on("order:driver_location", onLocation);
+    socket.on("order:eta_update", onEta);
 
     return () => {
       socket.off("order:status_changed", onStatus);
       socket.off("order:driver_location", onLocation);
+      socket.off("order:eta_update", onEta);
     };
   }, [orderId]);
 
-  return { socketStatus, driverLocation };
+  return { socketStatus, driverLocation, socketEta };
 }
