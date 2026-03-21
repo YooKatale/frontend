@@ -15,6 +15,7 @@ import {
   useToast,
   Checkbox,
   HStack,
+  Text,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -23,12 +24,14 @@ import { useCreateListingMutation } from "@slices/listingsApiSlice";
 import { useGetLocationsQuery } from "@slices/locationsApiSlice";
 import { useProductsCategoriesGetMutation } from "@slices/productsApiSlice";
 import { ThemeColors } from "@constants/constants";
+import { useAdvertisementPackageGetMutation } from "@slices/usersApiSlice";
 
 export default function NewListingPage() {
   const router = useRouter();
   const toast = useToast();
   const [createListing, { isLoading }] = useCreateListingMutation();
   const [fetchCategories] = useProductsCategoriesGetMutation();
+  const [fetchAdvertPackages] = useAdvertisementPackageGetMutation();
 
   const { data: regionsData } = useGetLocationsQuery();
   const [region, setRegion] = useState("");
@@ -43,6 +46,7 @@ export default function NewListingPage() {
   );
 
   const [categories, setCategories] = useState([]);
+  const [advertisementPackages, setAdvertisementPackages] = useState([]);
   const [form, setForm] = useState({
     title: "",
     categoryId: "",
@@ -51,6 +55,8 @@ export default function NewListingPage() {
     negotiable: false,
     locationId: "",
     addressLine: "",
+    listingType: "free",
+    advertisementPackageId: "",
     images: ["", ""],
   });
   const [error, setError] = useState("");
@@ -60,6 +66,9 @@ export default function NewListingPage() {
   const locationOptions = Array.isArray(locationsData?.data)
     ? locationsData.data
     : [];
+  const paidPackages = advertisementPackages
+    .filter((p) => Number(p?.price || 0) > 0)
+    .sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
 
   useEffect(() => {
     fetchCategories()
@@ -69,10 +78,18 @@ export default function NewListingPage() {
         setCategories(Array.isArray(cats) ? cats : []);
       })
       .catch(() => {});
-  }, [fetchCategories]);
+
+    fetchAdvertPackages()
+      .unwrap()
+      .then((res) => {
+        const packs = res?.packages || [];
+        setAdvertisementPackages(Array.isArray(packs) ? packs : []);
+      })
+      .catch(() => {});
+  }, [fetchCategories, fetchAdvertPackages]);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, checked } = e.target;
     if (name === "region") {
       setRegion(value);
       setDistrict("");
@@ -109,6 +126,11 @@ export default function NewListingPage() {
       setError("At least 2 image URLs are required");
       return;
     }
+    if (form.listingType === "paid" && !form.advertisementPackageId) {
+      setError("Select a paid advert package to continue");
+      return;
+    }
+
     setError("");
     try {
       await createListing({
@@ -119,8 +141,12 @@ export default function NewListingPage() {
         negotiable: form.negotiable,
         locationId: form.locationId || undefined,
         addressLine: form.addressLine || undefined,
+        listingType: form.listingType,
+        advertisementPackageId:
+          form.listingType === "paid" ? form.advertisementPackageId || undefined : undefined,
         images: urls,
       }).unwrap();
+
       toast({
         title: "Listing created",
         description: "Your listing has been submitted for approval.",
@@ -263,6 +289,39 @@ export default function NewListingPage() {
                 placeholder="Street address"
               />
             </FormControl>
+
+            <FormControl>
+              <FormLabel>Listing visibility</FormLabel>
+              <Select
+                name="listingType"
+                value={form.listingType}
+                onChange={handleChange}
+              >
+                <option value="free">Free listing (commission on successful sales)</option>
+                <option value="paid">Paid advert boost (higher visibility)</option>
+              </Select>
+            </FormControl>
+
+            {form.listingType === "paid" && (
+              <FormControl isRequired>
+                <FormLabel>Advert boost package</FormLabel>
+                <Select
+                  name="advertisementPackageId"
+                  value={form.advertisementPackageId}
+                  onChange={handleChange}
+                  placeholder="Select paid package"
+                >
+                  {paidPackages.map((pack) => (
+                    <option key={pack._id} value={pack._id}>
+                      {pack.type} - {pack.period} - UGX {Number(pack.price || 0).toLocaleString()} - {Number(pack.adverts || 0)} advert slot(s)
+                    </option>
+                  ))}
+                </Select>
+                <Text mt={1} fontSize="xs" color="gray.500">
+                  Boosted listings are prioritized in marketplace feeds while the boost period is active.
+                </Text>
+              </FormControl>
+            )}
 
             <FormControl>
               <FormLabel>Images (URLs) - At least 2 required</FormLabel>
