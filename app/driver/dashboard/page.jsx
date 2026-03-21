@@ -237,7 +237,11 @@ export default function DriverDashboardPage() {
       {toast && (
         <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl shadow-2xl text-sm font-medium flex items-center gap-2 animate-fade-in transition-all
           ${toast.type === "error" ? "bg-red-600 text-white" : "bg-green-600 text-white"}`}>
-          {toast.type === "error" ? "⚠️" : "✅"} {toast.msg}
+          {toast.type === "error" ? (
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          ) : (
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          )} {toast.msg}
         </div>
       )}
 
@@ -294,12 +298,12 @@ export default function DriverDashboardPage() {
               {/* Stats row */}
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { label: "Today", value: dashData?.weekDeliveries ?? 0, sub: "deliveries", icon: "📦" },
-                  { label: "Rating", value: (driver?.averageRating || 0).toFixed(1), sub: `${driver?.ratingCount || 0} reviews`, icon: "⭐" },
-                  { label: "Earnings", value: `${(driver?.totalEarnings || 0).toLocaleString()}`, sub: "UGX total", icon: "💰" },
+                  { label: "Today", value: dashData?.weekDeliveries ?? 0, sub: "deliveries", iconColor: "text-blue-400", icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M20 7H4a2 2 0 00-2 2v9a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path strokeLinecap="round" strokeLinejoin="round" d="M16 3H8l-2 4h12l-2-4z"/></svg> },
+                  { label: "Rating", value: (driver?.averageRating || 0).toFixed(1), sub: `${driver?.ratingCount || 0} reviews`, iconColor: "text-yellow-400", icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg> },
+                  { label: "Earnings", value: `${(driver?.totalEarnings || 0).toLocaleString()}`, sub: "UGX total", iconColor: "text-green-400", icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="10" strokeLinecap="round" strokeLinejoin="round"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg> },
                 ].map((s) => (
                   <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-2xl p-3 text-center">
-                    <div className="text-xl mb-1">{s.icon}</div>
+                    <div className={`flex justify-center mb-1 ${s.iconColor}`}>{s.icon}</div>
                     <div className="font-bold text-white text-sm">{s.value}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{s.sub}</div>
                   </div>
@@ -401,13 +405,17 @@ export default function DriverDashboardPage() {
                             Updating...
                           </span>
                         ) : (
-                          <span>✓ {activeStatusConfig.nextLabel}</span>
+                          <span className="flex items-center justify-center gap-2">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            {activeStatusConfig.nextLabel}
+                          </span>
                         )}
                       </button>
                     )}
                     {activeDeliveryStatus === "delivered" && (
-                      <div className="text-center py-2 text-green-400 font-semibold text-sm">
-                        🎉 Delivery Complete! Looking for new orders...
+                      <div className="text-center py-2 text-green-400 font-semibold text-sm flex items-center justify-center gap-2">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        Delivery Complete! Looking for new orders...
                       </div>
                     )}
                   </div>
@@ -415,7 +423,12 @@ export default function DriverDashboardPage() {
               ) : (
                 /* No active delivery */
                 <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 text-center">
-                  <div className="text-4xl mb-3">🛵</div>
+                  <div className="flex justify-center mb-3 text-gray-600">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-12 h-12">
+                      <circle cx="5.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/>
+                      <path d="M8 17.5h7M15 17.5V9l-3-5h-2L8 9h4l2 3"/><path d="M19 9h-4M5.5 15l1.5-6h2"/>
+                    </svg>
+                  </div>
                   <p className="text-white font-semibold mb-1">No active delivery</p>
                   <p className="text-gray-500 text-sm mb-4">
                     {isAvailable ? "You're online. Check available orders!" : "Go online to receive orders."}
@@ -481,7 +494,7 @@ export default function DriverDashboardPage() {
 
               {!isAvailable && (
                 <div className="bg-yellow-900 bg-opacity-30 border border-yellow-800 rounded-2xl p-4 flex items-center gap-3">
-                  <span className="text-yellow-400 text-xl">⚠️</span>
+                  <svg className="w-5 h-5 text-yellow-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                   <div>
                     <p className="text-yellow-300 text-sm font-medium">You're currently offline</p>
                     <p className="text-yellow-600 text-xs mt-0.5">Go online to accept orders</p>
@@ -494,7 +507,9 @@ export default function DriverDashboardPage() {
 
               {availableOrders.length === 0 ? (
                 <div className="text-center py-16">
-                  <div className="text-5xl mb-4">📭</div>
+                  <div className="flex justify-center mb-4 text-gray-700">
+                    <svg className="w-14 h-14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-6l-2 3H10l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
+                  </div>
                   <p className="text-gray-400 font-medium">No available orders</p>
                   <p className="text-gray-600 text-sm mt-1">Check back soon — orders update every 12 seconds</p>
                 </div>
@@ -559,7 +574,12 @@ export default function DriverDashboardPage() {
                             >
                               {isAccepting === order._id ? (
                                 <><svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Accepting...</>
-                              ) : "✓ Accept Order"}
+                              ) : (
+                                <span className="flex items-center gap-1.5">
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                  Accept Order
+                                </span>
+                              )}
                             </button>
                             {navUrl && (
                               <a href={navUrl} target="_blank" rel="noopener noreferrer"
@@ -586,13 +606,13 @@ export default function DriverDashboardPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: "Total Earned", value: `UGX ${(driver?.totalEarnings || 0).toLocaleString()}`, icon: "💰", color: "green" },
-                  { label: "Unpaid Balance", value: `UGX ${(driver?.commissionEarned || 0).toLocaleString()}`, icon: "⏳", color: "yellow" },
-                  { label: "Total Deliveries", value: driver?.totalDeliveries || 0, icon: "📦", color: "blue" },
-                  { label: "Avg Rating", value: `${(driver?.averageRating || 0).toFixed(1)} ⭐`, icon: "🌟", color: "purple" },
+                  { label: "Total Earned", value: `UGX ${(driver?.totalEarnings || 0).toLocaleString()}`, color: "green", icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg> },
+                  { label: "Unpaid Balance", value: `UGX ${(driver?.commissionEarned || 0).toLocaleString()}`, color: "yellow", icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
+                  { label: "Total Deliveries", value: driver?.totalDeliveries || 0, color: "blue", icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7H4a2 2 0 00-2 2v9a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8l-2 4h12l-2-4z"/></svg> },
+                  { label: "Avg Rating", value: `${(driver?.averageRating || 0).toFixed(1)}`, color: "purple", icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg> },
                 ].map((s) => (
                   <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
-                    <div className="text-2xl mb-2">{s.icon}</div>
+                    <div className={`mb-2 ${s.color === "green" ? "text-green-400" : s.color === "yellow" ? "text-yellow-400" : s.color === "blue" ? "text-blue-400" : "text-purple-400"}`}>{s.icon}</div>
                     <div className={`font-bold text-lg ${
                       s.color === "green" ? "text-green-400" :
                       s.color === "yellow" ? "text-yellow-400" :
@@ -664,14 +684,14 @@ export default function DriverDashboardPage() {
 
                 <div className="space-y-3 pt-2 border-t border-gray-800">
                   {[
-                    { label: "Email", value: driver?.email, icon: "✉️" },
-                    { label: "Phone", value: driver?.phone, icon: "📱" },
-                    { label: "Transport", value: driver?.transport, icon: "🚲" },
-                    { label: "Number Plate", value: driver?.numberPlate, icon: "🪪" },
-                    { label: "Member Since", value: driver?.createdAt ? new Date(driver.createdAt).toLocaleDateString() : "-", icon: "📅" },
+                    { label: "Email", value: driver?.email, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7"/></svg> },
+                    { label: "Phone", value: driver?.phone, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg> },
+                    { label: "Transport", value: driver?.transport, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="5.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/><path d="M8 17.5h7M15 17.5V9l-3-5h-2L8 9h4l2 3"/><path d="M19 9h-4M5.5 15l1.5-6h2"/></svg> },
+                    { label: "Number Plate", value: driver?.numberPlate, icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M7 12h10M7 9v6M17 9v6"/></svg> },
+                    { label: "Member Since", value: driver?.createdAt ? new Date(driver.createdAt).toLocaleDateString() : "-", icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
                   ].filter((r) => r.value).map((row) => (
                     <div key={row.label} className="flex items-center gap-3">
-                      <span className="text-lg w-6 text-center">{row.icon}</span>
+                      <span className="text-gray-500 w-5 flex-shrink-0">{row.icon}</span>
                       <div>
                         <p className="text-xs text-gray-500">{row.label}</p>
                         <p className="text-sm text-white capitalize">{row.value}</p>
