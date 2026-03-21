@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { DB_URL } from "@config/config";
 import { useDriverSocket } from "@hooks/useDriverSocket";
+import { useDriverFCM } from "@hooks/useDriverFCM";
 
 const DRIVER_KEY = "yookatale-driver";
 // Location updates now go through Socket.IO (useDriverSocket hook)
@@ -193,6 +194,9 @@ export default function DriverDashboardPage() {
       fetchAvailableOrders();
     },
   });
+
+  // FCM hook: requests notification permission, saves token to backend, handles foreground messages
+  useDriverFCM({ partnerId: session?.driver?._id, driverToken: session?.token });
 
   const toggleAvailability = async () => {
     if (!session?.driver?._id || isTogglingAvail) return;

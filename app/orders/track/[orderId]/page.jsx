@@ -96,6 +96,8 @@ export default function OrderTrackingPage() {
   const [isSubmittingRating, setIsSubmittingRating] = useState(false);
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const justRated = useRef(false);
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
 
   // Real-time socket hook — overlay status + driver location on top of initial fetch
   const { socketStatus, driverLocation } = useOrderTracking(orderId);
@@ -119,12 +121,29 @@ export default function OrderTrackingPage() {
     fetchLive();
   }, [fetchLive]);
 
+  const showStatusToast = (msg) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast(msg);
+    toastTimer.current = setTimeout(() => setToast(null), 4000);
+  };
+
   // Apply real-time status updates from socket
   useEffect(() => {
     if (!socketStatus?.status) return;
     setLiveData((prev) =>
       prev ? { ...prev, orderStatus: socketStatus.status } : prev
     );
+    // Toast for every status update
+    if (socketStatus.message) showStatusToast(socketStatus.message);
+    // Auto-open rating modal when order is delivered
+    if (socketStatus.status === "delivered") {
+      setTimeout(() => {
+        setShowRateModal((open) => {
+          if (!open && !justRated.current) return true;
+          return open;
+        });
+      }, 1500);
+    }
   }, [socketStatus]);
 
   // Apply real-time driver location from socket
@@ -214,8 +233,22 @@ export default function OrderTrackingPage() {
         @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
         @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
         @keyframes ping  { 0%{transform:scale(1);opacity:0.8;} 100%{transform:scale(2.2);opacity:0;} }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
         .track-card { animation: fadeIn 0.3s ease both; }
       `}</style>
+
+      {/* ── Status Toast ── */}
+      {toast && (
+        <div style={{
+          position: "fixed", top: 16, left: "50%", transform: "translateX(-50%)",
+          background: C.green, color: C.white, padding: "10px 20px", borderRadius: 10,
+          fontWeight: 600, fontSize: 14, zIndex: 1000, boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+          animation: "slideDown 0.3s ease", whiteSpace: "nowrap", maxWidth: "90vw",
+          textAlign: "center",
+        }}>
+          {toast}
+        </div>
+      )}
 
       {/* ── Rate Driver Modal ── */}
       {showRateModal && (
