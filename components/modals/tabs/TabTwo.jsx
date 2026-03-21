@@ -120,25 +120,56 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
     setIsProcessing(true);
     let processTimer;
 
+    const payload = {
+      user: userInfo,
+      customerName: `${userInfo?.firstname || ""} ${userInfo?.lastname || ""}`.trim() || userInfo?.email,
+      Carts: Cart,
+      order: {
+        orderTotal: cartTotal + DELIVERY_COST,
+        deliveryAddress: tabOneData?.deliveryAddress || {},
+        specialRequests: tabOneData?.specialRequests || {},
+        payment: { paymentMethod: "", transactionId: "" },
+        orderDate: currentDateTime,
+        receiptId,
+        orderId,
+      },
+    };
+
+    const isNetworkError = (err) =>
+      !err?.status &&
+      (String(err?.error || err?.message || "").toLowerCase().includes("fetch") ||
+        String(err?.error || err?.message || "").toLowerCase().includes("network") ||
+        err?.message === "Failed to fetch");
+
     try {
       processTimer = setInterval(() => {
         setProgress((old) => (old >= 90 ? 90 : Math.min(old + 15, 90)));
       }, 300);
 
-      const res = await createCartCheckout({
-        user: userInfo,
-        customerName: `${userInfo?.firstname || ""} ${userInfo?.lastname || ""}`.trim() || userInfo?.email,
-        Carts: Cart,
-        order: {
-          orderTotal: cartTotal + DELIVERY_COST,
-          deliveryAddress: tabOneData?.deliveryAddress || {},
-          specialRequests: tabOneData?.specialRequests || {},
-          payment: { paymentMethod: "", transactionId: "" },
-          orderDate: currentDateTime,
-          receiptId,
-          orderId,
-        },
-      }).unwrap();
+      const MAX_RETRIES = 3;
+      let res;
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          res = await createCartCheckout(payload).unwrap();
+          break; // success — exit retry loop
+        } catch (err) {
+          if (isNetworkError(err) && attempt < MAX_RETRIES) {
+            const delaySec = attempt * 6;
+            chakraToast({
+              id: `retry-${attempt}`,
+              title: "Server is starting up…",
+              description: `Retrying in ${delaySec} seconds (attempt ${attempt}/${MAX_RETRIES - 1})`,
+              status: "loading",
+              duration: delaySec * 1000 + 500,
+              isClosable: true,
+              position: "top-right",
+            });
+            await new Promise((r) => setTimeout(r, delaySec * 1000));
+            continue;
+          }
+          throw err;
+        }
+      }
 
       if (processTimer) clearInterval(processTimer);
       setProgress(100);
@@ -155,16 +186,15 @@ const TabTwo = ({ Cart, updateTabIndex, tabOneData }) => {
       if (processTimer) clearInterval(processTimer);
       setIsProcessing(false);
       setIsLoading(false);
-      const msg =
-        err?.data?.message ||
-        err?.message ||
-        err?.error ||
-        "Something went wrong. Please check your connection and try again.";
+      const networkFail = isNetworkError(err);
+      const msg = networkFail
+        ? "Could not reach the server. Please wait 30 seconds and try again — the server may be starting up."
+        : err?.data?.message || err?.message || err?.error || "Something went wrong. Please check your connection and try again.";
       chakraToast({
         title: "Checkout failed",
         description: msg,
         status: "error",
-        duration: 6000,
+        duration: 8000,
         isClosable: true,
         position: "top-right",
       });

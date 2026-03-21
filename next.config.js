@@ -6,6 +6,16 @@
 // const bundleAnalyzer = withBundleAnalyzer({ enabled: true });
 
 const nextConfig = {
+  // Proxy all /server-api/* requests to Render backend — avoids CORS entirely
+  async rewrites() {
+    return [
+      {
+        source: "/server-api/:path*",
+        destination: "https://yookatale-server.onrender.com/api/:path*",
+      },
+    ];
+  },
+
   // Prevent browser from using stale HTML/chunks (fixes 404s for layout.css, main-app.js, etc.)
   async headers() {
     return process.env.NODE_ENV === "development"

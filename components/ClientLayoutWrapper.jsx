@@ -86,6 +86,12 @@ export default function ClientLayoutWrapper({ children }) {
     dispatch(hydrateWishlist());
   }, [dispatch]);
 
+  // Pre-warm server on first mount (Render free-tier wakes up from sleep on first request)
+  useEffect(() => {
+    const base = DB_URL.replace(/\/api\/?$/, "");
+    fetch(`${base}/health`, { method: "GET", keepalive: true }).catch(() => {});
+  }, []);
+
   // Fire-and-forget page visit tracking
   useEffect(() => {
     try {
