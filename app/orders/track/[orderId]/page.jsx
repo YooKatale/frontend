@@ -1,11 +1,19 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { DB_URL } from "@config/config";
 import { useOrderTracking } from "@hooks/useOrderTracking";
+import RatingModal from "@components/ratings/RatingModal";
+import StarDisplay from "@components/ratings/StarDisplay";
+
+const DeliveryMap = dynamic(
+  () => import("@components/map/DeliveryMap"),
+  { ssr: false, loading: () => <div style={{ width: "100%", height: "100%", background: "#1a1a1a" }} /> }
+);
 
 /* ── Brand tokens ─────────────────────────────────────────── */
 const C = {
@@ -64,25 +72,6 @@ function ico(w = 16) { return { width: w, height: w, flexShrink: 0 }; }
 
 const font = { fontFamily: "'Sora','DM Sans',system-ui,sans-serif" };
 
-/* ── Star Picker ──────────────────────────────────────────── */
-function StarPicker({ value, onChange }) {
-  const [hovered, setHovered] = useState(0);
-  return (
-    <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-      {[1,2,3,4,5].map((s) => (
-        <button
-          key={s}
-          onMouseEnter={() => setHovered(s)}
-          onMouseLeave={() => setHovered(0)}
-          onClick={() => onChange(s)}
-          style={{ background: "none", border: "none", cursor: "pointer", padding: 4, transform: (hovered >= s || value >= s) ? "scale(1.2)" : "scale(1)", transition: "transform 0.15s" }}
-        >
-          <IcoStar fill={hovered >= s || value >= s} />
-        </button>
-      ))}
-    </div>
-  );
-}
 
 export default function OrderTrackingPage() {
   const { orderId } = useParams();
@@ -91,9 +80,6 @@ export default function OrderTrackingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showRateModal, setShowRateModal] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [ratingComment, setRatingComment] = useState("");
-  const [isSubmittingRating, setIsSubmittingRating] = useState(false);
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const justRated = useRef(false);
   const [toast, setToast] = useState(null);
@@ -181,21 +167,35 @@ export default function OrderTrackingPage() {
     return () => clearInterval(countdownTimer.current);
   }, [eta?.durationSeconds]);
 
-  const submitRating = async () => {
-    if (!rating || !liveData?.driver?._id) return;
-    setIsSubmittingRating(true);
-    try {
-      await fetch(`${DB_URL}/driver/${liveData.driver._id}/rate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, rating, comment: ratingComment }),
-      });
-      justRated.current = true;
-      setRatingSubmitted(true);
-      setShowRateModal(false);
-    } catch {}
-    finally { setIsSubmittingRating(false); }
+  const handleRatingClose = () => {
+    justRated.current = true;
+    setRatingSubmitted(true);
+    setShowRateModal(false);
+    fetchLive(); // refresh order data to reflect new ratings
   };
+
+  /* ETA display — server ETA preferred; haversine client fallback */
+  const etaDisplay = useMemo(() => {
+    if (eta?.durationText) {
+      const secs = countdown != null ? countdown : eta.durationSeconds;
+      const mins = Math.floor(secs / 60);
+      const sec  = secs % 60;
+      const countdownStr = secs <= 0 ? "Arriving now" : mins > 0 ? `${mins}m ${sec}s` : `${sec}s`;
+      return { text: countdownStr, dist: eta.distanceText, fromServer: true };
+    }
+    const _driver = liveData?.driver;
+    const _deliveryAddress = liveData?.deliveryAddress;
+    if (_driver?.location?.lat && _driver?.location?.lng && _deliveryAddress?.lat && _deliveryAddress?.lng) {
+      const km = haversineKm(_driver.location.lat, _driver.location.lng, _deliveryAddress.lat, _deliveryAddress.lng);
+      const mins = Math.max(1, Math.round(km / 0.4));
+      return {
+        text: km < 0.2 ? "Almost there!" : `~${mins} min`,
+        dist: `${km.toFixed(1)} km`,
+        fromServer: false,
+      };
+    }
+    return null;
+  }, [eta, countdown, liveData]);
 
   /* ── Loading ── */
   if (loading) return (
@@ -219,43 +219,26 @@ export default function OrderTrackingPage() {
     </div>
   );
 
-  const { orderStatus, driver, delivery, deliveryAddress, total, trackingHistory } = liveData;
+  const { orderStatus, driver, delivery, deliveryAddress, total, trackingHistory, vendorRated, vendorId } = liveData;
   const currentIdx = STATUS_IDX[orderStatus] ?? 0;
   const isDelivered = orderStatus === "delivered";
   const isCancelled = orderStatus === "cancelled";
   const hasDriver = !!driver;
-  const canRate = isDelivered && hasDriver && !delivery?.rated && !ratingSubmitted && !justRated.current;
+  const canRate = isDelivered && (hasDriver || vendorId) && !ratingSubmitted && !justRated.current;
+  const driverAlreadyRated = !!delivery?.rated;
+  const vendorAlreadyRated = !!vendorRated;
 
-  /* ETA display — server ETA preferred; haversine client fallback */
-  const etaDisplay = useMemo(() => {
-    if (eta?.durationText) {
-      const secs = countdown != null ? countdown : eta.durationSeconds;
-      const mins = Math.floor(secs / 60);
-      const sec  = secs % 60;
-      const countdownStr = secs <= 0 ? "Arriving now" : mins > 0 ? `${mins}m ${sec}s` : `${sec}s`;
-      return { text: countdownStr, dist: eta.distanceText, fromServer: true };
-    }
-    if (driver?.location?.lat && driver?.location?.lng && deliveryAddress?.lat && deliveryAddress?.lng) {
-      const km = haversineKm(driver.location.lat, driver.location.lng, deliveryAddress.lat, deliveryAddress.lng);
-      const mins = Math.max(1, Math.round(km / 0.4));
-      return {
-        text: km < 0.2 ? "Almost there!" : `~${mins} min`,
-        dist: `${km.toFixed(1)} km`,
-        fromServer: false,
-      };
-    }
-    return null;
-  }, [eta, countdown, driver, deliveryAddress]);
 
-  /* Google Maps embed */
-  let mapSrc = null;
-  if (driver?.location?.lat && driver?.location?.lng) {
-    const lat = driver.location.lat;
-    const lng = driver.location.lng;
-    mapSrc = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-  }
 
-  /* Nav link */
+  /* Map data for DeliveryMap */
+  const mapDriverLocation = driver?.location?.lat && driver?.location?.lng
+    ? { lat: driver.location.lat, lng: driver.location.lng, heading: driverLocation?.heading ?? 0 }
+    : null;
+  const mapCustomerLocation = deliveryAddress?.lat && deliveryAddress?.lng
+    ? { lat: deliveryAddress.lat, lng: deliveryAddress.lng }
+    : null;
+
+  /* Nav link fallback */
   const navUrl = deliveryAddress?.lat && deliveryAddress?.lng
     ? `https://www.google.com/maps/dir/?api=1&destination=${deliveryAddress.lat},${deliveryAddress.lng}&travelmode=driving`
     : null;
@@ -284,59 +267,17 @@ export default function OrderTrackingPage() {
         </div>
       )}
 
-      {/* ── Rate Driver Modal ── */}
-      {showRateModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, backdropFilter: "blur(6px)" }}>
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 24, padding: "32px 28px", width: "100%", maxWidth: 380, position: "relative", animation: "fadeIn 0.25s ease" }}>
-            <button onClick={() => setShowRateModal(false)} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", cursor: "pointer", color: C.text3 }}>
-              <IcoClose />
-            </button>
-
-            {/* Driver avatar */}
-            <div style={{ textAlign: "center", marginBottom: 20 }}>
-              <div style={{ width: 64, height: 64, borderRadius: "50%", background: `linear-gradient(135deg, ${C.green}, ${C.greenLt})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 800, color: C.gold, margin: "0 auto 12px" }}>
-                {(driver?.name || "D")[0].toUpperCase()}
-              </div>
-              <h3 style={{ color: C.text1, fontWeight: 700, fontSize: 18, marginBottom: 4 }}>Rate your delivery</h3>
-              <p style={{ color: C.text2, fontSize: 13 }}>How was {driver?.name || "your rider"}'s service?</p>
-            </div>
-
-            {/* Stars */}
-            <div style={{ marginBottom: 20 }}>
-              <StarPicker value={rating} onChange={setRating} />
-              {rating > 0 && (
-                <p style={{ textAlign: "center", color: C.gold, fontSize: 13, fontWeight: 600, marginTop: 10 }}>
-                  {["", "Poor", "Fair", "Good", "Very Good", "Excellent!"][rating]}
-                </p>
-              )}
-            </div>
-
-            {/* Comment */}
-            <textarea
-              value={ratingComment}
-              onChange={(e) => setRatingComment(e.target.value)}
-              placeholder="Leave a comment (optional)..."
-              rows={3}
-              style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: `1px solid ${C.border}`, borderRadius: 10, padding: "10px 12px", color: C.text1, fontSize: 13, resize: "none", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
-            />
-
-            <button
-              onClick={submitRating}
-              disabled={!rating || isSubmittingRating}
-              style={{
-                width: "100%", marginTop: 14,
-                background: !rating ? "rgba(255,255,255,0.05)" : `linear-gradient(135deg, ${C.gold}, #f7c05a)`,
-                border: "none", borderRadius: 12, padding: "13px 0",
-                color: !rating ? C.text3 : "#000",
-                fontWeight: 700, fontSize: 14, cursor: !rating ? "not-allowed" : "pointer",
-                transition: "all 0.2s", fontFamily: "inherit",
-              }}
-            >
-              {isSubmittingRating ? "Submitting..." : "Submit Rating"}
-            </button>
-          </div>
-        </div>
-      )}
+      {/* ── Rating Modal (2-step: driver + vendor) ── */}
+      <RatingModal
+        isOpen={showRateModal}
+        onClose={handleRatingClose}
+        orderId={orderId}
+        driverId={driver?._id}
+        driverName={driver?.name}
+        vendorName={liveData?.vendorName}
+        driverAlreadyRated={driverAlreadyRated}
+        vendorAlreadyRated={vendorAlreadyRated}
+      />
 
       {/* ── Header ── */}
       <div style={{ position: "sticky", top: 0, zIndex: 30, background: "rgba(13,13,13,0.95)", borderBottom: `1px solid ${C.border}`, backdropFilter: "blur(12px)" }}>
@@ -423,7 +364,7 @@ export default function OrderTrackingPage() {
         </div>
 
         {/* ── Live Map ── */}
-        {mapSrc && !isDelivered && (
+        {mapDriverLocation && !isDelivered && (
           <div className="track-card" style={{ borderRadius: 20, overflow: "hidden", border: `1px solid ${C.border}` }}>
             <div style={{ padding: "12px 16px", background: C.card, borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -437,12 +378,12 @@ export default function OrderTrackingPage() {
                 </a>
               )}
             </div>
-            <div style={{ height: 220, position: "relative" }}>
-              <iframe
-                src={mapSrc}
-                style={{ width: "100%", height: "100%", border: "none" }}
-                loading="lazy"
-                title="Driver location"
+            <div style={{ height: 300, position: "relative" }}>
+              <DeliveryMap
+                driverLocation={mapDriverLocation}
+                customerLocation={mapCustomerLocation}
+                height="100%"
+                showCenterFab={false}
               />
             </div>
           </div>
@@ -465,11 +406,8 @@ export default function OrderTrackingPage() {
                 <div style={{ flex: 1 }}>
                   <p style={{ color: C.text1, fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{driver.name}</p>
                   {/* Stars */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}>
-                    {[1,2,3,4,5].map((s) => (
-                      <svg key={s} style={{ width: 12, height: 12 }} fill={s <= Math.round(driver.averageRating) ? C.gold : "none"} viewBox="0 0 24 24" stroke={C.gold} strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    ))}
-                    <span style={{ color: C.text3, fontSize: 11 }}>{driver.averageRating?.toFixed(1)} ({driver.ratingCount} trips)</span>
+                  <div style={{ marginBottom: 4 }}>
+                    <StarDisplay rating={driver.averageRating} count={driver.ratingCount} size="sm" />
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     <span style={{ fontSize: 11, background: C.goldDim, color: C.gold, border: `1px solid ${C.goldBrd}`, borderRadius: 6, padding: "2px 8px", fontWeight: 600, textTransform: "capitalize" }}>
@@ -561,19 +499,17 @@ export default function OrderTrackingPage() {
           </div>
         )}
 
-        {/* ── Rate Driver CTA ── */}
+        {/* ── Rate Experience CTA ── */}
         {canRate && (
           <div className="track-card" style={{ background: `linear-gradient(135deg, rgba(245,166,35,0.08), rgba(24,95,45,0.06))`, border: `1px solid ${C.goldBrd}`, borderRadius: 20, padding: "20px 18px", textAlign: "center" }}>
-            <div style={{ fontSize: 40, marginBottom: 10 }}>
-              <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke={C.gold} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            </div>
-            <h3 style={{ color: C.text1, fontWeight: 700, fontSize: 17, marginBottom: 6 }}>How was your delivery?</h3>
-            <p style={{ color: C.text2, fontSize: 13, marginBottom: 16 }}>Rate {driver?.name || "your rider"} to help improve our service</p>
+            <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke={C.gold} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: 10 }}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <h3 style={{ color: C.text1, fontWeight: 700, fontSize: 17, marginBottom: 6 }}>How was your experience?</h3>
+            <p style={{ color: C.text2, fontSize: 13, marginBottom: 16 }}>Rate your rider and food to help us improve</p>
             <button
               onClick={() => setShowRateModal(true)}
               style={{ padding: "11px 28px", background: `linear-gradient(135deg, ${C.gold}, #f7c05a)`, border: "none", borderRadius: 12, color: "#000", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit", boxShadow: `0 4px 20px ${C.gold}30` }}
             >
-              Rate Rider
+              Rate Experience
             </button>
           </div>
         )}
