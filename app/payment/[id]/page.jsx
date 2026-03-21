@@ -270,16 +270,17 @@ const Payment = ({ params }) => {
             user: userInfo || {},
           },
         }).unwrap();
-    
+
         if (res?.status === "Success" || res?.status === "success") {
           chakraToast({
-            description: "✅ Order placed successfully for Cash on Delivery!",
-            status: "success",
-            duration: 5000,
+            title: "Order Placed!",
+            description: "Your Cash on Delivery order is pending admin approval. We'll notify you shortly.",
+            status: "info",
+            duration: 6000,
             isClosable: true,
             position: "top",
           });
-          setTimeout(() => router.push("/"), 1500);
+          setTimeout(() => router.push("/orders"), 1500);
         }
       } catch (err) {
         chakraToast({
@@ -670,6 +671,20 @@ const Payment = ({ params }) => {
                   </AnimatePresence>
                 </Box>
 
+                {paymentMethod === "cash_on_delivery" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ marginBottom: "1rem" }}
+                  >
+                    <Box p={3} border="1px solid" borderColor="orange.200" borderRadius="xl" bg="orange.50">
+                      <Text fontSize="sm" color="orange.700" fontWeight="500">
+                        COD orders require admin approval before a driver is assigned. You will be notified once approved.
+                      </Text>
+                    </Box>
+                  </motion.div>
+                )}
+
                 {paymentMethod === "gift_card" && (
                   <motion.div
                     initial={{ opacity: 0, y: 12 }}
@@ -829,10 +844,11 @@ const Payment = ({ params }) => {
             >
               <FlutterwavePayment
                 data={{
+                  orderId: Order?._id,
                   total: Order?.total,
                   paymentMethod: paymentMethod,
-                  title: "Delivery Schedule",
-                  message: "You are making payment for the delivery schedule service",
+                  title: "Yookatale Order",
+                  message: `Payment for order #${String(Order?._id || "").slice(-8)}`,
                 }}
                 callback={handleCallback}
                 closeComponent={() => setPaymentDisplay(false)}
