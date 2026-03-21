@@ -10,6 +10,7 @@ import {
 import { useMemo, useState } from "react";
 import { useAuth } from "@slices/authSlice";
 import OrderTracking from "@components/OrderTracking";
+import Link from "next/link";
 
 const activeStatuses = ["pending", "confirmed", "preparing", "ready", "assigned", "picked_up", "in_transit"];
 const cancellableStatuses = ["pending", "confirmed", "preparing", "ready", "assigned"];
@@ -105,6 +106,23 @@ const OrdersTab = () => {
                       <Button size="sm" variant="outline" onClick={() => setExpandedOrderId(isExpanded ? null : orderId)}>
                         {isExpanded ? "Hide Tracking" : "Track Order"}
                       </Button>
+
+                      {activeStatuses.includes(status) && orderId && (
+                        <Link href={`/orders/track/${orderId}`} passHref legacyBehavior>
+                          <Button
+                            as="a"
+                            size="sm"
+                            colorScheme="green"
+                            leftIcon={
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                              </svg>
+                            }
+                          >
+                            Live Tracking
+                          </Button>
+                        </Link>
+                      )}
 
                       {cancellableStatuses.includes(status) && (
                         <>

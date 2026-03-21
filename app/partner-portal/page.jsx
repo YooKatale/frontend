@@ -110,31 +110,48 @@ export default function PartnerPortalPage() {
           </CardBody>
         </Card>
       ) : (
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
-          <Card>
-            <CardBody>
-              <Text fontSize="sm" color="gray.500">Availability</Text>
-              <HStack mt={2}>
-                <Badge colorScheme={driver?.isAvailable ? "green" : "yellow"}>
-                  {driver?.isAvailable ? "Available" : "Offline"}
-                </Badge>
-                <Badge colorScheme="blue">{driver?.status || "Pending"}</Badge>
-              </HStack>
-            </CardBody>
-          </Card>
-          <Card>
-            <CardBody>
-              <Text fontSize="sm" color="gray.500">Commission Earned</Text>
-              <Heading size="md" mt={2}>UGX {Number(driver?.commissionEarned || 0).toLocaleString()}</Heading>
-            </CardBody>
-          </Card>
-          <Card>
-            <CardBody>
-              <Text fontSize="sm" color="gray.500">Completed Deliveries</Text>
-              <Heading size="md" mt={2}>{Number(driver?.completedOrders || 0).toLocaleString()}</Heading>
-            </CardBody>
-          </Card>
-        </SimpleGrid>
+        <VStack align="stretch" spacing={4}>
+          {driver?.driver?.status === "Verified" && (
+            <Card borderWidth="1px" borderColor="green.300" bg="green.50">
+              <CardBody>
+                <HStack justify="space-between" flexWrap="wrap" gap={3}>
+                  <VStack align="start" spacing={1}>
+                    <Heading size="sm" color="green.700">Your driver account is verified</Heading>
+                    <Text fontSize="sm" color="green.800">Access your full driver dashboard to manage orders and earnings.</Text>
+                  </VStack>
+                  <Button as={Link} href="/driver/dashboard" bg="green.600" color="white" _hover={{ bg: "green.700" }} size="sm">
+                    Open Driver Dashboard
+                  </Button>
+                </HStack>
+              </CardBody>
+            </Card>
+          )}
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+            <Card>
+              <CardBody>
+                <Text fontSize="sm" color="gray.500">Availability</Text>
+                <HStack mt={2}>
+                  <Badge colorScheme={driver?.isAvailable ? "green" : "yellow"}>
+                    {driver?.isAvailable ? "Available" : "Offline"}
+                  </Badge>
+                  <Badge colorScheme="blue">{driver?.driver?.status || driver?.status || "Pending"}</Badge>
+                </HStack>
+              </CardBody>
+            </Card>
+            <Card>
+              <CardBody>
+                <Text fontSize="sm" color="gray.500">Commission Earned</Text>
+                <Heading size="md" mt={2}>UGX {Number(driver?.driver?.commissionEarned || driver?.commissionEarned || 0).toLocaleString()}</Heading>
+              </CardBody>
+            </Card>
+            <Card>
+              <CardBody>
+                <Text fontSize="sm" color="gray.500">Completed Deliveries</Text>
+                <Heading size="md" mt={2}>{Number(driver?.driver?.totalDeliveries || driver?.completedOrders || 0).toLocaleString()}</Heading>
+              </CardBody>
+            </Card>
+          </SimpleGrid>
+        </VStack>
       )}
 
       <Card mt={6}>
@@ -143,7 +160,9 @@ export default function PartnerPortalPage() {
             <Heading size="sm">Quick links</Heading>
             <HStack spacing={4} flexWrap="wrap">
               <Button as={Link} href="/sell" variant="outline" colorScheme="green" size="sm">Vendor dashboard</Button>
-              <Button as={Link} href="/partner" variant="outline" colorScheme="orange" size="sm">Partner application page</Button>
+              <Button as={Link} href="/driver/dashboard" variant="outline" colorScheme="teal" size="sm">Driver dashboard</Button>
+              <Button as={Link} href="/driver/login" variant="outline" colorScheme="purple" size="sm">Driver login</Button>
+              <Button as={Link} href="/partner" variant="outline" colorScheme="orange" size="sm">Partner application</Button>
               <Button as={Link} href="/account" variant="outline" colorScheme="gray" size="sm">Account settings</Button>
             </HStack>
           </VStack>
