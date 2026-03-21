@@ -18,7 +18,7 @@ import { useAuth } from "@slices/authSlice";
 import { setCredentials } from "@slices/authSlice";
 import { DB_URL } from "@config/config";
 
-const NO_NAVBAR_FOOTER = ["/signin", "/signup", "/driver/login", "/driver/dashboard"];
+const NO_NAVBAR_FOOTER = ["/signin", "/signup", "/driver/login", "/driver/dashboard", "/driver/earnings", "/driver/profile"];
 
 function AuthSync() {
   const { userInfo } = useAuth();
