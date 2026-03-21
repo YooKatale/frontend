@@ -81,6 +81,7 @@ export default function OrderTrackingPage() {
   const [error, setError] = useState("");
   const [showRateModal, setShowRateModal] = useState(false);
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
   const justRated = useRef(false);
   const [toast, setToast] = useState(null);
   const toastTimer = useRef(null);
@@ -225,6 +226,26 @@ export default function OrderTrackingPage() {
   const isCancelled = orderStatus === "cancelled";
   const hasDriver = !!driver;
   const canRate = isDelivered && (hasDriver || vendorId) && !ratingSubmitted && !justRated.current;
+
+  const handleDownloadInvoice = async () => {
+    if (downloadingInvoice) return;
+    setDownloadingInvoice(true);
+    try {
+      const res = await fetch(`${DB_URL}/orders/${orderId}/invoice`);
+      if (!res.ok) throw new Error("Invoice not available");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `invoice-${String(orderId).slice(-8)}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      // silently ignore — user will see button re-enable
+    } finally {
+      setDownloadingInvoice(false);
+    }
+  };
   const driverAlreadyRated = !!delivery?.rated;
   const vendorAlreadyRated = !!vendorRated;
 
@@ -519,6 +540,28 @@ export default function OrderTrackingPage() {
           <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 16, padding: "14px 18px", display: "flex", alignItems: "center", gap: 10 }}>
             <IcoCheck />
             <p style={{ color: "#10b981", fontSize: 13, fontWeight: 600 }}>Thanks! Your rating has been submitted.</p>
+          </div>
+        )}
+
+        {/* ── Download Invoice (delivered only) ── */}
+        {isDelivered && (
+          <div style={{ textAlign: "center" }}>
+            <button
+              onClick={handleDownloadInvoice}
+              disabled={downloadingInvoice}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "11px 24px", background: "rgba(255,255,255,0.06)",
+                border: `1px solid ${C.border}`, borderRadius: 12,
+                color: C.text2, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                opacity: downloadingInvoice ? 0.5 : 1, transition: "all 0.2s",
+              }}
+            >
+              <svg style={{ width: 15, height: 15, flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 15V3M9 12l3 3 3-3M4 19h16"/>
+              </svg>
+              {downloadingInvoice ? "Generating PDF..." : "Download Invoice"}
+            </button>
           </div>
         )}
 

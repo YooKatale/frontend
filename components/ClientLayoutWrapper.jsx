@@ -18,7 +18,7 @@ import { useAuth } from "@slices/authSlice";
 import { setCredentials } from "@slices/authSlice";
 import { DB_URL } from "@config/config";
 
-const NO_NAVBAR_FOOTER = ["/signin", "/signup", "/driver/login", "/driver/dashboard", "/driver/earnings", "/driver/profile"];
+const NO_NAVBAR_FOOTER = ["/signin", "/signup", "/driver/login", "/driver/dashboard", "/driver/earnings", "/driver/profile", "/vendor/login", "/vendor/dashboard", "/vendor/orders", "/vendor/products", "/vendor/reviews", "/vendor/payouts"];
 
 function AuthSync() {
   const { userInfo } = useAuth();
@@ -80,7 +80,7 @@ function AuthSync() {
 export default function ClientLayoutWrapper({ children }) {
   const pathname = usePathname();
   const dispatch = useDispatch();
-  const hideNavAndFooter = NO_NAVBAR_FOOTER.includes(pathname || "");
+  const hideNavAndFooter = NO_NAVBAR_FOOTER.some((p) => (pathname || "") === p || (pathname || "").startsWith(p + "/"));
 
   useEffect(() => {
     dispatch(hydrateWishlist());

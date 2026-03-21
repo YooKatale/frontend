@@ -233,6 +233,7 @@ export default function DriverDashboardPage() {
         @keyframes sk-shimmer { 0%,100%{opacity:0.3;} 50%{opacity:0.8;} }
         @keyframes fadeSlideDown { from{opacity:0;transform:translateY(-20px);} to{opacity:1;transform:translateY(0);} }
         @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+        @media (max-width: 380px) { .driver-stats-grid { grid-template-columns: 1fr 1fr !important; } }
       `}</style>
 
       {/* Toast */}
@@ -354,7 +355,7 @@ export default function DriverDashboardPage() {
           </div>
 
           {/* Stats row */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, overflowX: "auto" }}>
+          <div className="driver-stats-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
             {[
               { label: "Today", value: dashData?.todayDeliveries ?? 0, sub: "deliveries", Icon: FaMotorcycle, color: C.blue },
               { label: "This Week", value: `${((dashData?.weekEarnings || 0) / 1000).toFixed(0)}K`, sub: "UGX earned", Icon: FaMoneyBillWave, color: "#10b981" },

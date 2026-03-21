@@ -3,6 +3,7 @@ import "./globals.css";
 import { Syne, DM_Sans } from "next/font/google";
 import dynamic from "next/dynamic";
 import { V4_CSS } from "@lib/v4Styles";
+import PageTransition from "@components/PageTransition";
 
 // Dynamically import ClientLayoutWrapper to avoid SSR issues (contains all client components)
 const ClientLayoutWrapper = dynamic(() => import("@components/ClientLayoutWrapper"), {
@@ -113,7 +114,7 @@ const RootLayout = ({ children }) => {
           <Providers>
             <ClientLayoutWrapper>
               <div className="yookatale-v4-page">
-                {children}
+                <PageTransition>{children}</PageTransition>
               </div>
             </ClientLayoutWrapper>
           </Providers>
