@@ -8,46 +8,45 @@ import {
   DirectionsRenderer,
 } from "@react-google-maps/api";
 
-/* ── Stable libs array (must not change between renders) ── */
 const LIBS = ["places", "geometry"];
 
-/* ── Silver map style ───────────────────────────────────── */
-const SILVER_STYLE = [
-  { elementType: "geometry",              stylers: [{ color: "#f5f5f5" }] },
-  { elementType: "labels.icon",           stylers: [{ visibility: "off" }] },
-  { elementType: "labels.text.fill",      stylers: [{ color: "#616161" }] },
-  { elementType: "labels.text.stroke",    stylers: [{ color: "#f5f5f5" }] },
+const MAP_STYLE = [
+  { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+  { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
   { featureType: "administrative.land_parcel", elementType: "labels.text.fill", stylers: [{ color: "#bdbdbd" }] },
-  { featureType: "poi",           elementType: "geometry",         stylers: [{ color: "#eeeeee" }] },
-  { featureType: "poi",           elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
-  { featureType: "poi.park",      elementType: "geometry",         stylers: [{ color: "#e5e5e5" }] },
-  { featureType: "poi.park",      elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
-  { featureType: "road",          elementType: "geometry",         stylers: [{ color: "#ffffff" }] },
+  { featureType: "poi", elementType: "geometry", stylers: [{ color: "#eeeeee" }] },
+  { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#e5e5e5" }] },
+  { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
   { featureType: "road.arterial", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
-  { featureType: "road.highway",  elementType: "geometry",         stylers: [{ color: "#dadada" }] },
-  { featureType: "road.highway",  elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
-  { featureType: "road.local",    elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
-  { featureType: "transit.line",     elementType: "geometry",      stylers: [{ color: "#e5e5e5" }] },
-  { featureType: "transit.station",  elementType: "geometry",      stylers: [{ color: "#eeeeee" }] },
-  { featureType: "water", elementType: "geometry",         stylers: [{ color: "#c9c9c9" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#dadada" }] },
+  { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+  { featureType: "road.local", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
+  { featureType: "transit.line", elementType: "geometry", stylers: [{ color: "#e5e5e5" }] },
+  { featureType: "transit.station", elementType: "geometry", stylers: [{ color: "#eeeeee" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#c9c9c9" }] },
   { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
 ];
 
-/* ── Map options (stable reference) ─────────────────────── */
 const MAP_OPTIONS = {
-  styles: SILVER_STYLE,
+  styles: MAP_STYLE,
   disableDefaultUI: true,
-  zoomControl: false,
+  zoomControl: true,
   mapTypeControl: false,
   streetViewControl: false,
   fullscreenControl: false,
 };
 
-/* ── Lerp helper ─────────────────────────────────────────── */
 function lerp(a, b, t) { return a + (b - a) * t; }
 
-/* ── Driver marker — motorcycle SVG in green circle ─────── */
-function DriverMarker({ position, heading = 0 }) {
+/* ── Driver marker — shows profile picture or motorcycle SVG ── */
+function DriverMarker({ position, heading = 0, profilePicture, driverName }) {
+  const [imgError, setImgError] = useState(false);
+  const showImg = profilePicture && !imgError;
+
   return (
     <OverlayView
       position={position}
@@ -55,45 +54,99 @@ function DriverMarker({ position, heading = 0 }) {
       getPixelPositionOffset={(w, h) => ({ x: -w / 2, y: -h / 2 })}
     >
       <div style={{
-        width: 38, height: 38,
-        transform: `rotate(${heading}deg)`,
-        transition: "transform 0.4s ease",
-        filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.45))",
+        filter: "drop-shadow(0 3px 12px rgba(0,0,0,0.45))",
         pointerEvents: "none",
+        animation: "dmPulseGlow 2s ease-in-out infinite",
       }}>
-        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
-          <circle cx="19" cy="19" r="19" fill="#185f2d" />
-          <g stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="25" r="3" />
-            <circle cx="27" cy="25" r="3" />
-            <path d="M14 25h9M23 25V17l-4-6H16L13 17h6l3 4" />
-            <path d="M28 17h-5M11 23l2-6h3" />
-          </g>
-        </svg>
+        <style>{`
+          @keyframes dmPulseGlow { 0%,100%{filter:drop-shadow(0 3px 12px rgba(24,95,45,0.4));} 50%{filter:drop-shadow(0 3px 20px rgba(24,95,45,0.7));} }
+        `}</style>
+        <div style={{
+          width: 48, height: 48,
+          borderRadius: "50%",
+          border: "3px solid #185f2d",
+          background: showImg ? "#fff" : "#185f2d",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          overflow: "hidden",
+          position: "relative",
+        }}>
+          {showImg ? (
+            <img
+              src={profilePicture}
+              alt={driverName || "Driver"}
+              onError={() => setImgError(true)}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : driverName ? (
+            <span style={{ color: "#fff", fontWeight: 800, fontSize: 18, fontFamily: "'Sora',sans-serif" }}>
+              {driverName[0].toUpperCase()}
+            </span>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="none" style={{ width: 22, height: 22 }}>
+              <g stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="8" cy="18" r="3" />
+                <circle cx="20" cy="18" r="3" />
+                <path d="M11 18h6M17 18V12l-4-6H10L7 12h6l3 4" />
+                <path d="M21 12h-5M8 16l2-6h3" />
+              </g>
+            </svg>
+          )}
+        </div>
+        {/* Direction arrow */}
+        <div style={{
+          position: "absolute", bottom: -8, left: "50%",
+          transform: `translateX(-50%) rotate(${heading}deg)`,
+          transition: "transform 0.4s ease",
+          width: 0, height: 0,
+          borderLeft: "6px solid transparent",
+          borderRight: "6px solid transparent",
+          borderTop: "10px solid #185f2d",
+        }} />
+        {/* Online pulse ring */}
+        <div style={{
+          position: "absolute", top: -4, right: -4,
+          width: 14, height: 14, borderRadius: "50%",
+          background: "#10b981",
+          border: "2px solid white",
+          animation: "dmDotPulse 2s ease infinite",
+        }} />
+        <style>{`@keyframes dmDotPulse { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.4);} 50%{box-shadow:0 0 0 6px rgba(16,185,129,0);} }`}</style>
       </div>
     </OverlayView>
   );
 }
 
-/* ── Customer destination pin ────────────────────────────── */
-function CustomerMarker({ position }) {
+/* ── Customer destination pin ── */
+function CustomerMarker({ position, customerName }) {
   return (
     <OverlayView
       position={position}
       mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
       getPixelPositionOffset={(w, h) => ({ x: -w / 2, y: -h })}
     >
-      <div style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.35))", pointerEvents: "none" }}>
-        <svg viewBox="0 0 32 42" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 28, height: 37 }}>
+      <div style={{ filter: "drop-shadow(0 3px 10px rgba(0,0,0,0.35))", pointerEvents: "none", textAlign: "center" }}>
+        <svg viewBox="0 0 32 42" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 32, height: 42 }}>
           <path d="M16 1C7.716 1 1 7.716 1 16c0 12.5 15 25 15 25S31 28.5 31 16C31 7.716 24.284 1 16 1z" fill="#ef4444" stroke="white" strokeWidth="1.5" />
           <circle cx="16" cy="16" r="5.5" fill="white" />
         </svg>
+        {customerName && (
+          <div style={{
+            marginTop: 4,
+            background: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)",
+            borderRadius: 6, padding: "3px 8px",
+            fontSize: 10, fontWeight: 600, color: "white",
+            fontFamily: "'Sora',sans-serif",
+            whiteSpace: "nowrap",
+          }}>
+            {customerName}
+          </div>
+        )}
       </div>
     </OverlayView>
   );
 }
 
-/* ── Vendor / pickup store pin ───────────────────────────── */
+/* ── Vendor / pickup store pin ── */
 function VendorMarker({ position }) {
   return (
     <OverlayView
@@ -101,8 +154,8 @@ function VendorMarker({ position }) {
       mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
       getPixelPositionOffset={(w, h) => ({ x: -w / 2, y: -h })}
     >
-      <div style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.35))", pointerEvents: "none" }}>
-        <svg viewBox="0 0 32 42" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 28, height: 37 }}>
+      <div style={{ filter: "drop-shadow(0 3px 10px rgba(0,0,0,0.35))", pointerEvents: "none" }}>
+        <svg viewBox="0 0 32 42" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 32, height: 42 }}>
           <path d="M16 1C7.716 1 1 7.716 1 16c0 12.5 15 25 15 25S31 28.5 31 16C31 7.716 24.284 1 16 1z" fill="#F5A623" stroke="white" strokeWidth="1.5" />
           <g stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 18v5h14v-5" />
@@ -116,23 +169,60 @@ function VendorMarker({ position }) {
   );
 }
 
+/* ── ETA badge overlay ── */
+function ETABadge({ eta, distance }) {
+  if (!eta) return null;
+  return (
+    <div style={{
+      position: "absolute", bottom: 70, left: "50%", transform: "translateX(-50%)",
+      background: "rgba(17,17,17,0.92)", backdropFilter: "blur(12px)",
+      borderRadius: 14, padding: "10px 18px",
+      display: "flex", alignItems: "center", gap: 14,
+      border: "1px solid rgba(245,166,35,0.3)",
+      boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+      zIndex: 10, fontFamily: "'Sora',sans-serif",
+      whiteSpace: "nowrap",
+    }}>
+      <div style={{ textAlign: "center" }}>
+        <p style={{ color: "#F5A623", fontSize: 18, fontWeight: 800, lineHeight: 1 }}>{eta}</p>
+        <p style={{ color: "#9ca3af", fontSize: 9, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>ETA</p>
+      </div>
+      {distance && (
+        <>
+          <div style={{ width: 1, height: 28, background: "rgba(255,255,255,0.1)" }} />
+          <div style={{ textAlign: "center" }}>
+            <p style={{ color: "#f3f4f6", fontSize: 14, fontWeight: 700, lineHeight: 1 }}>{distance}</p>
+            <p style={{ color: "#9ca3af", fontSize: 9, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Away</p>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 /**
  * DeliveryMap — shared live tracking map component.
  *
  * Props:
- *   driverLocation  { lat, lng, heading }   live driver position
- *   customerLocation { lat, lng }           delivery destination
- *   vendorLocation  { lat, lng }            optional pickup point
- *   height          string                  CSS height (default "100%")
- *   showCenterFab   boolean                 show "Center on driver" FAB
- *   onDirectionsReady (result) => void      called when route is ready
+ *   driverLocation    { lat, lng, heading }
+ *   customerLocation  { lat, lng }
+ *   vendorLocation    { lat, lng }
+ *   driverProfile     { profilePicture, name }
+ *   customerName      string
+ *   height            string
+ *   showCenterFab     boolean
+ *   showETA           boolean
+ *   onDirectionsReady (result) => void
  */
 export default function DeliveryMap({
   driverLocation,
   customerLocation,
   vendorLocation,
+  driverProfile,
+  customerName,
   height = "100%",
   showCenterFab = true,
+  showETA = true,
   onDirectionsReady,
 }) {
   const { isLoaded, loadError } = useJsApiLoader({
@@ -146,9 +236,11 @@ export default function DeliveryMap({
   const prevPosRef = useRef(null);
   const [displayedDriver, setDisplayedDriver] = useState(driverLocation || null);
   const [directions, setDirections] = useState(null);
-  const dirFetchedRef = useRef(null); // tracks last origin tile to debounce refetch
+  const [eta, setEta] = useState(null);
+  const [distance, setDistance] = useState(null);
+  const dirFetchedRef = useRef(null);
 
-  /* ── Lerp animation: smoothly move marker between GPS updates ── */
+  /* ── Lerp animation ── */
   useEffect(() => {
     if (!driverLocation) return;
     if (!prevPosRef.current) {
@@ -160,7 +252,7 @@ export default function DeliveryMap({
     prevPosRef.current = driverLocation;
 
     const startTime = performance.now();
-    const DURATION = 3600; // slightly shorter than 4s socket interval
+    const DURATION = 3600;
 
     if (animRef.current) cancelAnimationFrame(animRef.current);
     const tick = (now) => {
@@ -176,36 +268,33 @@ export default function DeliveryMap({
     return () => cancelAnimationFrame(animRef.current);
   }, [driverLocation]);
 
-  /* ── Auto-fit bounds when any marker changes ─────────────────── */
+  /* ── Auto-fit bounds with generous padding ── */
   useEffect(() => {
     if (!mapRef.current || !isLoaded || typeof window === "undefined" || !window.google) return;
     const bounds = new window.google.maps.LatLngBounds();
     let count = 0;
-    if (displayedDriver)    { bounds.extend(displayedDriver);    count++; }
-    if (customerLocation)   { bounds.extend(customerLocation);   count++; }
-    if (vendorLocation)     { bounds.extend(vendorLocation);     count++; }
+    if (displayedDriver) { bounds.extend(displayedDriver); count++; }
+    if (customerLocation) { bounds.extend(customerLocation); count++; }
+    if (vendorLocation) { bounds.extend(vendorLocation); count++; }
     if (count > 1) {
-      mapRef.current.fitBounds(bounds, { top: 80, bottom: 100, left: 40, right: 40 });
+      mapRef.current.fitBounds(bounds, { top: 60, bottom: 80, left: 60, right: 60 });
     } else if (count === 1) {
-      mapRef.current.setZoom(16);
+      mapRef.current.setZoom(15);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isLoaded,
     displayedDriver?.lat && Math.round(displayedDriver.lat * 500),
     displayedDriver?.lng && Math.round(displayedDriver.lng * 500),
-    customerLocation?.lat,
-    customerLocation?.lng,
-    vendorLocation?.lat,
-    vendorLocation?.lng,
+    customerLocation?.lat, customerLocation?.lng,
+    vendorLocation?.lat, vendorLocation?.lng,
   ]);
 
-  /* ── Directions fetch: refetch when driver moves >~55m ──────── */
+  /* ── Directions fetch with ETA extraction ── */
   useEffect(() => {
     if (!isLoaded || typeof window === "undefined" || !window.google) return;
     if (!displayedDriver || !customerLocation) return;
 
-    // Tile-based debounce: ~0.0005 deg ≈ 55m
     const tile = `${Math.round(displayedDriver.lat * 2000)},${Math.round(displayedDriver.lng * 2000)}`;
     if (dirFetchedRef.current === tile) return;
     dirFetchedRef.current = tile;
@@ -226,6 +315,12 @@ export default function DeliveryMap({
         if (status === "OK") {
           setDirections(result);
           if (onDirectionsReady) onDirectionsReady(result);
+          // Extract ETA and distance
+          const leg = result.routes?.[0]?.legs?.[result.routes[0].legs.length - 1];
+          if (leg) {
+            setEta(leg.duration?.text || null);
+            setDistance(leg.distance?.text || null);
+          }
         }
       }
     );
@@ -234,10 +329,8 @@ export default function DeliveryMap({
     isLoaded,
     displayedDriver ? Math.round(displayedDriver.lat * 2000) : null,
     displayedDriver ? Math.round(displayedDriver.lng * 2000) : null,
-    customerLocation?.lat,
-    customerLocation?.lng,
-    vendorLocation?.lat,
-    vendorLocation?.lng,
+    customerLocation?.lat, customerLocation?.lng,
+    vendorLocation?.lat, vendorLocation?.lng,
   ]);
 
   const onMapLoad = useCallback((map) => { mapRef.current = map; }, []);
@@ -245,11 +338,10 @@ export default function DeliveryMap({
   const centerOnDriver = useCallback(() => {
     if (mapRef.current && displayedDriver) {
       mapRef.current.panTo({ lat: displayedDriver.lat, lng: displayedDriver.lng });
-      mapRef.current.setZoom(17);
+      mapRef.current.setZoom(16);
     }
   }, [displayedDriver]);
 
-  /* ── Error / loading states ─────────────────────────────────── */
   if (loadError) {
     return (
       <div style={{ width: "100%", height, display: "flex", alignItems: "center", justifyContent: "center", background: "#1c1c1c", color: "#6b7280", fontSize: 13, fontFamily: "'Sora',sans-serif" }}>
@@ -273,7 +365,7 @@ export default function DeliveryMap({
       <GoogleMap
         mapContainerStyle={{ width: "100%", height: "100%" }}
         center={center}
-        zoom={15}
+        zoom={14}
         onLoad={onMapLoad}
         options={MAP_OPTIONS}
       >
@@ -295,11 +387,16 @@ export default function DeliveryMap({
           <DriverMarker
             position={{ lat: displayedDriver.lat, lng: displayedDriver.lng }}
             heading={displayedDriver.heading ?? 0}
+            profilePicture={driverProfile?.profilePicture}
+            driverName={driverProfile?.name}
           />
         )}
-        {customerLocation && <CustomerMarker position={customerLocation} />}
+        {customerLocation && <CustomerMarker position={customerLocation} customerName={customerName} />}
         {vendorLocation && <VendorMarker position={vendorLocation} />}
       </GoogleMap>
+
+      {/* ETA badge */}
+      {showETA && eta && <ETABadge eta={eta} distance={distance} />}
 
       {/* Center on Driver FAB */}
       {showCenterFab && displayedDriver && (
@@ -308,13 +405,15 @@ export default function DeliveryMap({
           title="Center on driver"
           style={{
             position: "absolute", bottom: 16, right: 16,
-            width: 44, height: 44, borderRadius: "50%",
-            background: "white", border: "none",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.25)",
+            width: 48, height: 48, borderRadius: "50%",
+            background: "white", border: "2px solid #185f2d",
+            boxShadow: "0 3px 16px rgba(0,0,0,0.25)",
             cursor: "pointer", display: "flex",
             alignItems: "center", justifyContent: "center",
-            zIndex: 10,
+            zIndex: 10, transition: "transform 0.2s",
           }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.08)"}
+          onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="#185f2d" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}>
             <circle cx="12" cy="12" r="3" />

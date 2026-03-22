@@ -90,22 +90,41 @@ export default function DriverProfilePage() {
   }, [session]);
 
   const savePayoutMethod = async () => {
-    if (!payoutForm.phone || !session?.driver?._id) return;
+    if (!payoutForm.phone || !session?.driver?._id) {
+      showToast("Please enter a phone number", "error");
+      return;
+    }
+    // Validate phone format
+    const cleanPhone = payoutForm.phone.replace(/\s+/g, "");
+    if (cleanPhone.length < 10) {
+      showToast("Enter a valid phone number", "error");
+      return;
+    }
     setSavingPayout(true);
     try {
-      const res  = await fetch(`${DB_URL}/driver/${session.driver._id}/payout-method`, {
+      const body = {
+        phone: cleanPhone,
+        provider: payoutForm.provider || "MTN",
+        accountName: session.driver.name || "",
+      };
+      const res = await fetch(`${DB_URL}/driver/${session.driver._id}/payout-method`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.token}` },
-        body: JSON.stringify(payoutForm),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (res.ok) {
-        setDriver((prev) => prev ? { ...prev, payoutMethod: payoutForm } : prev);
-        showToast("Payout method updated!");
+      if (res.ok && (data?.status === "Success" || data?.data)) {
+        setDriver((prev) => prev ? { ...prev, payoutMethod: { ...body, type: "mobile_money" } } : prev);
+        showToast("Payout method saved successfully!");
         setPayoutModal(false);
-      } else { showToast(data?.message || "Failed to update", "error"); }
-    } catch { showToast("Request failed", "error"); }
-    finally { setSavingPayout(false); }
+      } else {
+        showToast(data?.message || data?.error || "Failed to save payout method", "error");
+      }
+    } catch (err) {
+      showToast("Network error. Please check your connection.", "error");
+    } finally {
+      setSavingPayout(false);
+    }
   };
 
   const logout = () => {
@@ -160,7 +179,26 @@ export default function DriverProfilePage() {
         {/* Avatar + name card */}
         <Card style={{ padding: "24px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
-            <FaUserCircle style={{ width: 64, height: 64, color: C.text3, flexShrink: 0 }} />
+            {d.profilePicture || d.avatar ? (
+              <img
+                src={d.profilePicture || d.avatar}
+                alt={d.name || "Driver"}
+                style={{
+                  width: 68, height: 68, borderRadius: "50%", objectFit: "cover",
+                  border: `3px solid ${C.goldBrd}`, flexShrink: 0,
+                }}
+              />
+            ) : (
+              <div style={{
+                width: 68, height: 68, borderRadius: "50%",
+                background: `linear-gradient(135deg, ${C.green}, ${C.gold})`,
+                border: `3px solid ${C.goldBrd}`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 26, fontWeight: 800, color: C.white, flexShrink: 0,
+              }}>
+                {(d.name || "D")[0].toUpperCase()}
+              </div>
+            )}
             <div>
               <h2 style={{ fontWeight: 800, fontSize: 20, color: C.text1, marginBottom: 6 }}>{d.name || "Driver"}</h2>
               <StarDisplay rating={d.averageRating || 0} count={d.ratingCount || 0} size="sm" />
@@ -217,7 +255,7 @@ export default function DriverProfilePage() {
                 <FaMoneyBillWave style={{ width: 18, height: 18, color: C.gold }} />
               </div>
               <div>
-                <p style={{ color: C.text1, fontSize: 14, fontWeight: 600 }}>{d.payoutMethod.provider} Mobile Money</p>
+                <p style={{ color: C.text1, fontSize: 14, fontWeight: 600 }}>{d.payoutMethod.provider === "AIRTEL" ? "Airtel" : d.payoutMethod.provider} Mobile Money</p>
                 <p style={{ color: C.text3, fontSize: 12, marginTop: 2 }}>{d.payoutMethod.phone}</p>
               </div>
             </div>
@@ -251,7 +289,7 @@ export default function DriverProfilePage() {
             <div style={{ marginBottom: 14 }}>
               <p style={{ fontSize: 11, color: C.text3, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Provider</p>
               <div style={{ display: "flex", gap: 8 }}>
-                {["MTN", "Airtel"].map((p) => (
+                {["MTN", "AIRTEL"].map((p) => (
                   <button
                     key={p}
                     onClick={() => setPayoutForm((f) => ({ ...f, provider: p }))}

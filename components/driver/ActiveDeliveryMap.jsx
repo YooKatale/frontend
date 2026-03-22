@@ -83,8 +83,10 @@ export default function ActiveDeliveryMap({
         driverLocation={driverLocation}
         customerLocation={customerLocation}
         vendorLocation={showVendor ? vendorLocation : null}
+        customerName={order?.customerName}
         height="100%"
         showCenterFab
+        showETA
         onDirectionsReady={handleDirections}
       />
 
@@ -141,11 +143,11 @@ export default function ActiveDeliveryMap({
               href={`tel:${order.customerPhone}`}
               style={{
                 width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
-                background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)",
+                background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)",
                 display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none",
               }}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={ico(16)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={ico(16)}>
                 <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
             </a>
@@ -159,13 +161,13 @@ export default function ActiveDeliveryMap({
             disabled={isUpdating}
             style={{
               width: "100%",
-              background: `linear-gradient(135deg, ${statusColor}, ${statusColor}cc)`,
+              background: `linear-gradient(135deg, #185f2d, #1a7a36)`,
               border: "none", borderRadius: 14, padding: "14px 0",
               color: "#ffffff", fontWeight: 700, fontSize: 14,
               cursor: isUpdating ? "not-allowed" : "pointer",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               opacity: isUpdating ? 0.6 : 1, transition: "all 0.2s",
-              boxShadow: `0 4px 20px ${statusColor}38`,
+              boxShadow: `0 4px 20px rgba(24,95,45,0.4)`,
               fontFamily: "inherit",
             }}
           >

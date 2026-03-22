@@ -89,6 +89,11 @@ const Payment = ({ params }) => {
 
       // Check if order already has a status (completed/paid) - redirect if so
       if (orderData.status && orderData.status !== "" && orderData.status !== "pending" && orderData.status !== "Pending") {
+        // For COD orders pending approval, redirect to order tracking instead of home
+        if (orderData.status === "pending_cod_approval") {
+          router.push(`/orders/track/${orderData._id || orderData.id}`);
+          return;
+        }
         router.push("/");
         return;
       }

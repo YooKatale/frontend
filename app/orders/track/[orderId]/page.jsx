@@ -38,12 +38,13 @@ const C = {
 // const POLL_MS = 5000;
 
 const STATUS_FLOW = [
-  { key: "pending",    label: "Order Placed",    desc: "Your order has been received" },
-  { key: "confirmed",  label: "Confirmed",        desc: "Your order is confirmed" },
-  { key: "assigned",   label: "Driver Assigned",  desc: "A rider is heading to collect your order" },
-  { key: "picked_up",  label: "Picked Up",        desc: "Rider has your order" },
-  { key: "in_transit", label: "On the Way",       desc: "Rider is heading to you" },
-  { key: "delivered",  label: "Delivered",        desc: "Your order has arrived!" },
+  { key: "pending",              label: "Order Placed",       desc: "Your order has been received" },
+  { key: "pending_cod_approval", label: "Awaiting Approval",  desc: "Your COD order is being reviewed by admin" },
+  { key: "confirmed",            label: "Confirmed",          desc: "Your order is confirmed" },
+  { key: "assigned",             label: "Driver Assigned",    desc: "A rider is heading to collect your order" },
+  { key: "picked_up",            label: "Picked Up",          desc: "Rider has your order" },
+  { key: "in_transit",           label: "On the Way",         desc: "Rider is heading to you" },
+  { key: "delivered",            label: "Delivered",          desc: "Your order has arrived!" },
 ];
 const STATUS_IDX = Object.fromEntries(STATUS_FLOW.map((s, i) => [s.key, i]));
 
@@ -220,10 +221,11 @@ export default function OrderTrackingPage() {
     </div>
   );
 
-  const { orderStatus, driver, delivery, deliveryAddress, total, trackingHistory, vendorRated, vendorId } = liveData;
+  const { orderStatus, driver, delivery, deliveryAddress, total, trackingHistory, vendorRated, vendorId, paymentMethod } = liveData;
   const currentIdx = STATUS_IDX[orderStatus] ?? 0;
   const isDelivered = orderStatus === "delivered";
   const isCancelled = orderStatus === "cancelled";
+  const isPendingCod = orderStatus === "pending_cod_approval";
   const hasDriver = !!driver;
   const canRate = isDelivered && (hasDriver || vendorId) && !ratingSubmitted && !justRated.current;
 
@@ -359,6 +361,50 @@ export default function OrderTrackingPage() {
             </div>
           </div>
 
+          {/* COD Approval Status Banner */}
+          {isPendingCod && (
+            <div style={{
+              marginTop: 14, padding: "12px 16px",
+              background: "rgba(245,166,35,0.1)", border: `1px solid rgba(245,166,35,0.3)`,
+              borderRadius: 14, display: "flex", alignItems: "center", gap: 10,
+            }}>
+              <div style={{
+                width: 10, height: 10, borderRadius: "50%",
+                background: "#F5A623",
+                animation: "pulse 2s ease-in-out infinite",
+                flexShrink: 0,
+              }} />
+              <div>
+                <p style={{ color: "#F5A623", fontWeight: 700, fontSize: 13 }}>Awaiting Admin Approval</p>
+                <p style={{ color: C.text2, fontSize: 12, marginTop: 2 }}>
+                  Your Cash on Delivery order is being reviewed. You'll be notified once approved and a driver is assigned.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Driver assignment status */}
+          {orderStatus === "confirmed" && !hasDriver && (
+            <div style={{
+              marginTop: 14, padding: "12px 16px",
+              background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.3)",
+              borderRadius: 14, display: "flex", alignItems: "center", gap: 10,
+            }}>
+              <div style={{
+                width: 10, height: 10, borderRadius: "50%",
+                background: "#3b82f6",
+                animation: "pulse 2s ease-in-out infinite",
+                flexShrink: 0,
+              }} />
+              <div>
+                <p style={{ color: "#3b82f6", fontWeight: 700, fontSize: 13 }}>Finding Your Driver</p>
+                <p style={{ color: C.text2, fontSize: 12, marginTop: 2 }}>
+                  We're assigning the nearest available driver to your order. This usually takes a few minutes.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* ETA */}
           {etaDisplay && !isDelivered && !isCancelled && (
             <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -399,12 +445,18 @@ export default function OrderTrackingPage() {
                 </a>
               )}
             </div>
-            <div style={{ height: 300, position: "relative" }}>
+            <div style={{ height: 400, position: "relative" }}>
               <DeliveryMap
                 driverLocation={mapDriverLocation}
                 customerLocation={mapCustomerLocation}
+                driverProfile={{
+                  profilePicture: driver?.profilePicture || driver?.avatar,
+                  name: driver?.name,
+                }}
+                customerName="You"
                 height="100%"
-                showCenterFab={false}
+                showCenterFab={true}
+                showETA={true}
               />
             </div>
           </div>
@@ -420,7 +472,15 @@ export default function OrderTrackingPage() {
             <div style={{ padding: "18px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 {/* Avatar */}
-                <div style={{ width: 56, height: 56, borderRadius: "50%", background: `linear-gradient(135deg, ${C.green}, ${C.goldDim})`, border: `2px solid ${C.goldBrd}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 800, color: C.gold, flexShrink: 0 }}>
+                {driver.profilePicture || driver.avatar ? (
+                  <img
+                    src={driver.profilePicture || driver.avatar}
+                    alt={driver.name}
+                    style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", border: `2px solid ${C.goldBrd}`, flexShrink: 0 }}
+                    onError={(e) => { e.target.style.display = "none"; e.target.nextSibling.style.display = "flex"; }}
+                  />
+                ) : null}
+                <div style={{ width: 56, height: 56, borderRadius: "50%", background: `linear-gradient(135deg, ${C.green}, ${C.goldDim})`, border: `2px solid ${C.goldBrd}`, display: (driver.profilePicture || driver.avatar) ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 800, color: C.gold, flexShrink: 0 }}>
                   {(driver.name || "D")[0].toUpperCase()}
                 </div>
                 {/* Info */}

@@ -2,7 +2,7 @@
 
 import {
   FaClipboardList, FaCheckCircle, FaUserClock, FaMotorcycle,
-  FaBoxOpen, FaShippingFast, FaStar,
+  FaBoxOpen, FaShippingFast, FaStar, FaMoneyBillWave,
 } from "react-icons/fa";
 
 /**
@@ -25,11 +25,27 @@ const STEPS = [
   { key: "delivered",  label: "Delivered",     Icon: FaStar          },
 ];
 
-const STATUS_ORDER = STEPS.map((s) => s.key);
+// COD flow inserts an approval step after "pending"
+const COD_STEPS = [
+  { key: "pending",              label: "Placed",        Icon: FaClipboardList },
+  { key: "pending_cod_approval", label: "COD Approval",  Icon: FaMoneyBillWave },
+  { key: "confirmed",            label: "Confirmed",     Icon: FaCheckCircle   },
+  { key: "preparing",            label: "Preparing",     Icon: FaUserClock     },
+  { key: "assigned",             label: "Driver",        Icon: FaMotorcycle    },
+  { key: "picked_up",            label: "Picked Up",     Icon: FaBoxOpen       },
+  { key: "in_transit",           label: "On the Way",    Icon: FaShippingFast  },
+  { key: "delivered",            label: "Delivered",     Icon: FaStar          },
+];
 
-function getStepState(stepKey, currentStatus) {
-  const currentIdx = STATUS_ORDER.indexOf(currentStatus) ?? -1;
-  const stepIdx    = STATUS_ORDER.indexOf(stepKey);
+const STATUS_ORDER = STEPS.map((s) => s.key);
+const COD_STATUS_ORDER = COD_STEPS.map((s) => s.key);
+
+function getStepState(stepKey, currentStatus, isCod = false) {
+  const order = isCod ? COD_STATUS_ORDER : STATUS_ORDER;
+  const currentIdx = order.indexOf(currentStatus);
+  const stepIdx    = order.indexOf(stepKey);
+  // Handle unmapped statuses: treat as pending at step 0
+  if (currentIdx === -1) return stepIdx === 0 ? "active" : "pending";
   if (stepIdx < currentIdx) return "completed";
   if (stepIdx === currentIdx) return "active";
   return "pending";
@@ -41,8 +57,11 @@ function getTimestamp(stepKey, trackingHistory) {
   return new Date(entry.timestamp).toLocaleString("en-UG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
-export default function OrderStatusStepper({ currentStatus = "pending", trackingHistory = [], vertical = false, dark = false }) {
+export default function OrderStatusStepper({ currentStatus = "pending", trackingHistory = [], vertical = false, dark = false, paymentMethod }) {
   const isCancelled = currentStatus === "cancelled";
+  const isCod = paymentMethod === "cash_on_delivery" || currentStatus === "pending_cod_approval"
+    || (trackingHistory || []).some((h) => h.status === "pending_cod_approval");
+  const steps = isCod ? COD_STEPS : STEPS;
 
   const text1 = dark ? "#f3f4f6" : "#111827";
   const text2 = dark ? "#9ca3af" : "#6b7280";
@@ -61,10 +80,10 @@ export default function OrderStatusStepper({ currentStatus = "pending", tracking
   if (vertical) {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-        {STEPS.map((step, i) => {
-          const state = getStepState(step.key, currentStatus);
+        {steps.map((step, i) => {
+          const state = getStepState(step.key, currentStatus, isCod);
           const ts    = getTimestamp(step.key, trackingHistory);
-          const isLast = i === STEPS.length - 1;
+          const isLast = i === steps.length - 1;
           return (
             <div key={step.key} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
               {/* Icon + line */}
@@ -99,10 +118,10 @@ export default function OrderStatusStepper({ currentStatus = "pending", tracking
   return (
     <div style={{ overflowX: "auto", paddingBottom: 4 }}>
       <div style={{ display: "flex", alignItems: "flex-start", minWidth: 520, gap: 0 }}>
-        {STEPS.map((step, i) => {
-          const state = getStepState(step.key, currentStatus);
+        {steps.map((step, i) => {
+          const state = getStepState(step.key, currentStatus, isCod);
           const ts    = getTimestamp(step.key, trackingHistory);
-          const isLast = i === STEPS.length - 1;
+          const isLast = i === steps.length - 1;
           return (
             <div key={step.key} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
               {/* Connector line left */}

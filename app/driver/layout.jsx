@@ -3,18 +3,21 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import DriverBottomNav from "@components/driver/DriverBottomNav";
+import DriverSidebar from "@components/driver/DriverSidebar";
 import { DB_URL } from "@config/config";
 
-const DRIVER_KEY  = "yookatale-driver";
+const DRIVER_KEY   = "yookatale-driver";
 const PUBLIC_PATHS = ["/driver/login"];
 
 export default function DriverLayout({ children }) {
   const pathname = usePathname();
   const router   = useRouter();
-  const [ready, setReady]                     = useState(false);
-  const [hasActiveDelivery, setHasActive]     = useState(false);
+  const [ready, setReady]               = useState(false);
+  const [hasActiveDelivery, setHasActive] = useState(false);
+  const [driverInfo, setDriverInfo]     = useState({ name: "", avatar: "" });
 
   const isPublic = PUBLIC_PATHS.some((p) => pathname?.startsWith(p));
+  const isDeliveryActive = pathname === "/driver/delivery";
 
   useEffect(() => {
     if (isPublic) { setReady(true); return; }
@@ -24,7 +27,10 @@ export default function DriverLayout({ children }) {
       const parsed = JSON.parse(stored);
       if (!parsed?.token || !parsed?.driver?._id) { router.replace("/driver/login"); return; }
       setReady(true);
-      // Check for active delivery (fire-and-forget; badge is optional UX)
+      setDriverInfo({
+        name: parsed.driver.fullName || parsed.driver.name || "",
+        avatar: parsed.driver.profilePicture || parsed.driver.avatar || "",
+      });
       fetch(`${DB_URL}/driver/dashboard/${parsed.driver._id}`, {
         headers: { Authorization: `Bearer ${parsed.token}` },
       })
@@ -36,13 +42,44 @@ export default function DriverLayout({ children }) {
     }
   }, [isPublic, pathname, router]);
 
-  // Blank dark screen while auth check runs
   if (!ready) return <div style={{ minHeight: "100vh", background: "#0D0D0D" }} />;
 
   return (
     <div style={{ minHeight: "100vh", background: "#0D0D0D", fontFamily: "'Sora','DM Sans',system-ui,sans-serif" }}>
-      {children}
-      {!isPublic && <DriverBottomNav hasActiveDelivery={hasActiveDelivery} />}
+      {/* Desktop sidebar - hidden on mobile */}
+      {!isPublic && (
+        <div className="driver-sidebar-wrap">
+          <DriverSidebar
+            hasActiveDelivery={hasActiveDelivery}
+            driverName={driverInfo.name}
+            driverAvatar={driverInfo.avatar}
+          />
+        </div>
+      )}
+
+      {/* Main content */}
+      <div className={!isPublic ? "driver-main-content" : ""}>
+        {children}
+      </div>
+
+      {/* Mobile bottom nav - hidden on desktop */}
+      {!isPublic && (
+        <div className="driver-bottom-nav-wrap">
+          <DriverBottomNav hasActiveDelivery={hasActiveDelivery} />
+        </div>
+      )}
+
+      <style>{`
+        .driver-sidebar-wrap { display: none; }
+        .driver-bottom-nav-wrap { display: block; }
+        .driver-main-content { padding-bottom: 80px; }
+
+        @media (min-width: 1024px) {
+          .driver-sidebar-wrap { display: block; }
+          .driver-bottom-nav-wrap { display: none; }
+          .driver-main-content { margin-left: 240px; padding-bottom: 0; }
+        }
+      `}</style>
     </div>
   );
 }

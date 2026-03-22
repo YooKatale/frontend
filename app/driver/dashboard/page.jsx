@@ -279,25 +279,34 @@ export default function DriverDashboardPage() {
 
       {/* Header */}
       <header style={{
-        background: C.card, borderBottom: `1px solid ${C.border}`,
+        background: "rgba(17,17,17,0.95)", backdropFilter: "blur(16px)",
+        borderBottom: `1px solid ${C.border}`,
         padding: "0 16px", height: 60,
         display: "flex", alignItems: "center", justifyContent: "space-between",
         position: "sticky", top: 0, zIndex: 40,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, overflow: "hidden", border: `1.5px solid ${C.goldBrd}`, flexShrink: 0 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: 10, overflow: "hidden",
+            border: `1.5px solid ${C.goldBrd}`, flexShrink: 0,
+          }}>
             <Image src="/assets/icons/logo2.png" alt="Yookatale" width={36} height={36} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
           </div>
           <div>
-            <p style={{ color: C.text1, fontWeight: 700, fontSize: 14, lineHeight: 1.1 }}>Yookatale</p>
-            <p style={{ color: C.text3, fontSize: 11, marginTop: 1 }}>Driver App</p>
+            <p style={{ color: C.gold, fontWeight: 800, fontSize: 14, lineHeight: 1.1, letterSpacing: "-0.3px" }}>Yookatale</p>
+            <p style={{ color: C.text3, fontSize: 10, marginTop: 1, fontWeight: 500 }}>Driver Portal</p>
           </div>
         </div>
         <button
-          onClick={fetchDashboard}
-          style={{ padding: 8, background: "none", border: "none", cursor: "pointer", color: C.text3 }}
+          onClick={() => { fetchDashboard(); fetchAvailableOrders(); }}
+          style={{
+            padding: 8, background: "rgba(255,255,255,0.04)",
+            borderRadius: 10, border: `1px solid ${C.border}`,
+            cursor: "pointer", color: C.text3,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}
         >
-          <FaRedo style={{ width: 15, height: 15 }} />
+          <FaRedo style={{ width: 14, height: 14 }} />
         </button>
       </header>
 
@@ -314,8 +323,34 @@ export default function DriverDashboardPage() {
 
           {/* Top section: avatar + greeting + toggle */}
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <div style={{ color: C.text3, flexShrink: 0 }}>
-              <FaUserCircle style={{ width: 56, height: 56, color: isAvailable ? C.green : C.text3 }} />
+            <div style={{ flexShrink: 0, position: "relative" }}>
+              {driver?.profilePicture || driver?.avatar ? (
+                <img
+                  src={driver.profilePicture || driver.avatar}
+                  alt={driver.name || "Driver"}
+                  style={{
+                    width: 56, height: 56, borderRadius: "50%", objectFit: "cover",
+                    border: `3px solid ${isAvailable ? C.green : C.border}`,
+                  }}
+                />
+              ) : (
+                <div style={{
+                  width: 56, height: 56, borderRadius: "50%",
+                  background: `linear-gradient(135deg, ${C.green}, ${C.gold})`,
+                  border: `3px solid ${isAvailable ? C.green : C.border}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 22, fontWeight: 800, color: C.white,
+                }}>
+                  {(driver?.name || "D")[0].toUpperCase()}
+                </div>
+              )}
+              {/* Online indicator dot */}
+              <div style={{
+                position: "absolute", bottom: 0, right: 0,
+                width: 14, height: 14, borderRadius: "50%",
+                background: isAvailable ? "#10b981" : C.text3,
+                border: "2.5px solid #0D0D0D",
+              }} />
             </div>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 12, color: C.text3, marginBottom: 2 }}>{greeting()}</p>
