@@ -235,6 +235,7 @@ export default function AccountPage() {
   const { isOpen: isPasswordOpen, onOpen: onPasswordOpen, onClose: onPasswordClose } = useDisclosure();
   const fileInputRef = useRef(null);
   const [avatarLoading, setAvatarLoading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
@@ -330,8 +331,10 @@ export default function AccountPage() {
         dispatch(setCredentials(updated));
         handleSave();
       }
-    } catch (_) {}
-    finally {
+    } catch (err) {
+      setUploadError(err?.data?.message || err?.message || "Upload failed. Please try again.");
+      setTimeout(() => setUploadError(null), 4000);
+    } finally {
       setAvatarLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
@@ -385,6 +388,11 @@ export default function AccountPage() {
       {saved && (
         <div className="acc-toast">
           <CheckIcon s={15} /> Profile saved successfully!
+        </div>
+      )}
+      {uploadError && (
+        <div className="acc-toast" style={{ background: "#dc2626", boxShadow: "0 8px 32px rgba(220,38,38,0.42)" }}>
+          {uploadError}
         </div>
       )}
 
