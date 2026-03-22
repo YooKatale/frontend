@@ -13,27 +13,27 @@ import {
 
 const ActiveDeliveryMap = dynamic(
   () => import("@components/driver/ActiveDeliveryMap"),
-  { ssr: false, loading: () => <div style={{ width: "100%", height: "100%", background: "#0D0D0D", borderRadius: 18 }} /> }
+  { ssr: false, loading: () => <div style={{ width: "100%", height: "100%", background: "#f4f5f7", borderRadius: 18 }} /> }
 );
 
 const DRIVER_KEY = "yookatale-driver";
 
 const C = {
-  bg:      "#0D0D0D",
-  card:    "#111111",
-  card2:   "#161616",
-  border:  "rgba(255,255,255,0.07)",
-  gold:    "#F5A623",
-  goldDim: "rgba(245,166,35,0.12)",
-  goldBrd: "rgba(245,166,35,0.25)",
-  green:   "#185f2d",
-  greenLt: "#1a7a36",
+  bg:      "#f4f5f7",
+  card:    "#ffffff",
+  card2:   "#f9fafb",
+  border:  "#f3f4f6",
+  borderMd:"#e5e7eb",
+  amber:   "#d97706",
+  amberDim:"rgba(217,119,6,0.08)",
+  amberBrd:"rgba(217,119,6,0.18)",
+  green:   "#0d7c3b",
+  greenLt: "#10a34d",
   white:   "#ffffff",
-  text1:   "#f3f4f6",
-  text2:   "#9ca3af",
-  text3:   "#6b7280",
+  text1:   "#111827",
+  text2:   "#6b7280",
+  text3:   "#9ca3af",
   blue:    "#3b82f6",
-  amber:   "#f59e0b",
   purple:  "#8b5cf6",
   red:     "#ef4444",
 };
@@ -126,7 +126,7 @@ export default function DriverDeliveryPage() {
   const mapDriverLoc = myLocation ? { lat: myLocation.lat, lng: myLocation.lng, heading: myLocation.heading ?? 0 } : null;
 
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, color: C.text1, fontFamily: "'Sora','DM Sans',system-ui,sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: C.bg, color: C.text1, fontFamily: "'Bricolage Grotesque','Sora','DM Sans',system-ui,sans-serif" }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeSlideDown { from{opacity:0;transform:translateY(-20px);} to{opacity:1;transform:translateY(0);} }
@@ -156,9 +156,9 @@ export default function DriverDeliveryPage() {
           padding: "12px 20px", borderRadius: 14, fontWeight: 600, fontSize: 13,
           display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap",
           animation: "fadeSlideDown 0.25s ease",
-          background: toast.type === "error" ? "rgba(239,68,68,0.95)" : `rgba(24,95,45,0.95)`,
-          border: `1px solid ${toast.type === "error" ? "rgba(239,68,68,0.5)" : "rgba(26,122,54,0.5)"}`,
-          boxShadow: "0 8px 32px rgba(0,0,0,0.5)", color: C.white, backdropFilter: "blur(12px)",
+          background: toast.type === "error" ? "rgba(239,68,68,0.95)" : "rgba(13,124,59,0.95)",
+          border: `1px solid ${toast.type === "error" ? "rgba(239,68,68,0.5)" : "rgba(13,124,59,0.5)"}`,
+          boxShadow: "0 8px 32px rgba(0,0,0,0.15)", color: C.white, backdropFilter: "blur(12px)",
         }}>
           {toast.msg}
         </div>
@@ -168,7 +168,7 @@ export default function DriverDeliveryPage() {
       {isLoading && (
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
           <div style={{ textAlign: "center" }}>
-            <div style={{ width: 48, height: 48, border: `3px solid ${C.border}`, borderTop: `3px solid ${C.gold}`, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+            <div style={{ width: 48, height: 48, border: `3px solid ${C.border}`, borderTop: `3px solid ${C.green}`, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
             <p style={{ color: C.text2, fontSize: 14 }}>Loading delivery...</p>
           </div>
         </div>
@@ -180,12 +180,12 @@ export default function DriverDeliveryPage() {
           <div style={{ textAlign: "center", maxWidth: 380 }}>
             <div style={{
               width: 100, height: 100, borderRadius: "50%",
-              background: `linear-gradient(135deg, ${C.goldDim}, ${C.goldBrd})`,
-              border: `2px solid ${C.goldBrd}`,
+              background: C.amberDim,
+              border: `2px solid ${C.amberBrd}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               margin: "0 auto 24px",
             }}>
-              <FaMotorcycle style={{ width: 44, height: 44, color: C.gold }} />
+              <FaMotorcycle style={{ width: 44, height: 44, color: C.amber }} />
             </div>
             <h2 style={{ color: C.text1, fontWeight: 800, fontSize: 22, marginBottom: 10 }}>No Active Delivery</h2>
             <p style={{ color: C.text2, fontSize: 14, marginBottom: 32, lineHeight: 1.7 }}>
@@ -198,7 +198,7 @@ export default function DriverDeliveryPage() {
                 background: `linear-gradient(135deg, ${C.green}, ${C.greenLt})`,
                 border: "none", color: C.white, fontWeight: 700,
                 fontSize: 15, cursor: "pointer", fontFamily: "inherit",
-                boxShadow: `0 4px 20px rgba(24,95,45,0.3)`,
+                boxShadow: "0 4px 20px rgba(13,124,59,0.25)",
                 transition: "transform 0.2s",
               }}
               onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.02)"}
@@ -213,28 +213,30 @@ export default function DriverDeliveryPage() {
       {/* Active delivery - full-screen map + side panel layout */}
       {!isLoading && delivery && (
         <div className="delivery-layout">
-          {/* Map section - takes full remaining space */}
+          {/* Map section */}
           <div className="delivery-map-section">
             {/* Floating status badge on map */}
             <div style={{
               position: "absolute", top: 16, left: 16, zIndex: 20,
-              background: "rgba(17,17,17,0.92)", backdropFilter: "blur(12px)",
-              border: `1px solid ${statusConfig?.color || C.gold}40`,
+              background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)",
+              border: `1px solid ${statusConfig?.color || C.green}30`,
               borderRadius: 14, padding: "10px 16px",
               display: "flex", alignItems: "center", gap: 10,
+              boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
             }}>
               <div style={{
                 width: 8, height: 8, borderRadius: "50%",
-                background: statusConfig?.color || C.gold,
-                boxShadow: `0 0 8px ${statusConfig?.color || C.gold}80`,
+                background: statusConfig?.color || C.green,
+                boxShadow: `0 0 8px ${statusConfig?.color || C.green}80`,
                 animation: delivery.status !== "delivered" ? "pulse 2s ease-in-out infinite" : "none",
               }} />
-              <span style={{ color: statusConfig?.color || C.gold, fontWeight: 700, fontSize: 13 }}>
+              <span style={{ color: statusConfig?.color || C.green, fontWeight: 700, fontSize: 13 }}>
                 {statusConfig?.label || delivery.status}
               </span>
               <span style={{
-                background: "rgba(255,255,255,0.08)", borderRadius: 8,
+                background: "#f3f4f6", borderRadius: 8,
                 padding: "3px 10px", fontSize: 11, fontWeight: 600, color: C.text2,
+                fontFamily: "'Azeret Mono',monospace",
               }}>
                 #{String(delivery.orderId || delivery._id || "").slice(-6).toUpperCase()}
               </span>
@@ -246,10 +248,11 @@ export default function DriverDeliveryPage() {
               style={{
                 position: "absolute", top: 16, right: 16, zIndex: 20,
                 width: 40, height: 40, borderRadius: 12,
-                background: "rgba(17,17,17,0.92)", backdropFilter: "blur(12px)",
+                background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)",
                 border: `1px solid ${C.border}`,
                 color: C.text2, cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
               }}
             >
               <FaRedo style={{ width: 14, height: 14 }} />
@@ -263,7 +266,7 @@ export default function DriverDeliveryPage() {
             />
           </div>
 
-          {/* Info panel - side on desktop, bottom on mobile */}
+          {/* Info panel */}
           <div className="delivery-info-panel">
             {/* Customer info card */}
             <div style={{
@@ -290,7 +293,7 @@ export default function DriverDeliveryPage() {
                 {delivery.customerPhone && (
                   <a href={`tel:${delivery.customerPhone}`} style={{
                     width: 40, height: 40, borderRadius: 12,
-                    background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)",
+                    background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     textDecoration: "none",
                   }}>
@@ -302,8 +305,8 @@ export default function DriverDeliveryPage() {
               {/* Delivery address */}
               <div style={{
                 display: "flex", alignItems: "flex-start", gap: 10,
-                background: "rgba(59,130,246,0.06)", borderRadius: 12, padding: "12px",
-                border: "1px solid rgba(59,130,246,0.12)",
+                background: "rgba(59,130,246,0.04)", borderRadius: 12, padding: "12px",
+                border: "1px solid rgba(59,130,246,0.1)",
               }}>
                 <FaMapMarkerAlt style={{ width: 14, height: 14, color: C.blue, marginTop: 2, flexShrink: 0 }} />
                 <div>
@@ -339,7 +342,7 @@ export default function DriverDeliveryPage() {
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                         <div style={{
                           width: 28, height: 28, borderRadius: "50%",
-                          background: isDone ? `${cfg.color}20` : "rgba(255,255,255,0.04)",
+                          background: isDone ? `${cfg.color}15` : "#f9fafb",
                           border: `2px solid ${isDone ? cfg.color : C.border}`,
                           display: "flex", alignItems: "center", justifyContent: "center",
                           transition: "all 0.3s",
@@ -379,20 +382,20 @@ export default function DriverDeliveryPage() {
                 style={{
                   width: "100%", padding: "16px", borderRadius: 14, border: "none",
                   background: isUpdating
-                    ? "rgba(255,255,255,0.06)"
+                    ? "#f3f4f6"
                     : `linear-gradient(135deg, ${C.green}, ${C.greenLt})`,
                   color: isUpdating ? C.text3 : "#fff",
                   fontWeight: 800, fontSize: 15,
                   cursor: isUpdating ? "not-allowed" : "pointer",
                   fontFamily: "inherit",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                  boxShadow: isUpdating ? "none" : `0 6px 24px rgba(24,95,45,0.4)`,
+                  boxShadow: isUpdating ? "none" : "0 6px 24px rgba(13,124,59,0.25)",
                   transition: "all 0.2s", marginBottom: 8,
                 }}
               >
                 {isUpdating ? (
                   <>
-                    <div style={{ width: 18, height: 18, border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                    <div style={{ width: 18, height: 18, border: "2px solid rgba(156,163,175,0.3)", borderTop: "2px solid #6b7280", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
                     Updating...
                   </>
                 ) : (
@@ -406,7 +409,7 @@ export default function DriverDeliveryPage() {
 
             {delivery.status === "delivered" && (
               <div style={{
-                background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)",
+                background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)",
                 borderRadius: 14, padding: "16px", display: "flex", alignItems: "center", gap: 12,
               }}>
                 <FaCheckCircle style={{ color: "#10b981", width: 22, height: 22, flexShrink: 0 }} />

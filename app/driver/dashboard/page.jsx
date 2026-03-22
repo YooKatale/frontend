@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const ActiveDeliveryMap = dynamic(
   () => import("@components/driver/ActiveDeliveryMap"),
-  { ssr: false, loading: () => <div style={{ width: "100%", height: "100%", background: "#0D0D0D", borderRadius: 18 }} /> }
+  { ssr: false, loading: () => <div style={{ width: "100%", height: "100%", background: "#f4f5f7", borderRadius: 18 }} /> }
 );
 const DriverOrderCard = dynamic(
   () => import("@components/driver/OrderCard"),
@@ -22,21 +22,23 @@ const DRIVER_KEY    = "yookatale-driver";
 const POLL_INTERVAL = 12000;
 
 const C = {
-  bg:       "#0D0D0D",
-  card:     "#111111",
-  border:   "rgba(255,255,255,0.07)",
-  gold:     "#F5A623",
-  goldDim:  "rgba(245,166,35,0.12)",
-  goldBrd:  "rgba(245,166,35,0.25)",
-  green:    "#185f2d",
-  greenLt:  "#1a7a36",
+  bg:       "#f4f5f7",
+  card:     "#ffffff",
+  border:   "#f3f4f6",
+  borderMd: "#e5e7eb",
+  amber:    "#d97706",
+  amberDim: "rgba(217,119,6,0.08)",
+  amberBrd: "rgba(217,119,6,0.18)",
+  green:    "#0d7c3b",
+  greenLt:  "#10a34d",
+  greenDim: "rgba(13,124,59,0.08)",
   white:    "#ffffff",
-  text1:    "#f3f4f6",
-  text2:    "#9ca3af",
-  text3:    "#6b7280",
+  dark:     "#111827",
+  text1:    "#111827",
+  text2:    "#6b7280",
+  text3:    "#9ca3af",
   blue:     "#3b82f6",
   purple:   "#8b5cf6",
-  amber:    "#f59e0b",
   red:      "#ef4444",
 };
 
@@ -47,7 +49,7 @@ const STATUS_CONFIG = {
   delivered:  { label: "Delivered",  color: "#10b981", next: null,         nextLabel: null              },
 };
 
-const font = { fontFamily: "'Sora','DM Sans',system-ui,sans-serif" };
+const font = { fontFamily: "'Bricolage Grotesque','Sora','DM Sans',system-ui,sans-serif" };
 
 function greeting() {
   const h = new Date().getHours();
@@ -57,22 +59,22 @@ function greeting() {
 }
 
 const Card = ({ children, style = {} }) => (
-  <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 18, ...style }}>
+  <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 18, boxShadow: "0 1px 3px rgba(0,0,0,0.04)", ...style }}>
     {children}
   </div>
 );
 
 const Badge = ({ label, color }) => (
-  <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 999, background: `${color}18`, color, border: `1px solid ${color}40` }}>
+  <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 999, background: `${color}12`, color, border: `1px solid ${color}30` }}>
     {label}
   </span>
 );
 
 function SkeletonCard() {
   return (
-    <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: "20px 16px" }}>
+    <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: "20px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
       {[80, 60, 40].map((w, i) => (
-        <div key={i} style={{ height: 12, width: `${w}%`, borderRadius: 6, background: "rgba(255,255,255,0.06)", marginBottom: 10, animation: "sk-shimmer 1.5s ease-in-out infinite" }} />
+        <div key={i} style={{ height: 12, width: `${w}%`, borderRadius: 6, background: "#f3f4f6", marginBottom: 10, animation: "sk-shimmer 1.5s ease-in-out infinite" }} />
       ))}
     </div>
   );
@@ -88,7 +90,7 @@ export default function DriverDashboardPage() {
   const [isUpdatingStatus, setIsUpdating]   = useState(false);
   const [myLocation, setMyLocation]         = useState(null);
   const [toast, setToast]                   = useState(null);
-  const [banner, setBanner]                 = useState(null); // new order banner
+  const [banner, setBanner]                 = useState(null);
   const [mounted, setMounted]               = useState(false);
   const bannerTimerRef  = useRef(null);
   const pollIntervalRef = useRef(null);
@@ -98,7 +100,6 @@ export default function DriverDashboardPage() {
     setTimeout(() => setToast(null), 3500);
   }, []);
 
-  // Auth check is handled by layout.jsx; we still read session here for API calls
   useEffect(() => {
     setMounted(true);
     try {
@@ -230,7 +231,7 @@ export default function DriverDashboardPage() {
     <div style={{ minHeight: "100vh", background: C.bg, color: C.text1, paddingBottom: 88, ...font }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes sk-shimmer { 0%,100%{opacity:0.3;} 50%{opacity:0.8;} }
+        @keyframes sk-shimmer { 0%,100%{opacity:0.4;} 50%{opacity:1;} }
         @keyframes fadeSlideDown { from{opacity:0;transform:translateY(-20px);} to{opacity:1;transform:translateY(0);} }
         @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
         @media (max-width: 380px) { .driver-stats-grid { grid-template-columns: 1fr 1fr !important; } }
@@ -243,9 +244,9 @@ export default function DriverDashboardPage() {
           padding: "12px 20px", borderRadius: 14, fontWeight: 600, fontSize: 13,
           display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap",
           animation: "fadeSlideDown 0.25s ease",
-          background: toast.type === "error" ? "rgba(239,68,68,0.95)" : "rgba(24,95,45,0.95)",
-          border: `1px solid ${toast.type === "error" ? "rgba(239,68,68,0.5)" : "rgba(26,122,54,0.5)"}`,
-          boxShadow: "0 8px 32px rgba(0,0,0,0.5)", color: C.white, backdropFilter: "blur(12px)",
+          background: toast.type === "error" ? "rgba(239,68,68,0.95)" : "rgba(13,124,59,0.95)",
+          border: `1px solid ${toast.type === "error" ? "rgba(239,68,68,0.5)" : "rgba(13,124,59,0.5)"}`,
+          boxShadow: "0 8px 32px rgba(0,0,0,0.15)", color: C.white, backdropFilter: "blur(12px)",
         }}>
           {toast.type === "error" ? <FaExclamationTriangle /> : <FaCheckCircle />}
           {toast.msg}
@@ -265,7 +266,7 @@ export default function DriverDashboardPage() {
               background: `linear-gradient(135deg, ${C.green}, ${C.greenLt})`,
               padding: "14px 16px",
               display: "flex", alignItems: "center", gap: 10,
-              boxShadow: "0 4px 20px rgba(24,95,45,0.5)",
+              boxShadow: "0 4px 20px rgba(13,124,59,0.3)",
               cursor: "pointer",
             }}
             onClick={() => { setBanner(null); document.getElementById("available-orders")?.scrollIntoView({ behavior: "smooth" }); }}
@@ -279,7 +280,7 @@ export default function DriverDashboardPage() {
 
       {/* Header */}
       <header style={{
-        background: "rgba(17,17,17,0.95)", backdropFilter: "blur(16px)",
+        background: "rgba(255,255,255,0.97)", backdropFilter: "blur(16px)",
         borderBottom: `1px solid ${C.border}`,
         padding: "0 16px", height: 60,
         display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -288,21 +289,21 @@ export default function DriverDashboardPage() {
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10, overflow: "hidden",
-            border: `1.5px solid ${C.goldBrd}`, flexShrink: 0,
+            border: `1.5px solid ${C.amberBrd}`, flexShrink: 0,
           }}>
             <Image src="/assets/icons/logo2.png" alt="Yookatale" width={36} height={36} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
           </div>
           <div>
-            <p style={{ color: C.gold, fontWeight: 800, fontSize: 14, lineHeight: 1.1, letterSpacing: "-0.3px" }}>Yookatale</p>
+            <p style={{ color: C.green, fontWeight: 800, fontSize: 14, lineHeight: 1.1, letterSpacing: "-0.3px" }}>Yookatale</p>
             <p style={{ color: C.text3, fontSize: 10, marginTop: 1, fontWeight: 500 }}>Driver Portal</p>
           </div>
         </div>
         <button
           onClick={() => { fetchDashboard(); fetchAvailableOrders(); }}
           style={{
-            padding: 8, background: "rgba(255,255,255,0.04)",
+            padding: 8, background: "#f9fafb",
             borderRadius: 10, border: `1px solid ${C.border}`,
-            cursor: "pointer", color: C.text3,
+            cursor: "pointer", color: C.text2,
             display: "flex", alignItems: "center", justifyContent: "center",
           }}
         >
@@ -336,7 +337,7 @@ export default function DriverDashboardPage() {
               ) : (
                 <div style={{
                   width: 56, height: 56, borderRadius: "50%",
-                  background: `linear-gradient(135deg, ${C.green}, ${C.gold})`,
+                  background: `linear-gradient(135deg, ${C.green}, ${C.amber})`,
                   border: `3px solid ${isAvailable ? C.green : C.border}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 22, fontWeight: 800, color: C.white,
@@ -349,7 +350,7 @@ export default function DriverDashboardPage() {
                 position: "absolute", bottom: 0, right: 0,
                 width: 14, height: 14, borderRadius: "50%",
                 background: isAvailable ? "#10b981" : C.text3,
-                border: "2.5px solid #0D0D0D",
+                border: "2.5px solid #f4f5f7",
               }} />
             </div>
             <div style={{ flex: 1 }}>
@@ -367,14 +368,14 @@ export default function DriverDashboardPage() {
                 padding: "8px 16px", borderRadius: 999, fontSize: 13, fontWeight: 700,
                 background: isAvailable
                   ? `linear-gradient(135deg, ${C.green}, ${C.greenLt})`
-                  : "rgba(255,255,255,0.06)",
-                border: `1px solid ${isAvailable ? C.greenLt : C.border}`,
-                color: isAvailable ? C.white : C.text3,
+                  : "#f9fafb",
+                border: `1px solid ${isAvailable ? C.greenLt : C.borderMd}`,
+                color: isAvailable ? C.white : C.text2,
                 cursor: isTogglingAvail ? "not-allowed" : "pointer",
                 opacity: isTogglingAvail ? 0.6 : 1,
                 transition: "all 0.25s",
                 fontFamily: "inherit",
-                boxShadow: isAvailable ? "0 4px 16px rgba(24,95,45,0.35)" : "none",
+                boxShadow: isAvailable ? "0 4px 16px rgba(13,124,59,0.25)" : "none",
                 minWidth: 96,
                 flexShrink: 0,
               }}
@@ -394,7 +395,7 @@ export default function DriverDashboardPage() {
             {[
               { label: "Today", value: dashData?.todayDeliveries ?? 0, sub: "deliveries", Icon: FaMotorcycle, color: C.blue },
               { label: "This Week", value: `${((dashData?.weekEarnings || 0) / 1000).toFixed(0)}K`, sub: "UGX earned", Icon: FaMoneyBillWave, color: "#10b981" },
-              { label: "Rating", value: (driver?.averageRating || 0).toFixed(1), sub: `${driver?.ratingCount || 0} reviews`, Icon: FaStar, color: C.gold },
+              { label: "Rating", value: (driver?.averageRating || 0).toFixed(1), sub: `${driver?.ratingCount || 0} reviews`, Icon: FaStar, color: C.amber },
             ].map((s) => (
               <Card key={s.label} style={{ padding: "14px 10px", textAlign: "center" }}>
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: 8, color: s.color }}>
@@ -408,11 +409,10 @@ export default function DriverDashboardPage() {
 
           {/* Active Delivery */}
           {activeDelivery && (
-            <div style={{
-              background: "linear-gradient(135deg, #111111, #161616)",
-              border: `1px solid ${activeStatusConfig?.color || C.gold}40`,
-              borderRadius: 18, overflow: "hidden",
-              boxShadow: `0 0 40px ${activeStatusConfig?.color || C.gold}10`,
+            <Card style={{
+              overflow: "hidden",
+              border: `1px solid ${activeStatusConfig?.color || C.green}30`,
+              boxShadow: `0 0 40px ${activeStatusConfig?.color || C.green}08`,
             }}>
               <div style={{ height: 480, position: "relative" }}>
                 <ActiveDeliveryMap
@@ -422,13 +422,13 @@ export default function DriverDashboardPage() {
                   isUpdating={isUpdatingStatus}
                 />
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Available Orders */}
           <div id="available-orders">
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: C.text3, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: C.text2, letterSpacing: "0.08em", textTransform: "uppercase" }}>
                 Nearby Orders
               </p>
               {availableOrders.length > 0 && (
@@ -439,13 +439,13 @@ export default function DriverDashboardPage() {
             </div>
 
             {!isAvailable && (
-              <div style={{ background: "rgba(245,166,35,0.07)", border: `1px solid ${C.goldBrd}`, borderRadius: 14, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-                <FaExclamationTriangle style={{ color: C.gold, width: 18, height: 18, flexShrink: 0 }} />
+              <div style={{ background: C.amberDim, border: `1px solid ${C.amberBrd}`, borderRadius: 14, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+                <FaExclamationTriangle style={{ color: C.amber, width: 18, height: 18, flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
-                  <p style={{ color: C.gold, fontSize: 13, fontWeight: 600, marginBottom: 2 }}>You are offline</p>
-                  <p style={{ color: "#9a7c30", fontSize: 11 }}>Go online to receive orders</p>
+                  <p style={{ color: C.amber, fontSize: 13, fontWeight: 600, marginBottom: 2 }}>You are offline</p>
+                  <p style={{ color: "#b45309", fontSize: 11 }}>Go online to receive orders</p>
                 </div>
-                <button onClick={toggleAvailability} style={{ fontSize: 12, background: C.gold, color: "#000", padding: "7px 14px", borderRadius: 8, border: "none", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+                <button onClick={toggleAvailability} style={{ fontSize: 12, background: C.amber, color: "#fff", padding: "7px 14px", borderRadius: 8, border: "none", fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
                   Go Online
                 </button>
               </div>

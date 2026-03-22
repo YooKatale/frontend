@@ -12,29 +12,29 @@ import {
 } from "react-icons/fa";
 
 const DRIVER_KEY = "yookatale-driver";
-const PRIMARY    = "#185f2d";
+const PRIMARY    = "#0d7c3b";
 
 const C = {
-  bg:      "#0D0D0D",
-  card:    "#111111",
-  border:  "rgba(255,255,255,0.07)",
-  gold:    "#F5A623",
-  goldDim: "rgba(245,166,35,0.12)",
-  goldBrd: "rgba(245,166,35,0.25)",
-  green:   "#185f2d",
-  greenLt: "#1a7a36",
+  bg:      "#f4f5f7",
+  card:    "#ffffff",
+  border:  "#f3f4f6",
+  borderMd:"#e5e7eb",
+  amber:   "#d97706",
+  amberDim:"rgba(217,119,6,0.08)",
+  amberBrd:"rgba(217,119,6,0.18)",
+  green:   "#0d7c3b",
+  greenLt: "#10a34d",
   white:   "#ffffff",
-  text1:   "#f3f4f6",
-  text2:   "#9ca3af",
-  text3:   "#6b7280",
+  text1:   "#111827",
+  text2:   "#6b7280",
+  text3:   "#9ca3af",
   red:     "#ef4444",
-  amber:   "#f59e0b",
 };
 
-const font = { fontFamily: "'Sora','DM Sans',system-ui,sans-serif" };
+const font = { fontFamily: "'Bricolage Grotesque','Sora','DM Sans',system-ui,sans-serif" };
 
 const Card = ({ children, style = {} }) => (
-  <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 18, ...style }}>
+  <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 18, boxShadow: "0 1px 3px rgba(0,0,0,0.04)", ...style }}>
     {children}
   </div>
 );
@@ -94,7 +94,6 @@ export default function DriverProfilePage() {
       showToast("Please enter a phone number", "error");
       return;
     }
-    // Validate phone format
     const cleanPhone = payoutForm.phone.replace(/\s+/g, "");
     if (cleanPhone.length < 10) {
       showToast("Enter a valid phone number", "error");
@@ -162,7 +161,7 @@ export default function DriverProfilePage() {
           padding: "12px 20px", borderRadius: 14, fontWeight: 600, fontSize: 13,
           display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap",
           animation: "fadeSlideDown 0.25s ease",
-          background: toast.type === "error" ? "rgba(239,68,68,0.95)" : "rgba(24,95,45,0.95)",
+          background: toast.type === "error" ? "rgba(239,68,68,0.95)" : "rgba(13,124,59,0.95)",
           color: C.white, backdropFilter: "blur(12px)",
         }}>
           {toast.msg}
@@ -170,7 +169,7 @@ export default function DriverProfilePage() {
       )}
 
       {/* Header */}
-      <header style={{ background: C.card, borderBottom: `1px solid ${C.border}`, padding: "16px 16px 14px", position: "sticky", top: 0, zIndex: 40 }}>
+      <header style={{ background: C.card, borderBottom: `1px solid ${C.border}`, padding: "16px 16px 14px", position: "sticky", top: 0, zIndex: 40, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
         <p style={{ fontWeight: 800, fontSize: 18, color: C.text1 }}>My Profile</p>
       </header>
 
@@ -185,14 +184,14 @@ export default function DriverProfilePage() {
                 alt={d.name || "Driver"}
                 style={{
                   width: 68, height: 68, borderRadius: "50%", objectFit: "cover",
-                  border: `3px solid ${C.goldBrd}`, flexShrink: 0,
+                  border: `3px solid ${C.amberBrd}`, flexShrink: 0,
                 }}
               />
             ) : (
               <div style={{
                 width: 68, height: 68, borderRadius: "50%",
-                background: `linear-gradient(135deg, ${C.green}, ${C.gold})`,
-                border: `3px solid ${C.goldBrd}`,
+                background: `linear-gradient(135deg, ${C.green}, ${C.amber})`,
+                border: `3px solid ${C.amberBrd}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 26, fontWeight: 800, color: C.white, flexShrink: 0,
               }}>
@@ -210,9 +209,9 @@ export default function DriverProfilePage() {
           </div>
 
           {/* Vehicle badge */}
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 14px", borderRadius: 999, background: C.goldDim, border: `1px solid ${C.goldBrd}`, marginBottom: 20 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 14px", borderRadius: 999, background: C.amberDim, border: `1px solid ${C.amberBrd}`, marginBottom: 20 }}>
             <TransportIcon type={d.transport} />
-            <span style={{ fontSize: 12, fontWeight: 600, color: C.gold, textTransform: "capitalize" }}>{d.transport || "Rider"}</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: C.amber, textTransform: "capitalize" }}>{d.transport || "Rider"}</span>
           </div>
 
           {/* Info rows */}
@@ -225,8 +224,8 @@ export default function DriverProfilePage() {
               { Icon: FaCalendarAlt, label: "Member Since", value: d.createdAt ? new Date(d.createdAt).toLocaleDateString("en-UG", { year: "numeric", month: "long" }) : null },
             ].filter((r) => r.value).map((row) => (
               <div key={row.label} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: C.goldDim, border: `1px solid ${C.goldBrd}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <row.Icon style={{ width: 14, height: 14, color: C.gold }} />
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: C.amberDim, border: `1px solid ${C.amberBrd}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <row.Icon style={{ width: 14, height: 14, color: C.amber }} />
                 </div>
                 <div>
                   <p style={{ fontSize: 10, color: C.text3, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>{row.label}</p>
@@ -251,8 +250,8 @@ export default function DriverProfilePage() {
           </div>
           {d.payoutMethod?.phone ? (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: C.goldDim, border: `1px solid ${C.goldBrd}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <FaMoneyBillWave style={{ width: 18, height: 18, color: C.gold }} />
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: C.amberDim, border: `1px solid ${C.amberBrd}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <FaMoneyBillWave style={{ width: 18, height: 18, color: C.amber }} />
               </div>
               <div>
                 <p style={{ color: C.text1, fontSize: 14, fontWeight: 600 }}>{d.payoutMethod.provider === "AIRTEL" ? "Airtel" : d.payoutMethod.provider} Mobile Money</p>
@@ -268,13 +267,13 @@ export default function DriverProfilePage() {
         <button
           onClick={logout}
           style={{
-            width: "100%", background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)",
+            width: "100%", background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.15)",
             borderRadius: 14, padding: "13px 0", color: C.red, fontSize: 14, fontWeight: 600,
             cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
             gap: 8, fontFamily: "inherit", transition: "background 0.2s",
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.12)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.06)"; }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.08)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.04)"; }}
         >
           <FaSignOutAlt style={{ width: 16, height: 16 }} />
           Sign Out
@@ -283,8 +282,8 @@ export default function DriverProfilePage() {
 
       {/* Edit Payout Modal */}
       {payoutModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: "20px 20px 0 0", padding: "24px 20px 32px", width: "100%", maxWidth: 480 }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(6px)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: "20px 20px 0 0", padding: "24px 20px 32px", width: "100%", maxWidth: 480, boxShadow: "0 -10px 40px rgba(0,0,0,0.1)" }}>
             <p style={{ fontWeight: 800, fontSize: 17, color: C.text1, marginBottom: 18 }}>Edit Payout Method</p>
             <div style={{ marginBottom: 14 }}>
               <p style={{ fontSize: 11, color: C.text3, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 8 }}>Provider</p>
@@ -295,8 +294,8 @@ export default function DriverProfilePage() {
                     onClick={() => setPayoutForm((f) => ({ ...f, provider: p }))}
                     style={{
                       padding: "8px 20px", borderRadius: 999, fontSize: 13, fontWeight: 600,
-                      background: payoutForm.provider === p ? PRIMARY : "rgba(255,255,255,0.05)",
-                      color: payoutForm.provider === p ? C.white : C.text3,
+                      background: payoutForm.provider === p ? PRIMARY : C.card,
+                      color: payoutForm.provider === p ? C.white : C.text2,
                       border: `1px solid ${payoutForm.provider === p ? PRIMARY : C.border}`,
                       cursor: "pointer", fontFamily: "inherit",
                     }}
@@ -313,7 +312,7 @@ export default function DriverProfilePage() {
                 placeholder="e.g. 0771234567"
                 value={payoutForm.phone}
                 onChange={(e) => setPayoutForm((f) => ({ ...f, phone: e.target.value }))}
-                style={{ width: "100%", padding: "11px 14px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: `1px solid ${C.border}`, color: C.text1, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
+                style={{ width: "100%", padding: "11px 14px", borderRadius: 12, background: "#f9fafb", border: `1px solid ${C.border}`, color: C.text1, fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
               />
             </div>
             <div style={{ display: "flex", gap: 10 }}>

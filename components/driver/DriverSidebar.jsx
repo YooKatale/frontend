@@ -1,22 +1,20 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   FaHome, FaMotorcycle, FaMoneyBillWave, FaUser,
   FaSignOutAlt, FaChevronLeft, FaChevronRight,
 } from "react-icons/fa";
 
 const C = {
-  bg:      "#0D0D0D",
   sidebar: "#111111",
   border:  "rgba(255,255,255,0.07)",
-  gold:    "#F5A623",
-  goldDim: "rgba(245,166,35,0.10)",
-  goldBrd: "rgba(245,166,35,0.22)",
-  green:   "#185f2d",
-  greenLt: "#1a7a36",
+  green:   "#0d7c3b",
+  greenLt: "#10a34d",
+  amber:   "#d97706",
+  amberDim:"rgba(217,119,6,0.12)",
+  amberBrd:"rgba(217,119,6,0.25)",
   white:   "#ffffff",
   text1:   "#f3f4f6",
   text2:   "#9ca3af",
@@ -57,7 +55,7 @@ export default function DriverSidebar({ hasActiveDelivery = false, driverName = 
         top: 0,
         bottom: 0,
         zIndex: 50,
-        fontFamily: "'Sora','DM Sans',system-ui,sans-serif",
+        fontFamily: "'Bricolage Grotesque','Sora','DM Sans',system-ui,sans-serif",
         overflow: "hidden",
       }}
     >
@@ -82,7 +80,7 @@ export default function DriverSidebar({ hasActiveDelivery = false, driverName = 
               <FaMotorcycle style={{ width: 18, height: 18, color: C.white }} />
             </div>
             <div>
-              <p style={{ color: C.gold, fontWeight: 800, fontSize: 14, letterSpacing: "-0.3px" }}>Yookatale</p>
+              <p style={{ color: C.amber, fontWeight: 800, fontSize: 14, letterSpacing: "-0.3px" }}>Yookatale</p>
               <p style={{ color: C.text3, fontSize: 10, fontWeight: 500 }}>Driver Portal</p>
             </div>
           </div>
@@ -126,15 +124,15 @@ export default function DriverSidebar({ hasActiveDelivery = false, driverName = 
             <img
               src={driverAvatar}
               alt={driverName}
-              style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", border: `2px solid ${C.goldBrd}` }}
+              style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", border: `2px solid ${C.amberBrd}` }}
             />
           ) : (
             <div style={{
               width: 40, height: 40, borderRadius: "50%",
-              background: `linear-gradient(135deg, ${C.green}, ${C.gold})`,
+              background: `linear-gradient(135deg, ${C.green}, ${C.amber})`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontWeight: 800, fontSize: 16, color: C.white,
-              border: `2px solid ${C.goldBrd}`,
+              border: `2px solid ${C.amberBrd}`,
             }}>
               {(driverName || "D")[0].toUpperCase()}
             </div>
@@ -199,8 +197,8 @@ export default function DriverSidebar({ hasActiveDelivery = false, driverName = 
                 <div style={{
                   marginLeft: "auto",
                   width: 6, height: 6, borderRadius: "50%",
-                  background: C.gold,
-                  boxShadow: `0 0 8px ${C.gold}80`,
+                  background: C.amber,
+                  boxShadow: `0 0 8px ${C.amber}80`,
                 }} />
               )}
             </button>

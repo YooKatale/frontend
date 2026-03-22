@@ -4,13 +4,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { FaHome, FaMotorcycle, FaMoneyBillWave, FaUser } from "react-icons/fa";
 
 const C = {
-  bg:     "#0D0D0D",
-  card:   "#111111",
-  border: "rgba(255,255,255,0.07)",
-  green:  "#185f2d",
-  gold:   "#F5A623",
+  bg:     "#ffffff",
+  border: "#f3f4f6",
+  green:  "#0d7c3b",
+  amber:  "#d97706",
   white:  "#ffffff",
-  text3:  "#6b7280",
+  text3:  "#9ca3af",
 };
 
 const TABS = [
@@ -28,16 +27,16 @@ export default function DriverBottomNav({ hasActiveDelivery = false }) {
   return (
     <nav style={{
       position: "fixed", bottom: 0, left: 0, right: 0,
-      background: "rgba(13,13,13,0.95)", backdropFilter: "blur(16px)",
+      background: "rgba(255,255,255,0.97)", backdropFilter: "blur(16px)",
       borderTop: `1px solid ${C.border}`,
       display: "flex",
       zIndex: 100,
       paddingBottom: "env(safe-area-inset-bottom, 0px)",
-      fontFamily: "'Sora','DM Sans',system-ui,sans-serif",
+      fontFamily: "'Bricolage Grotesque','Sora','DM Sans',system-ui,sans-serif",
     }}>
       <style>{`
         @keyframes dbn-pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-        @keyframes dbn-glow { 0%,100%{box-shadow:0 0 4px rgba(245,166,35,0.3);} 50%{box-shadow:0 0 12px rgba(245,166,35,0.6);} }
+        @keyframes dbn-glow { 0%,100%{box-shadow:0 0 4px rgba(13,124,59,0.3);} 50%{box-shadow:0 0 12px rgba(13,124,59,0.6);} }
       `}</style>
 
       {TABS.map((tab) => {
@@ -52,7 +51,7 @@ export default function DriverBottomNav({ hasActiveDelivery = false }) {
               padding: "10px 0 8px", gap: 3,
               background: "none", border: "none",
               cursor: "pointer",
-              color: active ? C.gold : C.text3,
+              color: active ? C.green : C.text3,
               position: "relative",
               transition: "color 0.2s",
               fontFamily: "inherit",
@@ -63,8 +62,8 @@ export default function DriverBottomNav({ hasActiveDelivery = false }) {
               <div style={{
                 position: "absolute", top: -1, left: "20%", right: "20%",
                 height: 3, borderRadius: "0 0 6px 6px",
-                background: `linear-gradient(90deg, ${C.green}, ${C.gold})`,
-                boxShadow: `0 2px 8px ${C.gold}50`,
+                background: `linear-gradient(90deg, ${C.green}, ${C.amber})`,
+                boxShadow: `0 2px 8px ${C.green}50`,
               }} />
             )}
 
@@ -80,7 +79,7 @@ export default function DriverBottomNav({ hasActiveDelivery = false }) {
                   position: "absolute", top: -4, right: -6,
                   width: 9, height: 9, borderRadius: "50%",
                   background: "#10b981",
-                  boxShadow: "0 0 0 2px #0D0D0D",
+                  boxShadow: "0 0 0 2px #ffffff",
                   animation: "dbn-pulse 2s ease-in-out infinite",
                 }} />
               )}

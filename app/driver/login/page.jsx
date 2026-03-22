@@ -132,7 +132,7 @@ export default function DriverLoginPage() {
       className="min-h-screen flex"
       style={{
         background: "#0D0D0D",
-        fontFamily: "'Sora', 'DM Sans', system-ui, sans-serif",
+        fontFamily: "'Bricolage Grotesque', 'Sora', 'DM Sans', system-ui, sans-serif",
       }}
     >
       {/* ── diagonal background lines ── */}
@@ -148,7 +148,7 @@ export default function DriverLoginPage() {
         {/* gold glow top-left */}
         <div style={{ position:"absolute", top:"-15%", left:"-10%", width:"50%", height:"50%", background:"radial-gradient(circle, rgba(245,166,35,0.06) 0%, transparent 70%)" }} />
         {/* green glow bottom-right */}
-        <div style={{ position:"absolute", bottom:"-15%", right:"-10%", width:"45%", height:"45%", background:"radial-gradient(circle, rgba(24,95,45,0.10) 0%, transparent 70%)" }} />
+        <div style={{ position:"absolute", bottom:"-15%", right:"-10%", width:"45%", height:"45%", background:"radial-gradient(circle, rgba(13,124,59,0.10) 0%, transparent 70%)" }} />
       </div>
 
       {/* ════════════ LEFT PANEL — branding ════════════ */}
@@ -309,8 +309,8 @@ export default function DriverLoginPage() {
                 style={{
                   width: "100%",
                   background: isLoading
-                    ? "rgba(24,95,45,0.5)"
-                    : "linear-gradient(135deg, #185f2d, #1a7a36)",
+                    ? "rgba(13,124,59,0.5)"
+                    : "linear-gradient(135deg, #0d7c3b, #10a34d)",
                   border: "none",
                   borderRadius: 12,
                   padding: "13px 0",
@@ -323,13 +323,13 @@ export default function DriverLoginPage() {
                   justifyContent: "center",
                   gap: 8,
                   transition: "all 0.2s",
-                  boxShadow: isLoading ? "none" : "0 4px 24px rgba(24,95,45,0.4)",
+                  boxShadow: isLoading ? "none" : "0 4px 24px rgba(13,124,59,0.4)",
                   marginTop: 4,
                   fontFamily: "inherit",
                   letterSpacing: "0.01em",
                 }}
-                onMouseEnter={(e) => { if (!isLoading) { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(24,95,45,0.5)"; } }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = isLoading ? "none" : "0 4px 24px rgba(24,95,45,0.4)"; }}
+                onMouseEnter={(e) => { if (!isLoading) { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(13,124,59,0.5)"; } }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = isLoading ? "none" : "0 4px 24px rgba(13,124,59,0.4)"; }}
               >
                 {isLoading ? (
                   <><IconSpinner /> Signing in...</>

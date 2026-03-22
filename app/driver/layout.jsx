@@ -17,7 +17,6 @@ export default function DriverLayout({ children }) {
   const [driverInfo, setDriverInfo]     = useState({ name: "", avatar: "" });
 
   const isPublic = PUBLIC_PATHS.some((p) => pathname?.startsWith(p));
-  const isDeliveryActive = pathname === "/driver/delivery";
 
   useEffect(() => {
     if (isPublic) { setReady(true); return; }
@@ -42,10 +41,15 @@ export default function DriverLayout({ children }) {
     }
   }, [isPublic, pathname, router]);
 
-  if (!ready) return <div style={{ minHeight: "100vh", background: "#0D0D0D" }} />;
+  if (!ready) return <div style={{ minHeight: "100vh", background: "#f4f5f7" }} />;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0D0D0D", fontFamily: "'Sora','DM Sans',system-ui,sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f4f5f7", fontFamily: "'Bricolage Grotesque','Sora','DM Sans',system-ui,sans-serif" }}>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Azeret+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet"
+      />
+
       {/* Desktop sidebar - hidden on mobile */}
       {!isPublic && (
         <div className="driver-sidebar-wrap">

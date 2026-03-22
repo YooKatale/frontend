@@ -4,19 +4,19 @@ import { useState, useEffect, useRef } from "react";
 
 const ACCEPT_COUNTDOWN = 60;
 
-const font = { fontFamily: "'Sora','DM Sans',system-ui,sans-serif" };
+const font = { fontFamily: "'Bricolage Grotesque','Sora','DM Sans',system-ui,sans-serif" };
 
-/* ── Circular countdown ring ─────────────────────────────── */
+/* -- Circular countdown ring ----------------------------------------- */
 function CountdownRing({ seconds, total = ACCEPT_COUNTDOWN }) {
   const r = 16;
   const circ = 2 * Math.PI * r;
   const dash = circ * (seconds / total);
-  const color = seconds > 20 ? "#10b981" : seconds > 10 ? "#F5A623" : "#ef4444";
+  const color = seconds > 20 ? "#0d7c3b" : seconds > 10 ? "#d97706" : "#ef4444";
 
   return (
     <div style={{ position: "relative", width: 44, height: 44, flexShrink: 0 }}>
       <svg viewBox="0 0 44 44" style={{ width: "100%", height: "100%", transform: "rotate(-90deg)" }}>
-        <circle cx="22" cy="22" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3" />
+        <circle cx="22" cy="22" r={r} fill="none" stroke="#f3f4f6" strokeWidth="3" />
         <circle cx="22" cy="22" r={r} fill="none" stroke={color} strokeWidth="3"
           strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" />
       </svg>
@@ -31,7 +31,7 @@ function CountdownRing({ seconds, total = ACCEPT_COUNTDOWN }) {
   );
 }
 
-/* ── Static map thumbnail via Google Static Maps API ─────── */
+/* -- Static map thumbnail via Google Static Maps API ----------------- */
 function StaticMapThumb({ deliveryAddress, vendorLocation }) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   if (!apiKey || !deliveryAddress?.lat) return null;
@@ -53,7 +53,7 @@ function StaticMapThumb({ deliveryAddress, vendorLocation }) {
   ].join("");
 
   return (
-    <div style={{ position: "relative", overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
+    <div style={{ position: "relative", overflow: "hidden", borderRadius: "14px 14px 0 0" }}>
       <img
         src={src}
         alt="Delivery area"
@@ -63,14 +63,14 @@ function StaticMapThumb({ deliveryAddress, vendorLocation }) {
       {/* gradient overlay */}
       <div style={{
         position: "absolute", bottom: 0, left: 0, right: 0, height: 50,
-        background: "linear-gradient(to bottom, transparent, rgba(17,17,17,0.92))",
+        background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.9))",
       }} />
     </div>
   );
 }
 
 /**
- * DriverOrderCard — driver-facing available-order card.
+ * DriverOrderCard -- driver-facing available-order card.
  *
  * Props:
  *   order        { _id, deliveryAddress, distanceToPickup, estimatedMinutes,
@@ -112,11 +112,12 @@ export default function DriverOrderCard({ order, onAccept, isAccepting }) {
 
   return (
     <div style={{
-      background: "#111111",
-      border: `1px solid ${expired ? "rgba(239,68,68,0.3)" : "rgba(255,255,255,0.07)"}`,
+      background: "#ffffff",
+      border: `1px solid ${expired ? "rgba(239,68,68,0.3)" : "#f3f4f6"}`,
       borderRadius: 16, overflow: "hidden",
       opacity: expired ? 0.55 : 1,
       transition: "opacity 0.3s, border-color 0.3s",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
       ...font,
     }}>
 
@@ -127,14 +128,14 @@ export default function DriverOrderCard({ order, onAccept, isAccepting }) {
 
         {/* Header row */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontSize: 11, fontFamily: "monospace", color: "#6b7280" }}>
+          <span style={{ fontSize: 11, fontFamily: "'Azeret Mono',monospace", color: "#9ca3af" }}>
             #{String(order._id).slice(-6).toUpperCase()}
           </span>
           <span style={{
             fontSize: 11, fontWeight: 600, padding: "2px 10px", borderRadius: 999,
-            background: order.status === "ready" ? "rgba(16,185,129,0.12)" : "rgba(59,130,246,0.12)",
-            color: order.status === "ready" ? "#10b981" : "#3b82f6",
-            border: `1px solid ${order.status === "ready" ? "rgba(16,185,129,0.3)" : "rgba(59,130,246,0.3)"}`,
+            background: order.status === "ready" ? "rgba(13,124,59,0.08)" : "rgba(59,130,246,0.08)",
+            color: order.status === "ready" ? "#0d7c3b" : "#3b82f6",
+            border: `1px solid ${order.status === "ready" ? "rgba(13,124,59,0.2)" : "rgba(59,130,246,0.2)"}`,
           }}>
             {order.status}
           </span>
@@ -143,27 +144,27 @@ export default function DriverOrderCard({ order, onAccept, isAccepting }) {
         {/* Distance / ETA / Earning stats row */}
         <div style={{ display: "flex", gap: 8 }}>
           {order.distanceToPickup != null && (
-            <div style={{ flex: 1, background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: "9px 10px", textAlign: "center" }}>
-              <p style={{ fontSize: 16, fontWeight: 800, color: "#f3f4f6", lineHeight: 1 }}>
+            <div style={{ flex: 1, background: "#f9fafb", borderRadius: 10, padding: "9px 10px", textAlign: "center" }}>
+              <p style={{ fontSize: 16, fontWeight: 800, color: "#111827", lineHeight: 1 }}>
                 {Number(order.distanceToPickup).toFixed(1)}
               </p>
-              <p style={{ fontSize: 10, color: "#6b7280", marginTop: 3 }}>km pickup</p>
+              <p style={{ fontSize: 10, color: "#9ca3af", marginTop: 3 }}>km pickup</p>
             </div>
           )}
           {order.estimatedMinutes != null && (
-            <div style={{ flex: 1, background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: "9px 10px", textAlign: "center" }}>
-              <p style={{ fontSize: 16, fontWeight: 800, color: "#f3f4f6", lineHeight: 1 }}>
+            <div style={{ flex: 1, background: "#f9fafb", borderRadius: 10, padding: "9px 10px", textAlign: "center" }}>
+              <p style={{ fontSize: 16, fontWeight: 800, color: "#111827", lineHeight: 1 }}>
                 {order.estimatedMinutes}
               </p>
-              <p style={{ fontSize: 10, color: "#6b7280", marginTop: 3 }}>min est.</p>
+              <p style={{ fontSize: 10, color: "#9ca3af", marginTop: 3 }}>min est.</p>
             </div>
           )}
           {order.estimatedEarning != null && (
-            <div style={{ flex: 1, background: "rgba(245,166,35,0.08)", borderRadius: 10, padding: "9px 10px", textAlign: "center", border: "1px solid rgba(245,166,35,0.15)" }}>
-              <p style={{ fontSize: 16, fontWeight: 800, color: "#F5A623", lineHeight: 1 }}>
+            <div style={{ flex: 1, background: "rgba(217,119,6,0.06)", borderRadius: 10, padding: "9px 10px", textAlign: "center", border: "1px solid rgba(217,119,6,0.12)" }}>
+              <p style={{ fontSize: 16, fontWeight: 800, color: "#d97706", lineHeight: 1 }}>
                 {Math.round(order.estimatedEarning / 1000)}K
               </p>
-              <p style={{ fontSize: 10, color: "#9a7c30", marginTop: 3 }}>UGX earn</p>
+              <p style={{ fontSize: 10, color: "#b45309", marginTop: 3 }}>UGX earn</p>
             </div>
           )}
         </div>
@@ -171,31 +172,31 @@ export default function DriverOrderCard({ order, onAccept, isAccepting }) {
         {/* Customer name */}
         {order.customerName && (
           <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 13, height: 13, flexShrink: 0 }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 13, height: 13, flexShrink: 0 }}>
               <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
             </svg>
-            <span style={{ fontSize: 12, color: "#9ca3af" }}>{order.customerName}</span>
+            <span style={{ fontSize: 12, color: "#6b7280" }}>{order.customerName}</span>
           </div>
         )}
 
         {/* Delivery address */}
         {addrText && (
           <div style={{ display: "flex", alignItems: "flex-start", gap: 7 }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 13, height: 13, marginTop: 1, flexShrink: 0 }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 13, height: 13, marginTop: 1, flexShrink: 0 }}>
               <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span style={{ fontSize: 12, color: "#9ca3af", lineHeight: 1.5 }}>{addrText}</span>
+            <span style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.5 }}>{addrText}</span>
           </div>
         )}
 
         {/* Order total */}
         {order.total && (
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 15, fontWeight: 800, color: "#F5A623" }}>
+            <span style={{ fontSize: 15, fontWeight: 800, color: "#d97706" }}>
               UGX {Number(order.total).toLocaleString()}
             </span>
-            <span style={{ fontSize: 11, color: "#6b7280" }}>order value</span>
+            <span style={{ fontSize: 11, color: "#9ca3af" }}>order value</span>
           </div>
         )}
 
@@ -207,8 +208,8 @@ export default function DriverOrderCard({ order, onAccept, isAccepting }) {
             style={{
               flex: 1,
               background: expired
-                ? "rgba(239,68,68,0.08)"
-                : `linear-gradient(135deg, #185f2d, #1a7a36)`,
+                ? "rgba(239,68,68,0.06)"
+                : `linear-gradient(135deg, #0d7c3b, #10a34d)`,
               border: `1px solid ${expired ? "rgba(239,68,68,0.3)" : "transparent"}`,
               borderRadius: 12, padding: "12px 0",
               color: expired ? "#ef4444" : "#ffffff",
@@ -216,7 +217,7 @@ export default function DriverOrderCard({ order, onAccept, isAccepting }) {
               cursor: disabled ? "not-allowed" : "pointer",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
               opacity: isAccepting ? 0.6 : 1, transition: "all 0.2s",
-              boxShadow: expired || isAccepting ? "none" : "0 4px 16px rgba(24,95,45,0.3)",
+              boxShadow: expired || isAccepting ? "none" : "0 4px 16px rgba(13,124,59,0.25)",
               fontFamily: "inherit",
             }}
           >

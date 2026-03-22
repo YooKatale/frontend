@@ -7,27 +7,27 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 import { format, subDays } from "date-fns";
 
 const DRIVER_KEY = "yookatale-driver";
-const PRIMARY    = "#185f2d";
+const PRIMARY    = "#0d7c3b";
 
 const C = {
-  bg:      "#0D0D0D",
-  card:    "#111111",
-  card2:   "#161616",
-  border:  "rgba(255,255,255,0.07)",
-  gold:    "#F5A623",
-  goldDim: "rgba(245,166,35,0.12)",
-  goldBrd: "rgba(245,166,35,0.25)",
-  green:   "#185f2d",
-  greenLt: "#1a7a36",
+  bg:      "#f4f5f7",
+  card:    "#ffffff",
+  card2:   "#f9fafb",
+  border:  "#f3f4f6",
+  borderMd:"#e5e7eb",
+  amber:   "#d97706",
+  amberDim:"rgba(217,119,6,0.08)",
+  amberBrd:"rgba(217,119,6,0.18)",
+  green:   "#0d7c3b",
+  greenLt: "#10a34d",
   white:   "#ffffff",
-  text1:   "#f3f4f6",
-  text2:   "#9ca3af",
-  text3:   "#6b7280",
-  amber:   "#f59e0b",
+  text1:   "#111827",
+  text2:   "#6b7280",
+  text3:   "#9ca3af",
   red:     "#ef4444",
 };
 
-const font = { fontFamily: "'Sora','DM Sans',system-ui,sans-serif" };
+const font = { fontFamily: "'Bricolage Grotesque','Sora','DM Sans',system-ui,sans-serif" };
 
 const PERIODS = [
   { key: "today", label: "Today" },
@@ -39,7 +39,7 @@ const PERIODS = [
 const PAGE_SIZE = 15;
 
 const Card = ({ children, style = {} }) => (
-  <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 18, ...style }}>
+  <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 18, boxShadow: "0 1px 3px rgba(0,0,0,0.04)", ...style }}>
     {children}
   </div>
 );
@@ -154,7 +154,7 @@ export default function DriverEarningsPage() {
           padding: "12px 20px", borderRadius: 14, fontWeight: 600, fontSize: 13,
           display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap",
           animation: "fadeSlideDown 0.25s ease",
-          background: toast.type === "error" ? "rgba(239,68,68,0.95)" : "rgba(24,95,45,0.95)",
+          background: toast.type === "error" ? "rgba(239,68,68,0.95)" : "rgba(13,124,59,0.95)",
           color: C.white, backdropFilter: "blur(12px)",
         }}>
           {toast.type === "error" ? <FaExclamationTriangle /> : <FaCheckCircle />}
@@ -163,7 +163,7 @@ export default function DriverEarningsPage() {
       )}
 
       {/* Header */}
-      <header style={{ background: C.card, borderBottom: `1px solid ${C.border}`, padding: "16px 16px 12px", position: "sticky", top: 0, zIndex: 40 }}>
+      <header style={{ background: C.card, borderBottom: `1px solid ${C.border}`, padding: "16px 16px 12px", position: "sticky", top: 0, zIndex: 40, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <FaMoneyBillWave style={{ width: 22, height: 22, color: PRIMARY }} />
           <div>
@@ -187,11 +187,12 @@ export default function DriverEarningsPage() {
               onClick={() => { setPeriod(p.key); setPage(1); }}
               style={{
                 padding: "7px 16px", borderRadius: 999, fontSize: 12, fontWeight: 600,
-                background: period === p.key ? PRIMARY : "rgba(255,255,255,0.05)",
-                color: period === p.key ? C.white : C.text3,
+                background: period === p.key ? PRIMARY : C.card,
+                color: period === p.key ? C.white : C.text2,
                 border: `1px solid ${period === p.key ? PRIMARY : C.border}`,
                 cursor: "pointer", whiteSpace: "nowrap", fontFamily: "inherit",
                 transition: "all 0.2s",
+                boxShadow: period === p.key ? "none" : "0 1px 2px rgba(0,0,0,0.04)",
               }}
             >
               {p.label}
@@ -206,11 +207,11 @@ export default function DriverEarningsPage() {
           </p>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={chartData} margin={{ left: -20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
               <XAxis dataKey="day" tick={{ fill: C.text3, fontSize: 10 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: C.text3, fontSize: 9 }} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `${(v/1000).toFixed(0)}K` : v} />
               <Tooltip
-                contentStyle={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, color: C.text1, fontSize: 12 }}
+                contentStyle={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, color: C.text1, fontSize: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
                 formatter={(v) => [`UGX ${v.toLocaleString()}`, "Earned"]}
               />
               <Bar dataKey="earnings" fill={PRIMARY} radius={[4, 4, 0, 0]} />
@@ -231,7 +232,7 @@ export default function DriverEarningsPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {paginated.map((d, i) => (
                 <Card key={d._id || i} style={{ padding: "14px 16px", display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(24,95,45,0.12)", border: `1px solid rgba(24,95,45,0.2)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(13,124,59,0.06)", border: "1px solid rgba(13,124,59,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <FaMotorcycle style={{ width: 16, height: 16, color: PRIMARY }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -239,12 +240,12 @@ export default function DriverEarningsPage() {
                       {d.orderId?.vendor?.businessName || d.orderId?.customerName || "Order"}
                     </p>
                     <p style={{ fontSize: 11, color: C.text3 }}>
-                      {d.deliveredAt || d.createdAt ? new Date(d.deliveredAt || d.createdAt).toLocaleDateString("en-UG", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}
+                      {d.deliveredAt || d.createdAt ? new Date(d.deliveredAt || d.createdAt).toLocaleDateString("en-UG", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "\u2014"}
                     </p>
                     {d.rating > 0 && (
                       <div style={{ display: "flex", alignItems: "center", gap: 3, marginTop: 3 }}>
                         {[1,2,3,4,5].map((s) => (
-                          <FaStar key={s} style={{ width: 10, height: 10, color: s <= d.rating ? C.gold : C.text3 }} />
+                          <FaStar key={s} style={{ width: 10, height: 10, color: s <= d.rating ? C.amber : "#e5e7eb" }} />
                         ))}
                       </div>
                     )}
@@ -253,7 +254,7 @@ export default function DriverEarningsPage() {
                     {d.commissionAmount > 0 ? (
                       <p style={{ fontSize: 13, fontWeight: 700, color: "#10b981" }}>+UGX {d.commissionAmount.toLocaleString()}</p>
                     ) : (
-                      <p style={{ fontSize: 12, color: C.text3 }}>—</p>
+                      <p style={{ fontSize: 12, color: C.text3 }}>\u2014</p>
                     )}
                   </div>
                 </Card>
@@ -262,7 +263,7 @@ export default function DriverEarningsPage() {
               {hasMore && (
                 <button
                   onClick={() => setPage((p) => p + 1)}
-                  style={{ padding: "12px", background: "rgba(255,255,255,0.04)", border: `1px solid ${C.border}`, borderRadius: 14, color: C.text2, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                  style={{ padding: "12px", background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, color: C.text2, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
                 >
                   Load more
                 </button>
@@ -277,7 +278,7 @@ export default function DriverEarningsPage() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <div>
               <p style={{ fontSize: 12, color: C.text3 }}>Available Balance</p>
-              <p style={{ fontSize: 22, fontWeight: 800, color: unpaidBalance >= MIN_PAYOUT ? C.gold : C.text2 }}>
+              <p style={{ fontSize: 22, fontWeight: 800, color: unpaidBalance >= MIN_PAYOUT ? C.amber : C.text3 }}>
                 UGX {unpaidBalance.toLocaleString()}
               </p>
             </div>
@@ -299,11 +300,11 @@ export default function DriverEarningsPage() {
             disabled={unpaidBalance < MIN_PAYOUT}
             style={{
               width: "100%", padding: "12px", borderRadius: 12, fontWeight: 700, fontSize: 14,
-              background: unpaidBalance >= MIN_PAYOUT ? `linear-gradient(135deg, ${C.green}, ${C.greenLt})` : "rgba(255,255,255,0.05)",
+              background: unpaidBalance >= MIN_PAYOUT ? `linear-gradient(135deg, ${C.green}, ${C.greenLt})` : "#f3f4f6",
               color: unpaidBalance >= MIN_PAYOUT ? C.white : C.text3,
               border: "none", cursor: unpaidBalance >= MIN_PAYOUT ? "pointer" : "not-allowed",
               fontFamily: "inherit",
-              boxShadow: unpaidBalance >= MIN_PAYOUT ? "0 4px 16px rgba(24,95,45,0.3)" : "none",
+              boxShadow: unpaidBalance >= MIN_PAYOUT ? "0 4px 16px rgba(13,124,59,0.25)" : "none",
             }}
           >
             Request Payout
@@ -313,14 +314,14 @@ export default function DriverEarningsPage() {
 
       {/* Payout Confirmation Modal */}
       {payoutModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 20, padding: 24, width: "100%", maxWidth: 360 }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(6px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 20, padding: 24, width: "100%", maxWidth: 360, boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}>
             <p style={{ fontWeight: 800, fontSize: 17, color: C.text1, marginBottom: 6 }}>Confirm Payout Request</p>
             <p style={{ fontSize: 13, color: C.text2, marginBottom: 4 }}>Request payment of:</p>
-            <p style={{ fontSize: 24, fontWeight: 800, color: C.gold, marginBottom: 16 }}>UGX {unpaidBalance.toLocaleString()}</p>
+            <p style={{ fontSize: 24, fontWeight: 800, color: C.amber, marginBottom: 16 }}>UGX {unpaidBalance.toLocaleString()}</p>
             {driver?.payoutMethod?.phone && (
               <p style={{ fontSize: 12, color: C.text3, marginBottom: 20 }}>
-                To: {driver.payoutMethod.provider} — {driver.payoutMethod.phone}
+                To: {driver.payoutMethod.provider} \u2014 {driver.payoutMethod.phone}
               </p>
             )}
             <div style={{ display: "flex", gap: 10 }}>
