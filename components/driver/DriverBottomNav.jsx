@@ -1,95 +1,57 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { FaHome, FaMotorcycle, FaMoneyBillWave, FaUser } from "react-icons/fa";
-
-const C = {
-  bg:     "#ffffff",
-  border: "#f3f4f6",
-  green:  "#0d7c3b",
-  amber:  "#d97706",
-  white:  "#ffffff",
-  text3:  "#9ca3af",
-};
+import { I } from "./DriverUI";
 
 const TABS = [
-  { key: "home",     label: "Home",     Icon: FaHome,           path: "/driver/dashboard" },
-  { key: "delivery", label: "Delivery", Icon: FaMotorcycle,     path: "/driver/delivery"  },
-  { key: "earnings", label: "Earnings", Icon: FaMoneyBillWave,  path: "/driver/earnings"  },
-  { key: "profile",  label: "Profile",  Icon: FaUser,           path: "/driver/profile"   },
+  { key: "home",     label: "Home",     Ic: I.Home,   path: "/driver/dashboard" },
+  { key: "delivery", label: "Delivery", Ic: I.Nav,    path: "/driver/delivery"  },
+  { key: "earnings", label: "Earnings", Ic: I.Dollar, path: "/driver/earnings"  },
+  { key: "profile",  label: "Profile",  Ic: I.User,   path: "/driver/profile"   },
 ];
 
 export default function DriverBottomNav({ hasActiveDelivery = false }) {
   const pathname = usePathname();
   const router   = useRouter();
-  const isActive = (tab) => pathname === tab.path;
 
   return (
-    <nav style={{
+    <nav className="yBnav" style={{
       position: "fixed", bottom: 0, left: 0, right: 0,
-      background: "rgba(255,255,255,0.97)", backdropFilter: "blur(16px)",
-      borderTop: `1px solid ${C.border}`,
-      display: "flex",
-      zIndex: 100,
-      paddingBottom: "env(safe-area-inset-bottom, 0px)",
-      fontFamily: "'Bricolage Grotesque','Sora','DM Sans',system-ui,sans-serif",
+      background: "#fff", borderTop: "1px solid #e5e7eb",
+      zIndex: 100, display: "flex",
+      padding: "4px 0 env(safe-area-inset-bottom, 6px)",
+      fontFamily: "'Bricolage Grotesque','Outfit','DM Sans',sans-serif",
     }}>
-      <style>{`
-        @keyframes dbn-pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-        @keyframes dbn-glow { 0%,100%{box-shadow:0 0 4px rgba(13,124,59,0.3);} 50%{box-shadow:0 0 12px rgba(13,124,59,0.6);} }
-      `}</style>
-
       {TABS.map((tab) => {
-        const active = isActive(tab);
+        const active = pathname === tab.path;
         return (
           <button
             key={tab.key}
             onClick={() => router.push(tab.path)}
             style={{
               flex: 1, display: "flex", flexDirection: "column",
-              alignItems: "center", justifyContent: "center",
-              padding: "10px 0 8px", gap: 3,
+              alignItems: "center", gap: 1,
               background: "none", border: "none",
-              cursor: "pointer",
-              color: active ? C.green : C.text3,
+              cursor: "pointer", padding: "3px 0",
               position: "relative",
-              transition: "color 0.2s",
-              fontFamily: "inherit",
             }}
           >
-            {/* Active indicator */}
             {active && (
               <div style={{
-                position: "absolute", top: -1, left: "20%", right: "20%",
-                height: 3, borderRadius: "0 0 6px 6px",
-                background: `linear-gradient(90deg, ${C.green}, ${C.amber})`,
-                boxShadow: `0 2px 8px ${C.green}50`,
+                position: "absolute", top: 0, width: 16, height: 2,
+                borderRadius: 1, background: "#0d7c3b",
               }} />
             )}
-
-            {/* Icon */}
             <div style={{ position: "relative" }}>
-              <tab.Icon style={{
-                width: 20, height: 20,
-                transition: "transform 0.2s",
-                transform: active ? "scale(1.1)" : "scale(1)",
-              }} />
+              <tab.Ic s={18} c={active ? "#0d7c3b" : "#9ca3af"} />
               {tab.key === "delivery" && hasActiveDelivery && (
-                <span style={{
-                  position: "absolute", top: -4, right: -6,
-                  width: 9, height: 9, borderRadius: "50%",
-                  background: "#10b981",
-                  boxShadow: "0 0 0 2px #ffffff",
-                  animation: "dbn-pulse 2s ease-in-out infinite",
+                <div style={{
+                  position: "absolute", top: -1, right: -1, width: 5, height: 5,
+                  borderRadius: 3, background: "#0d7c3b", border: "1px solid #fff",
                 }} />
               )}
             </div>
-
-            <span style={{
-              fontSize: 10, fontWeight: active ? 700 : 500,
-              letterSpacing: "0.02em",
-              transition: "color 0.2s",
-            }}>
+            <span style={{ fontSize: 9, fontWeight: active ? 700 : 500, color: active ? "#0d7c3b" : "#9ca3af" }}>
               {tab.label}
             </span>
           </button>

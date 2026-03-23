@@ -2,38 +2,23 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import {
-  FaHome, FaMotorcycle, FaMoneyBillWave, FaUser,
-  FaSignOutAlt, FaChevronLeft, FaChevronRight,
-} from "react-icons/fa";
-
-const C = {
-  sidebar: "#111111",
-  border:  "rgba(255,255,255,0.07)",
-  green:   "#0d7c3b",
-  greenLt: "#10a34d",
-  amber:   "#d97706",
-  amberDim:"rgba(217,119,6,0.12)",
-  amberBrd:"rgba(217,119,6,0.25)",
-  white:   "#ffffff",
-  text1:   "#f3f4f6",
-  text2:   "#9ca3af",
-  text3:   "#6b7280",
-};
+import { I } from "./DriverUI";
 
 const TABS = [
-  { key: "home",     label: "Home",     Icon: FaHome,           path: "/driver/dashboard" },
-  { key: "delivery", label: "Delivery", Icon: FaMotorcycle,     path: "/driver/delivery"  },
-  { key: "earnings", label: "Earnings", Icon: FaMoneyBillWave,  path: "/driver/earnings"  },
-  { key: "profile",  label: "Profile",  Icon: FaUser,           path: "/driver/profile"   },
+  { key: "home",     label: "Home",     Ic: I.Home,   path: "/driver/dashboard" },
+  { key: "delivery", label: "Delivery", Ic: I.Nav,    path: "/driver/delivery"  },
+  { key: "earnings", label: "Earnings", Ic: I.Dollar, path: "/driver/earnings"  },
+  { key: "profile",  label: "Profile",  Ic: I.User,   path: "/driver/profile"   },
 ];
 
-export default function DriverSidebar({ hasActiveDelivery = false, driverName = "", driverAvatar = "" }) {
+export default function DriverSidebar({ hasActiveDelivery = false, driverName = "", driverAvatar = "", isOnline = false, onToggleOnline }) {
   const pathname = usePathname();
   const router   = useRouter();
-  const [collapsed, setCollapsed] = useState(false);
+  const [sideO, setSideO] = useState(true);
 
-  const isActive = (tab) => pathname === tab.path;
+  const initials = driverName
+    ? driverName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2)
+    : "D";
 
   const logout = () => {
     try { localStorage.removeItem("yookatale-driver"); } catch {}
@@ -41,164 +26,124 @@ export default function DriverSidebar({ hasActiveDelivery = false, driverName = 
   };
 
   return (
-    <aside
-      style={{
-        width: collapsed ? 72 : 240,
-        minHeight: "100vh",
-        background: C.sidebar,
-        borderRight: `1px solid ${C.border}`,
-        display: "flex",
-        flexDirection: "column",
-        transition: "width 0.25s cubic-bezier(0.4,0,0.2,1)",
-        position: "fixed",
-        left: 0,
-        top: 0,
-        bottom: 0,
-        zIndex: 50,
-        fontFamily: "'Bricolage Grotesque','Sora','DM Sans',system-ui,sans-serif",
-        overflow: "hidden",
-      }}
-    >
-      {/* Logo area */}
+    <aside className="ySide" style={{
+      width: sideO ? 220 : 60,
+      transition: "width 0.2s",
+      background: "#111",
+      display: "flex",
+      flexDirection: "column",
+      flexShrink: 0,
+      borderRight: "1px solid rgba(255,255,255,0.05)",
+      position: "fixed",
+      left: 0, top: 0, bottom: 0,
+      zIndex: 50,
+      overflow: "hidden",
+      fontFamily: "'Bricolage Grotesque','Outfit','DM Sans',sans-serif",
+    }}>
+      {/* Logo */}
       <div style={{
-        padding: collapsed ? "20px 0" : "20px 16px",
-        borderBottom: `1px solid ${C.border}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: collapsed ? "center" : "space-between",
-        gap: 10,
-        minHeight: 68,
+        padding: sideO ? "14px 16px" : "14px 10px",
+        display: "flex", alignItems: "center", gap: 8,
+        borderBottom: "1px solid rgba(255,255,255,0.05)", flexShrink: 0,
       }}>
-        {!collapsed && (
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{
-              width: 36, height: 36, borderRadius: 10,
-              background: `linear-gradient(135deg, ${C.green}, ${C.greenLt})`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              flexShrink: 0,
-            }}>
-              <FaMotorcycle style={{ width: 18, height: 18, color: C.white }} />
-            </div>
-            <div>
-              <p style={{ color: C.amber, fontWeight: 800, fontSize: 14, letterSpacing: "-0.3px" }}>Yookatale</p>
-              <p style={{ color: C.text3, fontSize: 10, fontWeight: 500 }}>Driver Portal</p>
-            </div>
+        <div style={{
+          width: 32, height: 32, borderRadius: 8, background: "#0d7c3b",
+          flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>Y</span>
+        </div>
+        {sideO && (
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", lineHeight: 1 }}>Yookatale</div>
+            <div style={{ fontSize: 8, fontWeight: 700, color: "#d97706", textTransform: "uppercase", letterSpacing: 1.5 }}>Driver</div>
           </div>
         )}
-        {collapsed && (
-          <div style={{
-            width: 36, height: 36, borderRadius: 10,
-            background: `linear-gradient(135deg, ${C.green}, ${C.greenLt})`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <FaMotorcycle style={{ width: 18, height: 18, color: C.white }} />
-          </div>
-        )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          style={{
-            width: 28, height: 28, borderRadius: 8,
-            background: "rgba(255,255,255,0.05)",
-            border: `1px solid ${C.border}`,
-            color: C.text3, cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            flexShrink: 0,
-            position: collapsed ? "absolute" : "relative",
-            right: collapsed ? -14 : "auto",
-            top: collapsed ? 24 : "auto",
-            zIndex: 51,
-          }}
-        >
-          {collapsed ? <FaChevronRight style={{ width: 10, height: 10 }} /> : <FaChevronLeft style={{ width: 10, height: 10 }} />}
+        <button onClick={() => setSideO(!sideO)} style={{
+          marginLeft: "auto", background: "none", border: "none",
+          cursor: "pointer", padding: 2, opacity: 0.4,
+        }}>
+          <I.Menu s={14} c="#fff" />
         </button>
       </div>
 
-      {/* Driver info */}
-      {!collapsed && driverName && (
-        <div style={{
-          padding: "16px",
-          borderBottom: `1px solid ${C.border}`,
-          display: "flex", alignItems: "center", gap: 12,
-        }}>
-          {driverAvatar ? (
-            <img
-              src={driverAvatar}
-              alt={driverName}
-              style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", border: `2px solid ${C.amberBrd}` }}
-            />
-          ) : (
-            <div style={{
-              width: 40, height: 40, borderRadius: "50%",
-              background: `linear-gradient(135deg, ${C.green}, ${C.amber})`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontWeight: 800, fontSize: 16, color: C.white,
-              border: `2px solid ${C.amberBrd}`,
-            }}>
-              {(driverName || "D")[0].toUpperCase()}
+      {/* Driver info + online toggle */}
+      {sideO && (
+        <div style={{ padding: "12px 12px 10px", borderBottom: "1px solid rgba(255,255,255,0.05)", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            {driverAvatar ? (
+              <img src={driverAvatar} alt={driverName} style={{
+                width: 34, height: 34, borderRadius: 17, objectFit: "cover", flexShrink: 0,
+              }} />
+            ) : (
+              <div style={{
+                width: 34, height: 34, borderRadius: 17,
+                background: "linear-gradient(135deg,#0d7c3b,#d97706)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0,
+              }}>{initials}</div>
+            )}
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>{driverName || "Driver"}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                <I.Star s={9} c="#d97706" f="#d97706" />
+              </div>
             </div>
-          )}
-          <div style={{ overflow: "hidden" }}>
-            <p style={{ color: C.text1, fontWeight: 700, fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{driverName}</p>
-            <p style={{ color: C.text3, fontSize: 11 }}>Driver</p>
           </div>
+          {onToggleOnline && (
+            <button onClick={onToggleOnline} style={{
+              width: "100%", padding: "6px 10px", borderRadius: 6, border: "none", cursor: "pointer",
+              background: isOnline ? "rgba(13,124,59,0.12)" : "rgba(255,255,255,0.04)",
+              display: "flex", alignItems: "center", gap: 6,
+            }}>
+              <div style={{ width: 6, height: 6, borderRadius: 3, background: isOnline ? "#22c55e" : "#6b7280" }} />
+              <span style={{ fontSize: 11, fontWeight: 600, color: isOnline ? "#22c55e" : "#6b7280", flex: 1, textAlign: "left" }}>
+                {isOnline ? "Online" : "Offline"}
+              </span>
+              <div style={{
+                width: 28, height: 16, borderRadius: 8, position: "relative",
+                background: isOnline ? "#0d7c3b" : "rgba(255,255,255,0.08)", transition: "0.2s",
+              }}>
+                <div style={{
+                  width: 12, height: 12, borderRadius: 6, background: "#fff",
+                  position: "absolute", top: 2, left: isOnline ? 14 : 2, transition: "0.2s",
+                }} />
+              </div>
+            </button>
+          )}
         </div>
       )}
 
       {/* Navigation */}
-      <nav style={{ flex: 1, padding: collapsed ? "12px 8px" : "12px", display: "flex", flexDirection: "column", gap: 4 }}>
+      <nav style={{ flex: 1, padding: "6px", display: "flex", flexDirection: "column", gap: 1 }}>
         {TABS.map((tab) => {
-          const active = isActive(tab);
+          const active = pathname === tab.path;
           return (
             <button
               key={tab.key}
               onClick={() => router.push(tab.path)}
-              title={collapsed ? tab.label : undefined}
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                padding: collapsed ? "12px 0" : "11px 14px",
-                borderRadius: 12,
-                background: active
-                  ? `linear-gradient(135deg, ${C.green}, ${C.greenLt})`
-                  : "transparent",
-                border: "none",
-                cursor: "pointer",
-                color: active ? C.white : C.text2,
-                fontWeight: active ? 700 : 500,
-                fontSize: 13,
-                fontFamily: "inherit",
-                transition: "all 0.2s",
+                display: "flex", alignItems: "center", gap: 8,
+                padding: sideO ? "8px 10px" : "8px 0",
+                justifyContent: sideO ? "flex-start" : "center",
+                borderRadius: 6, border: "none", cursor: "pointer",
                 position: "relative",
-                justifyContent: collapsed ? "center" : "flex-start",
-                width: "100%",
-              }}
-              onMouseEnter={(e) => {
-                if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-              }}
-              onMouseLeave={(e) => {
-                if (!active) e.currentTarget.style.background = "transparent";
+                background: active ? "rgba(13,124,59,0.1)" : "transparent",
               }}
             >
-              <div style={{ position: "relative", flexShrink: 0 }}>
-                <tab.Icon style={{ width: 18, height: 18 }} />
+              <div style={{ position: "relative" }}>
+                <tab.Ic s={17} c={active ? "#0d7c3b" : "#6b7280"} />
                 {tab.key === "delivery" && hasActiveDelivery && (
-                  <span style={{
-                    position: "absolute", top: -3, right: -5,
-                    width: 8, height: 8, borderRadius: "50%",
-                    background: "#10b981",
-                    boxShadow: `0 0 0 2px ${active ? C.green : C.sidebar}`,
-                    animation: "dbn-pulse 2s ease-in-out infinite",
+                  <div style={{
+                    position: "absolute", top: -1, right: -1, width: 5, height: 5,
+                    borderRadius: 3, background: "#0d7c3b", border: "1px solid #111",
                   }} />
                 )}
               </div>
-              {!collapsed && <span>{tab.label}</span>}
-              {active && !collapsed && (
+              {sideO && <span style={{ fontSize: 12, fontWeight: active ? 700 : 500, color: active ? "#fff" : "#9ca3af" }}>{tab.label}</span>}
+              {active && (
                 <div style={{
-                  marginLeft: "auto",
-                  width: 6, height: 6, borderRadius: "50%",
-                  background: C.amber,
-                  boxShadow: `0 0 8px ${C.amber}80`,
+                  position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)",
+                  width: 2.5, height: 16, borderRadius: 2, background: "#0d7c3b",
                 }} />
               )}
             </button>
@@ -207,28 +152,18 @@ export default function DriverSidebar({ hasActiveDelivery = false, driverName = 
       </nav>
 
       {/* Logout */}
-      <div style={{ padding: collapsed ? "12px 8px" : "12px 16px", borderTop: `1px solid ${C.border}` }}>
-        <button
-          onClick={logout}
-          style={{
-            display: "flex", alignItems: "center", gap: 10,
-            padding: collapsed ? "10px 0" : "10px 14px",
-            borderRadius: 10, background: "none", border: "none",
-            cursor: "pointer", color: "#ef4444",
-            fontSize: 13, fontWeight: 600, fontFamily: "inherit",
-            width: "100%",
-            justifyContent: collapsed ? "center" : "flex-start",
-            transition: "background 0.2s",
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.08)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
-        >
-          <FaSignOutAlt style={{ width: 16, height: 16, flexShrink: 0 }} />
-          {!collapsed && <span>Sign Out</span>}
+      <div style={{ padding: "8px 6px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <button onClick={logout} style={{
+          display: "flex", alignItems: "center", gap: 8,
+          padding: sideO ? "8px 10px" : "8px 0",
+          justifyContent: sideO ? "flex-start" : "center",
+          borderRadius: 6, border: "none", cursor: "pointer",
+          background: "transparent", width: "100%",
+        }}>
+          <I.Logout s={17} c="#dc2626" />
+          {sideO && <span style={{ fontSize: 12, fontWeight: 600, color: "#dc2626" }}>Sign Out</span>}
         </button>
       </div>
-
-      <style>{`@keyframes dbn-pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }`}</style>
     </aside>
   );
 }
