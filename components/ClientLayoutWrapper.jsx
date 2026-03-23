@@ -18,7 +18,7 @@ import { useAuth } from "@slices/authSlice";
 import { setCredentials } from "@slices/authSlice";
 import { DB_URL } from "@config/config";
 
-const NO_NAVBAR_FOOTER = ["/signin", "/signup", "/driver/login", "/driver/dashboard", "/driver/earnings", "/driver/profile", "/vendor/login", "/vendor/dashboard", "/vendor/orders", "/vendor/products", "/vendor/reviews", "/vendor/payouts"];
+const NO_NAVBAR_FOOTER = ["/signin", "/signup", "/driver", "/vendor/login", "/vendor/dashboard", "/vendor/orders", "/vendor/products", "/vendor/reviews", "/vendor/payouts"];
 
 function AuthSync() {
   const { userInfo } = useAuth();
@@ -103,6 +103,12 @@ export default function ClientLayoutWrapper({ children }) {
       }).catch(() => {});
     } catch {}
   }, [pathname]);
+
+  const isDriverRoute = (pathname || "").startsWith("/driver");
+
+  if (isDriverRoute) {
+    return <>{children}</>;
+  }
 
   return (
     <>

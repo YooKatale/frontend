@@ -4,11 +4,11 @@ import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { DB_URL } from "@config/config";
-import { I, MapBg, PinMarker, STEPS, DRIVER_STYLES } from "@components/driver/DriverUI";
+import { I, STEPS, DRIVER_STYLES } from "@components/driver/DriverUI";
 
-const ActiveDeliveryMap = dynamic(
-  () => import("@components/driver/ActiveDeliveryMap"),
-  { ssr: false, loading: () => <div style={{ width: "100%", height: "100%", background: "#e5e3dd" }} /> }
+const DeliveryMap = dynamic(
+  () => import("@components/map/DeliveryMap"),
+  { ssr: false, loading: () => <div style={{ width: "100%", height: "100%", background: "#e8e8e8" }} /> }
 );
 
 const DRIVER_KEY = "yookatale-driver";
@@ -22,6 +22,7 @@ export default function DriverDeliveryPage() {
   const [myLocation, setMyLocation]   = useState(null);
   const [toast, setToast]             = useState(null);
   const [mounted, setMounted]         = useState(false);
+  const [nextInstruction, setNextInstruction] = useState(null);
 
   const showToast = useCallback((msg, type = "success") => {
     setToast({ msg, type });
@@ -94,6 +95,16 @@ export default function DriverDeliveryPage() {
     finally { setIsUpdating(false); }
   };
 
+  const handleDirections = useCallback((result) => {
+    const leg = result?.routes?.[0]?.legs?.[0];
+    const step = leg?.steps?.[0];
+    if (!step) return;
+    setNextInstruction({
+      text: step.instructions?.replace(/<[^>]*>/g, "").trim() || "",
+      distance: step.distance?.text || "",
+    });
+  }, []);
+
   if (!mounted) return null;
 
   const delivery     = dashData?.activeDelivery;
@@ -101,16 +112,26 @@ export default function DriverDeliveryPage() {
   const nextStep     = curStepIdx >= 0 && curStepIdx < STEPS.length - 1 ? STEPS[curStepIdx + 1] : null;
   const isComplete   = delivery?.status === "delivered";
 
-  const pickupCoords  = delivery?.vendorId?.location || delivery?.pickupLocation;
-  const dropoffCoords = delivery?.deliveryLocation || delivery?.deliveryAddress;
+  const vendor       = delivery?.vendorId;
+  const vendorLoc    = vendor?.lat && vendor?.lng ? { lat: vendor.lat, lng: vendor.lng } : vendor?.location || null;
+  const deliveryAddr = delivery?.deliveryAddress;
+  const customerLoc  = deliveryAddr?.lat && deliveryAddr?.lng
+    ? { lat: deliveryAddr.lat, lng: deliveryAddr.lng }
+    : delivery?.deliveryLocation || null;
+  const showVendorPin = delivery?.status === "assigned" || delivery?.status === "picked_up";
+
   const customerName  = delivery?.userId?.firstname
     ? `${delivery.userId.firstname} ${delivery.userId.lastname || ""}`
     : delivery?.customerName || "Customer";
   const customerPhone = delivery?.userId?.phone || delivery?.customerPhone || "";
-  const vendorName    = delivery?.vendorId?.businessName || delivery?.vendorId?.name || "Restaurant";
-  const addrText      = typeof delivery?.deliveryAddress === "object"
-    ? delivery?.deliveryAddress?.address || delivery?.deliveryAddress?.address1 || ""
-    : delivery?.deliveryAddress || "";
+  const vendorName    = vendor?.businessName || vendor?.name || "Restaurant";
+  const addrText      = typeof deliveryAddr === "object"
+    ? deliveryAddr?.address || deliveryAddr?.address1 || ""
+    : deliveryAddr || "";
+
+  const driverProfile = session?.driver
+    ? { profilePicture: session.driver.profilePicture || session.driver.avatar, name: session.driver.name || session.driver.fullName }
+    : null;
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100vh", position: "relative", overflow: "hidden" }}>
@@ -162,68 +183,75 @@ export default function DriverDeliveryPage() {
         </div>
       )}
 
-      {/* Active delivery full-screen */}
+      {/* Active delivery with real map */}
       {!isLoading && delivery && (
         <>
-          {/* Map area */}
+          {/* Full-screen map */}
           <div style={{ flex: 1, position: "relative" }}>
-            <MapBg style={{ position: "absolute", inset: 0 }}>
-              {/* Navigation header overlay */}
+            <DeliveryMap
+              driverLocation={myLocation}
+              customerLocation={customerLoc}
+              vendorLocation={showVendorPin ? vendorLoc : null}
+              driverProfile={driverProfile}
+              customerName={customerName}
+              height="100%"
+              showCenterFab
+              showETA
+              onDirectionsReady={handleDirections}
+            />
+
+            {/* Back button overlay */}
+            <button onClick={() => router.push("/driver/dashboard")} style={{
+              position: "absolute", top: 12, left: 12, zIndex: 20,
+              width: 36, height: 36, borderRadius: 18, background: "rgba(0,0,0,0.5)",
+              backdropFilter: "blur(4px)", border: "none", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <I.Left s={16} c="#fff" />
+            </button>
+
+            {/* Turn-by-turn instruction pill */}
+            {nextInstruction && (
               <div style={{
-                position: "absolute", top: 0, left: 0, right: 0, zIndex: 10,
-                padding: "8px 12px", display: "flex", alignItems: "center", gap: 8,
-                background: "linear-gradient(rgba(0,0,0,0.5),transparent)",
+                position: "absolute", top: 12, left: 56, right: 12, zIndex: 20,
+                background: "rgba(17,17,17,0.92)", backdropFilter: "blur(12px)",
+                borderRadius: 12, padding: "10px 14px",
+                display: "flex", alignItems: "center", gap: 10,
+                boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
               }}>
-                <button onClick={() => router.push("/driver/dashboard")} style={{
-                  width: 32, height: 32, borderRadius: 16, background: "rgba(0,0,0,0.4)",
-                  backdropFilter: "blur(4px)", border: "none", cursor: "pointer",
+                <div style={{
+                  width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                  background: "rgba(13,124,59,0.15)", border: "1px solid rgba(13,124,59,0.3)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
-                  <I.Left s={16} c="#fff" />
-                </button>
-                <div style={{ flex: 1, textAlign: "center" }}>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
-                    {STEPS[curStepIdx]?.l || delivery.status}
-                  </div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>
-                    {curStepIdx <= 1 ? vendorName : addrText || "Destination"}
-                  </div>
+                  <I.Nav s={14} c="#0d7c3b" />
                 </div>
-                <div style={{
-                  padding: "4px 10px", borderRadius: 6,
-                  background: "rgba(13,124,59,0.85)", backdropFilter: "blur(4px)",
-                }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: "#fff", fontFamily: "'Azeret Mono',monospace" }}>
-                    {delivery.estimatedMinutes || "?"}min
-                  </span>
+                <div style={{ flex: 1, overflow: "hidden" }}>
+                  <div style={{ color: "#f3f4f6", fontSize: 12, fontWeight: 600, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
+                    {nextInstruction.text}
+                  </div>
+                  <div style={{ color: "#6b7280", fontSize: 10 }}>{nextInstruction.distance}</div>
                 </div>
               </div>
+            )}
 
-              {/* Map pins */}
-              <PinMarker color="#0d7c3b" icon={<I.Store s={12} c="#fff" />} label="Pickup" pulse
-                style={{ position: "absolute", left: "22%", top: "30%" }} />
-              <svg style={{ position: "absolute", left: "28%", top: "42%", width: "44%", height: 24 }}>
-                <line x1="0" y1="12" x2="100%" y2="12" stroke="#0d7c3b" strokeWidth="2" strokeDasharray="6 4" opacity="0.4" />
-              </svg>
-              <PinMarker color="#d97706" icon={<I.Pin s={12} c="#fff" />} label="Drop-off"
-                style={{ position: "absolute", right: "16%", top: "36%" }} />
-
-              {/* Driver position */}
-              {myLocation && (
-                <div style={{
-                  position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)",
-                  width: 16, height: 16, borderRadius: 8, background: "#3b82f6", border: "2.5px solid #fff",
-                  boxShadow: "0 0 0 4px rgba(59,130,246,0.15), 0 2px 8px rgba(0,0,0,0.15)", zIndex: 5,
-                }} />
-              )}
-            </MapBg>
+            {/* Status badge */}
+            <div style={{
+              position: "absolute", top: 12, right: 12, zIndex: 20,
+              padding: "5px 12px", borderRadius: 8,
+              background: "rgba(13,124,59,0.9)", backdropFilter: "blur(4px)",
+            }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "#fff", fontFamily: "'Azeret Mono',monospace" }}>
+                {STEPS[curStepIdx]?.sh || delivery.status}
+              </span>
+            </div>
           </div>
 
           {/* Bottom sheet */}
           <div style={{
             background: "#fff", borderTopLeftRadius: 16, borderTopRightRadius: 16,
             boxShadow: "0 -4px 20px rgba(0,0,0,0.08)", position: "relative", zIndex: 10,
-            maxHeight: "48vh", overflow: "auto",
+            maxHeight: "45vh", overflow: "auto",
           }}>
             <div style={{ width: 32, height: 3, borderRadius: 2, background: "#d1d5db", margin: "8px auto 10px" }} />
 
@@ -247,6 +275,7 @@ export default function DriverDeliveryPage() {
                 <a href={`tel:${customerPhone}`} style={{
                   width: 34, height: 34, borderRadius: 17, background: "#f0fdf4", border: "1px solid #dcfce7",
                   display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                  textDecoration: "none",
                 }}>
                   <I.Phone s={15} c="#0d7c3b" />
                 </a>
@@ -317,6 +346,7 @@ export default function DriverDeliveryPage() {
                   background: "#111", color: "#fff", fontWeight: 700, fontSize: 14,
                   border: "none", cursor: "pointer",
                   fontFamily: "'Bricolage Grotesque',sans-serif",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                 }}>
                   <I.Check s={16} c="#fff" /> Back to Dashboard
                 </button>
