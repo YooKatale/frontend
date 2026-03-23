@@ -209,9 +209,7 @@ export default function DriverDashboardPage() {
         borderBottom: "1px solid #e5e7eb", flexShrink: 0,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 7, background: "#0d7c3b", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>Y</span>
-          </div>
+          <img src="/assets/icons/logo2.png" alt="Yookatale" style={{ width: 28, height: 28, borderRadius: 7, objectFit: "cover" }} />
           <span style={{ fontSize: 14, fontWeight: 800, color: "#111" }}>Yookatale</span>
           <span style={{ fontSize: 8, fontWeight: 700, color: "#92400e", background: "#fef3c7", padding: "1px 5px", borderRadius: 3, textTransform: "uppercase", letterSpacing: 0.3 }}>Driver</span>
         </div>
@@ -231,13 +229,19 @@ export default function DriverDashboardPage() {
           }}>
             <I.Bell s={14} c="#111" />
           </button>
-          <div style={{
-            width: 28, height: 28, borderRadius: 14, background: "#111",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer",
-          }}>
-            {driverName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) || "D"}
-          </div>
+          {(driver?.profileImage || driver?.profilePicture) ? (
+            <img src={driver.profileImage || driver.profilePicture} alt={driverName}
+              style={{ width: 28, height: 28, borderRadius: 14, objectFit: "cover", cursor: "pointer" }}
+              onClick={() => router.push("/driver/profile")} />
+          ) : (
+            <div onClick={() => router.push("/driver/profile")} style={{
+              width: 28, height: 28, borderRadius: 14, background: "#111",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 10, fontWeight: 700, color: "#fff", cursor: "pointer",
+            }}>
+              {driverName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) || "D"}
+            </div>
+          )}
         </div>
       </header>
 

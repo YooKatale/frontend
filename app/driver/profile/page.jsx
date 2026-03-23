@@ -287,7 +287,7 @@ export default function DriverProfilePage() {
   const initials   = driverName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) || "D";
   const totalDel   = dashData?.totalDeliveries || driver?.totalDeliveries || 0;
   const rating     = (driver?.averageRating || 0).toFixed(1);
-  const acceptance = driver?.acceptanceRate != null ? `${driver.acceptanceRate}%` : "N/A";
+  const acceptance = driver?.acceptanceRate != null ? `${driver.acceptanceRate}%` : "100%";
   const transport  = driver?.transport || "motorcycle";
   const plate      = driver?.numberPlate || "";
 
@@ -500,9 +500,42 @@ export default function DriverProfilePage() {
             <I.Wallet s={16} c="#14b8a6" />
             <span style={{ fontSize: 11, color: "#14b8a6", fontWeight: 600 }}>Mobile Money Payout</span>
           </div>
-          <SelectField label="Provider" value={payoutProvider} onChange={setPayoutProvider}
-            options={[{ value: "MTN", label: "MTN Mobile Money" }, { value: "AIRTEL", label: "Airtel Money" }]} />
-          <Field label="Phone Number" value={payoutPhone} onChange={setPayoutPhone} placeholder="e.g. 0771234567" type="tel" />
+
+          {/* Provider selection with logos */}
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: "#6b7280", display: "block", marginBottom: 6 }}>Select Provider</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              {[
+                { value: "MTN", label: "MTN MoMo", bg: payoutProvider === "MTN" ? "#fff8e1" : "#fff", border: payoutProvider === "MTN" ? "#ffca28" : "#e5e7eb" },
+                { value: "AIRTEL", label: "Airtel Money", bg: payoutProvider === "AIRTEL" ? "#fce4ec" : "#fff", border: payoutProvider === "AIRTEL" ? "#e53935" : "#e5e7eb" },
+              ].map((p) => (
+                <button key={p.value} onClick={() => setPayoutProvider(p.value)} style={{
+                  flex: 1, padding: "12px 8px", borderRadius: 10,
+                  background: p.bg, border: `2px solid ${p.border}`,
+                  cursor: "pointer", textAlign: "center",
+                  transition: "all 0.15s",
+                }}>
+                  {p.value === "MTN" ? (
+                    <div style={{ width: 40, height: 40, borderRadius: 20, background: "#ffca28", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px" }}>
+                      <span style={{ fontSize: 11, fontWeight: 900, color: "#1a237e", letterSpacing: -0.5 }}>MTN</span>
+                    </div>
+                  ) : (
+                    <div style={{ width: 40, height: 40, borderRadius: 20, background: "#e53935", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px" }}>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: "#fff", letterSpacing: -0.3 }}>Airtel</span>
+                    </div>
+                  )}
+                  <div style={{ fontSize: 11, fontWeight: 700, color: payoutProvider === p.value ? "#111" : "#6b7280" }}>{p.label}</div>
+                  {payoutProvider === p.value && (
+                    <div style={{ marginTop: 4 }}>
+                      <I.Check s={14} c="#0d7c3b" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <Field label="Phone Number" value={payoutPhone} onChange={setPayoutPhone} placeholder={payoutProvider === "MTN" ? "e.g. 0771234567" : "e.g. 0701234567"} type="tel" />
           <Field label="Account Name" value={payoutName} onChange={setPayoutName} placeholder="Name on mobile money account" />
           <SaveBtn onClick={handleSavePayout} saving={saving} disabled={!payoutPhone} label="Save Payout Method" />
         </div>
@@ -518,21 +551,16 @@ export default function DriverProfilePage() {
             </div>
             <div style={{ fontSize: 11, color: "#6b7280" }}>{driver?.ratingCount || 0} reviews</div>
           </div>
-          {ratings?.reviews?.length > 0 ? (
-            ratings.reviews.slice(0, 10).map((r, i) => (
+          {(ratings?.ratings?.length > 0) ? (
+            ratings.ratings.slice(0, 10).map((r, i) => (
               <div key={i} style={{ padding: "10px 12px", background: "#fff", border: "1px solid #f3f4f6", borderRadius: 8, marginBottom: 4 }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
                   <div style={{ display: "flex", gap: 2 }}>
-                    {[1,2,3,4,5].map(s => <I.Star key={s} s={10} c={s <= (r.rating || 0) ? "#d97706" : "#e5e7eb"} f={s <= (r.rating || 0) ? "#d97706" : "none"} />)}
+                    {[1,2,3,4,5].map(s => <I.Star key={s} s={10} c={s <= (r.customerRating || 0) ? "#d97706" : "#e5e7eb"} f={s <= (r.customerRating || 0) ? "#d97706" : "none"} />)}
                   </div>
-                  <span style={{ fontSize: 9, color: "#9ca3af" }}>{r.createdAt ? new Date(r.createdAt).toLocaleDateString("en-UG", { month: "short", day: "numeric" }) : ""}</span>
+                  <span style={{ fontSize: 9, color: "#9ca3af" }}>{r.ratedAt ? new Date(r.ratedAt).toLocaleDateString("en-UG", { month: "short", day: "numeric" }) : ""}</span>
                 </div>
-                {r.comment && <div style={{ fontSize: 12, color: "#374151" }}>{r.comment}</div>}
-                {r.tags?.length > 0 && (
-                  <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 4 }}>
-                    {r.tags.map((t, j) => <span key={j} style={{ padding: "2px 8px", borderRadius: 8, background: "#f3f4f6", fontSize: 9, color: "#6b7280" }}>{t}</span>)}
-                  </div>
-                )}
+                {r.ratingComment && <div style={{ fontSize: 12, color: "#374151" }}>{r.ratingComment}</div>}
               </div>
             ))
           ) : (

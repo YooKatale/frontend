@@ -43,10 +43,14 @@ export default function DriverEarningsPage() {
   if (!mounted) return null;
 
   const driver          = dashData?.driver || session?.driver || {};
-  const totalEarnings   = dashData?.totalEarnings || 0;
+  const totalEarnings   = dashData?.totalEarnings || driver?.totalEarnings || 0;
   const weekEarnings    = dashData?.weekEarnings || 0;
   const pendingPayout   = dashData?.pendingPayout || 0;
+  const todayDeliveries = dashData?.todayDeliveries || 0;
+  const totalDeliveries = driver?.totalDeliveries || 0;
+  const acceptanceRate  = driver?.acceptanceRate ?? dashData?.driver?.acceptanceRate ?? 100;
   const recentDeliveries = dashData?.recentDeliveries || [];
+  const payoutHistory   = dashData?.payoutHistory || [];
 
   const chartData = [
     { d: "Mon", v: 0 }, { d: "Tue", v: 0 }, { d: "Wed", v: 0 },
@@ -57,10 +61,6 @@ export default function DriverEarningsPage() {
       const found = chartData.find(c => c.d === item.day);
       if (found) found.v = item.earnings || 0;
     });
-  } else {
-    const today = new Date().getDay();
-    const dayMap = [6, 0, 1, 2, 3, 4, 5];
-    chartData[dayMap[today]].v = weekEarnings || 5000;
   }
 
   return (
@@ -113,8 +113,24 @@ export default function DriverEarningsPage() {
         </div>
       </div>
 
+      {/* Stats row */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, padding: "12px 16px 0" }}>
+        <div style={{ background: "#fff", borderRadius: 10, padding: "10px", border: "1px solid #f3f4f6", textAlign: "center" }}>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "#0d7c3b" }}>{todayDeliveries}</div>
+          <div style={{ fontSize: 9, color: "#9ca3af", fontWeight: 600 }}>Today</div>
+        </div>
+        <div style={{ background: "#fff", borderRadius: 10, padding: "10px", border: "1px solid #f3f4f6", textAlign: "center" }}>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "#111" }}>{totalDeliveries}</div>
+          <div style={{ fontSize: 9, color: "#9ca3af", fontWeight: 600 }}>Total Trips</div>
+        </div>
+        <div style={{ background: "#fff", borderRadius: 10, padding: "10px", border: "1px solid #f3f4f6", textAlign: "center" }}>
+          <div style={{ fontSize: 18, fontWeight: 800, color: acceptanceRate >= 80 ? "#0d7c3b" : "#d97706" }}>{acceptanceRate}%</div>
+          <div style={{ fontSize: 9, color: "#9ca3af", fontWeight: 600 }}>Acceptance</div>
+        </div>
+      </div>
+
       {/* Chart section */}
-      <div style={{ padding: "16px", margin: "0 16px 0", background: "#fff", borderRadius: 12, marginTop: -10, border: "1px solid #f3f4f6" }}>
+      <div style={{ padding: "16px", margin: "0 16px 0", background: "#fff", borderRadius: 12, marginTop: 10, border: "1px solid #f3f4f6" }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 10 }}>Weekly Overview</div>
         <Chart data={chartData} />
       </div>
@@ -130,8 +146,38 @@ export default function DriverEarningsPage() {
             display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
           }}>
             <I.Wallet s={16} c="#fff" />
-            Request Payout
+            Request Payout — UGX {pendingPayout.toLocaleString()}
           </button>
+        </div>
+      )}
+
+      {/* Payout History */}
+      {payoutHistory.length > 0 && (
+        <div style={{ padding: "16px" }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "#111", marginBottom: 8 }}>Payout History</div>
+          {payoutHistory.map((p, idx) => (
+            <div key={p._id || idx} style={{
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "10px 12px", background: "#fff", borderRadius: 8,
+              marginBottom: 4, border: "1px solid #f3f4f6",
+            }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: 8, background: "#f0fdf4",
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+              }}>
+                <I.Wallet s={14} c="#0d7c3b" />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#111" }}>{p.note || "Payout"}</div>
+                <div style={{ fontSize: 10, color: "#9ca3af" }}>
+                  {p.paidAt ? new Date(p.paidAt).toLocaleDateString("en-UG", { month: "short", day: "numeric", year: "numeric" }) : ""}
+                </div>
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#0d7c3b" }}>
+                UGX {(p.amount || 0).toLocaleString()}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -144,9 +190,11 @@ export default function DriverEarningsPage() {
           </div>
         ) : recentDeliveries.length > 0 ? (
           recentDeliveries.map((d, idx) => {
-            const addr = typeof d.deliveryAddress === "object"
-              ? d.deliveryAddress?.address || d.deliveryAddress?.address1 || ""
-              : d.deliveryAddress || "";
+            const order = d.orderId || {};
+            const addr = typeof order.deliveryAddress === "object"
+              ? order.deliveryAddress?.address || order.deliveryAddress?.address1 || ""
+              : order.deliveryAddress || "";
+            const earning = d.commissionAmount || d.estimatedEarning || d.driverEarning || 0;
             return (
               <div key={d._id || idx} style={{
                 display: "flex", alignItems: "center", gap: 10,
@@ -164,18 +212,18 @@ export default function DriverEarningsPage() {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: "#111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {d.vendorId?.businessName || d.vendorId?.name || "Delivery"}
+                    {order.customerName || order.vendorId?.businessName || order.vendorId?.name || "Delivery"}
                   </div>
                   <div style={{ fontSize: 10, color: "#9ca3af", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {addr || "Completed delivery"}
+                    {addr || (d.status === "delivered" ? "Completed" : d.status)}
                   </div>
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "#0d7c3b" }}>
-                    +UGX {(d.estimatedEarning || d.driverEarning || 0).toLocaleString()}
+                    +UGX {earning.toLocaleString()}
                   </div>
                   <div style={{ fontSize: 9, color: "#9ca3af" }}>
-                    {d.createdAt ? new Date(d.createdAt).toLocaleDateString("en-UG", { month: "short", day: "numeric" }) : ""}
+                    {d.deliveredAt ? new Date(d.deliveredAt).toLocaleDateString("en-UG", { month: "short", day: "numeric" }) : d.createdAt ? new Date(d.createdAt).toLocaleDateString("en-UG", { month: "short", day: "numeric" }) : ""}
                   </div>
                 </div>
               </div>

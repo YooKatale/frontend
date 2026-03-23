@@ -472,15 +472,15 @@ export default function OrderTrackingPage() {
             <div style={{ padding: "18px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 {/* Avatar */}
-                {driver.profilePicture || driver.avatar ? (
+                {(driver.profileImage || driver.profilePicture || driver.avatar) ? (
                   <img
-                    src={driver.profilePicture || driver.avatar}
+                    src={driver.profileImage || driver.profilePicture || driver.avatar}
                     alt={driver.name}
                     style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", border: `2px solid ${C.goldBrd}`, flexShrink: 0 }}
                     onError={(e) => { e.target.style.display = "none"; e.target.nextSibling.style.display = "flex"; }}
                   />
                 ) : null}
-                <div style={{ width: 56, height: 56, borderRadius: "50%", background: `linear-gradient(135deg, ${C.green}, ${C.goldDim})`, border: `2px solid ${C.goldBrd}`, display: (driver.profilePicture || driver.avatar) ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 800, color: C.gold, flexShrink: 0 }}>
+                <div style={{ width: 56, height: 56, borderRadius: "50%", background: `linear-gradient(135deg, ${C.green}, ${C.goldDim})`, border: `2px solid ${C.goldBrd}`, display: (driver.profileImage || driver.profilePicture || driver.avatar) ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 800, color: C.gold, flexShrink: 0 }}>
                   {(driver.name || "D")[0].toUpperCase()}
                 </div>
                 {/* Info */}

@@ -130,7 +130,7 @@ export default function DriverDeliveryPage() {
     : deliveryAddr || "";
 
   const driverProfile = session?.driver
-    ? { profilePicture: session.driver.profilePicture || session.driver.avatar, name: session.driver.name || session.driver.fullName }
+    ? { profilePicture: session.driver.profileImage || session.driver.profilePicture || session.driver.avatar, name: session.driver.name || session.driver.fullName }
     : null;
 
   return (
