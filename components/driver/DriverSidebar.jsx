@@ -46,12 +46,11 @@ export default function DriverSidebar({ hasActiveDelivery = false, driverName = 
         display: "flex", alignItems: "center", gap: 8,
         borderBottom: "1px solid rgba(255,255,255,0.05)", flexShrink: 0,
       }}>
-        <div style={{
-          width: 32, height: 32, borderRadius: 8, background: "#0d7c3b",
-          flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>Y</span>
-        </div>
+        <img
+          src="/assets/icons/logo2.png"
+          alt="Yookatale"
+          style={{ width: 32, height: 32, borderRadius: 8, objectFit: "cover", flexShrink: 0 }}
+        />
         {sideO && (
           <div>
             <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", lineHeight: 1 }}>Yookatale</div>

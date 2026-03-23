@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { DB_URL } from "@config/config";
 import { I, DRIVER_STYLES } from "@components/driver/DriverUI";
@@ -34,58 +34,47 @@ function Modal({ open, onClose, title, children }) {
             <I.X s={14} c="#6b7280" />
           </button>
         </div>
-        <div style={{ padding: "0 16px 20px" }}>
-          {children}
-        </div>
+        <div style={{ padding: "0 16px 20px" }}>{children}</div>
       </div>
       <style>{`@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}`}</style>
     </div>
   );
 }
 
-/* ── Form field ── */
 function Field({ label, value, onChange, disabled, placeholder, type = "text" }) {
   return (
     <div style={{ marginBottom: 12 }}>
       <label style={{ fontSize: 11, fontWeight: 600, color: "#6b7280", display: "block", marginBottom: 4 }}>{label}</label>
-      <input
-        type={type}
-        value={value}
-        onChange={e => onChange?.(e.target.value)}
-        disabled={disabled}
-        placeholder={placeholder}
-        style={{
-          width: "100%", padding: "10px 12px", borderRadius: 8,
-          border: "1px solid #e5e7eb", fontSize: 13, color: "#111",
-          background: disabled ? "#f9fafb" : "#fff",
-          outline: "none", boxSizing: "border-box",
-          fontFamily: "'Bricolage Grotesque',sans-serif",
-        }}
-      />
+      <input type={type} value={value} onChange={e => onChange?.(e.target.value)} disabled={disabled} placeholder={placeholder}
+        style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 13, color: "#111", background: disabled ? "#f9fafb" : "#fff", outline: "none", boxSizing: "border-box", fontFamily: "'Bricolage Grotesque',sans-serif" }} />
     </div>
   );
 }
 
-/* ── Select field ── */
 function SelectField({ label, value, onChange, options, disabled }) {
   return (
     <div style={{ marginBottom: 12 }}>
       <label style={{ fontSize: 11, fontWeight: 600, color: "#6b7280", display: "block", marginBottom: 4 }}>{label}</label>
-      <select
-        value={value}
-        onChange={e => onChange?.(e.target.value)}
-        disabled={disabled}
-        style={{
-          width: "100%", padding: "10px 12px", borderRadius: 8,
-          border: "1px solid #e5e7eb", fontSize: 13, color: "#111",
-          background: disabled ? "#f9fafb" : "#fff",
-          outline: "none", boxSizing: "border-box",
-          fontFamily: "'Bricolage Grotesque',sans-serif",
-        }}
-      >
+      <select value={value} onChange={e => onChange?.(e.target.value)} disabled={disabled}
+        style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 13, color: "#111", background: disabled ? "#f9fafb" : "#fff", outline: "none", boxSizing: "border-box", fontFamily: "'Bricolage Grotesque',sans-serif" }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>
+  );
+}
+
+function SaveBtn({ onClick, saving, disabled, label = "Save" }) {
+  return (
+    <button onClick={onClick} disabled={saving || disabled} style={{
+      width: "100%", padding: "12px", borderRadius: 10, marginTop: 4,
+      background: saving || disabled ? "#d1d5db" : "#0d7c3b", color: "#fff", fontWeight: 700, fontSize: 13,
+      border: "none", cursor: saving || disabled ? "not-allowed" : "pointer",
+      fontFamily: "'Bricolage Grotesque',sans-serif",
+      display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+    }}>
+      {saving ? <div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> : <I.Check s={14} c="#fff" />}
+      {saving ? "Saving..." : label}
+    </button>
   );
 }
 
@@ -107,6 +96,16 @@ export default function DriverProfilePage() {
   const [activeModal, setActiveModal] = useState(null);
   const [toast, setToast]         = useState(null);
   const [saving, setSaving]       = useState(false);
+  const fileRef = useRef(null);
+
+  // Edit form state
+  const [editName, setEditName]     = useState("");
+  const [editPhone, setEditPhone]   = useState("");
+  const [editEmail, setEditEmail]   = useState("");
+
+  // Vehicle form state
+  const [editPlate, setEditPlate]     = useState("");
+  const [editTransport, setEditTransport] = useState("motorcycle");
 
   // Payout form state
   const [payoutPhone, setPayoutPhone]       = useState("");
@@ -131,17 +130,27 @@ export default function DriverProfilePage() {
     } catch {}
   }, []);
 
+  const authHeaders = useCallback(() => ({
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${session?.token}`,
+  }), [session]);
+
   const fetchDashboard = useCallback(async () => {
     if (!session?.driver?._id) return;
     try {
-      const res  = await fetch(`${DB_URL}/driver/dashboard/${session.driver._id}`, {
+      const res = await fetch(`${DB_URL}/driver/dashboard/${session.driver._id}`, {
         headers: { Authorization: `Bearer ${session.token}` },
       });
       const data = await res.json();
       if (data?.status === "Success") {
         setDashData(data.data);
-        // Populate payout form from existing data
-        const pm = data.data?.driver?.payoutMethod;
+        const d = data.data?.driver || {};
+        setEditName(d.name || d.fullName || "");
+        setEditPhone(d.phone || "");
+        setEditEmail(d.email || "");
+        setEditPlate(d.numberPlate || "");
+        setEditTransport(d.transport || "motorcycle");
+        const pm = d.payoutMethod;
         if (pm) {
           setPayoutPhone(pm.phone || "");
           setPayoutProvider(pm.provider || "MTN");
@@ -173,35 +182,94 @@ export default function DriverProfilePage() {
     if (modal === "ratings" && !ratings) fetchRatings();
   };
 
+  // Update local session after profile changes
+  const updateLocalSession = (updates) => {
+    try {
+      const stored = localStorage.getItem(DRIVER_KEY);
+      if (!stored) return;
+      const parsed = JSON.parse(stored);
+      parsed.driver = { ...parsed.driver, ...updates };
+      localStorage.setItem(DRIVER_KEY, JSON.stringify(parsed));
+      setSession(parsed);
+    } catch {}
+  };
+
+  const handleSaveProfile = async () => {
+    if (!session?.driver?._id) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`${DB_URL}/driver/${session.driver._id}/profile`, {
+        method: "PATCH", headers: authHeaders(),
+        body: JSON.stringify({ name: editName, phone: editPhone, email: editEmail }),
+      });
+      const data = await res.json();
+      if (data?.status === "Success") {
+        showToast("Profile updated!");
+        updateLocalSession({ name: editName, fullName: editName, phone: editPhone, email: editEmail });
+        setActiveModal(null);
+        await fetchDashboard();
+      } else showToast(data?.message || "Failed", "error");
+    } catch { showToast("Network error", "error"); }
+    finally { setSaving(false); }
+  };
+
+  const handleSaveVehicle = async () => {
+    if (!session?.driver?._id) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`${DB_URL}/driver/${session.driver._id}/profile`, {
+        method: "PATCH", headers: authHeaders(),
+        body: JSON.stringify({ numberPlate: editPlate, transport: editTransport }),
+      });
+      const data = await res.json();
+      if (data?.status === "Success") {
+        showToast("Vehicle details saved!");
+        updateLocalSession({ numberPlate: editPlate, transport: editTransport });
+        setActiveModal(null);
+        await fetchDashboard();
+      } else showToast(data?.message || "Failed", "error");
+    } catch { showToast("Network error", "error"); }
+    finally { setSaving(false); }
+  };
+
+  const handleAvatarUpload = async (e) => {
+    const file = e?.target?.files?.[0];
+    if (!file || !session?.driver?._id) return;
+    setSaving(true);
+    try {
+      const fd = new FormData();
+      fd.append("avatar", file);
+      const res = await fetch(`${DB_URL}/driver/${session.driver._id}/avatar`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${session.token}` },
+        body: fd,
+      });
+      const data = await res.json();
+      if (data?.status === "Success") {
+        showToast("Profile photo updated!");
+        updateLocalSession({ profileImage: data.data?.profileImage, profilePicture: data.data?.profileImage });
+        await fetchDashboard();
+      } else showToast(data?.message || "Upload failed", "error");
+    } catch { showToast("Upload failed", "error"); }
+    finally { setSaving(false); e.target.value = ""; }
+  };
+
   const handleSavePayout = async () => {
     if (!session?.driver?._id || !payoutPhone) return;
     setSaving(true);
     try {
       const res = await fetch(`${DB_URL}/driver/${session.driver._id}/payout-method`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.token}`,
-        },
-        body: JSON.stringify({
-          phone: payoutPhone,
-          provider: payoutProvider,
-          accountName: payoutName,
-        }),
+        method: "PATCH", headers: authHeaders(),
+        body: JSON.stringify({ phone: payoutPhone, provider: payoutProvider, accountName: payoutName }),
       });
       const data = await res.json();
       if (data?.status === "Success") {
         showToast("Payout method saved!");
         setActiveModal(null);
         await fetchDashboard();
-      } else {
-        showToast(data?.message || "Failed to save", "error");
-      }
-    } catch {
-      showToast("Network error", "error");
-    } finally {
-      setSaving(false);
-    }
+      } else showToast(data?.message || "Failed", "error");
+    } catch { showToast("Network error", "error"); }
+    finally { setSaving(false); }
   };
 
   const handleLogout = () => {
@@ -226,6 +294,9 @@ export default function DriverProfilePage() {
   return (
     <div style={{ flex: 1, overflow: "auto" }}>
       <style>{DRIVER_STYLES}</style>
+
+      {/* Hidden file input for avatar */}
+      <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden onChange={handleAvatarUpload} />
 
       {/* Toast */}
       {toast && (
@@ -252,24 +323,39 @@ export default function DriverProfilePage() {
         <div style={{ animation: "fadeIn 0.25s" }}>
           {/* Avatar + name */}
           <div style={{ textAlign: "center", padding: "24px 16px 12px" }}>
-            {avatar ? (
-              <img src={avatar} alt={driverName} style={{
-                width: 72, height: 72, borderRadius: 36, objectFit: "cover",
-                border: "3px solid #0d7c3b", margin: "0 auto 10px", display: "block",
-              }} />
-            ) : (
-              <div style={{
-                width: 72, height: 72, borderRadius: 36,
-                background: "linear-gradient(135deg,#0d7c3b,#d97706)",
+            <div style={{ position: "relative", display: "inline-block" }}>
+              {avatar ? (
+                <img src={avatar} alt={driverName} style={{
+                  width: 72, height: 72, borderRadius: 36, objectFit: "cover",
+                  border: "3px solid #0d7c3b", display: "block",
+                }} />
+              ) : (
+                <div style={{
+                  width: 72, height: 72, borderRadius: 36,
+                  background: "linear-gradient(135deg,#0d7c3b,#d97706)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 22, fontWeight: 800, color: "#fff",
+                }}>{initials}</div>
+              )}
+              {/* Camera button */}
+              <button onClick={() => fileRef.current?.click()} style={{
+                position: "absolute", bottom: -2, right: -2,
+                width: 26, height: 26, borderRadius: 13,
+                background: "#0d7c3b", border: "2px solid #fff",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                margin: "0 auto 10px", fontSize: 22, fontWeight: 800, color: "#fff",
-              }}>{initials}</div>
-            )}
-            <div style={{ fontSize: 18, fontWeight: 800, color: "#111" }}>{driverName}</div>
+                cursor: "pointer",
+              }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+              </button>
+            </div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#111", marginTop: 10 }}>{driverName}</div>
             {email && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{email}</div>}
             {phone && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 1 }}>{phone}</div>}
 
-            {/* Badges row */}
+            {/* Badges */}
             <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 8 }}>
               <div style={{ padding: "3px 10px", borderRadius: 12, background: "#fefce8", border: "1px solid #fef3c7", fontSize: 10, fontWeight: 600, color: "#d97706", display: "flex", alignItems: "center", gap: 4 }}>
                 <I.Star s={10} c="#d97706" f="#d97706" /> {rating}
@@ -285,41 +371,30 @@ export default function DriverProfilePage() {
             </div>
           </div>
 
-          {/* Stats grid */}
+          {/* Stats */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, padding: "0 16px 10px" }}>
             {[
               { l: "Deliveries", v: totalDel, ic: <I.Pkg s={14} c="#0d7c3b" />, bg: "#f0fdf4" },
               { l: "Rating", v: rating, ic: <I.Star s={14} c="#d97706" f="#d97706" />, bg: "#fefce8" },
               { l: "Acceptance", v: acceptance, ic: <I.Check s={14} c="#3b82f6" />, bg: "#eff6ff" },
             ].map((s, i) => (
-              <div key={i} style={{
-                background: "#fff", borderRadius: 10, padding: "12px 10px",
-                border: "1px solid #f3f4f6", textAlign: "center",
-              }}>
-                <div style={{
-                  width: 28, height: 28, borderRadius: 7, background: s.bg,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  margin: "0 auto 6px",
-                }}>{s.ic}</div>
+              <div key={i} style={{ background: "#fff", borderRadius: 10, padding: "12px 10px", border: "1px solid #f3f4f6", textAlign: "center" }}>
+                <div style={{ width: 28, height: 28, borderRadius: 7, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px" }}>{s.ic}</div>
                 <div style={{ fontSize: 18, fontWeight: 800, color: "#111", lineHeight: 1 }}>{s.v}</div>
                 <div style={{ fontSize: 9, color: "#9ca3af", marginTop: 3 }}>{s.l}</div>
               </div>
             ))}
           </div>
 
-          {/* Menu items */}
+          {/* Menu */}
           <div style={{ padding: "6px 16px" }}>
             {MENU_ITEMS.map((item, idx) => (
               <button key={idx} onClick={() => handleOpenModal(item.modal)} style={{
                 width: "100%", display: "flex", alignItems: "center", gap: 10,
                 padding: "12px", background: "#fff", border: "1px solid #f3f4f6",
-                borderRadius: 10, marginBottom: 4, cursor: "pointer",
-                textAlign: "left",
+                borderRadius: 10, marginBottom: 4, cursor: "pointer", textAlign: "left",
               }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: 8, background: item.bg,
-                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: item.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <item.ic s={15} c={item.cl} />
                 </div>
                 <span style={{ fontSize: 13, fontWeight: 600, color: "#111", flex: 1 }}>{item.l}</span>
@@ -333,8 +408,7 @@ export default function DriverProfilePage() {
             <button onClick={handleLogout} style={{
               width: "100%", padding: "12px", borderRadius: 10,
               background: "#fef2f2", border: "1px solid #fecaca",
-              cursor: "pointer", display: "flex", alignItems: "center",
-              justifyContent: "center", gap: 6,
+              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
             }}>
               <I.Logout s={16} c="#dc2626" />
               <span style={{ fontSize: 13, fontWeight: 700, color: "#dc2626" }}>Sign Out</span>
@@ -343,41 +417,47 @@ export default function DriverProfilePage() {
         </div>
       )}
 
-      {/* ── Personal Info Modal ── */}
+      {/* ── Personal Info Modal (EDITABLE) ── */}
       <Modal open={activeModal === "personal"} onClose={() => setActiveModal(null)} title="Personal Info">
         <div style={{ marginTop: 8 }}>
           <div style={{ textAlign: "center", marginBottom: 16 }}>
-            {avatar ? (
-              <img src={avatar} alt={driverName} style={{ width: 64, height: 64, borderRadius: 32, objectFit: "cover", border: "2px solid #0d7c3b" }} />
-            ) : (
-              <div style={{ width: 64, height: 64, borderRadius: 32, background: "linear-gradient(135deg,#0d7c3b,#d97706)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", fontSize: 20, fontWeight: 800, color: "#fff" }}>{initials}</div>
-            )}
+            <div style={{ position: "relative", display: "inline-block" }}>
+              {avatar ? (
+                <img src={avatar} alt={driverName} style={{ width: 64, height: 64, borderRadius: 32, objectFit: "cover", border: "2px solid #0d7c3b" }} />
+              ) : (
+                <div style={{ width: 64, height: 64, borderRadius: 32, background: "linear-gradient(135deg,#0d7c3b,#d97706)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 800, color: "#fff" }}>{initials}</div>
+              )}
+              <button onClick={() => fileRef.current?.click()} style={{
+                position: "absolute", bottom: -2, right: -2, width: 22, height: 22, borderRadius: 11,
+                background: "#0d7c3b", border: "2px solid #fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+              }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" /><circle cx="12" cy="13" r="4" />
+                </svg>
+              </button>
+            </div>
           </div>
-          <Field label="Full Name" value={driverName} disabled />
-          <Field label="Email Address" value={email} disabled />
-          <Field label="Phone Number" value={phone} disabled />
-          <Field label="Transport Type" value={transport} disabled />
-          {plate && <Field label="Number Plate" value={plate} disabled />}
-          <div style={{ padding: "8px 0", textAlign: "center" }}>
-            <span style={{ fontSize: 11, color: "#9ca3af" }}>Contact support to update your personal information</span>
-          </div>
+          <Field label="Full Name" value={editName} onChange={setEditName} placeholder="Your full name" />
+          <Field label="Email Address" value={editEmail} onChange={setEditEmail} placeholder="email@example.com" type="email" />
+          <Field label="Phone Number" value={editPhone} onChange={setEditPhone} placeholder="0771234567" type="tel" />
+          <SaveBtn onClick={handleSaveProfile} saving={saving} label="Save Profile" />
         </div>
       </Modal>
 
-      {/* ── Vehicle Details Modal ── */}
+      {/* ── Vehicle Details Modal (EDITABLE) ── */}
       <Modal open={activeModal === "vehicle"} onClose={() => setActiveModal(null)} title="Vehicle Details">
         <div style={{ marginTop: 8 }}>
-          <div style={{
-            textAlign: "center", padding: 20, background: "#eff6ff", borderRadius: 12, marginBottom: 16,
-          }}>
+          <div style={{ textAlign: "center", padding: 20, background: "#eff6ff", borderRadius: 12, marginBottom: 16 }}>
             <I.Bike s={40} c="#3b82f6" />
           </div>
-          <Field label="Vehicle Type" value={transport === "motorcycle" ? "Motorcycle" : transport === "bike" ? "Bicycle" : transport === "vehicle" ? "Car/Van" : transport} disabled />
-          <Field label="Number Plate" value={plate || "Not set"} disabled />
-          <Field label="Service Area" value={driver?.serviceArea ? `${driver.serviceArea.radiusKm || "?"}km radius` : "Not configured"} disabled />
-          <div style={{ padding: "8px 0", textAlign: "center" }}>
-            <span style={{ fontSize: 11, color: "#9ca3af" }}>Contact support to update vehicle details</span>
-          </div>
+          <SelectField label="Vehicle Type" value={editTransport} onChange={setEditTransport}
+            options={[
+              { value: "motorcycle", label: "Motorcycle" },
+              { value: "bike", label: "Bicycle" },
+              { value: "vehicle", label: "Car / Van" },
+            ]} />
+          <Field label="Number Plate" value={editPlate} onChange={setEditPlate} placeholder="e.g. UAB 123X" />
+          <SaveBtn onClick={handleSaveVehicle} saving={saving} label="Save Vehicle Details" />
         </div>
       </Modal>
 
@@ -385,20 +465,13 @@ export default function DriverProfilePage() {
       <Modal open={activeModal === "documents"} onClose={() => setActiveModal(null)} title="Documents">
         <div style={{ marginTop: 8 }}>
           {[
-            { name: "National ID", status: driver?.nationalIdVerified ? "verified" : "pending", icon: I.Shield },
-            { name: "Driving License", status: driver?.licenseVerified ? "verified" : "pending", icon: I.Shield },
-            { name: "Vehicle Registration", status: driver?.vehicleRegVerified ? "verified" : "pending", icon: I.Shield },
+            { name: "National ID", status: driver?.nationalIdVerified ? "verified" : "pending" },
+            { name: "Driving License", status: driver?.licenseVerified ? "verified" : "pending" },
+            { name: "Vehicle Registration", status: driver?.vehicleRegVerified ? "verified" : "pending" },
           ].map((doc, i) => (
-            <div key={i} style={{
-              display: "flex", alignItems: "center", gap: 10,
-              padding: "12px", background: "#fff", border: "1px solid #f3f4f6",
-              borderRadius: 10, marginBottom: 6,
-            }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: 9, background: "#fefce8",
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-              }}>
-                <doc.icon s={16} c="#d97706" />
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px", background: "#fff", border: "1px solid #f3f4f6", borderRadius: 10, marginBottom: 6 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 9, background: "#fefce8", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <I.Shield s={16} c="#d97706" />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "#111" }}>{doc.name}</div>
@@ -423,94 +496,41 @@ export default function DriverProfilePage() {
       {/* ── Payout Method Modal (FUNCTIONAL) ── */}
       <Modal open={activeModal === "payout"} onClose={() => setActiveModal(null)} title="Payout Method">
         <div style={{ marginTop: 8 }}>
-          <div style={{
-            padding: "10px 12px", background: "#f0fdfa", borderRadius: 8, marginBottom: 14,
-            display: "flex", alignItems: "center", gap: 8,
-          }}>
+          <div style={{ padding: "10px 12px", background: "#f0fdfa", borderRadius: 8, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
             <I.Wallet s={16} c="#14b8a6" />
             <span style={{ fontSize: 11, color: "#14b8a6", fontWeight: 600 }}>Mobile Money Payout</span>
           </div>
-          <SelectField
-            label="Provider"
-            value={payoutProvider}
-            onChange={setPayoutProvider}
-            options={[
-              { value: "MTN", label: "MTN Mobile Money" },
-              { value: "AIRTEL", label: "Airtel Money" },
-            ]}
-          />
-          <Field
-            label="Phone Number"
-            value={payoutPhone}
-            onChange={setPayoutPhone}
-            placeholder="e.g. 0771234567"
-            type="tel"
-          />
-          <Field
-            label="Account Name"
-            value={payoutName}
-            onChange={setPayoutName}
-            placeholder="Name on mobile money account"
-          />
-          <button
-            onClick={handleSavePayout}
-            disabled={saving || !payoutPhone}
-            style={{
-              width: "100%", padding: "12px", borderRadius: 10, marginTop: 4,
-              background: saving || !payoutPhone ? "#d1d5db" : "#0d7c3b",
-              color: "#fff", fontWeight: 700, fontSize: 13,
-              border: "none", cursor: saving || !payoutPhone ? "not-allowed" : "pointer",
-              fontFamily: "'Bricolage Grotesque',sans-serif",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-            }}
-          >
-            {saving ? (
-              <div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-            ) : (
-              <I.Check s={14} c="#fff" />
-            )}
-            {saving ? "Saving..." : "Save Payout Method"}
-          </button>
+          <SelectField label="Provider" value={payoutProvider} onChange={setPayoutProvider}
+            options={[{ value: "MTN", label: "MTN Mobile Money" }, { value: "AIRTEL", label: "Airtel Money" }]} />
+          <Field label="Phone Number" value={payoutPhone} onChange={setPayoutPhone} placeholder="e.g. 0771234567" type="tel" />
+          <Field label="Account Name" value={payoutName} onChange={setPayoutName} placeholder="Name on mobile money account" />
+          <SaveBtn onClick={handleSavePayout} saving={saving} disabled={!payoutPhone} label="Save Payout Method" />
         </div>
       </Modal>
 
       {/* ── Ratings Modal ── */}
       <Modal open={activeModal === "ratings"} onClose={() => setActiveModal(null)} title="Ratings & Reviews">
         <div style={{ marginTop: 8 }}>
-          {/* Summary */}
           <div style={{ textAlign: "center", padding: "16px", background: "#fefce8", borderRadius: 12, marginBottom: 14 }}>
             <div style={{ fontSize: 36, fontWeight: 800, color: "#111", lineHeight: 1 }}>{rating}</div>
             <div style={{ display: "flex", justifyContent: "center", gap: 2, margin: "6px 0" }}>
-              {[1,2,3,4,5].map(s => (
-                <I.Star key={s} s={16} c={s <= Math.round(driver?.averageRating || 0) ? "#d97706" : "#e5e7eb"} f={s <= Math.round(driver?.averageRating || 0) ? "#d97706" : "none"} />
-              ))}
+              {[1,2,3,4,5].map(s => <I.Star key={s} s={16} c={s <= Math.round(driver?.averageRating || 0) ? "#d97706" : "#e5e7eb"} f={s <= Math.round(driver?.averageRating || 0) ? "#d97706" : "none"} />)}
             </div>
             <div style={{ fontSize: 11, color: "#6b7280" }}>{driver?.ratingCount || 0} reviews</div>
           </div>
-
-          {/* Reviews list */}
           {ratings?.reviews?.length > 0 ? (
             ratings.reviews.slice(0, 10).map((r, i) => (
-              <div key={i} style={{
-                padding: "10px 12px", background: "#fff", border: "1px solid #f3f4f6",
-                borderRadius: 8, marginBottom: 4,
-              }}>
+              <div key={i} style={{ padding: "10px 12px", background: "#fff", border: "1px solid #f3f4f6", borderRadius: 8, marginBottom: 4 }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
                   <div style={{ display: "flex", gap: 2 }}>
-                    {[1,2,3,4,5].map(s => (
-                      <I.Star key={s} s={10} c={s <= (r.rating || 0) ? "#d97706" : "#e5e7eb"} f={s <= (r.rating || 0) ? "#d97706" : "none"} />
-                    ))}
+                    {[1,2,3,4,5].map(s => <I.Star key={s} s={10} c={s <= (r.rating || 0) ? "#d97706" : "#e5e7eb"} f={s <= (r.rating || 0) ? "#d97706" : "none"} />)}
                   </div>
-                  <span style={{ fontSize: 9, color: "#9ca3af" }}>
-                    {r.createdAt ? new Date(r.createdAt).toLocaleDateString("en-UG", { month: "short", day: "numeric" }) : ""}
-                  </span>
+                  <span style={{ fontSize: 9, color: "#9ca3af" }}>{r.createdAt ? new Date(r.createdAt).toLocaleDateString("en-UG", { month: "short", day: "numeric" }) : ""}</span>
                 </div>
                 {r.comment && <div style={{ fontSize: 12, color: "#374151" }}>{r.comment}</div>}
                 {r.tags?.length > 0 && (
                   <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 4 }}>
-                    {r.tags.map((t, j) => (
-                      <span key={j} style={{ padding: "2px 8px", borderRadius: 8, background: "#f3f4f6", fontSize: 9, color: "#6b7280", fontWeight: 500 }}>{t}</span>
-                    ))}
+                    {r.tags.map((t, j) => <span key={j} style={{ padding: "2px 8px", borderRadius: 8, background: "#f3f4f6", fontSize: 9, color: "#6b7280" }}>{t}</span>)}
                   </div>
                 )}
               </div>
@@ -533,32 +553,18 @@ export default function DriverProfilePage() {
             { name: "Location Sharing", desc: "Share live location during deliveries", enabled: true },
             { name: "Sound Alerts", desc: "Play sound for new orders", enabled: true },
           ].map((s, i) => (
-            <div key={i} style={{
-              display: "flex", alignItems: "center", gap: 10,
-              padding: "12px", background: "#fff", border: "1px solid #f3f4f6",
-              borderRadius: 10, marginBottom: 4,
-            }}>
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px", background: "#fff", border: "1px solid #f3f4f6", borderRadius: 10, marginBottom: 4 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "#111" }}>{s.name}</div>
                 <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 1 }}>{s.desc}</div>
               </div>
-              <div style={{
-                width: 36, height: 20, borderRadius: 10,
-                background: s.enabled ? "#0d7c3b" : "#d1d5db",
-                position: "relative", transition: "background 0.2s",
-              }}>
-                <div style={{
-                  width: 16, height: 16, borderRadius: 8,
-                  background: "#fff", position: "absolute", top: 2,
-                  left: s.enabled ? 18 : 2,
-                  transition: "left 0.2s",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
-                }} />
+              <div style={{ width: 36, height: 20, borderRadius: 10, background: s.enabled ? "#0d7c3b" : "#d1d5db", position: "relative" }}>
+                <div style={{ width: 16, height: 16, borderRadius: 8, background: "#fff", position: "absolute", top: 2, left: s.enabled ? 18 : 2, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.15)" }} />
               </div>
             </div>
           ))}
           <div style={{ padding: "12px 0 4px" }}>
-            <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 8 }}>App Version 1.0.0</div>
+            <div style={{ fontSize: 11, color: "#9ca3af" }}>App Version 1.0.0</div>
           </div>
         </div>
       </Modal>
