@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/server-api/:path*",
+      "destination": "https://yookatale-server.onrender.com/api/:path*"
+    }
+  ]
+}

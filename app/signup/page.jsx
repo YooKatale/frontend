@@ -127,8 +127,7 @@ const SignUp = () => {
           let fullUser = null;
           if (t) {
             try {
-              const base = (DB_URL || "").replace(/\/api\/?$/, "");
-              const res = await fetch(`${base}/api/auth/me`, {
+              const res = await fetch(`${API_ORIGIN}/api/auth/me`, {
                 headers: { Authorization: `Bearer ${t}` },
                 credentials: "include"
               });

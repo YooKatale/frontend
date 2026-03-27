@@ -112,8 +112,7 @@ const SignIn = ({ redirect, callback, ismodal }) => {
           let fullUser = null;
           if (t) {
             try {
-              const base = (DB_URL || "").replace(/\/api\/?$/, "");
-              const res = await fetch(`${base}/api/auth/me`, {
+              const res = await fetch(`${API_ORIGIN}/api/auth/me`, {
                 headers: { Authorization: `Bearer ${t}` },
                 credentials: "include"
               });
@@ -147,8 +146,7 @@ const SignIn = ({ redirect, callback, ismodal }) => {
       }
 
       // Fallback: Try to fetch user from cookie (cross-domain scenario)
-      const base = (DB_URL || "").replace(/\/api\/?$/, "");
-      let res = await fetchAuthMeWithCookieRetries(base);
+      let res = await fetchAuthMeWithCookieRetries(API_ORIGIN);
       if (!res) {
         try { res = await fetchAuthMe().unwrap(); } catch (_) {}
       }
