@@ -71,6 +71,16 @@ function resolveMealImage(url) {
   return getImageUrl(url);
 }
 
+/** Calculate countdown days to a specific date */
+function getCountdownDays(targetDate) {
+  if (!targetDate) return null;
+  const target = new Date(targetDate).getTime();
+  const today = new Date().getTime();
+  const diff = target - today;
+  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  return days > 0 ? days : null;
+}
+
 /** Meal card for homepage: shows meal from calendar config, click -> subscription */
 function HomeMealCard({ item }) {
   const router = useRouter();
@@ -530,6 +540,7 @@ export default function Home() {
               const isWide = i === 2;
               const href = card.link || "#";
               const external = href.startsWith("http");
+              const countdown = card.countdown ? getCountdownDays(card.countdown) : null;
               return (
                 <div key={i} className={`s-card${isWide ? " s-card-wide" : ""}`} role="button" tabIndex={0} onClick={() => external ? window.open(href, "_blank") : router.push(href)} onKeyDown={(e) => e.key === "Enter" && (external ? window.open(href, "_blank") : router.push(href))}>
                   <div className="s-card-bg" style={{ background: `linear-gradient(145deg,${card.gradientColors?.[0] || "#1a0510"},${card.gradientColors?.[1] || "#5c0a30"})` }} />
@@ -541,6 +552,7 @@ export default function Home() {
                       <div className="s-card-dot">{i === 0 ? <GiftIcon s={12} c="rgba(255,200,200,.8)" /> : i === 1 ? <TruckIcon s={12} c="rgba(100,200,255,.8)" /> : <DownloadIcon s={12} c="rgba(180,240,120,.8)" />}</div>
                     </div>
                     <div className="s-card-title">{card.title}</div>
+                    {countdown && <div style={{ fontSize: 12, color: "#fff", marginBottom: 6, fontWeight: 600 }}>{countdown} days left!</div>}
                     <div className="s-card-cta">{card.ctaText} <ChevRight s={10} /></div>
                   </div>
                 </div>
