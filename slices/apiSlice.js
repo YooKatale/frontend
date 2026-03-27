@@ -1,18 +1,19 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { DB_URL } from "@config/config";
+import { DB_URL, API_ORIGIN } from "@config/config";
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: "/",
   credentials: "include",
 });
 
-const BACKEND_ORIGIN = (DB_URL || "").replace(/\/api\/?$/, "");
+// Use actual API_ORIGIN for backend detection (e.g., https://yookatale-server.onrender.com)
+const BACKEND_ORIGIN = API_ORIGIN || "https://yookatale-server.onrender.com";
 
 /** Use full URL as-is when endpoint url is absolute. For backend URLs, always send Authorization Bearer token from store so auth works on all devices (not just cookie). */
 function baseQueryWithAbsoluteUrl(args, api, extraOptions) {
   const url = typeof args?.url === "string" ? args.url : args?.url?.url;
   if (url && (url.startsWith("http://") || url.startsWith("https://"))) {
-    const isBackend = BACKEND_ORIGIN && url.startsWith(BACKEND_ORIGIN);
+    const isBackend = url.startsWith(BACKEND_ORIGIN);
     return fetchBaseQuery({
       baseUrl: "",
       credentials: "include",
