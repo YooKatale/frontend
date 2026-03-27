@@ -251,6 +251,7 @@ const Header = () => {
     { label: "Cashout", href: "/cashout", icon: FaWallet },
     { label: "Rewards", href: "/rewards", icon: FaStar },
     { label: "Gift Cards", href: "/gift-cards", icon: FaGift },
+    { label: "Driver Dashboard", href: "/driver/dashboard", icon: FaTruck },
     { label: "Invite a friend", href: "/#refer", icon: FaGift, isInvite: true },
     { label: "Sign Up", href: "/signup", icon: AiOutlineLogin, hideWhenLoggedIn: true },
   ];
