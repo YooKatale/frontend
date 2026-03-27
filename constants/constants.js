@@ -26,7 +26,8 @@ export function getAvatarUrl(avatar) {
   if (!s) return undefined;
   if (s.startsWith("http://") || s.startsWith("https://") || s.startsWith("data:")) return s;
   const origin = (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_ORIGIN) || "https://yookatale-server.onrender.com";
-  return origin.replace(/\/$/, "") + (s.startsWith("/") ? s : "/" + s);
+  const resolved = origin.replace(/\/$/, "") + (s.startsWith("/") ? s : "/" + s);
+  return resolved;
 }
 
 /** Get user avatar URL from user object (handles avatar, profilePic, profile_pic, picture for Google). */
@@ -61,6 +62,18 @@ export function getOptimizedImageUrl(url) {
     : getAvatarUrl(s);
   if (!resolved) return undefined;
   return `/api/image?url=${encodeURIComponent(resolved)}`;
+}
+
+/**
+ * Get avatar URL with fallback to default placeholder.
+ * Tries user avatar first, falls back to default avatar image.
+ */
+export function getAvatarUrlWithFallback(user) {
+  if (!user || typeof user !== "object") return "/assets/icons/default-avatar.png";
+  const url = user.avatar || user.profilePic || user.profile_pic || user.profileImage || user.picture || user.photoURL;
+  if (url) return getAvatarUrl(url);
+  // Fallback to default avatar
+  return "/assets/icons/default-avatar.png";
 }
 
 /** Client/vendor dashboard URL (e.g. seller app). Set NEXT_PUBLIC_CLIENT_DASHBOARD_URL in env or defaults to /sell. */

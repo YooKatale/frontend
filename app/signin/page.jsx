@@ -106,17 +106,30 @@ const SignIn = ({ redirect, callback, ismodal }) => {
           }
           if (tokenFromUrl) data = { ...data, token: tokenFromUrl };
           if (!data?.token && !data?.accessToken) data.token = tokenFromUrl;
-          dispatch(setCredentials(data));
           const t = data?.token ?? data?.accessToken;
+
+          // Fetch fresh user data including avatar from /api/auth/me
+          let fullUser = null;
           if (t) {
             try {
               const base = (DB_URL || "").replace(/\/api\/?$/, "");
-              const res = await fetch(`${base}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` }, credentials: "include" });
+              const res = await fetch(`${base}/api/auth/me`, {
+                headers: { Authorization: `Bearer ${t}` },
+                credentials: "include"
+              });
               const json = await res.json().catch(() => ({}));
-              const fullUser = json?.data ?? json?.user ?? json;
-              if (fullUser && (fullUser._id || fullUser.id)) dispatch(setCredentials({ ...data, ...fullUser, token: t }));
-            } catch (_) {}
+              fullUser = json?.data ?? json?.user ?? json;
+            } catch (err) {
+              console.warn("Failed to fetch user data from /api/auth/me:", err);
+            }
           }
+
+          // Merge data: prefer /api/auth/me response (has avatar + all fields), fallback to URL params
+          const userData = fullUser && (fullUser._id || fullUser.id)
+            ? { ...data, ...fullUser, token: t, avatar: fullUser.avatar || data.avatar }
+            : { ...data, token: t };
+
+          dispatch(setCredentials(userData));
           chakraToast({
             title: "Welcome back!",
             description: `Signed in successfully`,
@@ -125,17 +138,22 @@ const SignIn = ({ redirect, callback, ismodal }) => {
             isClosable: true,
             position: "top-right",
           });
-          if (callback) callback({ loggedIn: true, user: data?._id });
+          if (callback) callback({ loggedIn: true, user: userData?._id });
           else push(redirectTo || redirect || "/");
           return;
-        } catch (_) {}
+        } catch (err) {
+          console.error("Google callback error:", err);
+        }
       }
+
+      // Fallback: Try to fetch user from cookie (cross-domain scenario)
       const base = (DB_URL || "").replace(/\/api\/?$/, "");
       let res = await fetchAuthMeWithCookieRetries(base);
       if (!res) {
         try { res = await fetchAuthMe().unwrap(); } catch (_) {}
       }
-      if (res) {
+
+      if (res && (res._id || res.id)) {
         const token = res?.token ?? res?.accessToken;
         dispatch(setCredentials({ ...res, token }));
         chakraToast({
@@ -151,9 +169,9 @@ const SignIn = ({ redirect, callback, ismodal }) => {
       } else {
         chakraToast({
           title: "Session sync failed",
-          description: "Frontend and backend are on different domains (Vercel vs Render), so session cookies can't be shared. Sign in with email below, or configure the backend to redirect with the token in the URL (see BACKEND_GOOGLE_TOKEN_REDIRECT.md).",
+          description: "Sign in with email below or try again.",
           status: "warning",
-          duration: 8000,
+          duration: 7000,
           isClosable: true,
           position: "top-right",
         });

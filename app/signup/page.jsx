@@ -121,33 +121,51 @@ const SignUp = () => {
           }
           if (tokenFromUrl) data = { ...data, token: tokenFromUrl };
           if (!data?.token && !data?.accessToken) data.token = tokenFromUrl;
-          dispatch(setCredentials(data));
           const t = data?.token ?? data?.accessToken;
+
+          // Fetch fresh user data including avatar from /api/auth/me
+          let fullUser = null;
           if (t) {
             try {
               const base = (DB_URL || "").replace(/\/api\/?$/, "");
-              const res = await fetch(`${base}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` }, credentials: "include" });
+              const res = await fetch(`${base}/api/auth/me`, {
+                headers: { Authorization: `Bearer ${t}` },
+                credentials: "include"
+              });
               const json = await res.json().catch(() => ({}));
-              const fullUser = json?.data ?? json?.user ?? json;
-              if (fullUser && (fullUser._id || fullUser.id)) dispatch(setCredentials({ ...data, ...fullUser, token: t }));
-            } catch (_) {}
+              fullUser = json?.data ?? json?.user ?? json;
+            } catch (err) {
+              console.warn("Failed to fetch user data from /api/auth/me:", err);
+            }
           }
+
+          // Merge data: prefer /api/auth/me response (has avatar + all fields), fallback to URL params
+          const userData = fullUser && (fullUser._id || fullUser.id)
+            ? { ...data, ...fullUser, token: t, avatar: fullUser.avatar || data.avatar }
+            : { ...data, token: t };
+
+          dispatch(setCredentials(userData));
           push(redirectTo || "/");
           return;
-        } catch (_) {}
+        } catch (err) {
+          console.error("Google callback error:", err);
+        }
       }
+
+      // Fallback: Try to fetch user from cookie (cross-domain scenario)
       const base = (DB_URL || "").replace(/\/api\/?$/, "");
       let res = await fetchAuthMeWithCookieRetries(base);
       if (!res) {
         try { res = await fetchAuthMe().unwrap(); } catch (_) {}
       }
-      if (res) {
+
+      if (res && (res._id || res.id)) {
         dispatch(setCredentials({ ...res, token: res?.token ?? res?.accessToken }));
         push(redirectTo || "/");
       } else {
         chakraToast({
           title: "Session sync failed",
-          description: "Sign in with email below or try again. For Google sign-in on all devices, the backend should redirect with token in the URL.",
+          description: "Sign in with email below or try again.",
           status: "warning",
           duration: 7000,
           isClosable: true,

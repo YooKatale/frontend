@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { DB_URL } from "@config/config";
+import { getAvatarUrl } from "@constants/constants";
 import {
   FaShoppingBag, FaMoneyBillWave, FaStar, FaToggleOn, FaToggleOff,
   FaStore, FaClock, FaCheckCircle,
@@ -105,13 +107,57 @@ export default function VendorDashboardPage() {
     <div>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px", flexWrap: "wrap", gap: "12px" }}>
-        <div>
-          <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#111827", margin: 0 }}>
-            {vendor?.name || "My Store"}
-          </h1>
-          <p style={{ color: "#6b7280", margin: "4px 0 0", fontSize: "0.875rem" }}>
-            {vendor?.category} • {vendor?.address}
-          </p>
+        <div style={{ display: "flex", gap: "16px", alignItems: "flex-start", flex: 1 }}>
+          {/* Avatar */}
+          <Link href="/vendor/profile">
+            <div style={{
+              width: "80px",
+              height: "80px",
+              borderRadius: "12px",
+              background: vendor?.profileImage ? "transparent" : `linear-gradient(135deg, ${PRIMARY}, #4cd964)`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden",
+              flexShrink: 0,
+              cursor: "pointer",
+              border: "2px solid #e5e7eb",
+              transition: "border-color 0.2s",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.borderColor = PRIMARY}
+            onMouseLeave={(e) => e.currentTarget.style.borderColor = "#e5e7eb"}
+            >
+              {vendor?.profileImage ? (
+                <img
+                  src={getAvatarUrl(vendor.profileImage)}
+                  alt={vendor.name}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <span style={{
+                  fontSize: "32px",
+                  fontWeight: "bold",
+                  color: "#fff",
+                  textTransform: "uppercase",
+                }}>
+                  {vendor?.name?.charAt(0) || "V"}
+                </span>
+              )}
+            </div>
+          </Link>
+
+          {/* Info */}
+          <div>
+            <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#111827", margin: 0 }}>
+              {vendor?.name || "My Store"}
+            </h1>
+            <p style={{ color: "#6b7280", margin: "4px 0 0", fontSize: "0.875rem" }}>
+              {vendor?.category} • {vendor?.address}
+            </p>
+            <Link href="/vendor/profile" style={{ color: PRIMARY, fontSize: "0.875rem", fontWeight: 600, textDecoration: "none", marginTop: "8px", display: "inline-block" }}>
+              Edit Profile →
+            </Link>
+          </div>
         </div>
 
         {/* Open/Closed toggle */}
