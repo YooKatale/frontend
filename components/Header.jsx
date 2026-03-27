@@ -109,7 +109,7 @@ const Header = () => {
   const [fetchCashoutStats] = useGetCashoutStatsMutation();
   const { isOpen: isReferralOpen, onOpen: openReferral, onClose: closeReferral } = useDisclosure();
 
-  const userDisplayName = userInfo?.name || userInfo?.firstname || userInfo?.email || "Account";
+  const userDisplayName = userInfo?.firstname ? `${userInfo.firstname}${userInfo.lastname ? ` ${userInfo.lastname}` : ''}` : (userInfo?.email || "Account");
   const wishlistItems = useSelector((s) => s.wishlist?.items ?? []);
   const wishlistCount = Array.isArray(wishlistItems) ? wishlistItems.length : 0;
 
