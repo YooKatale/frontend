@@ -91,6 +91,7 @@ export const metadata = {
   },
   other: {
     "mobile-web-app-capable": "yes",
+    "google-adsense-account": "ca-pub-1931973034560006",
   },
 };
 
@@ -98,6 +99,12 @@ const RootLayout = ({ children }) => {
   return (
     <html lang="en">
       <head>
+        {/* Google AdSense */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1931973034560006"
+          crossOrigin="anonymous"
+        />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
