@@ -1,0 +1,10 @@
+[33m48585d5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m feat: replace Eid banner with Easter banner and countdown
+[33m7421692[m feat: add easter countdown timer to homepage banner
+[33m48a7fa3[m fix: resolve avatar upload double /api path and add driver dashboard navbar link
+[33m72f0c14[m fix: use API_ORIGIN for backend URL detection in baseQuery
+[33m568a43a[m fix: display user firstname/lastname in header instead of 'Account'
+[33m0b7cadd[m fix: google oauth data extraction and api proxy configuration
+[33mc42bf4e[m fix: google oauth avatar sync and vendor profile image display
+[33mce18b35[m feat: driver earnings, payout MTN/Airtel logos, profile image fixes
+[33mb1b82c9[m feat: functional driver profile, Yookatale logo on sidebar
+[33mb969d8a[m feat(driver): real maps, profile modals, fix site navbar on driver pages

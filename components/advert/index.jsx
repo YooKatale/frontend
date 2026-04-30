@@ -19,15 +19,14 @@ const AdvertCard = () => {
 
   return (
     <div className="payment-blur-overlay">
-      {/* <div className="payment-blur-content"> */}
-        {/* <div className="payment-blur-message"> */}
-          {/* <h2>🔒 Access Restricted</h2>...... */}
-          {/* <p>Advertising</p> */}
-          {/* <p className="payment-blur-subtitle">
+      <div className="payment-blur-content">
+        <div className="payment-blur-message">
+          <h2>Advertising</h2>
+          <p className="payment-blur-subtitle">
             ....................................................
-          </p> */}
-        {/* </div> */}
-      {/* </div> */}
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
