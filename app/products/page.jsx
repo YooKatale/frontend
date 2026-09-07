@@ -49,12 +49,30 @@ const Products = () => {
   const [fetchProducts] = useProductsGetMutation();
   const [fetchCategories] = useProductsCategoriesGetMutation();
 
+  const normalizeProductsPayload = (payload) => {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.data)) return payload.data;
+    if (Array.isArray(payload?.products)) return payload.products;
+    if (Array.isArray(payload?.items)) return payload.items;
+    return [];
+  };
+
+  const isSuccessfulProductsPayload = (payload) => {
+    if (Array.isArray(payload)) return true;
+    if (!payload || typeof payload !== "object") return false;
+
+    const status = payload.status ?? payload.state;
+    if (status === "Success" || status === "success") return true;
+    if (payload.success === true || payload.ok === true) return true;
+    return Array.isArray(payload.data) || Array.isArray(payload.products) || Array.isArray(payload.items);
+  };
+
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
-    try {
-      setIsLoading(true);
+      try {
+        setIsLoading(true);
         const [productsRes, catsRes] = await Promise.allSettled([
           fetchProducts().unwrap(),
           fetchCategories().unwrap(),
@@ -62,14 +80,16 @@ const Products = () => {
 
         if (cancelled) return;
 
-        if (productsRes.status === "fulfilled" && productsRes.value?.status === "Success") {
-          const data = Array.isArray(productsRes.value.data) ? productsRes.value.data : [];
+        if (productsRes.status === "fulfilled" && isSuccessfulProductsPayload(productsRes.value)) {
+          const data = normalizeProductsPayload(productsRes.value);
           setAllProducts(data);
           setProducts(data);
+
           if (data.length) {
             const prices = data
               .map((p) => Number(p.price) || 0)
               .filter((n) => Number.isFinite(n) && n >= 0);
+
             if (prices.length) {
               const min = Math.min(...prices);
               const max = Math.max(...prices);
@@ -91,17 +111,17 @@ const Products = () => {
             apiSlug: slugForBackend(c.name),
           }));
           setCategories(mapped);
-      }
-    } catch (error) {
+        }
+      } catch (error) {
         console.error("Error loading products:", error);
         toast({
-        title: "Error",
-        description: "Failed to load products",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    } finally {
+          title: "Error",
+          description: "Failed to load products",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      } finally {
         if (!cancelled) setIsLoading(false);
       }
     }
@@ -147,7 +167,7 @@ const Products = () => {
     return list;
   }, [products, searchTerm, selectedCategorySlugs, priceMin, priceMax, sort]);
 
-  const visibleProducts = filteredProducts.slice(0, visibleCount);
+  const visibleProducts = filteredProducts;
 
   const activeFilterChips = useMemo(() => {
     const chips = [];

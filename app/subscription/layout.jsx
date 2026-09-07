@@ -1,27 +1,36 @@
 export const metadata = {
-  title: "Meal Plan Subscriptions — Weekly Fresh Food Delivery",
+  title: "Yookatale Meal Plan Subscriptions — Fresh Daily & Weekly Food Delivery",
   description:
-    "Subscribe to Yookatale's weekly meal plans. Get fresh, nutritious food delivered to your door every week in Kampala. Affordable plans starting from UGX 50,000.",
+    "Subscribe to Yookatale's affordable meal plans starting from UGX 40,000. Enjoy fresh, nutritious ready-to-eat or ready-to-cook meals delivered daily or weekly across Kampala.",
   keywords: [
     "meal plan Uganda",
-    "weekly grocery subscription Uganda",
-    "food subscription Kampala",
-    "Yookatale subscription",
-    "fresh food plan Uganda",
-    "weekly delivery Uganda",
-    "affordable meal plan Kampala",
+    "weekly meal subscription Uganda",
+    "daily food delivery Kampala",
+    "Yookatale meal plans",
+    "fresh food subscription Uganda",
+    "ready to eat meals Kampala",
+    "ready to cook ingredients Uganda",
+    "affordable meal plans Uganda",
   ],
   openGraph: {
-    title: "Subscribe to Weekly Meal Plans | Yookatale Uganda",
+    title: "Yookatale Meal Plan Subscriptions — Fresh Food Delivered in Kampala",
     description:
-      "Get fresh, healthy food delivered to your home every week. Choose a Yookatale meal plan that fits your lifestyle and budget.",
+      "Choose from individual, family, or business meal plans. Fresh food delivered daily or weekly. Plans start at UGX 40,000.",
     url: "https://yookatale.com/subscription",
-    images: [{ url: "/assets/icons/logo2.png", width: 1200, height: 630, alt: "Yookatale Meal Plan Subscription" }],
+    images: [
+      {
+        url: "/assets/icons/logo2.png",
+        width: 1200,
+        height: 630,
+        alt: "Yookatale Meal Plan Subscription",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Weekly Meal Plans | Yookatale",
-    description: "Fresh food delivered weekly to your door. Subscribe to a Yookatale meal plan today.",
+    title: "Yookatale Meal Plans — Fresh Food Delivered",
+    description:
+      "Affordable meal plans starting at UGX 40,000. Fresh ready-to-eat and ready-to-cook meals delivered across Kampala.",
   },
   alternates: { canonical: "https://yookatale.com/subscription" },
 };
@@ -29,3 +38,4 @@ export const metadata = {
 export default function SubscriptionLayout({ children }) {
   return children;
 }
+

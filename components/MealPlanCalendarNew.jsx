@@ -225,7 +225,11 @@ const MP_CSS = `
 .footer-sub{font-size:11px;color:#4ade80;font-weight:500}
 `;
 
-export default function MealPlanCalendarNew({ planType = "premium", subscriptionPackages = [], onPlanSelect }) {
+export default function MealPlanCalendarNew({
+  planType = "premium",
+  subscriptionPackages = [],
+  onPlanSelect,
+}) {
   const [activeDay, setActiveDay] = useState("Mon");
   const [mode, setMode] = useState("eat");
   const [duration, setDuration] = useState("weekly");
@@ -236,6 +240,9 @@ export default function MealPlanCalendarNew({ planType = "premium", subscription
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const [mealOverrides, setMealOverrides] = useState([]);
   const [mealSlots, setMealSlots] = useState([]);
+
+  // Subscription package names map to the seed script's customerType values.
+  const customerType = planType?.toLowerCase() === "premium" ? "individual" : (planType?.toLowerCase() || "individual");
 
   const toast = useToast();
   const router = useRouter();
@@ -253,8 +260,10 @@ export default function MealPlanCalendarNew({ planType = "premium", subscription
   }, [fetchOverrides]);
   useEffect(() => {
     fetchSlots().unwrap().then((res) => {
-      if (res?.status === "Success" && Array.isArray(res?.data)) setMealSlots(res.data);
-    }).catch(() => {});
+      const slots = Array.isArray(res) ? res : res?.data;
+      const successful = Array.isArray(res) || res?.status === "Success" || res?.status === "success" || res?.success === true;
+      setMealSlots(successful && Array.isArray(slots) ? slots : []);
+    }).catch(() => setMealSlots([]));
   }, [fetchSlots]);
 
   const { data: ratingsData, refetch: refetchRatings } = useGetPlanRatingsQuery(
@@ -268,17 +277,20 @@ export default function MealPlanCalendarNew({ planType = "premium", subscription
   const dayBackend = DAY_TO_BACKEND[activeDay];
   const incomeLevel = income;
 
-  const getSlot = (day, mealTypeId, prepTypeId) =>
-    mealSlots.find(
+  const getSlots = (day, mealTypeId, prepTypeId) =>
+    mealSlots.filter(
       (s) =>
-        s.incomeLevel === incomeLevel &&
+        (s.customerType === customerType || s.planType === customerType) &&
+        (s.incomeLevel === incomeLevel || s.incomeLevel === "all") &&
         s.prepType === prepTypeId &&
+        (s.planType === (prepTypeId === "ready-to-eat" ? "standard-rte" : "standard-rtc") ||
+          s.planType === customerType) &&
         s.day === day &&
         s.mealType === mealTypeId
     );
 
   const getMealImage = (day, mealTypeId, prepTypeId) => {
-    const slot = getSlot(day, mealTypeId, prepTypeId);
+    const slot = getSlots(day, mealTypeId, prepTypeId)[0];
     if (slot?.imageUrl) return slot.imageUrl;
     const override = mealOverrides.find(
       (o) =>
@@ -291,50 +303,42 @@ export default function MealPlanCalendarNew({ planType = "premium", subscription
     return null;
   };
 
-  const getMeal = (day, mealTypeId, prepTypeId) => {
-    const slot = getSlot(day, mealTypeId, prepTypeId);
-    const configMeal = getMealForDay(day, mealTypeId, incomeLevel, prepTypeId);
+  const getMeals = (day, mealTypeId, prepTypeId) => {
+    const slots = getSlots(day, mealTypeId, prepTypeId);
+    const configMeal = !mealSlots.length
+      ? getMealForDay(day, mealTypeId, incomeLevel, prepTypeId)
+      : null;
     const pricing = getMealPricing(mealTypeId, prepTypeId, incomeLevel);
-    const priceKey = duration === "weekly" ? "weekly" : "monthly";
-    const amount = slot?.priceWeekly != null || slot?.priceMonthly != null
-      ? (duration === "weekly" ? (slot.priceWeekly ?? pricing?.weekly) : (slot.priceMonthly ?? pricing?.monthly))
-      : (pricing?.[priceKey] ?? 0);
-    if (slot) {
-      return {
+    if (slots.length > 0) {
+      return slots.map((slot) => ({
         meal: slot.mealName || configMeal?.meal || "",
         description: slot.description || configMeal?.description || "",
         quantity: slot.quantity || configMeal?.quantity || "—",
         image: slot.imageUrl || getMealImage(day, mealTypeId, prepTypeId),
+        mealKey: slot.mealKey || "default",
         type: prepTypeId,
         pricing: { weekly: slot.priceWeekly ?? pricing?.weekly ?? 0, monthly: slot.priceMonthly ?? pricing?.monthly ?? 0 },
-      };
+      }));
     }
-    if (configMeal) {
-      return {
-        ...configMeal,
-        type: prepTypeId,
-        pricing,
-      };
-    }
-    return null;
+    return configMeal ? [{ ...configMeal, type: prepTypeId, mealKey: "default", pricing }] : [];
   };
 
   const mealsForDay = [];
   MEAL_TYPES.forEach((mt) => {
-    const meal = getMeal(dayBackend, mt.id, prepType);
-    if (!meal) return;
-    const img = getMealImage(dayBackend, mt.id, prepType) || meal.image;
-    mealsForDay.push({
-      meal: mt.name,
-      time: mt.time,
-      icon: mt.icon,
-      name: meal.meal,
-      weight: meal.quantity || "—",
-      price: formatPrice(duration === "weekly" ? (meal.pricing?.weekly ?? 0) : (meal.pricing?.monthly ?? 0)),
-      pricePeriod: duration === "weekly" ? "week" : "month",
-      img: img || meal.image || (prepType === "ready-to-cook" ? null : PLACEHOLDER_IMAGE),
-      _key: { day: dayBackend, mealType: mt.id, prepType },
-      _pricing: meal.pricing,
+    getMeals(dayBackend, mt.id, prepType).forEach((meal) => {
+      const img = meal.image || getMealImage(dayBackend, mt.id, prepType);
+      mealsForDay.push({
+        meal: mt.name,
+        time: mt.time,
+        icon: mt.icon,
+        name: meal.meal,
+        weight: meal.quantity || "—",
+        price: formatPrice(duration === "weekly" ? (meal.pricing?.weekly ?? 0) : (meal.pricing?.monthly ?? 0)),
+        pricePeriod: duration === "weekly" ? "week" : "month",
+        img: img || (prepType === "ready-to-cook" ? null : PLACEHOLDER_IMAGE),
+        _key: { day: dayBackend, mealType: mt.id, prepType, mealKey: meal.mealKey || "default" },
+        _pricing: meal.pricing,
+      });
     });
   });
 
@@ -351,14 +355,14 @@ export default function MealPlanCalendarNew({ planType = "premium", subscription
 
   const isMealSelected = (item) =>
     selectedMeals.some(
-      (m) => m.day === item._key.day && m.mealType === item._key.mealType && m.prepType === item._key.prepType
+      (m) => m.day === item._key.day && m.mealType === item._key.mealType && m.prepType === item._key.prepType && m.mealKey === item._key.mealKey
     );
 
   const handleMealSelect = (item) => {
-    const key = { day: item._key.day, mealType: item._key.mealType, prepType: item._key.prepType, pricing: item._pricing, meal: item.name, incomeLevel };
+    const key = { day: item._key.day, mealType: item._key.mealType, prepType: item._key.prepType, mealKey: item._key.mealKey, pricing: item._pricing, meal: item.name, incomeLevel };
     setSelectedMeals((prev) => {
-      const exists = prev.some((m) => m.day === key.day && m.mealType === key.mealType && m.prepType === key.prepType);
-      if (exists) return prev.filter((m) => !(m.day === key.day && m.mealType === key.mealType && m.prepType === key.prepType));
+      const exists = prev.some((m) => m.day === key.day && m.mealType === key.mealType && m.prepType === key.prepType && m.mealKey === key.mealKey);
+      if (exists) return prev.filter((m) => !(m.day === key.day && m.mealType === key.mealType && m.prepType === key.prepType && m.mealKey === key.mealKey));
       return [...prev, key];
     });
   };
@@ -444,6 +448,7 @@ export default function MealPlanCalendarNew({ planType = "premium", subscription
           meals: selectedMeals.map((meal) => ({
             mealType: meal.mealType,
             prepType: meal.prepType,
+            mealKey: meal.mealKey,
             duration,
             price: duration === "weekly" ? (meal.pricing?.weekly || 0) : (meal.pricing?.monthly || 0),
             mealName: meal.meal,

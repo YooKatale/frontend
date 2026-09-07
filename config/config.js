@@ -1,5 +1,5 @@
 const PROD_DB_URL = "/server-api"; // proxied through Vercel → Render (no CORS)
-const DEV_DB_URL = "http://localhost:8000/api";
+const DEV_DB_URL = "http://localhost:4400/api";
 
 export const DB_URL =
   process.env.NEXT_PUBLIC_API_URL ||
