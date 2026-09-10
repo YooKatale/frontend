@@ -191,6 +191,9 @@ function V4ProductCard({ product, userInfo, categoryTag, onAddCart }) {
   const col = PLACEHOLDER_COLS[(product?.name?.length || 0) % PLACEHOLDER_COLS.length];
   const tag = (categoryTag || product?.category || "Product").toUpperCase();
   const fmt = (n) => `UGX ${Number(n).toLocaleString()}`;
+  const quantity = product?.quantity ?? product?.stock ?? product?.availableQuantity;
+  const unit = product?.unit || product?.measurementUnit || "";
+  const quantityLabel = quantity != null && quantity !== "" ? `${quantity}${unit ? ` ${unit}` : ""}` : "Not specified";
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -209,6 +212,7 @@ function V4ProductCard({ product, userInfo, categoryTag, onAddCart }) {
       </div>
       <div className="pcard-body">
         <div className="pcard-name">{product?.name}</div>
+        <div style={{ fontSize: 11, color: "#536653", marginBottom: 6 }}>Quantity: {quantityLabel}</div>
         <div className="pcard-meta">
           <StarFill s={10} />
           <span className="pcard-rating">{Number(product?.rating) || 4.5}</span>

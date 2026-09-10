@@ -12,6 +12,12 @@ const ProductListingPage = ({ products, categories }) => {
         {products.map((product) => (
           <li key={product.id}>
             <Link href={`/product/${product.slug}`}>{product.name}</Link>
+            <span style={{ display: "block", fontSize: 12, color: "#6b7280" }}>
+              Quantity:{" "}
+              {product.quantity != null && product.quantity !== ""
+                ? `${product.quantity}${product.unit ? ` ${product.unit}` : ""}`
+                : "Not specified"}
+            </span>
           </li>
         ))}
       </ul>

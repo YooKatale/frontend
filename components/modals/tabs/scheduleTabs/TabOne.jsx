@@ -112,6 +112,9 @@ const TabOne = ({ updateTabIndex, data, fetchData }) => {
                     {product.name}
                   </p>
                   <h3 className="text-base">{product.category}</h3>
+                  <p className="text-sm text-gray-600">
+                    Quantity: {product.quantity != null && product.quantity !== "" ? `${product.quantity}${product.unit ? ` ${product.unit}` : ""}` : "Not specified"}
+                  </p>
                 </div>
 
                 <div className="py-2"></div>

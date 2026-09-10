@@ -279,7 +279,7 @@ function PlanCard({ plan, delay, onSubmit, isLoading, onTnc, onInvite }) {
           <TruckIcon s={13} />
           <div>
             <div className="sub-delivery-title">Delivery terms:</div>
-            <div className="sub-delivery-body">Free: Within 3km • Extra: 950 UGX/km beyond 3km</div>
+            <div className="sub-delivery-body">Free: Within 3km • Extra: 850 UGX/km beyond 3km</div>
           </div>
         </div>
         <button type="button" className="sub-plan-tnc" onClick={onTnc}>
@@ -615,7 +615,7 @@ export default function SubscriptionPage() {
 
         <div className="bottom-note">
           <p>
-            <strong>Delivery Terms:</strong> Free delivery within 3km. Extra: <strong>950 UGX/km</strong> beyond 3km.{" "}
+            <strong>Delivery Terms:</strong> Free delivery within 3km. Extra: <strong>850 UGX/km</strong> beyond 3km.{" "}
             All plans include a <strong>25% limited-time discount</strong>. Cancel anytime. Prices in Ugandan Shillings (UGX).
           </p>
         </div>

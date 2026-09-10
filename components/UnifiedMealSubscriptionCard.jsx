@@ -732,7 +732,7 @@ const UnifiedMealSubscriptionCard = ({ planType = "premium" }) => {
             color="gray.700"
             textAlign="center"
           >
-            🚚 Free delivery within 3km • 950 UGX per extra km
+            🚚 Free delivery within 3km • 850 UGX per extra km
           </Text>
         </Box>
       </Box>

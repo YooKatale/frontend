@@ -288,6 +288,9 @@ function ProductDetailPage() {
               </>
             )}
           </div>
+          <div style={{ marginTop: 8, fontSize: 14, color: "#536653" }}>
+            Quantity: {product.quantity != null && product.quantity !== "" ? `${product.quantity}${product.unit ? ` ${product.unit}` : ""}` : "Not specified"}
+          </div>
           <div className={styles.infoBadges}>
             <div className={styles.infoBadge}>
               <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -447,6 +450,9 @@ function ProductDetailPage() {
                 <div className={styles.relatedBody}>
                   <div className={styles.relatedCat}>{p.category || "Product"}</div>
                   <div className={styles.relatedName}>{p.name}</div>
+                  <div style={{ fontSize: 11, color: "#536653", marginTop: 3 }}>
+                    Quantity: {p.quantity != null && p.quantity !== "" ? `${p.quantity}${p.unit ? ` ${p.unit}` : ""}` : "Not specified"}
+                  </div>
                   <div className={styles.relatedPrice}>UGX {FormatCurr(p.price)}</div>
                 </div>
               </Link>

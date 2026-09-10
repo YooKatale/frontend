@@ -665,7 +665,7 @@ export default function MealPlanCalendarNew({
               <Icons.Truck s={16} />
               <div>
                 <div className="footer-text">Free delivery within 3km</div>
-                <div className="footer-sub">Extra: 950 UGX per km beyond 3km</div>
+                <div className="footer-sub">Extra: 850 UGX per km beyond 3km</div>
               </div>
             </div>
           </div>

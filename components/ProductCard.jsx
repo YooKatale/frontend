@@ -125,7 +125,14 @@ const ProductCard = ({ product, userInfo, variant }) => {
   const hasWasPrice = discount > 0;
   const fmt = (n) => `UGX ${Number(n).toLocaleString()}`;
   const tag = (product?.category || "Product").toUpperCase();
-  const imgSrc = product?.images?.[0] ? getImageUrl(product.images[0]) : null;
+  const imgSrc = product?.images?.[0] || product?.imageUrl ? getImageUrl(product.images?.[0] || product.imageUrl) : null;
+  const productQuantity = product?.quantity ?? product?.stock ?? product?.availableQuantity;
+  const productUnit = product?.unit || product?.measurementUnit || "";
+  const rawIncomeLevel = product?.incomeLevel ?? product?.level ?? product?.priceLevel ?? product?.productLevel;
+  const incomeLevelLabel = { low: "Low", middle: "Middle", high: "High" }[String(rawIncomeLevel || "").toLowerCase()];
+  const quantityLabel = productQuantity != null && productQuantity !== ""
+    ? `${productQuantity}${productUnit ? ` ${productUnit}` : ""}`
+    : "";
 
   if (variant === "v4") {
     return (
@@ -155,8 +162,9 @@ const ProductCard = ({ product, userInfo, variant }) => {
             <div className="pcard-name">{product?.name}</div>
             <div className="pcard-meta">
               <span className="pcard-rating">★ {Number(product?.rating) || 4.5}</span>
-              <span className="pcard-sold">{product?.reviewCount ?? 0} sold</span>
+              {quantityLabel && <span className="pcard-sold">Quantity: {quantityLabel}</span>}
             </div>
+            {incomeLevelLabel && <div style={{ fontSize: 11, color: "#536653", marginBottom: 8 }}>Level: {incomeLevelLabel}</div>}
             <div className="pcard-price-row">
               <div>
                 <span className="pcard-price">{fmt(displayPrice)}</span>
@@ -241,6 +249,16 @@ const ProductCard = ({ product, userInfo, variant }) => {
             <div className={styles.rating}>
               <span className={styles.stars}>{"★".repeat(Math.min(5, Math.round(Number(product.rating) || 0)))}{"☆".repeat(5 - Math.min(5, Math.round(Number(product.rating) || 0)))}</span>
               <span className={styles.ratingCount}>({product.reviewCount ?? 0})</span>
+            </div>
+          )}
+          <div className={styles.quantityRow}>
+            <span className={styles.quantityLabel}>Quantity</span>
+            <span className={styles.quantityValue}>{quantityLabel || "Not specified"}</span>
+          </div>
+          {incomeLevelLabel && (
+            <div className={styles.levelRow}>
+              <span className={styles.quantityLabel}>Level</span>
+              <span className={styles.quantityValue}>{incomeLevelLabel}</span>
             </div>
           )}
           <div className={styles.priceRow}>

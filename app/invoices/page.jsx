@@ -345,6 +345,9 @@ const Invoice = () => {
                                         className="text-gray-800 block"
                                       >
                                         {product.name}
+                                        <span style={{ display: "block", fontSize: 12, color: "#6b7280" }}>
+                                          Quantity: {product.quantity != null && product.quantity !== "" ? `${product.quantity}${product.unit ? ` ${product.unit}` : ""}` : "Not specified"}
+                                        </span>
                                       </Text>
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">

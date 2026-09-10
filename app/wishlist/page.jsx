@@ -136,6 +136,9 @@ export default function WishlistPage() {
                   <Link href={`/product/${productId}`} className={styles.name}>
                     {name}
                   </Link>
+                  <span style={{ display: "block", fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>
+                    Quantity: {product?.quantity != null && product.quantity !== "" ? `${product.quantity}${product.unit ? ` ${product.unit}` : ""}` : "Not specified"}
+                  </span>
                   <span className={styles.price}>UGX {FormatCurr(displayPrice)}</span>
                   <button
                     type="button"
