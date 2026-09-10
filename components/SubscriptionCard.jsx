@@ -444,7 +444,7 @@ const SubscriptionCard = ({ card, handleClick, onPlanSelect, isSelected }) => {
             <Text as="span" fontWeight="medium">
               Extra:
             </Text>
-            <Text as="span">950 UGX/km beyond 3km</Text>
+            <Text as="span">850 UGX/km beyond 3km</Text>
           </Flex>
         </Box>
 

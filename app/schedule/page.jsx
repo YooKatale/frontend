@@ -373,7 +373,10 @@ const ScheduleDelivery = () => {
                           data-target={product._id}
                           onChange={handleSelectedProducts}
                         />
-                        {product.name}
+                        <span>{product.name}</span>
+                        <span className="block text-xs text-gray-500">
+                          Quantity: {product.quantity != null && product.quantity !== "" ? `${product.quantity}${product.unit ? ` ${product.unit}` : ""}` : "Not specified"}
+                        </span>
                       </div>
                     ))}
                   </div>

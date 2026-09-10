@@ -82,6 +82,9 @@ export default function VendorProductsPage() {
                 <div style={{ fontWeight: 800, color: PRIMARY, fontSize: "1rem" }}>
                   UGX {Number(p.price || 0).toLocaleString()}
                 </div>
+                <div style={{ color: "#4b5563", fontSize: "0.8rem", marginTop: "4px" }}>
+                  Quantity: {p.quantity != null && p.quantity !== "" ? `${p.quantity}${p.unit ? ` ${p.unit}` : ""}` : "Not specified"}
+                </div>
                 {p.category && (
                   <span style={{ display: "inline-block", marginTop: "6px", padding: "2px 8px", background: "#f3f4f6", borderRadius: "20px", fontSize: "0.75rem", color: "#6b7280" }}>
                     {p.category}

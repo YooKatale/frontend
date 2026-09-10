@@ -136,6 +136,22 @@
 }
 .stars { color: var(--gold); font-size: 12px; }
 .ratingCount { font-size: 11px; color: var(--muted); }
+.quantityRow {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.quantityLabel { color: var(--muted); }
+.quantityValue { color: var(--dark); font-weight: 700; }
+.levelRow {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
 .priceRow {
   display: flex;
   align-items: baseline;

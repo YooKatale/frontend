@@ -39,6 +39,7 @@ function RecommendedProducts({ Products }) {
             className="bg-white border rounded-lg shadow-lg p-4"
           >
             <p className="text-lg font-semibold">{product.name}</p>
+            <p className="text-sm text-gray-600">Quantity: {product.quantity != null && product.quantity !== "" ? `${product.quantity}${product.unit ? ` ${product.unit}` : ""}` : "Not specified"}</p>
           </div>
         ))}
       </div>
@@ -59,6 +60,7 @@ function RecommendedProducts({ Products }) {
                 Like
               </button>
             </p>
+            <p className="text-sm text-gray-600">Quantity: {product.quantity != null && product.quantity !== "" ? `${product.quantity}${product.unit ? ` ${product.unit}` : ""}` : "Not specified"}</p>
           </div>
         ))}
       </div>

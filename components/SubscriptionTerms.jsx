@@ -47,8 +47,8 @@ const SubscriptionTerms = ({ handleModalClose }) => {
         <Box className="terms-delivery">
           <h3>Delivery terms &amp; conditions</h3>
           <p><span className="strong">Free delivery:</span> For orders where delivery distance is within 3 km from restaurant/vendor to customer address.</p>
-          <p><span className="strong">Additional charges:</span> Beyond 3 km, 950 UGX per extra kilometre applies.</p>
-          <p><span className="strong">Example:</span> 5 km total → 2 km extra → 2 × 950 = 1,900 UGX (plus any base fee).</p>
+          <p><span className="strong">Additional charges:</span> Beyond 3 km, 850 UGX per extra kilometre applies.</p>
+          <p><span className="strong">Example:</span> 5 km total → 2 km extra → 2 × 850 = 1,700 UGX (plus any base fee).</p>
           <p>Distance is straight-line or routed as used by the app. The surcharge is shown in checkout before payment.</p>
         </Box>
       </Box>

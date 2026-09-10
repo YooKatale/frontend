@@ -10,6 +10,7 @@ import {
   VStack,
   HStack,
   Icon,
+  Image,
 } from "@chakra-ui/react";
 import { ThemeColors } from "@constants/constants";
 import { motion } from "framer-motion";
@@ -587,12 +588,110 @@ const About = () => {
             </MotionBox>
           </Grid>
 
+          {/* Leadership Team Section */}
+          <MotionBox
+            variants={fadeInUp}
+            initial="hidden"
+            animate={isVisible ? "visible" : "hidden"}
+            transition={{ delay: 0.8 }}
+          >
+            <VStack spacing={8} width="full">
+              <MotionBox variants={itemVariants}>
+                <VStack spacing={3} textAlign="center">
+                  <Icon as={FiUsers} boxSize="48px" color={ThemeColors.primaryColor} />
+                  <Heading as="h3" size="xl" color="gray.800">
+                    Our Leadership Team
+                  </Heading>
+                  <Box
+                    height="3px"
+                    width="80px"
+                    background={`linear-gradient(to right, ${ThemeColors.primaryColor}, ${ThemeColors.secondaryColor})`}
+                    borderRadius="full"
+                  />
+                </VStack>
+              </MotionBox>
+
+              {/* Mugisha Frank Card */}
+              <MotionBox
+                variants={scaleIn}
+                initial="hidden"
+                animate={isVisible ? "visible" : "hidden"}
+                transition={{ delay: 0.9 }}
+                whileHover={{ y: -5 }}
+                width="full"
+              >
+                <VStack
+                  spacing={6}
+                  p={{ base: 6, md: 8 }}
+                  bg="white"
+                  borderRadius="2xl"
+                  boxShadow="xl"
+                  border="1px solid"
+                  borderColor="gray.100"
+                >
+                  <Grid
+                    templateColumns={{ base: "1fr", md: "1fr 1fr" }}
+                    gap={{ base: 6, md: 8 }}
+                    width="full"
+                    alignItems="center"
+                  >
+                    {/* Image Section */}
+                    <Flex justify={{ base: "center", md: "flex-start" }}>
+                      <Box
+                        position="relative"
+                        borderRadius="2xl"
+                        overflow="hidden"
+                        boxShadow="lg"
+                        border="3px solid"
+                        borderColor={ThemeColors.primaryColor}
+                      >
+                        <Image
+                          src="/assets/images/mugisha-frank.jpeg"
+                          alt="Mugisha Frank - Founder, Board Chairman & Managing Director"
+                          width="300px"
+                          height="400px"
+                          objectFit="cover"
+                        />
+                      </Box>
+                    </Flex>
+
+                    {/* Info Section */}
+                    <VStack spacing={4} align={{ base: "center", md: "start" }} textAlign={{ base: "center", md: "left" }}>
+                      <VStack spacing={2} align={{ base: "center", md: "start" }}>
+                        <Heading as="h4" size="lg" color={ThemeColors.primaryColor}>
+                          Mugisha Frank
+                        </Heading>
+                        <Text fontSize="lg" fontWeight="semibold" color="gray.700">
+                          Founder
+                        </Text>
+                        <Text fontSize="md" fontWeight="medium" color={ThemeColors.primaryColor}>
+                          Board Chairman & Managing Director
+                        </Text>
+                      </VStack>
+                      <Box height="2px" width="60px" bg={ThemeColors.primaryColor} />
+                      <Text
+                        fontSize="md"
+                        color="gray.600"
+                        lineHeight="tall"
+                        maxW="400px"
+                      >
+                        Leading the revolution in Uganda's food marketplace with a vision to transform food
+                        accessibility across the country. Driving innovation, growth, and sustainable impact
+                        through strategic leadership and customer-first principles.
+                      </Text>
+                    </VStack>
+                  </Grid>
+                </VStack>
+              </MotionBox>
+            </VStack>
+          </MotionBox>
+
           {/* Call to Action */}
           <MotionBox
             variants={fadeInUp}
             initial="hidden"
             animate={isVisible ? "visible" : "hidden"}
-            transition={{ delay: 0.9 }}
+            transition={{ delay: 1 }}
             textAlign="center"
             pt={{ base: 8, md: 12 }}
           >

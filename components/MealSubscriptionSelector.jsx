@@ -496,7 +496,7 @@ const MealSubscriptionSelector = ({ planType = "premium", incomeLevel: propIncom
               >
                 <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="medium" textAlign="center">
                   <Text as="span" fontWeight="bold">Free Delivery:</Text> Within 3km •{" "}
-                  <Text as="span" fontWeight="bold">Extra:</Text> 950 UGX per km
+                  <Text as="span" fontWeight="bold">Extra:</Text> 850 UGX per km
                 </Text>
               </Box>
             </Stack>
@@ -549,7 +549,7 @@ const MealSubscriptionSelector = ({ planType = "premium", incomeLevel: propIncom
             >
               <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="medium" color="gray.700">
                 <Text as="span" fontWeight="bold">Free Delivery:</Text> Within 3km distance.{" "}
-                <Text as="span" fontWeight="bold">Extra:</Text> 950 UGX per additional kilometer.
+                <Text as="span" fontWeight="bold">Extra:</Text> 850 UGX per additional kilometer.
               </Text>
             </Box>
           </ModalBody>

@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import {
   Box,
   Flex,
+  Heading,
   useToast,
   Icon,
   Spinner,
@@ -278,7 +279,7 @@ function PlanCard({ plan, delay, onSubmit, isLoading, onTnc, onInvite }) {
           <TruckIcon s={13} />
           <div>
             <div className="sub-delivery-title">Delivery terms:</div>
-            <div className="sub-delivery-body">Free: Within 3km • Extra: 950 UGX/km beyond 3km</div>
+            <div className="sub-delivery-body">Free: Within 3km • Extra: 850 UGX/km beyond 3km</div>
           </div>
         </div>
         <button type="button" className="sub-plan-tnc" onClick={onTnc}>
@@ -370,6 +371,8 @@ body{font-family:'Sora',sans-serif;background:var(--bg);-webkit-font-smoothing:a
 export default function SubscriptionPage() {
   const [subscriptionPackages, setSubscriptionPackages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const { isOpen: isTncOpen, onOpen: onTncOpen, onClose: onTncClose } = useDisclosure();
 
@@ -402,14 +405,30 @@ export default function SubscriptionPage() {
   const { openAuthModal } = useAuthModal();
 
   const handleSubscriptionCardFetch = async () => {
+    setIsPageLoading(true);
+    setError(null);
     try {
       const res = await fetchPackages().unwrap();
-      if (res?.status === "Success") {
-        setSubscriptionPackages(res?.data || []);
-        if (res?.data?.[0]) setSelectedPlan(res.data[0].type);
+      if (res?.status === "Success" && res?.data && Array.isArray(res.data) && res.data.length > 0) {
+        setSubscriptionPackages(res.data);
+        if (res.data[0]) setSelectedPlan(res.data[0].type);
+        setError(null);
+      } else {
+        // Empty data array or no packages available
+        setSubscriptionPackages([]);
+        setError("No subscription packages available at the moment. Please try again later.");
+        chakraToast({
+          title: "No Packages",
+          description: "Subscription packages are not available right now.",
+          status: "info",
+          duration: 5000,
+          isClosable: true,
+        });
       }
     } catch (error) {
       console.error("Error fetching subscription packages:", error);
+      setSubscriptionPackages([]);
+      setError("Failed to load subscription packages. Please check your connection and try again.");
       chakraToast({
         title: "Error",
         description: "Failed to load subscription packages",
@@ -417,6 +436,8 @@ export default function SubscriptionPage() {
         duration: 5000,
         isClosable: true,
       });
+    } finally {
+      setIsPageLoading(false);
     }
   };
 
@@ -549,7 +570,34 @@ export default function SubscriptionPage() {
           </p>
         </div>
 
-        {subscriptionPackages.length > 0 ? (
+        {isPageLoading ? (
+          <Flex justify="center" align="center" minH="300px" direction="column" gap={4}>
+            <Spinner size="xl" color="var(--g)" />
+            <p style={{ fontSize: "14px", color: "var(--muted)" }}>Loading subscription plans...</p>
+          </Flex>
+        ) : error ? (
+          <Flex justify="center" align="center" minH="300px" direction="column" gap={4}>
+            <Box textAlign="center" maxW="400px">
+              <Heading size="md" color="var(--dark)" mb={2}>Unable to Load Plans</Heading>
+              <p style={{ fontSize: "14px", color: "var(--muted)", marginBottom: "16px" }}>{error}</p>
+              <button
+                onClick={handleSubscriptionCardFetch}
+                style={{
+                  padding: "10px 20px",
+                  background: "var(--g)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                }}
+              >
+                Try Again
+              </button>
+            </Box>
+          </Flex>
+        ) : subscriptionPackages.length > 0 ? (
           <div className="plans-grid">
             {plansForDisplay.map((plan, i) => (
               <PlanCard
@@ -563,15 +611,11 @@ export default function SubscriptionPage() {
               />
             ))}
           </div>
-        ) : (
-          <Flex justify="center" align="center" minH="200px">
-            <Spinner size="xl" color="var(--g)" />
-          </Flex>
-        )}
+        ) : null}
 
         <div className="bottom-note">
           <p>
-            <strong>Delivery Terms:</strong> Free delivery within 3km. Extra: <strong>950 UGX/km</strong> beyond 3km.{" "}
+            <strong>Delivery Terms:</strong> Free delivery within 3km. Extra: <strong>850 UGX/km</strong> beyond 3km.{" "}
             All plans include a <strong>25% limited-time discount</strong>. Cancel anytime. Prices in Ugandan Shillings (UGX).
           </p>
         </div>

@@ -564,7 +564,7 @@ const MealCalendar = ({ planType = "premium" }) => {
           <Text as="span" fontWeight={"bold"}>
             Extra:
           </Text>{" "}
-          950 UGX per additional kilometer.
+          850 UGX per additional kilometer.
         </Text>
       </Box>
 
