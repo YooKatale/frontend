@@ -279,14 +279,21 @@ export default function MealPlanCalendarNew({
 
   const getSlots = (day, mealTypeId, prepTypeId) =>
     mealSlots.filter(
-      (s) =>
-        (s.customerType === customerType || s.planType === customerType) &&
-        (s.incomeLevel === incomeLevel || s.incomeLevel === "all") &&
-        s.prepType === prepTypeId &&
-        (s.planType === (prepTypeId === "ready-to-eat" ? "standard-rte" : "standard-rtc") ||
-          s.planType === customerType) &&
-        s.day === day &&
-        s.mealType === mealTypeId
+      (s) => {
+        const expectedMenuPlan = prepTypeId === "ready-to-eat" ? "standard-rte" : "standard-rtc";
+        const hasPlanIdentity = Boolean(s.customerType || s.planType);
+        const customerMatches = !hasPlanIdentity || s.customerType === customerType || s.planType === customerType;
+        const menuMatches = !s.planType || s.planType === expectedMenuPlan || s.planType === customerType;
+
+        return (
+          customerMatches &&
+          menuMatches &&
+          (s.incomeLevel === incomeLevel || s.incomeLevel === "all") &&
+          s.prepType === prepTypeId &&
+          s.day === day &&
+          s.mealType === mealTypeId
+        );
+      }
     );
 
   const getMealImage = (day, mealTypeId, prepTypeId) => {
@@ -343,13 +350,27 @@ export default function MealPlanCalendarNew({
   });
 
   const defaultPlanStyle = { id: "plan", label: "Plan", icon: Icons.Crown, color: "#1a5c1a", bg: "#e6f0e6" };
-  const plansList = subscriptionPackages?.length > 0
-    ? subscriptionPackages.map((p) => ({
-        id: (p.type || "").toLowerCase(),
-        label: (p.type || "").charAt(0).toUpperCase() + (p.type || "").slice(1),
-        ...(PLAN_STYLES[(p.type || "").toLowerCase()] || defaultPlanStyle),
-      }))
-    : Object.values(PLAN_STYLES);
+  const plansList = (subscriptionPackages?.length > 0
+    ? subscriptionPackages
+        .map((p) => {
+          const rawType = (p.type || "").toLowerCase();
+          const id = rawType === "individual" ? "premium" : rawType;
+          return { ...p, id };
+        })
+        .filter((p) => ["premium", "family", "business"].includes(p.id))
+    : Object.values(PLAN_STYLES))
+    .reduce((unique, p) => {
+      if (unique.some((item) => item.id === p.id)) return unique;
+      const style = PLAN_STYLES[p.id] || defaultPlanStyle;
+      unique.push({
+        id: p.id,
+        label: style.label,
+        icon: style.icon,
+        color: style.color,
+        bg: style.bg,
+      });
+      return unique;
+    }, []);
   const planStyle = PLAN_STYLES[planType?.toLowerCase()] || defaultPlanStyle;
   const PlanIcon = planStyle.icon;
 

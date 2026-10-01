@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const API_ORIGIN = process.env.NEXT_PUBLIC_API_ORIGIN || "https://yookatale-server.onrender.com";
+const API_ORIGIN = process.env.NEXT_PUBLIC_API_ORIGIN || "https://yookatale-serverside.onrender.com";
 
 /** PUT /api/users/[id]/avatar - Proxy avatar upload to backend */
 export async function PUT(request, { params }) {

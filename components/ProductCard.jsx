@@ -140,7 +140,13 @@ const ProductCard = ({ product, userInfo, variant }) => {
         <Link href={`/product/${product?._id}`} className="pcard">
           <div className="pcard-img">
             {imgSrc ? (
-              <img src={imgSrc} alt={product?.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              <Image
+                src={imgSrc}
+                alt={product?.name || "Product"}
+                fill
+                sizes="(max-width: 768px) 50vw, 25vw"
+                style={{ objectFit: "cover", display: "block" }}
+              />
             ) : (
               <div style={{ position: "absolute", inset: 0, background: "#d0d8cc", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <FiPackage size={32} style={{ color: "#8a9e87" }} />

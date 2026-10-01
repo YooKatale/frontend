@@ -12,7 +12,7 @@ export default function HomepageMealsBlock() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const base = (API_ORIGIN || "").replace(/\/api\/?$/, "") || "https://yookatale-server.onrender.com";
+    const base = (API_ORIGIN || "").replace(/\/api\/?$/, "") || "https://yookatale-serverside.onrender.com";
     const url = (mealType) => `${base}/api/meal-calendar/slots/public?mealType=${mealType}`;
 
     let cancelled = false;

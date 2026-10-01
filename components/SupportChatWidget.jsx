@@ -5,7 +5,7 @@ import Image from "next/image";
 import { DB_URL } from "@config/config";
 import styles from "./SupportChatWidget.module.css";
 
-const API_BASE = (DB_URL || "").replace(/\/api\/?$/, "") || "https://yookatale-server.onrender.com";
+const API_BASE = (DB_URL || "").replace(/\/api\/?$/, "") || "https://yookatale-serverside.onrender.com";
 const SUPPORT_CHAT_URL = `${API_BASE}/api/support/chat`;
 
 const INITIAL_BOT_MESSAGE = "👋 Hey! Need help with orders, meal plans, or delivery? I'm here to help 24/7. Ask me anything about Yookatale — subscriptions, tracking, or the app! 🌱";

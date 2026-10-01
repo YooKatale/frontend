@@ -103,101 +103,20 @@ function getBenefitIcon(text) {
   return BenefitIcons.check;
 }
 
-/* ─── PLAN CONFIG (content in sentence case; headers unchanged) ─────────────── */
-const PLAN_CONFIG = {
-  premium: {
-    id: "premium",
-    name: "Premium",
-    tagline: "SINGLE USER",
-    color: "#7c3aed",
-    colorLight: "#ede9fe",
-    gradient: "linear-gradient(135deg,#4c1d95 0%,#7c3aed 100%)",
-    ctaGradient: "linear-gradient(135deg,#6d28d9,#7c3aed)",
-    ctaLabel: "Subscribe to premium",
-    popular: false,
-    originalPrice: "UGX 40,000",
-    saveAmt: "SAVE 10,000",
-    currentPrice: "UGX 30,000",
-    discount: "25% OFF",
-    stars: 4.5,
-    reviews: 128,
-    features: [
-      "Premium Membership Fee",
-      "1 Premium Food Test",
-      "24 - 45 mins Delivery",
-      "Cashless Shopping",
-      "Same Day Delivery",
-      "12 months Membership",
-      "24/7 Customer Support",
-    ],
-  },
-  family: {
-    id: "family",
-    name: "Family",
-    tagline: "2-6 FAMILY MEMBERS",
-    color: "#e07820",
-    colorLight: "#fff4ea",
-    gradient: "linear-gradient(135deg,#92400e 0%,#e07820 100%)",
-    ctaGradient: "linear-gradient(135deg,#b45309,#e07820)",
-    ctaLabel: "Subscribe to family",
-    popular: true,
-    originalPrice: "UGX 100,000",
-    saveAmt: "SAVE 30,000",
-    currentPrice: "UGX 90,000",
-    discount: "25% OFF",
-    stars: 4.5,
-    reviews: 128,
-    features: [
-      "2-6 users",
-      "Benefits:",
-      "• Account activation",
-      "• 1 Food test",
-      "• Diet insights: Personalized nutrition advice and meal planning tips.",
-      "• Promotional offers & discounts: Exclusive deals for the entire family.",
-      "• Credit line: A flexible micro-credit option that caters to family grocery needs, allowing a pay-later model.",
-      "• Unlimited food varieties in different quantities: Access to a wide selection of groceries, catering to diverse family dietary needs.",
-      "• Loyalty points: Redeem cash for loyalty points, offering cost savings over time.",
-      "• Gas credit: Access to gas refills, ensuring customers never run out of cooking fuel.",
-      "• Express delivery 24/7: Priority delivery service with around-the-clock availability, perfect for busy families with tight schedules.",
-    ],
-  },
-  business: {
-    id: "business",
-    name: "Business",
-    tagline: "10+ EMPLOYEES",
-    color: "#0ea5e9",
-    colorLight: "#e0f2fe",
-    gradient: "linear-gradient(135deg,#0c4a6e 0%,#0ea5e9 100%)",
-    ctaGradient: "linear-gradient(135deg,#0369a1,#0ea5e9)",
-    ctaLabel: "Subscribe to business",
-    popular: false,
-    originalPrice: "UGX 240,000",
-    saveAmt: "SAVE 60,000",
-    currentPrice: "UGX 180,000",
-    discount: "25% OFF",
-    stars: 4.5,
-    reviews: 128,
-    features: [
-      "10+ users",
-      "Benefits:",
-      "• Account activation",
-      "• 1 Food test",
-      "• Employee meal cards: Ensure your team is well-nourished with employee meal cards.",
-      "• Gym and wellness cards: Promote wellness with gym memberships and wellness benefits for employees.",
-      "• Diet insights: Personalized nutrition advice and meal planning tips.",
-      "• Promotional offers & discounts: Exclusive access to deals for your business.",
-      "• Credit line: A flexible micro-credit option that allows businesses to purchase groceries with a pay-later model.",
-      "• Unlimited food varieties in different quantities: Access to a wide selection of groceries tailored to meet business needs.",
-      "• Loyalty points: Redeem cash for loyalty points, providing long-term savings.",
-      "• Gas credit: Access to gas refills for business operations, ensuring an uninterrupted fuel supply.",
-      "• Express delivery 24/7: Fast and priority delivery for businesses at any time.",
-    ],
-  },
-};
-
 /* ─── PLAN CARD ──────────────────────────────────────────────────────────── */
 function PlanCard({ plan, delay, onSubmit, isLoading, onTnc, onInvite }) {
+  const tiers = plan.tiers && typeof plan.tiers === "object" ? plan.tiers : null;
+  const tierNames = tiers ? Object.keys(tiers) : [];
+  const [tier, setTier] = useState(() => tierNames[0] || null);
   const features = Array.isArray(plan.features) ? plan.features : [];
+  const tierPrice = tiers?.[tier];
+  const tierPricePeriod = tierPrice && typeof tierPrice === "object"
+    ? Object.keys(tierPrice).find((period) => ["weekly", "monthly"].includes(period))
+    : null;
+  const priceValue = tierPricePeriod
+    ? tierPrice[tierPricePeriod]
+    : (typeof tierPrice === "object" ? tierPrice?.price ?? tierPrice?.amount : tierPrice) ?? plan.priceValue;
+  const pricePeriod = tierPricePeriod || plan.pricePeriod;
   const benefits = features
     .map((f) => (typeof f === "string" ? f.replace(/^[\s•\-]\s*/, "").trim() : String(f)))
     .filter((t) => t && !/^benefits?\s*:?\s*$/i.test(t));
@@ -222,21 +141,38 @@ function PlanCard({ plan, delay, onSubmit, isLoading, onTnc, onInvite }) {
             {plan.type === "business" && <Icon as={FaChartLine} boxSize={4} color="white" />}
             {!["premium", "family", "business"].includes(plan.type) && <Icon as={FaAppleAlt} boxSize={4} color="white" />}
           </div>
-          <div className="sub-plan-discount-pill">{plan.discount || "25% OFF"}</div>
+          {plan.discount && <div className="sub-plan-discount-pill">{plan.discount}</div>}
         </div>
         <div className="sub-plan-title-row">
           <span className="sub-plan-name">{plan.name}</span>
-          <span className="sub-plan-title-sep">·</span>
-          <span className="sub-plan-tagline-pill">{plan.tagline}</span>
+          {plan.tagline && <>
+            <span className="sub-plan-title-sep">·</span>
+            <span className="sub-plan-tagline-pill">{plan.tagline}</span>
+          </>}
         </div>
-        <div className="sub-plan-pricing">
-          <div className="sub-plan-orig-row">
-            <span className="sub-plan-orig">{plan.originalPrice}</span>
-            {plan.saveAmt && <span className="sub-plan-save">{plan.saveAmt}</span>}
-          </div>
-          <div className="sub-plan-price">{plan.currentPrice}</div>
-        </div>
+        {(plan.originalPrice || plan.saveAmt) && <div className="sub-plan-orig-row">
+          {plan.originalPrice && <span className="sub-plan-orig">{plan.originalPrice}</span>}
+          {plan.saveAmt && <span className="sub-plan-save">{plan.saveAmt}</span>}
+        </div>}
+        {priceValue != null && <div className="sub-plan-pricing">
+          <div className="sub-plan-price">{plan.currency} {FormatCurr(priceValue)}{pricePeriod && <span className="sub-plan-price-period"> / {pricePeriod}</span>}</div>
+        </div>}
       </div>
+
+      {tierNames.length > 0 && (
+        <div className="sub-tier-picker" aria-label={`${plan.name} income tier`}>
+          {tierNames.map((tierName) => (
+            <button
+              key={tierName}
+              type="button"
+              className={`sub-tier-btn${tier === tierName ? " active" : ""}`}
+              onClick={() => setTier(tierName)}
+            >
+              {tierName.charAt(0).toUpperCase() + tierName.slice(1)}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="sub-plan-features">
         <div className="sub-features-label">PLAN BENEFITS</div>
@@ -255,33 +191,33 @@ function PlanCard({ plan, delay, onSubmit, isLoading, onTnc, onInvite }) {
 
       <div className="sub-plan-footer">
         <div className="sub-plan-stars">
-          {[1, 2, 3, 4, 5].map((i) => {
-            const rating = Number(plan.stars) || 0;
-            const filled = i <= Math.round(rating);
-            return <span key={i}><StarFill s={13} filled={filled} /></span>;
-          })}
-          <span className="sub-plan-rating">{Number(plan.stars) ? Number(plan.stars).toFixed(1) : "—"}</span>
-          <span className="sub-plan-reviews">{plan.reviews != null ? plan.reviews : "—"} reviews</span>
+          {plan.stars != null && <>
+            {[1, 2, 3, 4, 5].map((i) => <span key={i}><StarFill s={13} filled={i <= Math.round(Number(plan.stars))} /></span>)}
+            <span className="sub-plan-rating">{Number(plan.stars).toFixed(1)}</span>
+          </>}
+          {plan.reviews != null && <span className="sub-plan-reviews">{plan.reviews} reviews</span>}
         </div>
         <button
           type="button"
           className="sub-plan-cta"
           style={{ background: plan.ctaGradient }}
-          onClick={() => onSubmit(plan.packageId)}
-          disabled={isLoading}
+          onClick={() => onSubmit(plan.packageId, tier)}
+          disabled={isLoading || !plan.packageId}
         >
           {isLoading ? "Processing…" : plan.ctaLabel} <ChevRight s={14} c="#fff" />
         </button>
         <button type="button" className="sub-plan-invite" onClick={onInvite}>
           <UserPlusIcon s={13} /> Invite Friend to Test
         </button>
-        <div className="sub-plan-delivery">
-          <TruckIcon s={13} />
-          <div>
-            <div className="sub-delivery-title">Delivery terms:</div>
-            <div className="sub-delivery-body">Free: Within 3km • Extra: 850 UGX/km beyond 3km</div>
+        {plan.deliveryTerms && (
+          <div className="sub-plan-delivery">
+            <TruckIcon s={13} />
+            <div>
+              <div className="sub-delivery-title">Delivery terms:</div>
+              <div className="sub-delivery-body">{plan.deliveryTerms}</div>
+            </div>
           </div>
-        </div>
+        )}
         <button type="button" className="sub-plan-tnc" onClick={onTnc}>
           <InfoIcon s={12} /> View Terms &amp; Conditions
         </button>
@@ -336,6 +272,25 @@ body{font-family:'Sora',sans-serif;background:var(--bg);-webkit-font-smoothing:a
 .sub-plan-orig{font-size:11px;font-weight:600;color:rgba(255,255,255,.55);text-decoration:line-through;}
 .sub-plan-save{background:rgba(255,255,255,.2);border-radius:100px;padding:1px 6px;font-size:8px;font-weight:800;color:#fff;}
 .sub-plan-price{font-family:'DM Serif Display',serif;font-size:clamp(20px,3vw,26px);color:#fff;line-height:1;font-style:italic;}
+.sub-plan-price-period{font-family:'Sora',sans-serif;font-size:10px;font-style:normal;font-weight:600;color:rgba(255,255,255,.72);}
+.sub-tier-picker{display:flex;gap:5px;padding:10px 14px 0;background:var(--surf);}
+.sub-tier-btn{flex:1;padding:7px 5px;border:1px solid var(--bdr);border-radius:8px;background:var(--bg);font-family:'Sora',sans-serif;font-size:10px;font-weight:700;color:var(--mid);cursor:pointer;transition:all .18s;}
+.sub-tier-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.extended-heading{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:42px 0 16px;}
+.extended-heading h2{font-family:'DM Serif Display',serif;font-size:clamp(24px,4vw,34px);color:var(--dark);}
+.promo-bar-label{font-size:9px;font-weight:800;letter-spacing:1.2px;color:var(--orange);margin-bottom:5px;}
+.extended-heading p{font-size:11px;color:var(--muted);max-width:360px;text-align:right;line-height:1.5;}
+.extended-grid{display:grid;grid-template-columns:1fr;gap:14px;}
+@media(min-width:640px){.extended-grid{grid-template-columns:repeat(2,1fr);}}
+@media(min-width:960px){.extended-grid{grid-template-columns:repeat(3,1fr);}}
+.extended-card{background:var(--surf);border:1px solid var(--bdr);border-radius:16px;padding:16px;box-shadow:var(--sh);}
+.extended-card-kicker{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--orange);margin-bottom:6px;}
+.extended-card h3{font-size:15px;color:var(--dark);margin-bottom:5px;}
+.extended-card p{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:12px;}
+.extended-card-meta{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;font-size:11px;color:var(--mid);}
+.extended-card-meta span:first-child{font-weight:800;color:var(--dark);}
+.extended-card .sub-plan-cta{font-size:11px;padding:9px 12px;}
+@media(max-width:640px){.extended-heading{display:block}.extended-heading p{text-align:left;margin-top:6px;}}
 .sub-plan-features{padding:12px 14px 0;flex:1;}
 .sub-features-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;}
 .sub-feature-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;}
@@ -445,17 +400,19 @@ export default function SubscriptionPage() {
     handleSubscriptionCardFetch();
   }, []);
 
-  const handleSubmit = async (packageId) => {
+  const handleSubmit = async (packageId, incomeLevel) => {
     if (!userInfo?._id) {
       openAuthModal();
       return;
     }
     setIsLoading(true);
     try {
-      const res = await createSubscription({
+      const subscriptionData = {
         user: userInfo._id,
         packageId,
-      }).unwrap();
+      };
+      if (incomeLevel != null) subscriptionData.incomeLevel = incomeLevel;
+      const res = await createSubscription(subscriptionData).unwrap();
       if (res.status === "Success") {
         router.push(`/payment/${res.data.Order}`);
       }
@@ -498,40 +455,47 @@ export default function SubscriptionPage() {
     }
   };
 
-  // Merge API packages with PLAN_CONFIG (keep original wording; use API price when available)
   const plansForDisplay = subscriptionPackages.map((pkg) => {
     const type = (pkg.type || "").toLowerCase();
-    const config = PLAN_CONFIG[type] || {
-      id: type,
-      name: pkg.name || pkg.type || "Plan",
-      tagline: "SUBSCRIBER",
-      color: "#1a5c1a",
-      colorLight: "#e6f0e6",
-      gradient: "linear-gradient(135deg,#0e1e0e,#1a5c1a)",
-      ctaGradient: "linear-gradient(135deg,#1a5c1a,#2d8c2d)",
-      ctaLabel: `Subscribe to ${pkg.type || "plan"}`,
-      popular: false,
-      features: Array.isArray(pkg.details) && pkg.details.length > 0
-        ? pkg.details
-        : ["Benefits included with this plan."],
-    };
-    const price = pkg.price != null ? Number(pkg.price) : null;
+    const priceFields = [
+      ["price", ""],
+      ["priceWeekly", "week"],
+      ["priceWeeklyRTE", "week"],
+      ["weeklyPrice", "week"],
+      ["priceMonthly", "month"],
+      ["priceMonthlyRTE", "month"],
+      ["monthlyPrice", "month"],
+    ];
+    const priceField = priceFields.find(([field]) => pkg[field] != null);
+    const price = priceField ? Number(pkg[priceField[0]]) : null;
     const previousPrice = pkg.previousPrice != null ? Number(pkg.previousPrice) : null;
-    const currentPrice = price != null ? `UGX ${FormatCurr(price)}` : (config.currentPrice || "—");
-    const originalPrice = previousPrice != null ? `UGX ${FormatCurr(previousPrice)}` : (config.originalPrice || null);
-    const saveAmt = previousPrice != null && price != null ? `SAVE ${FormatCurr(previousPrice - price)}` : (config.saveAmt || null);
+    const currency = pkg.currency || "UGX";
     const backendRating = getRatingForType(type);
     return {
-      ...config,
+      id: pkg._id,
       type,
       packageId: pkg._id,
-      currentPrice,
-      originalPrice,
-      saveAmt,
-      discount: config.discount || "25% OFF",
-      stars: backendRating.stars ?? pkg.rating ?? config.stars ?? 4.5,
-      reviews: backendRating.reviews ?? pkg.ratingCount ?? config.reviews ?? 128,
-      features: Array.isArray(pkg.details) && pkg.details.length > 0 ? pkg.details : config.features,
+      name: pkg.name || pkg.title || pkg.type || "Subscription plan",
+      tagline: pkg.tagline || pkg.subtitle,
+      color: pkg.color || "#1a5c1a",
+      colorLight: pkg.colorLight || "#e6f0e6",
+      gradient: pkg.gradient || "linear-gradient(135deg,#0e1e0e,#1a5c1a)",
+      ctaGradient: pkg.ctaGradient || "linear-gradient(135deg,#1a5c1a,#2d8c2d)",
+      ctaLabel: pkg.ctaLabel || "Subscribe",
+      popular: Boolean(pkg.popular),
+      currency,
+      tiers: pkg.tiers && typeof pkg.tiers === "object" ? pkg.tiers : null,
+      priceValue: price != null && Number.isFinite(price) ? price : null,
+      pricePeriod: priceField?.[1] || pkg.pricePeriod,
+      originalPrice: previousPrice != null && Number.isFinite(previousPrice) ? `${currency} ${FormatCurr(previousPrice)}` : null,
+      saveAmt: previousPrice != null && price != null && previousPrice > price
+        ? `SAVE ${FormatCurr(previousPrice - price)}`
+        : null,
+      discount: pkg.discount,
+      stars: backendRating.stars ?? pkg.rating ?? null,
+      reviews: backendRating.reviews ?? pkg.ratingCount ?? null,
+      features: Array.isArray(pkg.details) ? pkg.details : [],
+      deliveryTerms: pkg.deliveryTerms || pkg.delivery || pkg.deliveryCadence,
     };
   });
 
@@ -547,22 +511,6 @@ export default function SubscriptionPage() {
         </ModalContent>
       </Modal>
       <div className="sub-page">
-        <div className="promo-bar">
-          <div className="promo-left">
-            <div className="promo-zap">
-              <ZapIcon s={18} />
-            </div>
-            <div>
-              <div className="promo-title">Limited Time Offer</div>
-              <div className="promo-sub">Subscribe today and save big!</div>
-            </div>
-          </div>
-          <div className="promo-right">
-            <div className="promo-pct">25% OFF</div>
-            <div className="promo-pct-sub">On all subscription plans</div>
-          </div>
-        </div>
-
         <div className="hero-head">
           <h1>Choose Your Perfect Plan</h1>
           <p>
@@ -612,13 +560,6 @@ export default function SubscriptionPage() {
             ))}
           </div>
         ) : null}
-
-        <div className="bottom-note">
-          <p>
-            <strong>Delivery Terms:</strong> Free delivery within 3km. Extra: <strong>850 UGX/km</strong> beyond 3km.{" "}
-            All plans include a <strong>25% limited-time discount</strong>. Cancel anytime. Prices in Ugandan Shillings (UGX).
-          </p>
-        </div>
 
         {subscriptionPackages.length > 0 && selectedPlan && (
           <SlideFade in={!!selectedPlan} offsetY="20px">

@@ -47,7 +47,7 @@ export default function MealCalendarSection({ mealType }) {
   const title = MEAL_LABELS[type] || mealType;
 
   useEffect(() => {
-    const base = (API_ORIGIN || "").replace(/\/api\/?$/, "") || "https://yookatale-server.onrender.com";
+    const base = (API_ORIGIN || "").replace(/\/api\/?$/, "") || "https://yookatale-serverside.onrender.com";
     const url = `${base}/api/meal-calendar/slots/public?mealType=${type}`;
     let cancelled = false;
     setLoading(true);

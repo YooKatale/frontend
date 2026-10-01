@@ -6,8 +6,9 @@ const rawBaseQuery = fetchBaseQuery({
   credentials: "include",
 });
 
-// Use actual API_ORIGIN for backend detection (e.g., https://yookatale-server.onrender.com)
-const BACKEND_ORIGIN = API_ORIGIN || "https://yookatale-server.onrender.com";
+// Use actual API_ORIGIN for backend detection (e.g., https://yookatale-serverside.onrender.com)
+const BACKEND_ORIGIN =
+  API_ORIGIN || "https://yookatale-serverside.onrender.com";
 
 /** Use full URL as-is when endpoint url is absolute. For backend URLs, always send Authorization Bearer token from store so auth works on all devices (not just cookie). */
 function baseQueryWithAbsoluteUrl(args, api, extraOptions) {
@@ -19,7 +20,9 @@ function baseQueryWithAbsoluteUrl(args, api, extraOptions) {
       credentials: "include",
       prepareHeaders: (headers, { getState }) => {
         if (isBackend) {
-          const token = getState()?.auth?.userInfo?.token ?? getState()?.auth?.userInfo?.accessToken;
+          const token =
+            getState()?.auth?.userInfo?.token ??
+            getState()?.auth?.userInfo?.accessToken;
           if (token) headers.set("Authorization", `Bearer ${token}`);
         }
         return headers;

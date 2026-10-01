@@ -25,7 +25,7 @@ export function getAvatarUrl(avatar) {
   const s = avatar.trim();
   if (!s) return undefined;
   if (s.startsWith("http://") || s.startsWith("https://") || s.startsWith("data:")) return s;
-  const origin = (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_ORIGIN) || "https://yookatale-server.onrender.com";
+  const origin = (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_ORIGIN) || "https://yookatale-serverside.onrender.com";
   const resolved = origin.replace(/\/$/, "") + (s.startsWith("/") ? s : "/" + s);
   return resolved;
 }

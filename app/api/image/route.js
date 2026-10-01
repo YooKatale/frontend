@@ -11,7 +11,7 @@ import path from "path";
 import fs from "fs/promises";
 
 const ALLOWED_ORIGINS = [
-  "https://yookatale-server.onrender.com",
+  "https://yookatale-serverside.onrender.com",
   "https://yookatale-server-app.onrender.com",
   "https://yookatale.s3.eu-north-1.amazonaws.com",
   "https://www.yookatale.app",
