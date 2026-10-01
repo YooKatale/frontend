@@ -63,6 +63,123 @@ const BowlIcon = ({ s = 14 }) => <Svg size={s}><path d="M12 2a10 10 0 0 1 10 10H
 const SunIcon = ({ s = 14 }) => <Svg size={s}><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></Svg>;
 const MoonIcon = ({ s = 14 }) => <Svg size={s}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></Svg>;
 
+const HOMEPAGE_SUBSCRIPTION_PLANS = [
+  {
+    id: "individual",
+    title: "Individual Plan",
+    subtitle: "One person, fresh meals every day",
+    color: "#1a5c1a",
+    tiers: {
+      low: { weekly: 142000, monthly: 640000, quantity: "3 meals/day", label: "Budget friendly" },
+      middle: { weekly: 300000, monthly: 1170000, quantity: "3 meals/day", label: "Balanced choice" },
+      high: { weekly: 545000, monthly: 2270000, quantity: "3 premium meals/day", label: "Premium experience" },
+    },
+  },
+  {
+    id: "family",
+    title: "Family Plan",
+    subtitle: "Covers 4-6 people, daily meals",
+    color: "#e07820",
+    tiers: {
+      low: { weekly: 727500, monthly: 3280000, quantity: "12 meals/day", label: "Budget friendly" },
+      middle: { weekly: 1042000, monthly: 4510000, quantity: "12 meals/day", label: "Balanced choice" },
+      high: { weekly: 1990000, monthly: 8270000, quantity: "12 premium meals/day", label: "Premium experience" },
+    },
+  },
+  {
+    id: "business",
+    title: "Business Plan",
+    subtitle: "Fuel teams of 8 or more",
+    color: "#0ea5e9",
+    tiers: {
+      low: { weekly: 982500, monthly: 4470000, quantity: "24 meals/day", label: "Budget friendly" },
+      middle: { weekly: 1357000, monthly: 5970000, quantity: "24 meals/day", label: "Balanced choice" },
+      high: { weekly: 2410000, monthly: 10220000, quantity: "24 premium meals/day", label: "Premium experience" },
+    },
+  },
+];
+
+function HomepageSubscriptionCards({ onOpen }) {
+  const [tiers, setTiers] = useState({ individual: "middle", family: "middle", business: "middle" });
+
+  return (
+    <section className="home-subscriptions" aria-labelledby="home-subscriptions-title">
+      <style>{`
+        .home-subscriptions{padding:28px 0 8px}
+        .home-subscriptions-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:16px}
+        .home-subscriptions-kicker{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#e07820;margin-bottom:5px}
+        .home-subscriptions-title{font-family:Georgia,serif;font-size:clamp(25px,4vw,38px);line-height:1.05;color:#0e180e;margin:0}
+        .home-subscriptions-copy{max-width:330px;text-align:right;color:#6f806d;font-size:12px;line-height:1.55;margin:0}
+        .home-subscriptions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+        .home-subscription-card{background:#fff;border:1px solid #dfe8de;border-radius:18px;overflow:hidden;box-shadow:0 6px 24px rgba(26,92,26,.08);transition:transform .2s,box-shadow .2s}
+        .home-subscription-card:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(26,92,26,.14)}
+        .home-subscription-top{padding:18px 18px 16px;color:#fff;position:relative;overflow:hidden}
+        .home-subscription-top:after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,.16),transparent);transform:translateX(-70%);transition:transform .5s}
+        .home-subscription-card:hover .home-subscription-top:after{transform:translateX(70%)}
+        .home-subscription-name,.home-subscription-sub{position:relative;z-index:1}
+        .home-subscription-name{font-size:18px;font-weight:800;margin-bottom:5px}
+        .home-subscription-sub{font-size:11px;color:rgba(255,255,255,.78);line-height:1.45}
+        .home-subscription-body{padding:14px 16px 16px}
+        .home-tier-tabs{display:flex;gap:5px;margin-bottom:14px}
+        .home-tier-tab{flex:1;border:1px solid #dfe8de;background:#f6faf5;color:#536653;border-radius:8px;padding:7px 4px;font-size:10px;font-weight:800;cursor:pointer}
+        .home-tier-tab.active{background:#1a5c1a;color:#fff;border-color:#1a5c1a}
+        .home-subscription-price{font-size:22px;font-weight:900;color:#1a5c1a;letter-spacing:-.3px}
+        .home-subscription-period{font-size:11px;color:#82917f;font-weight:600}
+        .home-subscription-detail{display:flex;justify-content:space-between;gap:8px;margin:10px 0 14px;font-size:11px;color:#536653}
+        .home-subscription-detail strong{color:#0e180e}
+        .home-subscription-cta{width:100%;border:0;border-radius:10px;padding:10px;color:#fff;font-size:12px;font-weight:800;cursor:pointer;background:#1a5c1a}
+        @media(max-width:760px){.home-subscriptions-head{display:block}.home-subscriptions-copy{text-align:left;margin-top:7px}.home-subscriptions-grid{grid-template-columns:1fr;gap:12px}.home-subscription-card{display:grid;grid-template-columns:1fr 1.1fr}.home-subscription-top{display:flex;flex-direction:column;justify-content:center}.home-subscription-body{padding:14px}}
+      `}</style>
+      <div className="home-subscriptions-head">
+        <div>
+          <div className="home-subscriptions-kicker">Simple meal subscriptions</div>
+          <h2 id="home-subscriptions-title" className="home-subscriptions-title">Choose what fits your table.</h2>
+        </div>
+        <p className="home-subscriptions-copy">Three clear plans, with Low, Middle, and High tiers inside each card.</p>
+      </div>
+      <div className="home-subscriptions-grid">
+        {HOMEPAGE_SUBSCRIPTION_PLANS.map((plan) => {
+          const tier = tiers[plan.id];
+          const selected = plan.tiers[tier];
+          return (
+            <article className="home-subscription-card" key={plan.id}>
+              <div className="home-subscription-top" style={{ background: `linear-gradient(135deg, ${plan.color}, #0e180e)` }}>
+                <div className="home-subscription-name">{plan.title}</div>
+                <div className="home-subscription-sub">{plan.subtitle}</div>
+              </div>
+              <div className="home-subscription-body">
+                <div className="home-tier-tabs" role="tablist" aria-label={`${plan.title} tiers`}>
+                  {Object.keys(plan.tiers).map((tierName) => (
+                    <button
+                      key={tierName}
+                      type="button"
+                      role="tab"
+                      aria-selected={tier === tierName}
+                      className={`home-tier-tab${tier === tierName ? " active" : ""}`}
+                      onClick={() => setTiers((current) => ({ ...current, [plan.id]: tierName }))}
+                    >
+                      {tierName.charAt(0).toUpperCase() + tierName.slice(1)}
+                    </button>
+                  ))}
+                </div>
+                <div className="home-subscription-price">UGX {selected.weekly.toLocaleString()}</div>
+                <div className="home-subscription-period">per week</div>
+                <div className="home-subscription-detail">
+                  <span><strong>{selected.quantity}</strong></span>
+                  <span>{selected.label}</span>
+                </div>
+                <button type="button" className="home-subscription-cta" style={{ background: plan.color }} onClick={() => onOpen(plan.id)}>
+                  View {plan.title.replace(" Plan", "")} plan
+                </button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 /** Resolve meal image: full URL (http), same-origin /assets, or backend path via getImageUrl */
 function resolveMealImage(url) {
   if (!url || typeof url !== "string") return null;
@@ -563,6 +680,10 @@ export default function Home() {
               );
             })}
           </div>
+        </div>
+
+        <div className="section-wrap">
+          <HomepageSubscriptionCards onOpen={(plan) => router.push(`/subscription?plan=${plan}`)} />
         </div>
 
         <div className="section-wrap">

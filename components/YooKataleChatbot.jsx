@@ -5,7 +5,7 @@ import Link from "next/link";
 import { DB_URL } from "@config/config";
 import styles from "./YooKataleChatbot.module.css";
 
-const API_BASE = (DB_URL || "").replace(/\/api\/?$/, "") || "https://yookatale-server.onrender.com";
+const API_BASE = (DB_URL || "").replace(/\/api\/?$/, "") || "https://yookatale-serverside.onrender.com";
 
 const TABS = [
   { id: "all", label: "All" },

@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/server-api/:path*",
-      "destination": "https://yookatale-server.onrender.com/api/:path*"
+      "destination": "https://yookatale-serverside.onrender.com/api/:path*"
     }
   ]
 }

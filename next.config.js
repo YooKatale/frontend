@@ -11,7 +11,7 @@ const nextConfig = {
     return [
       {
         source: "/server-api/:path*",
-        destination: "https://yookatale-server.onrender.com/api/:path*",
+        destination: "https://yookatale-serverside.onrender.com/api/:path*",
       },
     ];
   },
@@ -58,7 +58,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "yookatale-server.onrender.com",
+        hostname: "yookatale-serverside.onrender.com",
         port: "",
         pathname: "/**",
       },
