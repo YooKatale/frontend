@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useState } from "react";
 import {
   FaChartBar, FaShoppingBag, FaBoxOpen, FaStar, FaMoneyBillWave,
-  FaSignOutAlt, FaBars, FaTimes, FaStore,
+  FaSignOutAlt, FaBars, FaTimes, FaStore, FaHandshake,
 } from "react-icons/fa";
 
 const PRIMARY = "#185f2d";
@@ -17,6 +17,7 @@ const NAV_LINKS = [
   { label: "Products",   path: "/vendor/products",  Icon: FaBoxOpen },
   { label: "Reviews",    path: "/vendor/reviews",   Icon: FaStar },
   { label: "Payouts",    path: "/vendor/payouts",   Icon: FaMoneyBillWave },
+  { label: "Partner Plans", path: "/vendor/partner-plans", Icon: FaHandshake },
 ];
 
 const VENDOR_KEY = "yookatale-vendor";

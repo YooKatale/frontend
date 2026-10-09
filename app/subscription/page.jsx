@@ -103,20 +103,139 @@ function getBenefitIcon(text) {
   return BenefitIcons.check;
 }
 
+/* ─── PLAN CONFIG (content in sentence case; headers unchanged) ─────────────── */
+const PLAN_CONFIG = {
+  premium: {
+    id: "premium",
+    name: "Premium",
+    tagline: "SINGLE USER",
+    color: "#7c3aed",
+    colorLight: "#ede9fe",
+    gradient: "linear-gradient(135deg,#4c1d95 0%,#7c3aed 100%)",
+    ctaGradient: "linear-gradient(135deg,#6d28d9,#7c3aed)",
+    ctaLabel: "Subscribe to premium",
+    popular: false,
+    originalPrice: "UGX 40,000",
+    saveAmt: "SAVE 10,000",
+    currentPrice: "UGX 30,000",
+    discount: "25% OFF",
+    stars: 4.5,
+    reviews: 128,
+    features: [
+      "Premium Membership Fee",
+      "1 Premium Food Test",
+      "24 - 45 mins Delivery",
+      "Cashless Shopping",
+      "Same Day Delivery",
+      "12 months Membership",
+      "24/7 Customer Support",
+    ],
+  },
+  family: {
+    id: "family",
+    name: "Family",
+    tagline: "2-6 FAMILY MEMBERS",
+    color: "#e07820",
+    colorLight: "#fff4ea",
+    gradient: "linear-gradient(135deg,#92400e 0%,#e07820 100%)",
+    ctaGradient: "linear-gradient(135deg,#b45309,#e07820)",
+    ctaLabel: "Subscribe to family",
+    popular: true,
+    originalPrice: "UGX 100,000",
+    saveAmt: "SAVE 30,000",
+    currentPrice: "UGX 90,000",
+    discount: "25% OFF",
+    stars: 4.5,
+    reviews: 128,
+    features: [
+      "2-6 users",
+      "Benefits:",
+      "• Account activation",
+      "• 1 Food test",
+      "• Diet insights: Personalized nutrition advice and meal planning tips.",
+      "• Promotional offers & discounts: Exclusive deals for the entire family.",
+      "• Credit line: A flexible micro-credit option that caters to family grocery needs, allowing a pay-later model.",
+      "• Unlimited food varieties in different quantities: Access to a wide selection of groceries, catering to diverse family dietary needs.",
+      "• Loyalty points: Redeem cash for loyalty points, offering cost savings over time.",
+      "• Gas credit: Access to gas refills, ensuring customers never run out of cooking fuel.",
+      "• Express delivery 24/7: Priority delivery service with around-the-clock availability, perfect for busy families with tight schedules.",
+    ],
+  },
+  business: {
+    id: "business",
+    name: "Business",
+    tagline: "10+ EMPLOYEES",
+    color: "#0ea5e9",
+    colorLight: "#e0f2fe",
+    gradient: "linear-gradient(135deg,#0c4a6e 0%,#0ea5e9 100%)",
+    ctaGradient: "linear-gradient(135deg,#0369a1,#0ea5e9)",
+    ctaLabel: "Subscribe to business",
+    popular: false,
+    originalPrice: "UGX 240,000",
+    saveAmt: "SAVE 60,000",
+    currentPrice: "UGX 180,000",
+    discount: "25% OFF",
+    stars: 4.5,
+    reviews: 128,
+    features: [
+      "10+ users",
+      "Benefits:",
+      "• Account activation",
+      "• 1 Food test",
+      "• Employee meal cards: Ensure your team is well-nourished with employee meal cards.",
+      "• Gym and wellness cards: Promote wellness with gym memberships and wellness benefits for employees.",
+      "• Diet insights: Personalized nutrition advice and meal planning tips.",
+      "• Promotional offers & discounts: Exclusive access to deals for your business.",
+      "• Credit line: A flexible micro-credit option that allows businesses to purchase groceries with a pay-later model.",
+      "• Unlimited food varieties in different quantities: Access to a wide selection of groceries tailored to meet business needs.",
+      "• Loyalty points: Redeem cash for loyalty points, providing long-term savings.",
+      "• Gas credit: Access to gas refills for business operations, ensuring an uninterrupted fuel supply.",
+      "• Express delivery 24/7: Fast and priority delivery for businesses at any time.",
+    ],
+  },
+};
+
+const TIER_PRICES = {
+  premium: {
+    low: { weekly: 142000, monthly: 640000 },
+    middle: { weekly: 300000, monthly: 1170000 },
+    high: { weekly: 545000, monthly: 2270000 },
+  },
+  family: {
+    low: { weekly: 727500, monthly: 3280000 },
+    middle: { weekly: 1042000, monthly: 4510000 },
+    high: { weekly: 1990000, monthly: 8270000 },
+  },
+  business: {
+    low: { weekly: 982500, monthly: 4470000 },
+    middle: { weekly: 1357000, monthly: 5970000 },
+    high: { weekly: 2410000, monthly: 10220000 },
+  },
+};
+
+const MAIN_PLAN_TYPES = ["premium", "family", "business"];
+
+function normalizeTierPrices(pkg, fallbackType) {
+  const apiTiers = pkg.incomeTiers || pkg.tiers || pkg.tierPrices || {};
+  const fallback = TIER_PRICES[fallbackType] || {};
+
+  return ["low", "middle", "high"].reduce((tiers, tier) => {
+    const source = apiTiers[tier] || {};
+    const weekly = source.weekly ?? source.priceWeekly ?? source.weeklyPrice ?? pkg[`priceWeekly${tier[0].toUpperCase()}${tier.slice(1)}`];
+    const monthly = source.monthly ?? source.priceMonthly ?? source.monthlyPrice ?? pkg[`priceMonthly${tier[0].toUpperCase()}${tier.slice(1)}`];
+    tiers[tier] = {
+      weekly: Number(weekly ?? fallback[tier]?.weekly ?? 0),
+      monthly: Number(monthly ?? fallback[tier]?.monthly ?? 0),
+    };
+    return tiers;
+  }, {});
+}
+
 /* ─── PLAN CARD ──────────────────────────────────────────────────────────── */
 function PlanCard({ plan, delay, onSubmit, isLoading, onTnc, onInvite }) {
-  const tiers = plan.tiers && typeof plan.tiers === "object" ? plan.tiers : null;
-  const tierNames = tiers ? Object.keys(tiers) : [];
-  const [tier, setTier] = useState(() => tierNames[0] || null);
+  const [tier, setTier] = useState("middle");
   const features = Array.isArray(plan.features) ? plan.features : [];
-  const tierPrice = tiers?.[tier];
-  const tierPricePeriod = tierPrice && typeof tierPrice === "object"
-    ? Object.keys(tierPrice).find((period) => ["weekly", "monthly"].includes(period))
-    : null;
-  const priceValue = tierPricePeriod
-    ? tierPrice[tierPricePeriod]
-    : (typeof tierPrice === "object" ? tierPrice?.price ?? tierPrice?.amount : tierPrice) ?? plan.priceValue;
-  const pricePeriod = tierPricePeriod || plan.pricePeriod;
+  const tierPrice = plan.tiers?.[tier];
   const benefits = features
     .map((f) => (typeof f === "string" ? f.replace(/^[\s•\-]\s*/, "").trim() : String(f)))
     .filter((t) => t && !/^benefits?\s*:?\s*$/i.test(t));
@@ -141,31 +260,30 @@ function PlanCard({ plan, delay, onSubmit, isLoading, onTnc, onInvite }) {
             {plan.type === "business" && <Icon as={FaChartLine} boxSize={4} color="white" />}
             {!["premium", "family", "business"].includes(plan.type) && <Icon as={FaAppleAlt} boxSize={4} color="white" />}
           </div>
-          {plan.discount && <div className="sub-plan-discount-pill">{plan.discount}</div>}
+          <div className="sub-plan-discount-pill">{plan.discount || "25% OFF"}</div>
         </div>
         <div className="sub-plan-title-row">
           <span className="sub-plan-name">{plan.name}</span>
-          {plan.tagline && <>
-            <span className="sub-plan-title-sep">·</span>
-            <span className="sub-plan-tagline-pill">{plan.tagline}</span>
-          </>}
+          <span className="sub-plan-title-sep">·</span>
+          <span className="sub-plan-tagline-pill">{plan.tagline}</span>
         </div>
-        {(plan.originalPrice || plan.saveAmt) && <div className="sub-plan-orig-row">
-          {plan.originalPrice && <span className="sub-plan-orig">{plan.originalPrice}</span>}
-          {plan.saveAmt && <span className="sub-plan-save">{plan.saveAmt}</span>}
-        </div>}
-        {priceValue != null && <div className="sub-plan-pricing">
-          <div className="sub-plan-price">{plan.currency} {FormatCurr(priceValue)}{pricePeriod && <span className="sub-plan-price-period"> / {pricePeriod}</span>}</div>
-        </div>}
+        <div className="sub-plan-pricing">
+          <div className="sub-plan-orig-row">
+            <span className="sub-plan-orig">{plan.originalPrice}</span>
+            {plan.saveAmt && <span className="sub-plan-save">{plan.saveAmt}</span>}
+          </div>
+          <div className="sub-plan-price">UGX {FormatCurr(tierPrice?.weekly ?? plan.priceValue ?? 0)}<span className="sub-plan-price-period"> / week</span></div>
+        </div>
       </div>
 
-      {tierNames.length > 0 && (
+      {plan.tiers && (
         <div className="sub-tier-picker" aria-label={`${plan.name} income tier`}>
-          {tierNames.map((tierName) => (
+          {Object.keys(plan.tiers).map((tierName) => (
             <button
               key={tierName}
               type="button"
               className={`sub-tier-btn${tier === tierName ? " active" : ""}`}
+              aria-pressed={tier === tierName}
               onClick={() => setTier(tierName)}
             >
               {tierName.charAt(0).toUpperCase() + tierName.slice(1)}
@@ -191,17 +309,19 @@ function PlanCard({ plan, delay, onSubmit, isLoading, onTnc, onInvite }) {
 
       <div className="sub-plan-footer">
         <div className="sub-plan-stars">
-          {plan.stars != null && <>
-            {[1, 2, 3, 4, 5].map((i) => <span key={i}><StarFill s={13} filled={i <= Math.round(Number(plan.stars))} /></span>)}
-            <span className="sub-plan-rating">{Number(plan.stars).toFixed(1)}</span>
-          </>}
-          {plan.reviews != null && <span className="sub-plan-reviews">{plan.reviews} reviews</span>}
+          {[1, 2, 3, 4, 5].map((i) => {
+            const rating = Number(plan.stars) || 0;
+            const filled = i <= Math.round(rating);
+            return <span key={i}><StarFill s={13} filled={filled} /></span>;
+          })}
+          <span className="sub-plan-rating">{Number(plan.stars) ? Number(plan.stars).toFixed(1) : "—"}</span>
+          <span className="sub-plan-reviews">{plan.reviews != null ? plan.reviews : "—"} reviews</span>
         </div>
         <button
           type="button"
           className="sub-plan-cta"
           style={{ background: plan.ctaGradient }}
-          onClick={() => onSubmit(plan.packageId, tier)}
+          onClick={() => onSubmit(plan, tier, tierPrice)}
           disabled={isLoading || !plan.packageId}
         >
           {isLoading ? "Processing…" : plan.ctaLabel} <ChevRight s={14} c="#fff" />
@@ -209,15 +329,13 @@ function PlanCard({ plan, delay, onSubmit, isLoading, onTnc, onInvite }) {
         <button type="button" className="sub-plan-invite" onClick={onInvite}>
           <UserPlusIcon s={13} /> Invite Friend to Test
         </button>
-        {plan.deliveryTerms && (
-          <div className="sub-plan-delivery">
-            <TruckIcon s={13} />
-            <div>
-              <div className="sub-delivery-title">Delivery terms:</div>
-              <div className="sub-delivery-body">{plan.deliveryTerms}</div>
-            </div>
+        <div className="sub-plan-delivery">
+          <TruckIcon s={13} />
+          <div>
+            <div className="sub-delivery-title">Delivery terms:</div>
+            <div className="sub-delivery-body">Free: Within 3km • Extra: 850 UGX/km beyond 3km</div>
           </div>
-        )}
+        </div>
         <button type="button" className="sub-plan-tnc" onClick={onTnc}>
           <InfoIcon s={12} /> View Terms &amp; Conditions
         </button>
@@ -400,19 +518,24 @@ export default function SubscriptionPage() {
     handleSubscriptionCardFetch();
   }, []);
 
-  const handleSubmit = async (packageId, incomeLevel) => {
+  const handleSubmit = async (plan, incomeLevel = "middle", tierPrice = null) => {
+    const packageId = typeof plan === "object" ? plan.packageId : plan;
     if (!userInfo?._id) {
       openAuthModal();
       return;
     }
     setIsLoading(true);
     try {
-      const subscriptionData = {
+      const res = await createSubscription({
         user: userInfo._id,
         packageId,
-      };
-      if (incomeLevel != null) subscriptionData.incomeLevel = incomeLevel;
-      const res = await createSubscription(subscriptionData).unwrap();
+        incomeLevel,
+        tier: incomeLevel,
+        packageType: typeof plan === "object" ? plan.type : undefined,
+        billingPeriod: "weekly",
+        amount: tierPrice?.weekly ?? (typeof plan === "object" ? plan.priceValue : undefined),
+        selectedPrice: tierPrice?.weekly ?? (typeof plan === "object" ? plan.priceValue : undefined),
+      }).unwrap();
       if (res.status === "Success") {
         router.push(`/payment/${res.data.Order}`);
       }
@@ -455,49 +578,70 @@ export default function SubscriptionPage() {
     }
   };
 
+  // Merge API packages with PLAN_CONFIG (keep original wording; use API price when available)
   const plansForDisplay = subscriptionPackages.map((pkg) => {
     const type = (pkg.type || "").toLowerCase();
-    const priceFields = [
-      ["price", ""],
-      ["priceWeekly", "week"],
-      ["priceWeeklyRTE", "week"],
-      ["weeklyPrice", "week"],
-      ["priceMonthly", "month"],
-      ["priceMonthlyRTE", "month"],
-      ["monthlyPrice", "month"],
-    ];
-    const priceField = priceFields.find(([field]) => pkg[field] != null);
-    const price = priceField ? Number(pkg[priceField[0]]) : null;
+    const configType = type === "individual" ? "premium" : type;
+    const config = PLAN_CONFIG[configType] || {
+      id: type,
+      name: pkg.name || pkg.type || "Plan",
+      tagline: "SUBSCRIBER",
+      color: "#1a5c1a",
+      colorLight: "#e6f0e6",
+      gradient: "linear-gradient(135deg,#0e1e0e,#1a5c1a)",
+      ctaGradient: "linear-gradient(135deg,#1a5c1a,#2d8c2d)",
+      ctaLabel: `Subscribe to ${pkg.type || "plan"}`,
+      popular: false,
+      features: Array.isArray(pkg.details) && pkg.details.length > 0
+        ? pkg.details
+        : ["Benefits included with this plan."],
+    };
+    const price = pkg.price != null ? Number(pkg.price) : null;
     const previousPrice = pkg.previousPrice != null ? Number(pkg.previousPrice) : null;
-    const currency = pkg.currency || "UGX";
+    const currentPrice = price != null ? `UGX ${FormatCurr(price)}` : (config.currentPrice || "—");
+    const originalPrice = previousPrice != null ? `UGX ${FormatCurr(previousPrice)}` : (config.originalPrice || null);
+    const saveAmt = previousPrice != null && price != null ? `SAVE ${FormatCurr(previousPrice - price)}` : (config.saveAmt || null);
     const backendRating = getRatingForType(type);
+    const packageGroup = type.startsWith("milk-")
+      ? "Milk plans"
+      : type.startsWith("beef-")
+        ? "Beef plans"
+        : type.includes("rtc")
+          ? "Ready-to-cook"
+          : type.includes("rte") || type.includes("special")
+            ? "Specialty meals"
+            : "Extended package";
     return {
-      id: pkg._id,
+      ...config,
       type,
+      configType,
       packageId: pkg._id,
-      name: pkg.name || pkg.title || pkg.type || "Subscription plan",
-      tagline: pkg.tagline || pkg.subtitle,
-      color: pkg.color || "#1a5c1a",
-      colorLight: pkg.colorLight || "#e6f0e6",
-      gradient: pkg.gradient || "linear-gradient(135deg,#0e1e0e,#1a5c1a)",
-      ctaGradient: pkg.ctaGradient || "linear-gradient(135deg,#1a5c1a,#2d8c2d)",
-      ctaLabel: pkg.ctaLabel || "Subscribe",
-      popular: Boolean(pkg.popular),
-      currency,
-      tiers: pkg.tiers && typeof pkg.tiers === "object" ? pkg.tiers : null,
-      priceValue: price != null && Number.isFinite(price) ? price : null,
-      pricePeriod: priceField?.[1] || pkg.pricePeriod,
-      originalPrice: previousPrice != null && Number.isFinite(previousPrice) ? `${currency} ${FormatCurr(previousPrice)}` : null,
-      saveAmt: previousPrice != null && price != null && previousPrice > price
-        ? `SAVE ${FormatCurr(previousPrice - price)}`
-        : null,
-      discount: pkg.discount,
-      stars: backendRating.stars ?? pkg.rating ?? null,
-      reviews: backendRating.reviews ?? pkg.ratingCount ?? null,
-      features: Array.isArray(pkg.details) ? pkg.details : [],
-      deliveryTerms: pkg.deliveryTerms || pkg.delivery || pkg.deliveryCadence,
+      tiers: normalizeTierPrices(pkg, configType),
+      priceValue: price,
+      packageGroup,
+      quantity: pkg.quantity || pkg.quantityRTE || pkg.quantityRTC || "",
+      weeklyPrice: pkg.priceWeekly || pkg.priceWeeklyRTE || pkg.weeklyPrice || null,
+      monthlyPrice: pkg.priceMonthly || pkg.priceMonthlyRTE || pkg.monthlyPrice || price,
+      delivery: pkg.delivery || pkg.deliveryCadence || "Flexible delivery",
+      currentPrice,
+      originalPrice,
+      saveAmt,
+      discount: config.discount || "25% OFF",
+      stars: backendRating.stars ?? pkg.rating ?? config.stars ?? 4.5,
+      reviews: backendRating.reviews ?? pkg.ratingCount ?? config.reviews ?? 128,
+      features: Array.isArray(pkg.details) && pkg.details.length > 0 ? pkg.details : config.features,
     };
   });
+
+  const mainPlans = MAIN_PLAN_TYPES.map((type) => plansForDisplay.find((plan) => plan.configType === type) || ({
+    ...PLAN_CONFIG[type],
+    type,
+    configType: type,
+    packageId: null,
+    tiers: TIER_PRICES[type],
+    features: PLAN_CONFIG[type].features,
+  }));
+  const extendedPlans = plansForDisplay.filter((plan) => !MAIN_PLAN_TYPES.includes(plan.configType));
 
   return (
     <>
@@ -511,6 +655,22 @@ export default function SubscriptionPage() {
         </ModalContent>
       </Modal>
       <div className="sub-page">
+        <div className="promo-bar">
+          <div className="promo-left">
+            <div className="promo-zap">
+              <ZapIcon s={18} />
+            </div>
+            <div>
+              <div className="promo-title">Limited Time Offer</div>
+              <div className="promo-sub">Subscribe today and save big!</div>
+            </div>
+          </div>
+          <div className="promo-right">
+            <div className="promo-pct">25% OFF</div>
+            <div className="promo-pct-sub">On all subscription plans</div>
+          </div>
+        </div>
+
         <div className="hero-head">
           <h1>Choose Your Perfect Plan</h1>
           <p>
@@ -546,8 +706,9 @@ export default function SubscriptionPage() {
             </Box>
           </Flex>
         ) : subscriptionPackages.length > 0 ? (
+          <>
           <div className="plans-grid">
-            {plansForDisplay.map((plan, i) => (
+            {mainPlans.map((plan, i) => (
               <PlanCard
                 key={plan.packageId || plan.id}
                 plan={plan}
@@ -559,7 +720,49 @@ export default function SubscriptionPage() {
               />
             ))}
           </div>
+          {extendedPlans.length > 0 && (
+            <>
+              <div className="extended-heading">
+                <div>
+                  <div className="promo-bar-label">MORE WAYS TO SUBSCRIBE</div>
+                  <h2>Extended packages</h2>
+                </div>
+                <p>Explore ingredient refills, specialty meals, milk, beef, and other focused packages.</p>
+              </div>
+              <div className="extended-grid">
+                {extendedPlans.map((plan) => (
+                  <div className="extended-card" key={plan.packageId || plan.id}>
+                    <div className="extended-card-kicker">{plan.packageGroup}</div>
+                    <h3>{plan.name}</h3>
+                    <p>{plan.quantity || plan.tagline || "Flexible add-on package"}</p>
+                    <div className="extended-card-meta">
+                      <span>{plan.weeklyPrice != null ? `UGX ${FormatCurr(plan.weeklyPrice)} / week` : "Weekly pricing available"}</span>
+                      <span>{plan.monthlyPrice != null ? `UGX ${FormatCurr(plan.monthlyPrice)} / month` : "Monthly pricing available"}</span>
+                      <span>{plan.delivery}</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="sub-plan-cta"
+                      style={{ background: plan.ctaGradient }}
+                      onClick={() => handleSubmit(plan, "middle", { weekly: plan.weeklyPrice, monthly: plan.monthlyPrice })}
+                      disabled={isLoading || !plan.packageId}
+                    >
+                      {isLoading ? "Processing…" : "Choose package"} <ChevRight s={14} c="#fff" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+          </>
         ) : null}
+
+        <div className="bottom-note">
+          <p>
+            <strong>Delivery Terms:</strong> Free delivery within 3km. Extra: <strong>850 UGX/km</strong> beyond 3km.{" "}
+            All plans include a <strong>25% limited-time discount</strong>. Cancel anytime. Prices in Ugandan Shillings (UGX).
+          </p>
+        </div>
 
         {subscriptionPackages.length > 0 && selectedPlan && (
           <SlideFade in={!!selectedPlan} offsetY="20px">
