@@ -15,6 +15,7 @@ import {
 import { useMealSlotsPublicGetMutation, useMealCalendarOverridesGetMutation } from "@slices/usersApiSlice";
 import { CategoriesJson, getImageUrl, getOptimizedImageUrl } from "@constants/constants";
 import { getMealForDay } from "@lib/mealMenuConfig";
+import { getMealImageUrl } from "@lib/mealImageMap";
 import LoaderSkeleton from "@components/LoaderSkeleton";
 
 /** Same as CategoryCard: normalize category name to match /public/assets/images/categories/ filenames */
@@ -201,7 +202,7 @@ function getCountdownDays(targetDate) {
 /** Meal card for homepage: shows meal from calendar config, click -> subscription */
 function HomeMealCard({ item }) {
   const router = useRouter();
-  const raw = resolveMealImage(item?.image);
+  const raw = resolveMealImage(item?.image) || getMealImageUrl({ meal: item?.meal, image: item?.image });
   const imgSrc = raw ? (getOptimizedImageUrl(raw) ?? raw) : null;
   const prepLabel = item?.prepType === "ready-to-cook" ? "Ready to cook" : "Ready to eat";
   const col = PLACEHOLDER_COLS[(item?.meal?.length || 0) % PLACEHOLDER_COLS.length];
@@ -234,21 +235,39 @@ function HomeMealCard({ item }) {
 }
 
 const DEFAULT_SLIDES = [
-  { tag: "YOOKATALE APP", title: "Fresh Groceries", accent: "Delivered Fast", desc: "Farm-fresh produce at your door in under 2 hours. Track in real-time on Android & iOS.", cta: "Download App", ctaSec: "Browse Web", accentColor: "#f0c020", bg: ["#061806", "#1a5c1a"] },
-  { tag: "BEST SELLERS", title: "Top Picks", accent: "This Week", desc: "Freshness curated daily. From local farms to your table, always at the best price.", cta: "Shop Now", ctaSec: "View All", accentColor: "#ff8c42", bg: ["#160800", "#3d1800"] },
-  { tag: "WORLD MENUS", title: "Authentic Meals", accent: "From Every Nation", desc: "Subscribe to receive authentic, chef-prepared world cuisine plans on your schedule.", cta: "Subscribe", ctaSec: "Learn More", accentColor: "#00c8a0", bg: ["#00130f", "#003328"] },
+  { tag: "CHRISTMAS FESTIVAL", title: "Make Room for", accent: "Christmas Feasts", desc: "Bring fresh groceries and festive favourites to your holiday table, delivered to your door.", cta: "Shop Christmas", ctaSec: "Browse Meals", accentColor: "#f0c020", bg: ["#061806", "#1a5c1a"] },
+  { tag: "FESTIVE FAVOURITES", title: "Gather Around", accent: "Something Good", desc: "Discover seasonal produce, party essentials, and crowd-pleasing meals for every celebration.", cta: "Shop Favourites", ctaSec: "View All", accentColor: "#ff8c42", bg: ["#160800", "#3d1800"] },
+  { tag: "HOLIDAY MEAL PLANS", title: "Celebrate With", accent: "Meals Together", desc: "Choose ready-to-eat or ready-to-cook meals for family gatherings and festive days.", cta: "Explore Plans", ctaSec: "See Menus", accentColor: "#00c8a0", bg: ["#00130f", "#003328"] },
 ];
 
 const DEFAULT_CARDS = [
-  { eyebrow: "Occasion", title: "Mother's Day Special Offers", ctaText: "Shop now", link: "/search?q=promotions", gradientColors: ["#1a0510", "#5c0a30"] },
-  { eyebrow: "Free Delivery", title: "Free delivery within 3km", ctaText: "See details", link: "/subscription", gradientColors: ["#001a2e", "#003d6b"] },
-  { eyebrow: "Download", title: "Yookatale App — Android & iOS", ctaText: "Get the app", link: PLAY_STORE_APP_URL, gradientColors: ["#0a1a00", "#294d00"] },
+  { eyebrow: "Christmas Table", title: "Festive Food Favourites", ctaText: "Shop now", link: "/search?q=promotions", gradientColors: ["#1a0510", "#5c0a30"] },
+  { eyebrow: "Holiday Delivery", title: "Free delivery within 3km", ctaText: "See details", link: "/subscription", gradientColors: ["#001a2e", "#003d6b"] },
+  { eyebrow: "Celebrate on the Go", title: "Yookatale App — Android & iOS", ctaText: "Get the app", link: PLAY_STORE_APP_URL, gradientColors: ["#0a1a00", "#294d00"] },
 ];
 
 const DEFAULT_PROMO_BANNERS = [
-  { title: "Discover meals & cuisines everyday", sub: "Authentic recipes from 21 countries — delivered fresh to your door", cta: "Explore Now", ctaColor: "#e07820", link: "/subscription", bg: "linear-gradient(120deg, #0e1e0e 0%, #1a5c1a 50%, #2d8c2d 100%)", order: 0 },
-  { title: "Flexible Payment Options", sub: "Mobile money · Visa & Mastercard accepted", cta: "Learn More", ctaColor: "#f0c020", link: "/search?q=promotions", bg: "linear-gradient(120deg, #0a1628 0%, #1a3a6b 55%, #2a5a9b 100%)", order: 1 },
-  { title: "Get Yookatale Boda Loan", sub: "Instant delivery credit for boda boda riders — apply in 2 minutes", cta: "Apply Now", ctaColor: "#f0c020", link: "/subscription", bg: "linear-gradient(120deg, #1a0a00 0%, #4a1a00 50%, #7a2e00 100%)", order: 2 },
+  { title: "Set the Christmas Table", sub: "Shop festive groceries and fresh meals for every gathering.", cta: "Explore Now", ctaColor: "#e07820", link: "/subscription", bg: "linear-gradient(120deg, #0e1e0e 0%, #1a5c1a 50%, #2d8c2d 100%)", order: 0 },
+  { title: "Easy Payments for the Holidays", sub: "Pay with mobile money, Visa, or Mastercard while you prepare to celebrate.", cta: "Shop Now", ctaColor: "#f0c020", link: "/search?q=promotions", bg: "linear-gradient(120deg, #0a1628 0%, #1a3a6b 55%, #2a5a9b 100%)", order: 1 },
+  { title: "Deliver More Holiday Joy", sub: "Get your festive essentials delivered right to your door.", cta: "Browse Now", ctaColor: "#f0c020", link: "/products", bg: "linear-gradient(120deg, #1a0a00 0%, #4a1a00 50%, #7a2e00 100%)", order: 2 },
+];
+
+const CHRISTMAS_SLIDES = [
+  { tag: "CHRISTMAS FESTIVAL", title: "Make Room for", accent: "Christmas Feasts", desc: "Bring fresh groceries and festive favourites to your holiday table, delivered to your door.", cta: "Shop Christmas", ctaSec: "Browse Meals" },
+  { tag: "FESTIVE FAVOURITES", title: "Gather Around", accent: "Something Good", desc: "Discover seasonal produce, party essentials, and crowd-pleasing meals for every celebration.", cta: "Shop Favourites", ctaSec: "View All" },
+  { tag: "HOLIDAY MEAL PLANS", title: "Celebrate With", accent: "Meals Together", desc: "Choose ready-to-eat or ready-to-cook meals for family gatherings and festive days.", cta: "Explore Plans", ctaSec: "See Menus" },
+];
+
+const CHRISTMAS_CARDS = [
+  { eyebrow: "Christmas Table", title: "Festive Food Favourites", ctaText: "Shop now" },
+  { eyebrow: "Holiday Delivery", title: "Free delivery within 3km", ctaText: "See details" },
+  { eyebrow: "Celebrate on the Go", title: "Yookatale App — Android & iOS", ctaText: "Get the app" },
+];
+
+const CHRISTMAS_PROMO_BANNERS = [
+  { title: "Set the Christmas Table", sub: "Shop festive groceries and fresh meals for every gathering.", cta: "Explore Now" },
+  { title: "Easy Payments for the Holidays", sub: "Pay with mobile money, Visa, or Mastercard while you prepare to celebrate.", cta: "Shop Now" },
+  { title: "Deliver More Holiday Joy", sub: "Get your festive essentials delivered right to your door.", cta: "Browse Now" },
 ];
 
 const CAT_COLORS = ["#8B6914", "#4a8fa8", "#7a3e3e", "#1a5c1a", "#3a6b8a", "#8a4a1a", "#b85c00", "#2d6b2d", "#5c3a7a", "#c0392b", "#d4851a", "#4a5c6a", "#1a7a1a", "#8a1a1a", "#a07850", "#1a5c8a", "#8a1a5c"];
@@ -426,11 +445,22 @@ export default function Home() {
     if (fromApi && fromApi.length > 0) return fromApi;
     return DEFAULT_COUNTRIES;
   }, [countryCuisinesData]);
-  const slides = useMemo(() => homepageConfigData?.data?.heroSlides ?? DEFAULT_SLIDES, [homepageConfigData]);
-  const sideCards = useMemo(() => homepageConfigData?.data?.sideCards ?? DEFAULT_CARDS, [homepageConfigData]);
+  const slides = useMemo(() => {
+    const configured = homepageConfigData?.data?.heroSlides;
+    const source = Array.isArray(configured) && configured.length ? configured : DEFAULT_SLIDES;
+    return source.map((slide, index) => ({ ...slide, ...CHRISTMAS_SLIDES[index % CHRISTMAS_SLIDES.length] }));
+  }, [homepageConfigData]);
+  const sideCards = useMemo(() => {
+    const configured = homepageConfigData?.data?.sideCards;
+    const source = Array.isArray(configured) && configured.length ? configured : DEFAULT_CARDS;
+    return source.map((card, index) => ({ ...card, ...CHRISTMAS_CARDS[index % CHRISTMAS_CARDS.length] }));
+  }, [homepageConfigData]);
   const promoBanners = useMemo(() => {
     const list = homepageConfigData?.data?.promoBanners;
-    return Array.isArray(list) && list.length > 0 ? [...list].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)) : DEFAULT_PROMO_BANNERS;
+    const source = Array.isArray(list) && list.length > 0 ? list : DEFAULT_PROMO_BANNERS;
+    return source
+      .map((banner, index) => ({ ...banner, ...CHRISTMAS_PROMO_BANNERS[index % CHRISTMAS_PROMO_BANNERS.length] }))
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   }, [homepageConfigData]);
 
   const [addCartApi] = useCartCreateMutation();
@@ -529,7 +559,7 @@ export default function Home() {
     const incomeLevel = mealIncomeLevel || "middle";
     const getSlot = (day, mealTypeId, prepTypeId) =>
       mealSlots.find(
-        (s) => s.incomeLevel === incomeLevel && s.prepType === prepTypeId && s.day === day && s.mealType === mealTypeId
+        (s) => (s.incomeLevel === incomeLevel || s.incomeLevel === "all") && s.prepType === prepTypeId && s.day === day && s.mealType === mealTypeId
       );
     const getMealImage = (day, mealTypeId, prepTypeId) => {
       const slot = getSlot(day, mealTypeId, prepTypeId);

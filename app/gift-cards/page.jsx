@@ -45,7 +45,6 @@ const OCCASIONS = [
   { key: "wedding", emoji: "\uD83D\uDC92", label: "Wedding", tagline: "For the happy couple" },
   { key: "graduation", emoji: "\uD83C\uDF93", label: "Graduation", tagline: "Celebrate achievement" },
   { key: "thank_you", emoji: "\uD83D\uDE4F", label: "Thank You", tagline: "Show your gratitude" },
-  { key: "easter", emoji: "\uD83D\uDC23", label: "Easter", tagline: "Egg-citing gifts" },
   { key: "fathers_day", emoji: "\uD83D\uDC54", label: "Father\u2019s Day", tagline: "For the best dad" },
   { key: "new_year", emoji: "\uD83C\uDF86", label: "New Year", tagline: "New beginnings" },
   { key: "anniversary", emoji: "\uD83D\uDC8D", label: "Anniversary", tagline: "Years of love" },
