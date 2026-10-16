@@ -87,6 +87,15 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    subscriptionMeatMenuGet: builder.mutation({
+      query: (planType) => {
+        const query = planType ? `?${new URLSearchParams({ planType }).toString()}` : "";
+        return {
+          url: `${DB_URL}/subscription/meat-menu/get${query}`,
+          method: "GET",
+        };
+      },
+    }),
     subscriptionPost: builder.mutation({
       query: (data) => ({
         url: `${DB_URL}/subscription`,
@@ -341,6 +350,7 @@ export const {
   usePlanRatingCreateMutation,
   useGetPlanRatingsQuery,
   useSubscriptionPackageGetMutation,
+  useSubscriptionMeatMenuGetMutation,
   useSubscriptionPostMutation,
   useMealCalendarOverridesGetMutation,
   useMealSlotsPublicGetMutation,
